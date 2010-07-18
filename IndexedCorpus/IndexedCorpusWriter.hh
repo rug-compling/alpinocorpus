@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <boost/config.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #if defined(BOOST_HAS_THREADS)
 #include <boost/thread.hpp>
