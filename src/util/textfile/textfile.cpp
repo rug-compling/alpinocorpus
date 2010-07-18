@@ -3,7 +3,7 @@
 vector<unsigned char> indexedcorpus::readFile(string const &filename)
 {
 	QFileInfo p(filename.c_str());
-	if (p.isFile())
+	if (!p.isFile())
           throw runtime_error(string("readFile: '") + filename + "' is not a regular file!");
 
 	vector<unsigned char> data;
