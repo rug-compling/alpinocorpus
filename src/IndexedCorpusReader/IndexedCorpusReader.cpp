@@ -48,8 +48,8 @@ void IndexedCorpusReader::copy(IndexedCorpusReader const &other)
 void IndexedCorpusReader::destroy()
 {
 	d_namedIndices.clear();
-	d_indices.clear();	
-	d_dataStream.reset();
+        d_indices.clear();
+        d_dataStream.clear();
 }
 
 std::vector<std::string> IndexedCorpusReader::entries() const

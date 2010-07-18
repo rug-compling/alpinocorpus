@@ -3,8 +3,9 @@
 
 #include <iostream>
 
+#include <QSharedPointer>
+
 #include <boost/config.hpp>
-#include <boost/shared_ptr.hpp>
 
 #if defined(BOOST_HAS_THREADS)
 #include <boost/thread.hpp>
@@ -15,7 +16,7 @@
 namespace indexedcorpus
 {
 
-typedef boost::shared_ptr<std::ostream> ostreamPtr;
+typedef QSharedPointer<std::ostream> ostreamPtr;
 
 class IndexedCorpusWriter
 {

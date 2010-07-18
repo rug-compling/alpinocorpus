@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
-
 #include <zlib.h>
 
 #include "DzChunk.hh"

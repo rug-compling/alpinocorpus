@@ -101,7 +101,7 @@ vector<string> ActCorpusReader::entriesCorpus(path const &corpusPath)
 	if (!is_regular_file(dataPath))
 		throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular file!");
 	
-	shared_ptr<istream> dataStream(new DzIstream(dataFilename.c_str()));
+        QSharedPointer<istream> dataStream(new DzIstream(dataFilename.c_str()));
 	if (!*dataStream)
 		throw runtime_error("ActCorpusReader::pathNameCorpus: Could not open corpus data file for reading!");
 
@@ -110,7 +110,7 @@ vector<string> ActCorpusReader::entriesCorpus(path const &corpusPath)
 	if (!is_regular_file(indexPath))
 		throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular file!");
 	
-	shared_ptr<ifstream> indexStream(new ifstream(indexFilename.c_str()));
+        QSharedPointer<ifstream> indexStream(new ifstream(indexFilename.c_str()));
 	if (!*indexStream)
 		throw runtime_error("ActCorpusReader::pathNameCorpus: Could not open corpus index file for reading!");
 	
@@ -186,7 +186,7 @@ string ActCorpusReader::pathNameCorpus(path const &corpus,
 	if (!is_regular_file(dataPath))
 		throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular file!");
 	
-	shared_ptr<istream> dataStream(new DzIstream(dataFilename.c_str()));
+        QSharedPointer<istream> dataStream(new DzIstream(dataFilename.c_str()));
 	if (!*dataStream)
 		throw runtime_error("ActCorpusReader::pathNameCorpus: Could not open corpus data file for reading!");
 
@@ -195,7 +195,7 @@ string ActCorpusReader::pathNameCorpus(path const &corpus,
 	if (!is_regular_file(indexPath))
 		throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular file!");
 	
-	shared_ptr<ifstream> indexStream(new ifstream(indexFilename.c_str()));
+        QSharedPointer<ifstream> indexStream(new ifstream(indexFilename.c_str()));
 	if (!*indexStream)
 		throw runtime_error("ActCorpusReader::pathNameCorpus: Could not open corpus index file for reading!");
 	
@@ -260,7 +260,7 @@ vector<unsigned char> ActCorpusReader::readFromCorpus(path const &corpus,
 	if (!is_regular_file(dataPath))
 		throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular file!");
 
-	shared_ptr<istream> dataStream(new DzIstream(dataFilename.c_str()));
+        QSharedPointer<istream> dataStream(new DzIstream(dataFilename.c_str()));
 	if (!*dataStream)
 		throw runtime_error("ActCorpusReader::readFromCorpus: Could not open corpus data file for reading!");
 
@@ -269,7 +269,7 @@ vector<unsigned char> ActCorpusReader::readFromCorpus(path const &corpus,
 	if (!is_regular_file(indexPath))
 		throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular file!");
 
-	shared_ptr<ifstream> indexStream(new ifstream(indexFilename.c_str()));
+        QSharedPointer<ifstream> indexStream(new ifstream(indexFilename.c_str()));
 	if (!*indexStream)
 		throw runtime_error("ActCorpusReader::readFromCorpus: Could not open corpus index file for reading!");
 	

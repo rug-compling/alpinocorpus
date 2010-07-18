@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include <boost/shared_ptr.hpp>
+#include <QSharedPointer>
 
 #include "DzOstreamBuf.hh"
 
@@ -16,7 +16,7 @@ public:
 	DzOstream(char const *filename); // Let's stick to the standards... :/
 	virtual ~DzOstream() {}
 private:
-	boost::shared_ptr<DzOstreamBuf> d_streamBuf;
+	QSharedPointer<DzOstreamBuf> d_streamBuf;
 };
 
 }

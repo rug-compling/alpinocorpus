@@ -7,6 +7,9 @@ endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
 include_directories(${INDEXEDCORPUS_SOURCE_DIR})
 
+find_package(Qt4 COMPONENTS QtCore REQUIRED)
+INCLUDE(${QT_USE_FILE})
+
 find_package(Boost 1.41.0 COMPONENTS filesystem)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
