@@ -5,11 +5,10 @@
 #include <string>
 #include <vector>
 
-#include <boost/filesystem.hpp>
+#include <QFileInfo>
 
 #include <IndexedCorpus/util/textfile.hh>
 
 using namespace std;
-using namespace boost::filesystem;
 using namespace indexedcorpus;
 

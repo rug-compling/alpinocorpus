@@ -16,9 +16,9 @@
 #include <string>
 #include <vector>
 
+#include <QFileInfo>
 #include <QMutex>
-
-#include <boost/filesystem.hpp>
+#include <QString>
 
 #include "IndexNamePair.hh"
 #include "IndexedCorpusReader.hh"
@@ -33,23 +33,23 @@ public:
 	std::vector<unsigned char> getData(std::string const &path);
 	std::string pathName(std::string const &path, int offset);
 private:
-	bool dzCorpusExists(boost::filesystem::path const &name) const;
-	std::vector<std::string> entriesCorpus(boost::filesystem::path const &name);
-	std::vector<std::string> entriesDirectory(boost::filesystem::path const &name);
+	bool dzCorpusExists(QFileInfo const &name) const;
+	std::vector<std::string> entriesCorpus(QFileInfo const &name);
+	std::vector<std::string> entriesDirectory(QFileInfo const &name);
 	std::string findEntry(std::vector<std::string> const &entries,
 		std::string const &entry, int offset) const;
-	std::string pathNameCorpus(boost::filesystem::path const &corpus,
-		boost::filesystem::path const &filename, int offset);
-	std::string pathNameDirectory(boost::filesystem::path const &directory,
-		boost::filesystem::path const &filename, int offset);
+	std::string pathNameCorpus(QFileInfo const &corpus,
+		QFileInfo const &filename, int offset);
+	std::string pathNameDirectory(QFileInfo const &directory,
+		QFileInfo const &filename, int offset);
 	std::vector<unsigned char> readFromCorpus(
-		boost::filesystem::path const &corpus,
-		boost::filesystem::path const &file);
-	std::string stripCorpusExt(std::string const &name) const;
+		QFileInfo const &corpus,
+		QFileInfo const &file);
+	QString stripCorpusExt(QString const &name) const;
 
-	std::string d_lastDir;
+	QString d_lastDir;
 	std::vector<IndexNamePair> d_lastDirEntries;
-	std::string d_lastCorpusPath;
+	QString d_lastCorpusPath;
 	IndexedCorpusReader d_lastCorpusReader;
 
 	QMutex d_mutex;

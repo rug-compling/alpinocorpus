@@ -13,10 +13,11 @@
 #include <libgen.h>
 #include <sys/stat.h>
 
+#include <QByteArray>
+#include <QFileInfo>
 #include <QMutexLocker>
 #include <QSharedPointer>
-
-#include <boost/filesystem.hpp>
+#include <QString>
 
 #include <IndexedCorpus/ActCorpusReader.hh>
 #include <IndexedCorpus/DzIstream.hh>
@@ -26,8 +27,6 @@
 
 using namespace std;
 using namespace indexedcorpus;
-
-using namespace boost::filesystem;
 
 char const * const ACT_INDEX_EXT = ".index";
 char const * const ACT_DATA_EXT = ".data.dz";
