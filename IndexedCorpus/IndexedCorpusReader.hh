@@ -6,13 +6,8 @@
 #include <string>
 #include <vector>
 
+#include <QMutex>
 #include <QSharedPointer>
-
-#include <boost/config.hpp>
-
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread/thread.hpp>
-#endif
 
 namespace indexedcorpus
 {
@@ -54,9 +49,7 @@ private:
 	IndexPtrVec d_indices;
 	IndexMap d_namedIndices;
 
-#if defined(BOOST_HAS_THREADS)
-	boost::mutex d_readMutex;
-#endif
+	QMutex d_mutex;
 };
 
 inline IndexedCorpusReader::IndexedCorpusReader(IndexedCorpusReader const &other)

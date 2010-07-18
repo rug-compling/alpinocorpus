@@ -16,12 +16,9 @@
 #include <string>
 #include <vector>
 
-#include <boost/config.hpp>
-#include <boost/filesystem.hpp>
+#include <QMutex>
 
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread.hpp>
-#endif
+#include <boost/filesystem.hpp>
 
 #include "IndexNamePair.hh"
 #include "IndexedCorpusReader.hh"
@@ -55,9 +52,7 @@ private:
 	std::string d_lastCorpusPath;
 	IndexedCorpusReader d_lastCorpusReader;
 
-#if defined(BOOST_HAS_THREADS)
-	boost::mutex d_readMutex;
-#endif
+	QMutex d_mutex;
 };
 
 }

@@ -71,9 +71,7 @@ vector<unsigned char> IndexedCorpusReader::read(string const &filename)
 
 	vector<unsigned char> data(iter->second->size);
 	{
-#if defined(BOOST_HAS_THREADS)
-		mutex::scoped_lock lock(d_readMutex);
-#endif
+		QMutexLocker locker(&d_mutex);
 		
 		// Read data. We rely on the fact that vector elements have to
 		// be consecutive according to the 2003 standard update.

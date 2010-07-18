@@ -55,10 +55,7 @@ vector<unsigned char> ActCorpusReader::getData(string const &pathName)
 	path filePart(corpusPath.filename());
 	path dirPart(corpusPath.parent_path());
 
-#if defined(BOOST_HAS_THREADS)
-	mutex::scoped_lock lock(d_readMutex);
-#endif
-	
+	QMutexLocker locker(&d_mutex);
 	
 	if (d_lastCorpusPath == dirPart.string())
 		return d_lastCorpusReader.read(filePart.string());
@@ -79,9 +76,7 @@ vector<string> ActCorpusReader::entries(string const &pathName)
 {
 	path corpusPath(pathName);
 
-#if defined(BOOST_HAS_THREADS)
-	mutex::scoped_lock lock(d_readMutex);
-#endif
+	QMutexLocker locker(&d_mutex);
 	
 	if (d_lastCorpusPath == corpusPath)
 		return d_lastCorpusReader.entries();
@@ -156,9 +151,7 @@ string ActCorpusReader::pathName(string const &pathName, int offset)
 	path filePart(corpusPath.filename());
 	path dirPart(corpusPath.parent_path());
 
-#if defined(BOOST_HAS_THREADS)
-	mutex::scoped_lock lock(d_readMutex);
-#endif
+	QMutexLocker locker(&d_mutex);
 	
 	if (d_lastCorpusPath == dirPart.string())
 		return dirPart.string() + "/" +

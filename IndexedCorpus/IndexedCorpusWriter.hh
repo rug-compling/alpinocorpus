@@ -3,13 +3,8 @@
 
 #include <iostream>
 
+#include <QMutex>
 #include <QSharedPointer>
-
-#include <boost/config.hpp>
-
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread.hpp>
-#endif
 
 #include "NullStream.hh"
 
@@ -35,9 +30,7 @@ private:
 	ostreamPtr d_indexStream;
 	size_t d_offset;
 
-#if defined(BOOST_HAS_THREADS)
-	boost::mutex d_writeMutex;
-#endif
+	QMutex d_mutex;
 };
 
 inline IndexedCorpusWriter::IndexedCorpusWriter(IndexedCorpusWriter const &other)

@@ -1,10 +1,6 @@
 #include <string>
 
-#include <boost/config.hpp>
-
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread.hpp>
-#endif
+#include <QMutexLocker>
 
 #include <IndexedCorpus/util/base64.hh>
 
@@ -13,6 +9,3 @@
 using namespace std;
 using namespace indexedcorpus;
 
-#if defined(BOOST_HAS_THREADS)
-using boost::mutex;
-#endif
