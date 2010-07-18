@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <limits>
@@ -8,10 +9,9 @@
 #include <vector>
 
 #include <unistd.h>
+#include <stdint.h>
 #include <zlib.h>
 #include <sys/time.h>
-
-#include <boost/cstdint.hpp>
 
 #include <IndexedCorpus/DzOstreamBuf.hh>
 #include <IndexedCorpus/dictzip.hh>
