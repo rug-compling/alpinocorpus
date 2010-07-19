@@ -9,11 +9,8 @@
 #include <string>
 #include <vector>
 
-#include <glob.h>
-#include <libgen.h>
-#include <sys/stat.h>
-
 #include <QByteArray>
+#include <QDir>
 #include <QFileInfo>
 #include <QMutexLocker>
 #include <QSharedPointer>

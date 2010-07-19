@@ -112,19 +112,19 @@ vector<string> ActCorpusReader::entriesDirectory(QFileInfo const &corpusPath)
     {
         d_lastDirEntries.clear();
 
-        QString pattern = corpusPath.filePath() + "/*.xml";
-
-        glob_t g;
-        QByteArray patternData = pattern.toUtf8();
-        if (glob(patternData.constData(), GLOB_MARK, NULL, &g) != 0)
+        QDir dir(corpusPath.filePath(), "*.xml");
+        if (!dir.exists() || !dir.isReadable())
             throw runtime_error("ActCorpusReader::pathNameDirectory: Could not read directory entries!");
-	
-        for (char **p = g.gl_pathv; p < g.gl_pathv + g.gl_pathc; ++p)
-            d_lastDirEntries.push_back(IndexNamePair(*p));
 
+        // Retrieve and sort directory entries.
+        QStringList entries(dir.entryList());
+        for (QStringList::const_iterator iter = entries.begin();
+            iter != entries.end(); ++iter)
+        {
+            QByteArray entryData(iter->toUtf8());
+            d_lastDirEntries.push_back(IndexNamePair(entryData.constData()));
+        }
         sort(d_lastDirEntries.begin(), d_lastDirEntries.end(), IndexNamePairCompare());
-
-        globfree(&g);
 
         d_lastDir = corpusPath.filePath();
     }
@@ -213,19 +213,19 @@ string ActCorpusReader::pathNameDirectory(QFileInfo const &directory,
     {
         d_lastDirEntries.clear();
 
-        QString pattern = directory.filePath() + "/*.xml";
-
-        glob_t g;
-        QByteArray patternData(pattern.toUtf8());
-        if (glob(patternData.constData(), GLOB_MARK, NULL, &g) != 0)
+        QDir dir(directory.filePath(), "*.xml");
+        if (!dir.exists() || !dir.isReadable())
             throw runtime_error("ActCorpusReader::pathNameDirectory: Could not read directory entries!");
-	
-        for (char **p = g.gl_pathv; p < g.gl_pathv + g.gl_pathc; ++p)
-            d_lastDirEntries.push_back(IndexNamePair(*p));
 
+        // Retrieve and sort directory entries.
+        QStringList entries(dir.entryList());
+        for (QStringList::const_iterator iter = entries.begin();
+            iter != entries.end(); ++iter)
+        {
+            QByteArray entryData(iter->toUtf8());
+            d_lastDirEntries.push_back(IndexNamePair(entryData.constData()));
+        }
         sort(d_lastDirEntries.begin(), d_lastDirEntries.end(), IndexNamePairCompare());
-
-        globfree(&g);
 
         d_lastDir = directory.filePath();
     }
