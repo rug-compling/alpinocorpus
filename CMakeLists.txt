@@ -15,7 +15,7 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
-add_library(corpus STATIC 
+add_library(corpus SHARED 
   src/ActCorpusReader/ActCorpusReader.cpp
   src/DzIstreamBuf/DzIstreamBuf.cpp
   src/IndexedCorpusReader/IndexedCorpusReader.cpp
@@ -28,3 +28,5 @@ add_library(corpus STATIC
   src/DzIstream/DzIstream.cpp
 )
 
+target_link_libraries(corpus ${QT_LIBRARIES})
+target_link_libraries(corpus ${ZLIB_LIBRARIES})
