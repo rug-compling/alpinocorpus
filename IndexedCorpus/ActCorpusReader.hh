@@ -30,7 +30,7 @@ class ActCorpusReader
 public:
 	ActCorpusReader() {}
 	std::vector<std::string> entries(std::string const &path);
-	std::vector<unsigned char> getData(std::string const &path);
+	QString getData(QString const &path);
 	std::string pathName(std::string const &path, int offset);
 private:
 	bool dzCorpusExists(QFileInfo const &name) const;

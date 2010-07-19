@@ -2,10 +2,12 @@
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
-#include <string>
 #include <vector>
 
+#include <QFile>
 #include <QFileInfo>
+#include <QString>
+#include <QTextStream>
 
 #include <IndexedCorpus/util/textfile.hh>
 

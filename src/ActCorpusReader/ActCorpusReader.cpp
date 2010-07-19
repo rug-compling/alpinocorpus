@@ -37,30 +37,29 @@ string ActCorpusReader::findEntry(vector<string> const &entries, string const &e
     return *iter;
 }
 
-vector<unsigned char> ActCorpusReader::getData(string const &pathName)
+QString ActCorpusReader::getData(QString const &pathName)
 {
-    QFileInfo corpusPath(pathName.c_str());
+    QFileInfo corpusPath(pathName);
     QFileInfo filePart(corpusPath.fileName());
     QFileInfo dirPart(corpusPath.path());
 
     QMutexLocker locker(&d_mutex);
 
+    vector<unsigned char> data;
+
     if (d_lastCorpusPath == dirPart.filePath())
     {
         QByteArray filePartData = filePart.filePath().toUtf8();
-        return d_lastCorpusReader.read(filePartData.constData());
+        data = d_lastCorpusReader.read(filePartData.constData());
     }
-
-    if (corpusPath.path().isEmpty())
+    else if (corpusPath.path().isEmpty())
         return readFile(pathName);
-
-    vector<unsigned char> data;
-    if (dzCorpusExists(dirPart))
+    else if (dzCorpusExists(dirPart))
         data = readFromCorpus(dirPart, filePart);
     else
-        data = readFile(pathName);
+        return readFile(pathName);
 
-    return data;
+    return QString::fromUtf8(reinterpret_cast<char const *>(&data[0]), data.size());
 }
 
 vector<string> ActCorpusReader::entries(string const &pathName)
