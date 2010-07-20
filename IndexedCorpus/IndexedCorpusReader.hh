@@ -1,51 +1,51 @@
 #ifndef CORPUSREADER_HH
 #define CORPUSREADER_HH
 
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-
+#include <QHash>
 #include <QMutex>
 #include <QSharedPointer>
+#include <QString>
+#include <QVector>
+
+#include "DictZipFile.hh"
 
 namespace indexedcorpus
 {
 
 struct IndexItem
 {
-	IndexItem(std::string newName, size_t newOffset, size_t newSize)
+    IndexItem(QString newName, size_t newOffset, size_t newSize)
 		: name(newName), offset(newOffset), size(newSize) {}
 	IndexItem() : name(""), offset(0), size(0) {}
 
-	std::string name;
+    QString name;
 	size_t offset;
 	size_t size;
 };
 
 typedef QSharedPointer<IndexItem> IndexItemPtr;
 
-typedef std::map<std::string, IndexItemPtr> IndexMap;
-typedef std::vector<IndexItemPtr> IndexPtrVec;
+typedef QHash<QString, IndexItemPtr> IndexMap;
+typedef QVector<IndexItemPtr> IndexPtrVec;
 
-typedef QSharedPointer<std::istream> IstreamPtr;
+typedef QSharedPointer<DictZipFile> DictZipFilePtr;
 
 class IndexedCorpusReader
 {
 public:
 	IndexedCorpusReader() {}
 	IndexedCorpusReader(IndexedCorpusReader const &other);
-	IndexedCorpusReader(IstreamPtr dataStream, IstreamPtr indexStream);
+    IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
 	virtual ~IndexedCorpusReader();
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
-	std::vector<std::string> entries() const;
+    QVector<QString> entries() const;
 	IndexPtrVec const &indices() const;
-	std::vector<unsigned char> read(std::string const &filename);
+    QString read(QString const &filename);
 private:
 	void copy(IndexedCorpusReader const &other);
 	void destroy();
 	
-	IstreamPtr d_dataStream;
+    DictZipFilePtr d_dataFile;
 	IndexPtrVec d_indices;
 	IndexMap d_namedIndices;
 

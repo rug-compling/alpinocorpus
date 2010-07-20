@@ -1,46 +1,47 @@
 #include "IndexNamePair.ih"
 
-IndexNamePair::IndexNamePair(string const &newName) : name(newName)
+IndexNamePair::IndexNamePair(QString const &newName) : name(newName)
 {
 	if (name.size() == 0)
 		return;
 
-	ostringstream buf;
+    QString buf; // XXX - Bad for concatenation, but QStringBuilder is not visible...
 	
-	bool prevIsDigit = isdigit(name[0]);
-	for (string::const_iterator iter = name.begin(); iter != name.end();
+    bool prevIsDigit = name[0].isDigit();
+    for (QString::const_iterator iter = name.constBegin(); iter != name.constEnd();
 		++iter)
 	{
-		bool curIsDigit = isdigit(*iter);
+        bool curIsDigit = iter->isDigit();
 
 		if (curIsDigit && prevIsDigit)
-			buf << *iter;
+            buf += *iter;
 		else
 		{
-			index.push_back(buf.str());
-			buf.str("");
-			buf << *iter;
+            index.push_back(buf);
+            buf.clear();
+            buf += *iter;
 		}
 		
 		prevIsDigit = curIsDigit;
 	}
 	
 	// Leftover
-	index.push_back(buf.str());
+    index.push_back(buf);
 }
 
 bool IndexNamePairCompare::operator()(IndexNamePair const &p1, IndexNamePair const &p2)
 {
-	vector<string> const &i1 = p1.index;
-	vector<string> const &i2 = p2.index;
+    QVector<QString> const &i1 = p1.index;
+    QVector<QString> const &i2 = p2.index;
 	
 	for (size_t i = 0; i < i1.size() && i < i2.size(); ++i)
 	{
 		// Both digits? Sort on digits!
-		if (isdigit(i1[i][0]) && isdigit(i2[i][0]))
+        if (i1[i][0].isDigit() && i2[i][0].isDigit())
 		{
-			int d1 = parseString<int>(i1[i]);
-			int d2 = parseString<int>(i2[i]);
+            // XXX - use unbounded numbers?
+            qulonglong d1 = i1[i].toULongLong();
+            qulonglong d2 = i2[i].toULongLong();
 			
 			if (d1 != d2)
 				return d1 < d2;

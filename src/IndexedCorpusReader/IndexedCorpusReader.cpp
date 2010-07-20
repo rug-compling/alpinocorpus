@@ -1,30 +1,40 @@
 #include "IndexedCorpusReader.ih"
 
-IndexedCorpusReader::IndexedCorpusReader(IstreamPtr dataStream,
-		IstreamPtr indexStream) :
-	d_dataStream(dataStream)
+IndexedCorpusReader::IndexedCorpusReader(QString const &dataFilename,
+        QString const &indexFilename)
 {
-	// Read indices
-	string line;
-	while(getline(*indexStream, line))
-	{
-		istringstream iss(line);
-		
-		string name;
-		iss >> name;
-		
-		string offset64;
-		iss >> offset64;
-		size_t offset = b64_decode(offset64);
+    QFile indexFile(indexFilename);
+    if (!indexFile.open(QFile::ReadOnly))
+        throw "Could not open index file for reading!";
 
-		string size64;
-		iss >> size64;
-		size_t size = b64_decode(size64);
+    d_dataFile = DictZipFilePtr(new DictZipFile(dataFilename));
+    if (!d_dataFile->open(DictZipFile::ReadOnly))
+        throw "Could not open data file for reading!";
 
-		IndexItemPtr item(new IndexItem(name, offset, size));
-		d_indices.push_back(item);
-		d_namedIndices[name] = item;
-	}	
+    QTextStream indexStream(&indexFile);
+
+    QString line;
+    while (true)
+    {
+        line = indexStream.readLine();
+        if (line.isNull())
+            break;
+
+        QStringList lineParts = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+
+        if (lineParts.size() != 3)
+            throw "Malformed line in index file!";
+
+        QString name(lineParts[0]);
+        size_t offset = b64_decode(lineParts[1].toAscii());
+        size_t size = b64_decode(lineParts[2].toAscii());
+
+        IndexItemPtr item(new IndexItem(name, offset, size));
+        d_indices.push_back(item);
+        d_namedIndices[name] = item;
+    }
+
+
 }
 
 IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &other)
@@ -40,44 +50,38 @@ IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &o
 
 void IndexedCorpusReader::copy(IndexedCorpusReader const &other)
 {
-	d_dataStream = other.d_dataStream;
+    d_dataFile = other.d_dataFile;
 	d_namedIndices = other.d_namedIndices;
 	d_indices = other.d_indices;
 }
 
 void IndexedCorpusReader::destroy()
 {
-	d_namedIndices.clear();
-        d_indices.clear();
-        d_dataStream.clear();
+    d_namedIndices.clear();
+    d_indices.clear();
+    d_dataFile.clear();
 }
 
-std::vector<std::string> IndexedCorpusReader::entries() const
+QVector<QString> IndexedCorpusReader::entries() const
 {
-	vector<string> entries;
+    QVector<QString> entries;
 	
-	for (vector<IndexItemPtr>::const_iterator iter = d_indices.begin();
-			iter != d_indices.end(); ++iter)
+    for (QVector<IndexItemPtr>::const_iterator iter = d_indices.constBegin();
+            iter != d_indices.constEnd(); ++iter)
 		entries.push_back((*iter)->name);
 	
 	return entries;
 }
 
-vector<unsigned char> IndexedCorpusReader::read(string const &filename)
+QString IndexedCorpusReader::read(QString const &filename)
 {
-	map<string, IndexItemPtr>::const_iterator iter = d_namedIndices.find(filename);
+    QHash<QString, IndexItemPtr>::const_iterator iter = d_namedIndices.find(filename);
 	if (iter == d_namedIndices.end())
 		throw runtime_error("IndexedCorpusReader::read: requesting unknown data!");
 
-	vector<unsigned char> data(iter->second->size);
-	{
-		QMutexLocker locker(&d_mutex);
-		
-		// Read data. We rely on the fact that vector elements have to
-		// be consecutive according to the 2003 standard update.
-		d_dataStream->seekg(iter->second->offset, std::ios::beg);
-		d_dataStream->read(reinterpret_cast<char *>(&data[0]), iter->second->size);
-	}
+    QMutexLocker locker(&d_mutex);
 
-	return data;
+    d_dataFile->seek(iter.value()->offset);
+
+    return d_dataFile->read(iter.value()->size);
 }

@@ -1,13 +1,17 @@
-#include <sstream>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
+#include <QFile>
 #include <QMutexLocker>
+#include <QRegExp>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QTextStream>
+#include <QVector>
 
+#include <IndexedCorpus/DictZipFile.hh>
+#include <IndexedCorpus/IndexedCorpusReader.hh>
 #include <IndexedCorpus/util/base64.hh>
-
-#include "IndexedCorpus/IndexedCorpusReader.hh"
 
 using namespace std;
 using namespace indexedcorpus;

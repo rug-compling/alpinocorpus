@@ -50,7 +50,7 @@
 
 #include <cstring>
 #include <stdexcept>
-#include <string>
+#include <QByteArray>
 
 static unsigned char b64_list[] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -79,7 +79,7 @@ static int b64_index[256] = {
 /* |b64_encode| encodes |val| in a printable base 64 format.  A MSB-first
    encoding is generated. */
 
-std::string b64_encode(unsigned long val)
+QByteArray b64_encode(unsigned long val)
 {
    char   result[7];
 
@@ -98,7 +98,7 @@ std::string b64_encode(unsigned long val)
    return result + 5;
 }
 
-unsigned long b64_decode(std::string const &val)
+unsigned long b64_decode(QByteArray const &val)
 {
    unsigned long v = 0;
    int           i;

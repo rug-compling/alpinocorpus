@@ -29,3 +29,4 @@ add_library(corpus SHARED
 
 target_link_libraries(corpus ${QT_LIBRARIES})
 target_link_libraries(corpus ${ZLIB_LIBRARIES})
+

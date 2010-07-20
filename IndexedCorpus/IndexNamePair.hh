@@ -1,19 +1,19 @@
 #ifndef INDEX_NAME_PAIR_HH
 #define INDEX_NAME_PAIR_HH
 
-#include <cctype>
-#include <string>
-#include <vector>
+#include <QString>
+#include <QVector>
 
 namespace indexedcorpus {
 
 struct IndexNamePair
 {
-	IndexNamePair(std::string const &newName);
-	IndexNamePair(std::vector<std::string> const &newIndex, std::string const &newName) :
+    IndexNamePair() {}
+    IndexNamePair(QString const &newName);
+    IndexNamePair(QVector<QString> const &newIndex, QString const &newName) :
 		index(newIndex), name(newName) {}
-	std::vector<std::string> index;
-	std::string name;
+    QVector<QString> index;
+    QString name;
 };
 
 struct IndexNamePairCompare

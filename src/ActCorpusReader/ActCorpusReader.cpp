@@ -21,17 +21,17 @@ bool ActCorpusReader::dzCorpusExists(QFileInfo const &name) const
     return dataPath.isFile() && indexPath.isFile();
 }
 
-string ActCorpusReader::findEntry(vector<string> const &entries, string const &entry,
+QString ActCorpusReader::findEntry(QVector<QString> const &entries, QString const &entry,
                                   int offset) const
 {
-    vector<string>::const_iterator iter = find(entries.begin(), entries.end(),
+    QVector<QString>::const_iterator iter = find(entries.constBegin(), entries.constEnd(),
                                                entry);
-    if (iter == entries.end())
+    if (iter == entries.constEnd())
         throw runtime_error("ActCorpusReader::findEntry: File name unknown!");
 
     iter += offset;
 
-    if (iter < entries.begin() || iter >= entries.end())
+    if (iter < entries.constBegin() || iter >= entries.constEnd())
         throw runtime_error("ActCorpusReader::findEntry: Offset points out of bounds!");
 
     return *iter;
@@ -48,23 +48,18 @@ QString ActCorpusReader::getData(QString const &pathName)
     vector<unsigned char> data;
 
     if (d_lastCorpusPath == dirPart.filePath())
-    {
-        QByteArray filePartData = filePart.filePath().toUtf8();
-        data = d_lastCorpusReader.read(filePartData.constData());
-    }
+        return d_lastCorpusReader.read(filePart.filePath());
     else if (corpusPath.path().isEmpty())
         return readFile(pathName);
     else if (dzCorpusExists(dirPart))
-        data = readFromCorpus(dirPart, filePart);
-    else
-        return readFile(pathName);
+        return readFromCorpus(dirPart, filePart);
 
-    return QString::fromUtf8(reinterpret_cast<char const *>(&data[0]), data.size());
+    return readFile(pathName);
 }
 
-vector<string> ActCorpusReader::entries(string const &pathName)
+QVector<QString> ActCorpusReader::entries(QString const &pathName)
 {
-    QFileInfo corpusPath(pathName.c_str());
+    QFileInfo corpusPath(pathName);
 
     QMutexLocker locker(&d_mutex);
 
@@ -77,36 +72,27 @@ vector<string> ActCorpusReader::entries(string const &pathName)
         return entriesDirectory(corpusPath);
 }
 
-vector<string> ActCorpusReader::entriesCorpus(QFileInfo const &corpusPath)
+QVector<QString> ActCorpusReader::entriesCorpus(QFileInfo const &corpusPath)
 {
     QString noextName = stripCorpusExt(corpusPath.filePath());
 
     QString dataFilename = noextName + ACT_DATA_EXT;
     QFileInfo dataPath(dataFilename);
-    if (!dataPath.isFile())
-        throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular file!");
+    if (!dataPath.isFile() || !dataPath.isReadable())
+        throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular readable file!");
 
-    QByteArray dataFilenameData(dataFilename.toUtf8());
-    QSharedPointer<istream> dataStream(new DzIstream(dataFilenameData.constData()));
-    if (!*dataStream)
-        throw runtime_error("ActCorpusReader::pathNameCorpus: Could not open corpus data file for reading!");
 
     QString indexFilename = noextName + ACT_INDEX_EXT;
     QFileInfo indexPath(indexFilename);
-    if (!indexPath.isFile())
-        throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular file!");
+    if (!indexPath.isFile() || !indexPath.isReadable())
+        throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular readable file!");
 
-    QByteArray indexFilenameData(indexFilename.toUtf8());
-    QSharedPointer<ifstream> indexStream(new ifstream(indexFilenameData.constData()));
-    if (!*indexStream)
-        throw runtime_error("ActCorpusReader::pathNameCorpus: Could not open corpus index file for reading!");
-
-    IndexedCorpusReader corpusReader(dataStream, indexStream);
+    IndexedCorpusReader corpusReader(dataFilename, indexFilename);
 
     return corpusReader.entries();
 }
 
-vector<string> ActCorpusReader::entriesDirectory(QFileInfo const &corpusPath)
+QVector<QString> ActCorpusReader::entriesDirectory(QFileInfo const &corpusPath)
 {
     if (corpusPath.filePath() != d_lastDir)
     {
@@ -118,29 +104,24 @@ vector<string> ActCorpusReader::entriesDirectory(QFileInfo const &corpusPath)
 
         // Retrieve and sort directory entries.
         QStringList entries(dir.entryList());
-        for (QStringList::const_iterator iter = entries.begin();
-            iter != entries.end(); ++iter)
-        {
-            QByteArray entryData(iter->toUtf8());
-            d_lastDirEntries.push_back(IndexNamePair(entryData.constData()));
-        }
+        copy(entries.constBegin(), entries.constEnd(), back_inserter(d_lastDirEntries));
         sort(d_lastDirEntries.begin(), d_lastDirEntries.end(), IndexNamePairCompare());
 
         d_lastDir = corpusPath.filePath();
     }
 
-    vector<string> entries;
+    QVector<QString> entries;
 
-    for (vector<IndexNamePair>::const_iterator iter = d_lastDirEntries.begin();
-    iter != d_lastDirEntries.end(); ++iter)
+    for (QVector<IndexNamePair>::const_iterator iter = d_lastDirEntries.constBegin();
+    iter != d_lastDirEntries.constEnd(); ++iter)
         entries.push_back(iter->name);
 
     return entries;
 }
 
-string ActCorpusReader::pathName(string const &pathName, int offset)
+QString ActCorpusReader::pathName(QString const &pathName, int offset)
 {
-    QFileInfo corpusPath(pathName.c_str());
+    QFileInfo corpusPath(pathName);
     QFileInfo filePart(corpusPath.fileName());
     QFileInfo dirPart(corpusPath.path());
 
@@ -151,7 +132,7 @@ string ActCorpusReader::pathName(string const &pathName, int offset)
 
     if (d_lastCorpusPath == dirPart.filePath())
     {
-        return string(dirPartData.constData()) + "/" +
+        return QString(dirPartData.constData()) + "/" +
                 findEntry(d_lastCorpusReader.entries(), filePartData.constData(), offset);
     }
 
@@ -160,53 +141,40 @@ string ActCorpusReader::pathName(string const &pathName, int offset)
 
     string newPath;
     if (dzCorpusExists(dirPart))
-        newPath = pathNameCorpus(dirPart, filePart, offset);
-    else
-        newPath = pathNameDirectory(dirPart, filePart, offset);
+        return pathNameCorpus(dirPart, filePart, offset);
 
-    return newPath;
+    return pathNameDirectory(dirPart, filePart, offset);
 }
 
-string ActCorpusReader::pathNameCorpus(QFileInfo const &corpus,
+QString ActCorpusReader::pathNameCorpus(QFileInfo const &corpus,
                                        QFileInfo const &filename, int offset)
 {
     QString noextName = stripCorpusExt(corpus.filePath());
 
     QString dataFilename = noextName + ACT_DATA_EXT;
     QFileInfo dataPath(dataFilename);
-    if (!dataPath.isFile())
-        throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular file!");
-
-    QByteArray dataFilenameData(dataFilename.toUtf8());
-    QSharedPointer<istream> dataStream(new DzIstream(dataFilenameData.constData()));
-    if (!*dataStream)
-        throw runtime_error("ActCorpusReader::pathNameCorpus: Could not open corpus data file for reading!");
+    if (!dataPath.isFile() || !dataPath.isReadable())
+        throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular readable file!");
 
     QString indexFilename = noextName + ACT_INDEX_EXT;
     QFileInfo indexPath(indexFilename);
-    if (!indexPath.isFile())
-        throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular file!");
+    if (!indexPath.isFile() | !indexPath.isReadable())
+        throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular readable file!");
 
-    QByteArray indexFilenameData(indexFilename.toUtf8());
-    QSharedPointer<ifstream> indexStream(new ifstream(indexFilenameData.constData()));
-    if (!*indexStream)
-        throw runtime_error("ActCorpusReader::pathNameCorpus: Could not open corpus index file for reading!");
+    IndexedCorpusReader corpusReader(dataFilename, indexFilename);
 
-    IndexedCorpusReader corpusReader(dataStream, indexStream);
-
-    vector<string> const &entries = corpusReader.entries();
+    QVector<QString> const &entries = corpusReader.entries();
 
     QByteArray filenameData(filename.filePath().toUtf8());
-    string found(findEntry(entries, filenameData.constData(), offset));
+    QString found(findEntry(entries, filenameData.constData(), offset));
 
     d_lastCorpusPath = corpus.filePath();
     d_lastCorpusReader = corpusReader;
 
-    QByteArray result((corpus.filePath() + "/" + found.c_str()).toUtf8());
-    return result.constData();
+    return corpus.filePath() + "/" + found;
 }
 
-string ActCorpusReader::pathNameDirectory(QFileInfo const &directory,
+QString ActCorpusReader::pathNameDirectory(QFileInfo const &directory,
                                           QFileInfo const &filename, int offset)
 {
     if (directory.filePath() != d_lastDir)
@@ -231,15 +199,14 @@ string ActCorpusReader::pathNameDirectory(QFileInfo const &directory,
     }
 
     QString path = directory.filePath() + "/" + filename.filePath();
-    QByteArray pathData(path.toUtf8());
 
-    pair<vector<IndexNamePair>::const_iterator, vector<IndexNamePair>::const_iterator> found =
-            equal_range(d_lastDirEntries.begin(), d_lastDirEntries.end(), string(pathData.constData()), IndexNamePairCompare());
+    pair<QVector<IndexNamePair>::const_iterator, QVector<IndexNamePair>::const_iterator> found =
+            equal_range(d_lastDirEntries.begin(), d_lastDirEntries.end(), path, IndexNamePairCompare());
 
     if (found.first == found.second)
         throw runtime_error("ActCorpusReader::pathNameDirectory: Unknown path!");
 
-    vector<IndexNamePair>::const_iterator iter = found.first;
+    QVector<IndexNamePair>::const_iterator iter = found.first;
     iter += offset;
     if (iter < d_lastDirEntries.begin() || iter >= d_lastDirEntries.end())
         throw runtime_error("ActCorpusReader::pathNameDirectory: Offset points out of bounds!");
@@ -247,37 +214,26 @@ string ActCorpusReader::pathNameDirectory(QFileInfo const &directory,
     return iter->name;
 }
 
-vector<unsigned char> ActCorpusReader::readFromCorpus(QFileInfo const &corpus,
+QString ActCorpusReader::readFromCorpus(QFileInfo const &corpus,
                                                       QFileInfo const &file)
 {
     QString noextName = stripCorpusExt(corpus.filePath());
 
     QString dataFilename = noextName + ACT_DATA_EXT;
     QFileInfo dataPath(dataFilename);
-    if (!dataPath.isFile())
-        throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular file!");
-
-    QByteArray dataFilenameData(dataFilename.toUtf8());
-    QSharedPointer<istream> dataStream(new DzIstream(dataFilenameData.constData()));
-    if (!*dataStream)
-        throw runtime_error("ActCorpusReader::readFromCorpus: Could not open corpus data file for reading!");
+    if (!dataPath.isFile() | !dataPath.isReadable())
+        throw runtime_error("ActCorpusReader::pathNameCorpus: data is not a regular readable file!");
 
     QString indexFilename = noextName + ACT_INDEX_EXT;
     QFileInfo indexPath(indexFilename);
-    if (!indexPath.isFile())
-        throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular file!");
+    if (!indexPath.isFile() || !indexPath.isReadable())
+        throw runtime_error("ActCorpusReader::pathNameCorpus: index is not a regular readable file!");
 
-    QByteArray indexFilenameData(indexFilename.toUtf8());
-    QSharedPointer<ifstream> indexStream(new ifstream(indexFilenameData.constData()));
-    if (!*indexStream)
-        throw runtime_error("ActCorpusReader::readFromCorpus: Could not open corpus index file for reading!");
-
-    IndexedCorpusReader corpusReader(dataStream, indexStream);
+    IndexedCorpusReader corpusReader(dataFilename, indexFilename);
 
     d_lastCorpusPath = corpus.filePath();
     d_lastCorpusReader = corpusReader;
 
-    QByteArray filenameData(file.filePath().toUtf8());
-    return corpusReader.read(filenameData.constData());
+    return corpusReader.read(file.filePath());
 }
 

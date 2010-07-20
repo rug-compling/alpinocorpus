@@ -8,13 +8,13 @@ namespace indexedcorpus {
 size_t const GZ_HEADER_SIZE = 10;
 
 // Gzip header fields
-size_t const GZ_HEADER_ID1 = 0;
-size_t const GZ_HEADER_ID2 = 1;
-size_t const GZ_HEADER_CM = 2;
-size_t const GZ_HEADER_FLG = 3;
-size_t const GZ_HEADER_MTIME = 4;
-size_t const GZ_HEADER_XFL = 8;
-size_t const GZ_HEADER_OS = 9;
+uint const GZ_HEADER_ID1 = 0;
+uint const GZ_HEADER_ID2 = 1;
+uint const GZ_HEADER_CM = 2;
+uint const GZ_HEADER_FLG = 3;
+uint const GZ_HEADER_MTIME = 4;
+uint const GZ_HEADER_XFL = 8;
+uint const GZ_HEADER_OS = 9;
 
 // Gzip file magic
 unsigned char const gzipId1 = 0x1f;

@@ -1,13 +1,4 @@
-#include <algorithm>
-#include <cstdlib>
-#include <cstring>
-#include <exception>
-#include <fstream>
-#include <iostream>
-#include <iterator>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
 #include <QByteArray>
 #include <QDir>
@@ -15,6 +6,7 @@
 #include <QMutexLocker>
 #include <QSharedPointer>
 #include <QString>
+#include <QVector>
 
 #include <IndexedCorpus/ActCorpusReader.hh>
 #include <IndexedCorpus/DzIstream.hh>
