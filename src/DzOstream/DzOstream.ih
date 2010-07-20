@@ -1,8 +1,0 @@
-#include <iostream>
-
-#include <QSharedPointer>
-
-#include <IndexedCorpus/DzOstream.hh>
-
-using namespace std;
-using namespace indexedcorpus;
