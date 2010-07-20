@@ -9,7 +9,6 @@
 #include <QVector>
 
 #include <IndexedCorpus/ActCorpusReader.hh>
-#include <IndexedCorpus/DzIstream.hh>
 #include <IndexedCorpus/IndexNamePair.hh>
 #include <IndexedCorpus/IndexedCorpusReader.hh>
 #include <IndexedCorpus/util/textfile.hh>
