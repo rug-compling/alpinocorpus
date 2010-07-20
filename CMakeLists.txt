@@ -18,13 +18,11 @@ endif()
 add_library(corpus SHARED 
   src/ActCorpusReader/ActCorpusReader.cpp
   src/DictZipFile/DictZipFile.cpp
-  src/DzIstreamBuf/DzIstreamBuf.cpp
   src/IndexedCorpusReader/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter/IndexedCorpusWriter.cpp
   src/util/textfile/textfile.cpp
   src/util/base64.cpp
   src/IndexNamePair/IndexNamePair.cpp
-  src/DzIstream/DzIstream.cpp
 )
 
 target_link_libraries(corpus ${QT_LIBRARIES})
