@@ -1,0 +1,14 @@
+#include <QFile>
+#include <QIODevice>
+#include <QSharedPointer>
+#include <QString>
+
+#include <stdexcept>
+
+#include <zlib.h>
+
+#include <IndexedCorpus/DictZipFile.hh>
+#include <IndexedCorpus/gzip.hh>
+
+using namespace std;
+using namespace indexedcorpus;
