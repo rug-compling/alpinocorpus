@@ -108,10 +108,12 @@ unsigned long b64_decode(QByteArray const &val)
    for (i = len - 1; i >= 0; i--) {
       int tmp = b64_index[ (unsigned char)val[i] ];
 
-      if (tmp == XX)
-          throw std::runtime_error(std::string("Illegal character in base64 value: ") +
-              val[i]);
-      
+      if (tmp == XX) {
+		  std::string msg("Illegal character in base64 value: ");
+		  msg += val[i];
+          throw std::runtime_error(msg);
+	  }
+
       v |= tmp << offset;
       offset += 6;
    }

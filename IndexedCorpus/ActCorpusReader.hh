@@ -27,7 +27,8 @@ namespace indexedcorpus {
 class INDEXED_CORPUS_EXPORT ActCorpusReader
 {
 public:
-	ActCorpusReader() {}
+	ActCorpusReader();
+	~ActCorpusReader();
     QVector<QString> entries(QString const &path);
 	QString getData(QString const &path);
     QString pathName(QString const &path, int offset);

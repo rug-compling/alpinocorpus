@@ -1,5 +1,13 @@
 #include "ActCorpusReader.ih"
 
+ActCorpusReader::ActCorpusReader()
+{
+}
+
+ActCorpusReader::~ActCorpusReader()
+{
+}
+
 QString ActCorpusReader::stripCorpusExt(QString const &name) const
 {
     QString noextName = name;

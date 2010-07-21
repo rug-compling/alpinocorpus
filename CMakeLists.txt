@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
-project(INDEXEDCORPUS)
+project(IndexedCorpus)
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
 endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
-include_directories(${INDEXEDCORPUS_SOURCE_DIR})
+include_directories(${IndexedCorpus_SOURCE_DIR})
 
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
 INCLUDE(${QT_USE_FILE})
