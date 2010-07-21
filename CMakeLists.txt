@@ -28,3 +28,10 @@ add_library(corpus SHARED
 target_link_libraries(corpus ${QT_LIBRARIES})
 target_link_libraries(corpus ${ZLIB_LIBRARIES})
 
+install(TARGETS corpus
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
+install(DIRECTORY IndexedCorpus 
+  DESTINATION include)
