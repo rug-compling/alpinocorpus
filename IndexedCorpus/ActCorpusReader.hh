@@ -18,12 +18,13 @@
 #include <QString>
 #include <QVector>
 
+#include "DLLDefines.hh"
 #include "IndexNamePair.hh"
 #include "IndexedCorpusReader.hh"
 
 namespace indexedcorpus {
 
-class ActCorpusReader
+class INDEXED_CORPUS_EXPORT ActCorpusReader
 {
 public:
 	ActCorpusReader() {}
