@@ -15,7 +15,25 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
-add_library(corpus SHARED 
+set (HEADERS
+  IndexedCorpus/ActCorpusReader.hh
+  IndexedCorpus/dictzip.hh
+  IndexedCorpus/DictZipFile.hh
+  IndexedCorpus/DLLDefines.hh
+  IndexedCorpus/DzChunk.hh
+  IndexedCorpus/fdstream.hh
+  IndexedCorpus/gzip.hh
+  IndexedCorpus/IndexedCorpusReader.hh
+  IndexedCorpus/IndexedCorpusWriter.hh
+  IndexedCorpus/IndexNamePair.hh
+  IndexedCorpus/NullStream.hh
+  IndexedCorpus/util/base64.hh
+  IndexedCorpus/util/bufutil.hh
+  IndexedCorpus/util/stringutil.hh
+  IndexedCorpus/util/textfile.hh
+)
+
+set (SOURCES
   src/ActCorpusReader/ActCorpusReader.cpp
   src/DictZipFile/DictZipFile.cpp
   src/IndexedCorpusReader/IndexedCorpusReader.cpp
@@ -23,6 +41,11 @@ add_library(corpus SHARED
   src/util/textfile/textfile.cpp
   src/util/base64.cpp
   src/IndexNamePair/IndexNamePair.cpp
+)
+
+add_library(corpus SHARED 
+	${SOURCES}
+	${HEADERS}
 )
 
 target_link_libraries(corpus ${QT_LIBRARIES})
