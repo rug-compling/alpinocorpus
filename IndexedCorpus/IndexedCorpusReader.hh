@@ -1,5 +1,5 @@
-#ifndef CORPUSREADER_HH
-#define CORPUSREADER_HH
+#ifndef INDEXED_CORPUSREADER_HH
+#define INDEXED_CORPUSREADER_HH
 
 #include <QHash>
 #include <QMutex>
@@ -7,6 +7,7 @@
 #include <QString>
 #include <QVector>
 
+#include "CorpusReader.hh"
 #include "DictZipFile.hh"
 
 namespace indexedcorpus
@@ -30,7 +31,7 @@ typedef QVector<IndexItemPtr> IndexPtrVec;
 
 typedef QSharedPointer<DictZipFile> DictZipFilePtr;
 
-class IndexedCorpusReader
+class IndexedCorpusReader : public CorpusReader
 {
 public:
 	IndexedCorpusReader() {}
@@ -69,4 +70,4 @@ inline IndexPtrVec const &IndexedCorpusReader::indices() const
 
 }
 
-#endif // CORPUSWRITER_HH
+#endif // INDEXED_CORPUSWRITER_HH

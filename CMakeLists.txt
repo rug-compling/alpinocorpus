@@ -17,6 +17,7 @@ endif()
 
 set (HEADERS
   IndexedCorpus/ActCorpusReader.hh
+  IndexedCorpus/CorpusReader.hh
   IndexedCorpus/dictzip.hh
   IndexedCorpus/DictZipFile.hh
   IndexedCorpus/DLLDefines.hh
