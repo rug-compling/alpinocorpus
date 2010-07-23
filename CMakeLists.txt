@@ -16,7 +16,6 @@ if(ZLIB_FOUND)
 endif()
 
 set (HEADERS
-  IndexedCorpus/ActCorpusReader.hh
   IndexedCorpus/CorpusReader.hh
   IndexedCorpus/dictzip.hh
   IndexedCorpus/DictZipFile.hh
@@ -36,7 +35,6 @@ set (HEADERS
 )
 
 set (SOURCES
-  src/ActCorpusReader/ActCorpusReader.cpp
   src/CorpusReader/CorpusReader.cpp
   src/DictZipFile/DictZipFile.cpp
   src/DirectoryCorpusReader/DirectoryCorpusReader.cpp
