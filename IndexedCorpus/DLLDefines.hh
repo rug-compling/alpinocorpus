@@ -2,7 +2,7 @@
 #define DLL_DEFINES_HH
 
 #if defined(_WIN32)
-  #if defined(IndexedCorpus_EXPORTS)
+  #if defined(corpus_EXPORTS)
     #define INDEXED_CORPUS_EXPORT __declspec(dllexport)
   #else
     #define INDEXED_CORPUS_EXPORT __declspec(dllimport)
