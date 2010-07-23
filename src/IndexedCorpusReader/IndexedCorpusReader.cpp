@@ -33,8 +33,6 @@ IndexedCorpusReader::IndexedCorpusReader(QString const &dataFilename,
         d_indices.push_back(item);
         d_namedIndices[name] = item;
     }
-
-
 }
 
 IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &other)

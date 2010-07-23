@@ -37,6 +37,7 @@ set (HEADERS
 
 set (SOURCES
   src/ActCorpusReader/ActCorpusReader.cpp
+  src/CorpusReader/CorpusReader.cpp
   src/DictZipFile/DictZipFile.cpp
   src/DirectoryCorpusReader/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader/IndexedCorpusReader.cpp

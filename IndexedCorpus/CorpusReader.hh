@@ -12,6 +12,8 @@ public:
     virtual ~CorpusReader() {}
     virtual QString read(QString const &entry) = 0;
     virtual QVector<QString> entries() const = 0;
+
+    static CorpusReader *newCorpusReader(QString const &corpusPath);
 };
 
 }
