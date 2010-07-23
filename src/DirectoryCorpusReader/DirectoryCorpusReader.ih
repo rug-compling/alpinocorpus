@@ -1,0 +1,13 @@
+#include <QDir>
+#include <QString>
+
+#include <algorithm>
+#include <iterator>
+#include <stdexcept>
+
+#include <IndexedCorpus/DirectoryCorpusReader.hh>
+#include <IndexedCorpus/IndexNamePair.hh>
+#include <IndexedCorpus/util/TextFile.hh>
+
+using namespace indexedcorpus;
+using namespace std;

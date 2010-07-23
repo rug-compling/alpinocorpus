@@ -20,6 +20,7 @@ set (HEADERS
   IndexedCorpus/CorpusReader.hh
   IndexedCorpus/dictzip.hh
   IndexedCorpus/DictZipFile.hh
+  IndexedCorpus/DirectoryCorpusReader.hh
   IndexedCorpus/DLLDefines.hh
   IndexedCorpus/DzChunk.hh
   IndexedCorpus/fdstream.hh
@@ -37,6 +38,7 @@ set (HEADERS
 set (SOURCES
   src/ActCorpusReader/ActCorpusReader.cpp
   src/DictZipFile/DictZipFile.cpp
+  src/DirectoryCorpusReader/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter/IndexedCorpusWriter.cpp
   src/util/textfile/textfile.cpp
