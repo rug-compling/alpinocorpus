@@ -4,16 +4,18 @@
 #include <QString>
 #include <QVector>
 
+#include "DLLDefines.hh"
+
 namespace indexedcorpus {
 
 class CorpusReader
 {
 public:
-    virtual ~CorpusReader() {}
+	virtual ~CorpusReader() {}
     virtual QString read(QString const &entry) = 0;
     virtual QVector<QString> entries() const = 0;
 
-    static CorpusReader *newCorpusReader(QString const &corpusPath);
+    static INDEXED_CORPUS_EXPORT CorpusReader *newCorpusReader(QString const &corpusPath);
 };
 
 }
