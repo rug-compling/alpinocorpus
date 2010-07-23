@@ -31,17 +31,10 @@ public:
 	~ActCorpusReader();
     QVector<QString> entries(QString const &path);
 	QString getData(QString const &path);
-    QString pathName(QString const &path, int offset);
 private:
 	bool dzCorpusExists(QFileInfo const &name) const;
     QVector<QString> entriesCorpus(QFileInfo const &name);
     QVector<QString> entriesDirectory(QFileInfo const &name);
-    QString findEntry(QVector<QString> const &entries,
-        QString const &entry, int offset) const;
-    QString pathNameCorpus(QFileInfo const &corpus,
-		QFileInfo const &filename, int offset);
-    QString pathNameDirectory(QFileInfo const &directory,
-		QFileInfo const &filename, int offset);
     QString readFromCorpus(
 		QFileInfo const &corpus,
 		QFileInfo const &file);
