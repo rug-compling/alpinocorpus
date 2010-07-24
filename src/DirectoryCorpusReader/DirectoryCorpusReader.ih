@@ -7,7 +7,7 @@
 
 #include <IndexedCorpus/DirectoryCorpusReader.hh>
 #include <IndexedCorpus/IndexNamePair.hh>
-#include <IndexedCorpus/util/TextFile.hh>
+#include <IndexedCorpus/util/textfile.hh>
 
 using namespace indexedcorpus;
 using namespace std;
