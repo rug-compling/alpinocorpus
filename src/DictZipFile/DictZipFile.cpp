@@ -69,28 +69,36 @@ void DictZipFile::readChunk(qint64 n)
 
 qint64 DictZipFile::readData(char *data, qint64 maxlen)
 {
-    if (!isOpen()) {
+    if (!isOpen())
+    {
         qWarning("DictZipFile::readData(): file is not open");
-        return false;
+        return -1;
+    } else if (d_bufferPos >= d_bufferSize && d_curChunk + 1 >= d_chunks.size())
+        return -1;
+
+    quint64 read = 0;
+    while (read != maxlen)
+    {
+        // We have copied the full buffer, read the next chunk.
+        if (d_bufferPos >= d_bufferSize) {
+            if (d_curChunk + 1 >= d_chunks.size())
+                break;
+            readChunk(d_curChunk + 1);
+        }
+
+        // Determine the amount of data to read.
+        qint64 toCopy = d_bufferSize - d_bufferPos;
+        if (toCopy > maxlen - read)
+            toCopy = maxlen - read;
+
+        // Copy data to the caller's buffer.
+        memcpy(data + read, d_buffer.constData() + d_bufferPos, toCopy);
+
+        d_bufferPos += toCopy;
+        read += toCopy;
     }
 
-    // We have returned the full buffer, read the next chunk.
-    if (d_bufferPos >= d_bufferSize) {
-        if (d_curChunk + 1 >= d_chunks.size())
-            return -1;
-        readChunk(d_curChunk + 1);
-    }
-
-    // Determine the amount of data to read.
-    qint64 len = d_bufferSize - d_bufferPos;
-    if (len > maxlen)
-        len = maxlen;
-
-    // Copy data to the caller's buffer.
-    memcpy(data, d_buffer.constData() + d_bufferPos, len);
-    d_bufferPos += len;
-
-    return len;
+    return read;
 }
 
 void DictZipFile::readExtra()
