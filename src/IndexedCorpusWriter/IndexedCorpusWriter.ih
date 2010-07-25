@@ -7,5 +7,5 @@
 #include "IndexedCorpus/IndexedCorpusWriter.hh"
 
 using namespace std;
-using namespace indexedcorpus;
+using namespace alpinocorpus;
 

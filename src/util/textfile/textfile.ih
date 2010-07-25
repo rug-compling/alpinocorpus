@@ -9,8 +9,8 @@
 #include <QString>
 #include <QTextStream>
 
-#include <IndexedCorpus/util/textfile.hh>
+#include <AlpinoCorpus/util/textfile.hh>
 
 using namespace std;
-using namespace indexedcorpus;
+using namespace alpinocorpus;
 

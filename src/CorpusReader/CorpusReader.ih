@@ -1,10 +1,10 @@
 #include <QString>
 #include <QFileInfo>
 
-#include <IndexedCorpus/CorpusReader.hh>
-#include <IndexedCorpus/DirectoryCorpusReader.hh>
-#include <IndexedCorpus/IndexedCorpusReader.hh>
+#include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/DirectoryCorpusReader.hh>
+#include <AlpinoCorpus/IndexedCorpusReader.hh>
 
-using namespace indexedcorpus;
+using namespace alpinocorpus;
 char const * const ACT_INDEX_EXT = ".index";
 char const * const ACT_DATA_EXT = ".data.dz";

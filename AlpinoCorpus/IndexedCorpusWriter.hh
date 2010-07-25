@@ -8,7 +8,7 @@
 
 #include "NullStream.hh"
 
-namespace indexedcorpus
+namespace alpinocorpus
 {
 
 typedef QSharedPointer<std::ostream> ostreamPtr;

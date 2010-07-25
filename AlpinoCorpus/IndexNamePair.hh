@@ -4,7 +4,7 @@
 #include <QString>
 #include <QVector>
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 struct IndexNamePair
 {

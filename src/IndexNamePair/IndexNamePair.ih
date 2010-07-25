@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 
-#include <IndexedCorpus/IndexNamePair.hh>
-#include <IndexedCorpus/util/stringutil.hh>
+#include <AlpinoCorpus/IndexNamePair.hh>
+#include <AlpinoCorpus/util/stringutil.hh>
 
 using namespace std;
-using namespace indexedcorpus;
+using namespace alpinocorpus;

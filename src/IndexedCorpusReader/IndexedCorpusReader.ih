@@ -9,10 +9,10 @@
 #include <QTextStream>
 #include <QVector>
 
-#include <IndexedCorpus/DictZipFile.hh>
-#include <IndexedCorpus/IndexedCorpusReader.hh>
-#include <IndexedCorpus/util/base64.hh>
+#include <AlpinoCorpus/DictZipFile.hh>
+#include <AlpinoCorpus/IndexedCorpusReader.hh>
+#include <AlpinoCorpus/util/base64.hh>
 
 using namespace std;
-using namespace indexedcorpus;
+using namespace alpinocorpus;
 

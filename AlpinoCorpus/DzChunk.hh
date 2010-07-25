@@ -3,7 +3,7 @@
 
 #include <QtGlobal>
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 struct DzChunk
 {

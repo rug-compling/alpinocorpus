@@ -3,7 +3,7 @@
 
 #include <cstddef>
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 size_t const GZ_HEADER_SIZE = 10;
 

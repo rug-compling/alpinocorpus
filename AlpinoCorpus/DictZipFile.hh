@@ -11,7 +11,7 @@
 
 #include "DzChunk.hh"
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 class DictZipFile : public QIODevice
 {

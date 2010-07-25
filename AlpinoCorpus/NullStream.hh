@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 struct NullStream : std::ostream
 {

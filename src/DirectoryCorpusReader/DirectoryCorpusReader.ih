@@ -5,9 +5,9 @@
 #include <iterator>
 #include <stdexcept>
 
-#include <IndexedCorpus/DirectoryCorpusReader.hh>
-#include <IndexedCorpus/IndexNamePair.hh>
-#include <IndexedCorpus/util/textfile.hh>
+#include <AlpinoCorpus/DirectoryCorpusReader.hh>
+#include <AlpinoCorpus/IndexNamePair.hh>
+#include <AlpinoCorpus/util/textfile.hh>
 
-using namespace indexedcorpus;
+using namespace alpinocorpus;
 using namespace std;

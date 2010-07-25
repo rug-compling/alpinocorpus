@@ -7,8 +7,8 @@
 
 #include <zlib.h>
 
-#include <IndexedCorpus/DictZipFile.hh>
-#include <IndexedCorpus/gzip.hh>
+#include <AlpinoCorpus/DictZipFile.hh>
+#include <AlpinoCorpus/gzip.hh>
 
 using namespace std;
-using namespace indexedcorpus;
+using namespace alpinocorpus;

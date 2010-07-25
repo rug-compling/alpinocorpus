@@ -6,7 +6,7 @@
 
 #include "DLLDefines.hh"
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 class CorpusReader
 {

@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
-project(IndexedCorpus)
+project(AlpinoCorpus)
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
 endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
-include_directories(${IndexedCorpus_SOURCE_DIR})
+include_directories(${AlpinoCorpus_SOURCE_DIR})
 
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
 INCLUDE(${QT_USE_FILE})
@@ -16,22 +16,22 @@ if(ZLIB_FOUND)
 endif()
 
 set (HEADERS
-  IndexedCorpus/CorpusReader.hh
-  IndexedCorpus/dictzip.hh
-  IndexedCorpus/DictZipFile.hh
-  IndexedCorpus/DirectoryCorpusReader.hh
-  IndexedCorpus/DLLDefines.hh
-  IndexedCorpus/DzChunk.hh
-  IndexedCorpus/fdstream.hh
-  IndexedCorpus/gzip.hh
-  IndexedCorpus/IndexedCorpusReader.hh
-  IndexedCorpus/IndexedCorpusWriter.hh
-  IndexedCorpus/IndexNamePair.hh
-  IndexedCorpus/NullStream.hh
-  IndexedCorpus/util/base64.hh
-  IndexedCorpus/util/bufutil.hh
-  IndexedCorpus/util/stringutil.hh
-  IndexedCorpus/util/textfile.hh
+  AlpinoCorpus/CorpusReader.hh
+  AlpinoCorpus/dictzip.hh
+  AlpinoCorpus/DictZipFile.hh
+  AlpinoCorpus/DirectoryCorpusReader.hh
+  AlpinoCorpus/DLLDefines.hh
+  AlpinoCorpus/DzChunk.hh
+  AlpinoCorpus/fdstream.hh
+  AlpinoCorpus/gzip.hh
+  AlpinoCorpus/IndexedCorpusReader.hh
+  AlpinoCorpus/IndexedCorpusWriter.hh
+  AlpinoCorpus/IndexNamePair.hh
+  AlpinoCorpus/NullStream.hh
+  AlpinoCorpus/util/base64.hh
+  AlpinoCorpus/util/bufutil.hh
+  AlpinoCorpus/util/stringutil.hh
+  AlpinoCorpus/util/textfile.hh
 )
 
 set (SOURCES
@@ -45,18 +45,18 @@ set (SOURCES
   src/IndexNamePair/IndexNamePair.cpp
 )
 
-add_library(corpus SHARED 
+add_library(alpino_corpus SHARED 
 	${SOURCES}
 	${HEADERS}
 )
 
-target_link_libraries(corpus ${QT_LIBRARIES})
-target_link_libraries(corpus ${ZLIB_LIBRARIES})
+target_link_libraries(alpino_corpus ${QT_LIBRARIES})
+target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
 
-install(TARGETS corpus
+install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
 
-install(DIRECTORY IndexedCorpus 
+install(DIRECTORY AlpinoCorpus 
   DESTINATION include)

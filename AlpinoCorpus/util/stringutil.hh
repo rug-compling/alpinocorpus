@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 /**
  * Parse a string.

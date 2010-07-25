@@ -1,7 +1,7 @@
 #ifndef BUF_UTIL_HH
 #define BUF_UTIL_HH
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 template <typename T>
 void writeToBuf(unsigned char *buf, T n)

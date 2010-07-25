@@ -3,7 +3,7 @@
 
 #include <QString>
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 QString readFile(QString const &filename);
 

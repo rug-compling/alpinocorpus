@@ -10,7 +10,7 @@
 #include "CorpusReader.hh"
 #include "DictZipFile.hh"
 
-namespace indexedcorpus
+namespace alpinocorpus
 {
 
 struct IndexItem

@@ -6,7 +6,7 @@
 
 #include "CorpusReader.hh"
 
-namespace indexedcorpus {
+namespace alpinocorpus {
 
 class DirectoryCorpusReader : public CorpusReader
 {

@@ -1,6 +1,6 @@
 #include "textfile.ih"
 
-QString indexedcorpus::readFile(QString const &filename)
+QString alpinocorpus::readFile(QString const &filename)
 {
     QFileInfo p(filename);
 	if (!p.isFile())
