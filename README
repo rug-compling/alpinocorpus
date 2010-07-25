@@ -30,6 +30,7 @@ Requirements
 
 - A C++ compiler.
 - A C++ standard library with TR1 extensions.
+- Qt version 4.6 or later.
 
 Execute 'cmake .', followed by 'make' in the source directory.
 
