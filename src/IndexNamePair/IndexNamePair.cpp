@@ -34,7 +34,7 @@ bool IndexNamePairCompare::operator()(IndexNamePair const &p1, IndexNamePair con
     QVector<QString> const &i1 = p1.index;
     QVector<QString> const &i2 = p2.index;
 	
-	for (size_t i = 0; i < i1.size() && i < i2.size(); ++i)
+	for (int i = 0; i < i1.size() && i < i2.size(); ++i)
 	{
 		// Both digits? Sort on digits!
         if (i1[i][0].isDigit() && i2[i][0].isDigit())
