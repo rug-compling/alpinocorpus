@@ -7,8 +7,8 @@ IndexedCorpusReader::IndexedCorpusReader(QString const &dataFilename,
     if (!indexFile.open(QFile::ReadOnly))
         throw "Could not open index file for reading!";
 
-    d_dataFile = DictZipFilePtr(new DictZipFile(dataFilename));
-    if (!d_dataFile->open(DictZipFile::ReadOnly))
+    d_dataFile = QDictZipFilePtr(new QDictZipFile(dataFilename));
+    if (!d_dataFile->open(QDictZipFile::ReadOnly))
         throw "Could not open data file for reading!";
 
     QTextStream indexStream(&indexFile);

@@ -7,8 +7,9 @@
 #include <QString>
 #include <QVector>
 
+#include <QDictZip/QDictZipFile.hh>
+
 #include "CorpusReader.hh"
-#include "DictZipFile.hh"
 
 namespace alpinocorpus
 {
@@ -29,7 +30,7 @@ typedef QSharedPointer<IndexItem> IndexItemPtr;
 typedef QHash<QString, IndexItemPtr> IndexMap;
 typedef QVector<IndexItemPtr> IndexPtrVec;
 
-typedef QSharedPointer<DictZipFile> DictZipFilePtr;
+typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
 
 class IndexedCorpusReader : public CorpusReader
 {
@@ -46,7 +47,7 @@ private:
 	void copy(IndexedCorpusReader const &other);
 	void destroy();
 	
-    DictZipFilePtr d_dataFile;
+    QDictZipFilePtr d_dataFile;
 	IndexPtrVec d_indices;
 	IndexMap d_namedIndices;
 

@@ -5,20 +5,20 @@ if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
 endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
+list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
+
 include_directories(${AlpinoCorpus_SOURCE_DIR})
 
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
-find_package(ZLIB REQUIRED)
-if(ZLIB_FOUND)
-  include_directories(${ZLIB_INCLUDE_DIRS})
+find_package(QDictZip REQUIRED)
+if(QDICTZIP_FOUND)
+  include_directories(${QDICTZIP_INCLUDE_DIR})
 endif()
 
 set (HEADERS
   AlpinoCorpus/CorpusReader.hh
-  AlpinoCorpus/dictzip.hh
-  AlpinoCorpus/DictZipFile.hh
   AlpinoCorpus/DirectoryCorpusReader.hh
   AlpinoCorpus/DLLDefines.hh
   AlpinoCorpus/DzChunk.hh
@@ -36,7 +36,6 @@ set (HEADERS
 
 set (SOURCES
   src/CorpusReader/CorpusReader.cpp
-  src/DictZipFile/DictZipFile.cpp
   src/DirectoryCorpusReader/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter/IndexedCorpusWriter.cpp
@@ -51,7 +50,7 @@ add_library(alpino_corpus SHARED
 )
 
 target_link_libraries(alpino_corpus ${QT_LIBRARIES})
-target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
+target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib

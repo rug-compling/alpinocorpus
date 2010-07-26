@@ -9,7 +9,8 @@
 #include <QTextStream>
 #include <QVector>
 
-#include <AlpinoCorpus/DictZipFile.hh>
+#include <QDictZip/QDictZipFile.hh>
+
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 #include <AlpinoCorpus/util/base64.hh>
 
