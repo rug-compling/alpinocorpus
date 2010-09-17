@@ -3,9 +3,21 @@
 DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory) :
         d_directory(directory)
 {
-    QDir dir(directory, "*.xml");
-    if (!dir.exists() || !dir.isReadable())
-        throw runtime_error("DirectoryCorpusReader::DirectoryCorpusReader: Could not read directory entries!");
+}
+
+QVector<QString> DirectoryCorpusReader::entries() const
+{
+    return d_entries;
+}
+
+bool DirectoryCorpusReader::open()
+{
+    QDir dir(d_directory, "*.xml");
+    if (!dir.exists() || !dir.isReadable()) {
+        qCritical() <<
+                "DirectoryCorpusReader::DirectoryCorpusReader: Could not read directory entries!";
+        return false;
+    }
 
     // Retrieve and sort directory entries.
     QDirIterator entryIter(dir, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
@@ -23,11 +35,8 @@ DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory) :
     for (QVector<IndexNamePair>::const_iterator iter = indexedEntries.constBegin();
             iter != indexedEntries.constEnd(); ++iter)
         d_entries.push_back(iter->name);
-}
 
-QVector<QString> DirectoryCorpusReader::entries() const
-{
-    return d_entries;
+    return true;
 }
 
 QString DirectoryCorpusReader::read(QString const &entry)

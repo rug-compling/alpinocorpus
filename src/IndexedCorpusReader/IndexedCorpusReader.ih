@@ -8,6 +8,7 @@
 #include <QStringList>
 #include <QTextStream>
 #include <QVector>
+#include <QtDebug>
 
 #include <QDictZip/QDictZipFile.hh>
 

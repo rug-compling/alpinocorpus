@@ -42,13 +42,16 @@ public:
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
     QVector<QString> entries() const;
 	IndexPtrVec const &indices() const;
+    bool open();
     QString read(QString const &filename);
 private:
 	void copy(IndexedCorpusReader const &other);
 	void destroy();
 	
     QDictZipFilePtr d_dataFile;
+    QString d_dataFilename;
 	IndexPtrVec d_indices;
+    QString d_indexFilename;
 	IndexMap d_namedIndices;
 
 	QMutex d_mutex;

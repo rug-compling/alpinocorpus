@@ -13,6 +13,7 @@ class DirectoryCorpusReader : public CorpusReader
 public:
     DirectoryCorpusReader(QString const &directory);
     QVector<QString> entries() const;
+    bool open();
     QString read(const QString &entry);
 private:
     QString d_directory;

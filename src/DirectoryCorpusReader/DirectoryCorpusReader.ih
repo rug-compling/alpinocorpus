@@ -1,6 +1,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QString>
+#include <QtDebug>
 
 #include <algorithm>
 #include <iterator>
