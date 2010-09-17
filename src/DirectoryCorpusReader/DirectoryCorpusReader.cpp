@@ -28,10 +28,12 @@ bool DirectoryCorpusReader::open()
         if (entry[0] == '/')
             entry.remove(0, 1);
         indexedEntries.push_back(entry);
+        d_entries.push_back(entry); // Ugly hack to inform readers.
     }
 
     sort(indexedEntries.begin(), indexedEntries.end(), IndexNamePairCompare());
 
+    d_entries.clear();
     for (QVector<IndexNamePair>::const_iterator iter = indexedEntries.constBegin();
             iter != indexedEntries.constEnd(); ++iter)
         d_entries.push_back(iter->name);
