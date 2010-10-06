@@ -17,9 +17,11 @@ IndexNamePair::IndexNamePair(QString const &newName) : name(newName)
             buf += *iter;
 		else
 		{
-            index.push_back(buf);
-            buf.clear();
-            buf += *iter;
+      if (buf.size() != 0) {
+        index.push_back(buf);
+        buf.clear();
+      }
+      buf += *iter;
 		}
 		
 		prevIsDigit = curIsDigit;
