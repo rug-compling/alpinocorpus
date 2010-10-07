@@ -13,6 +13,7 @@ QString alpinocorpus::readFile(QString const &filename)
     QFile dataFile(filename);
     dataFile.open(QFile::ReadOnly);
     QTextStream dataStream(&dataFile);
+    dataStream.setCodec(QTextCodec::codecForName("UTF-8"));
 
     return dataStream.readAll();
 }
