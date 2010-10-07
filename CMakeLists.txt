@@ -17,6 +17,11 @@ include_directories(${AlpinoCorpus_SOURCE_DIR})
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
+find_package(ZLIB REQUIRED)
+if(ZLIB_FOUND)
+  include_directories(${ZLIB_INCLUDE_DIRS})
+endif()
+
 find_package(QDictZip REQUIRED)
 if(QDICTZIP_FOUND)
   include_directories(${QDICTZIP_INCLUDE_DIR})
