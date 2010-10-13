@@ -1,5 +1,7 @@
+#include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
+#include <QFileInfo>
 #include <QString>
 #include <QtDebug>
 

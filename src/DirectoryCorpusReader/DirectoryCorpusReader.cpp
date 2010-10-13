@@ -1,7 +1,8 @@
 #include "DirectoryCorpusReader.ih"
 
-DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory) :
-        d_directory(directory)
+DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
+    bool cache)
+    : d_directory(directory), d_cache(cache)
 {
 }
 
@@ -18,6 +19,9 @@ bool DirectoryCorpusReader::open()
                 "DirectoryCorpusReader::DirectoryCorpusReader: Could not read directory entries!";
         return false;
     }
+
+    if (useCache() && readCache())
+      return true;
 
     // Retrieve and sort directory entries.
     QDirIterator entryIter(dir, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
@@ -38,6 +42,8 @@ bool DirectoryCorpusReader::open()
             iter != indexedEntries.constEnd(); ++iter)
         d_entries.push_back(iter->name);
 
+    writeCache();
+
     return true;
 }
 
@@ -45,4 +51,59 @@ QString DirectoryCorpusReader::read(QString const &entry)
 {
     QString filename(QString("%1/%2").arg(d_directory).arg(entry));
     return readFile(filename);
+}
+
+bool DirectoryCorpusReader::readCache()
+{
+  QFile cacheFile(QString("%1.dir_index").arg(d_directory));
+  if (!cacheFile.exists() || !cacheFile.open(QFile::ReadOnly)) {
+    qWarning() << "DirectoryCorpusReader::readCache: Directory cache exists, but could not be opened!";
+    return false;
+  }
+
+  QTextStream cacheStream(&cacheFile);
+  while (true)
+  {
+    QString line(cacheStream.readLine());
+    if (line.isNull())
+      break;
+
+    d_entries.push_back(line);
+  }
+
+  return true;
+}
+
+bool DirectoryCorpusReader::useCache()
+{
+  if (d_cache == false)
+    return false;
+
+  QString cachePath(QString("%1.dir_index").arg(d_directory));
+  QFileInfo cacheInfo(cachePath);
+  if (!cacheInfo.exists())
+    return false;
+
+  QFileInfo dirInfo(d_directory);
+  if (dirInfo.lastModified() > cacheInfo.lastModified())
+    return false;
+
+  return true;
+}
+
+void DirectoryCorpusReader::writeCache()
+{
+   if (d_cache == false)
+     return;
+
+  QString cachePath(QString("%1.dir_index").arg(d_directory));
+  QFile cacheFile(cachePath);
+  if (!cacheFile.open(QFile::WriteOnly))
+    return;
+
+  QTextStream cacheStream(&cacheFile);
+  // QTextStreamIterator???
+  for (QVector<QString>::iterator iter = d_entries.begin();
+      iter != d_entries.end(); ++iter)
+    cacheStream << *iter << "\n";
 }
