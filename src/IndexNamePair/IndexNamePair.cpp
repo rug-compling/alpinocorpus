@@ -31,7 +31,7 @@ IndexNamePair::IndexNamePair(QString const &newName) : name(newName)
     index.push_back(buf);
 }
 
-bool IndexNamePairCompare::operator()(IndexNamePair const &p1, IndexNamePair const &p2)
+bool operator<(IndexNamePair const &p1, IndexNamePair const &p2)
 {
     QVector<QString> const &i1 = p1.index;
     QVector<QString> const &i2 = p2.index;

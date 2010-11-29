@@ -16,10 +16,7 @@ struct IndexNamePair
     QString name;
 };
 
-struct IndexNamePairCompare
-{
-	bool operator()(IndexNamePair const &p1, IndexNamePair const &p2);
-};
+bool operator<(IndexNamePair const &p1, IndexNamePair const &p2);
 
 }
 
