@@ -1,0 +1,9 @@
+# Vim temporaries
+.*.swp
+.*.swo
+
+# Object files etc.
+*.dll
+*.dylib
+*.o
+*.so
