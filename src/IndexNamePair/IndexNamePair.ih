@@ -6,4 +6,3 @@
 #include <AlpinoCorpus/util/stringutil.hh>
 
 using namespace std;
-using namespace alpinocorpus;

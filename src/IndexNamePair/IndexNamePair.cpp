@@ -1,5 +1,7 @@
 #include "IndexNamePair.ih"
 
+namespace alpinocorpus {
+
 IndexNamePair::IndexNamePair(QString const &newName) : name(newName)
 {
 	if (name.size() == 0)
@@ -55,4 +57,6 @@ bool operator<(IndexNamePair const &p1, IndexNamePair const &p2)
 	
 	// The pairs are equal...
 	return false;
+}
+
 }
