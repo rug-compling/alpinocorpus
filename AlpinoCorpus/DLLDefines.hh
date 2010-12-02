@@ -1,5 +1,5 @@
-#ifndef DLL_DEFINES_HH
-#define DLL_DEFINES_HH
+#ifndef ALPINO_DLL_DEFINES_HH
+#define ALPINO_DLL_DEFINES_HH
 
 #if defined(_WIN32)
   #if defined(corpus_EXPORTS)
@@ -11,5 +11,4 @@
   #define INDEXED_CORPUS_EXPORT
 #endif
 
-#endif // DLL_DEFINES_HH
-
+#endif // ALPINO_DLL_DEFINES_HH

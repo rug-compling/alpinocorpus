@@ -1,10 +1,10 @@
-#ifndef CORPUSREADER_HH
-#define CORPUSREADER_HH
+#ifndef ALPINO_CORPUSREADER_HH
+#define ALPINO_CORPUSREADER_HH
 
 #include <QString>
 #include <QVector>
 
-#include "DLLDefines.hh"
+#include <AlpinoCorpus/DLLDefines.hh>
 
 namespace alpinocorpus {
 
@@ -21,4 +21,4 @@ public:
 
 }
 
-#endif // CORPUSREADER_HH
+#endif  // ALPINO_CORPUSREADER_HH

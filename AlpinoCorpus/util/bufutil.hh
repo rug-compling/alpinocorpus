@@ -1,5 +1,5 @@
-#ifndef BUF_UTIL_HH
-#define BUF_UTIL_HH
+#ifndef ALPINO_BUF_UTIL_HH
+#define ALPINO_BUF_UTIL_HH
 
 namespace alpinocorpus {
 
@@ -12,5 +12,4 @@ void writeToBuf(unsigned char *buf, T n)
 
 }
 
-#endif // BUF_UTIL_HH
-
+#endif  // ALPINO_BUF_UTIL_HH

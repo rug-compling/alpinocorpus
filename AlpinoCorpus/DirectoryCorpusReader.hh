@@ -1,10 +1,10 @@
-#ifndef DIRECTORYCORPUSREADER_HH
-#define DIRECTORYCORPUSREADER_HH
+#ifndef ALPINO_DIRECTORYCORPUSREADER_HH
+#define ALPINO_DIRECTORYCORPUSREADER_HH
 
 #include <QString>
 #include <QVector>
 
-#include "CorpusReader.hh"
+#include <AlpinoCorpus/CorpusReader.hh>
 
 namespace alpinocorpus {
 
@@ -27,4 +27,4 @@ private:
 
 }
 
-#endif // DIRECTORYCORPUSREADER_HH
+#endif  // ALPINO_DIRECTORYCORPUSREADER_HH

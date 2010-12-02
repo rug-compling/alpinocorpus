@@ -1,5 +1,5 @@
-#ifndef NULLSTREAM_HH
-#define NULLSTREAM_HH
+#ifndef ALPINO_NULLSTREAM_HH
+#define ALPINO_NULLSTREAM_HH
 
 #include <iostream>
 
@@ -12,5 +12,4 @@ struct NullStream : std::ostream
 
 }
 
-#endif // NULLSTREAM_HH
-
+#endif // ALPINO_NULLSTREAM_HH

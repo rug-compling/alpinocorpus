@@ -1,5 +1,5 @@
-#ifndef INDEX_NAME_PAIR_HH
-#define INDEX_NAME_PAIR_HH
+#ifndef ALPINO_INDEX_NAME_PAIR_HH
+#define ALPINO_INDEX_NAME_PAIR_HH
 
 #include <QString>
 #include <QVector>
@@ -20,4 +20,4 @@ bool operator<(IndexNamePair const &p1, IndexNamePair const &p2);
 
 }
 
-#endif // INDEX_NAME_PAIR
+#endif  // ALPINO_INDEX_NAME_PAIR_HH

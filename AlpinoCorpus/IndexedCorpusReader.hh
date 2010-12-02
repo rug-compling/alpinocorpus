@@ -1,5 +1,5 @@
-#ifndef INDEXED_CORPUSREADER_HH
-#define INDEXED_CORPUSREADER_HH
+#ifndef ALPINO_INDEXED_CORPUSREADER_HH
+#define ALPINO_INDEXED_CORPUSREADER_HH
 
 #include <QHash>
 #include <QMutex>
@@ -9,7 +9,7 @@
 
 #include <QDictZip/QDictZipFile.hh>
 
-#include "CorpusReader.hh"
+#include <AlpinoCorpus/CorpusReader.hh>
 
 namespace alpinocorpus
 {
@@ -74,4 +74,4 @@ inline IndexPtrVec const &IndexedCorpusReader::indices() const
 
 }
 
-#endif // INDEXED_CORPUSWRITER_HH
+#endif  // ALPINO_INDEXED_CORPUSWRITER_HH

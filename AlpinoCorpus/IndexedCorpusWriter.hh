@@ -1,12 +1,12 @@
-#ifndef CORPUSWRITER_HH
-#define CORPUSWRITER_HH
+#ifndef ALPINO_CORPUSWRITER_HH
+#define ALPINO_CORPUSWRITER_HH
 
 #include <iostream>
 
 #include <QMutex>
 #include <QSharedPointer>
 
-#include "NullStream.hh"
+#include <AlpinoCorpus/NullStream.hh>
 
 namespace alpinocorpus
 {
@@ -48,4 +48,4 @@ inline IndexedCorpusWriter &IndexedCorpusWriter::operator=(IndexedCorpusWriter c
 
 }
 
-#endif // CORPUSWRITER_HH
+#endif  // ALPINO_CORPUSWRITER_HH

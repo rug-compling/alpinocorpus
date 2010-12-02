@@ -17,8 +17,8 @@
  * MA 02110-1301 USA
  */
 
-#ifndef STRINGUTIL_HH
-#define STRINGUTIL_HH
+#ifndef ALPINO_STRINGUTIL_HH
+#define ALPINO_STRINGUTIL_HH
 
 #include <algorithm>
 #include <iterator>
@@ -63,5 +63,4 @@ inline std::vector<std::string> stringSplit(std::string str)
 
 }
 
-#endif // STRINGUTIL_HH
-
+#endif  // ALPINO_STRINGUTIL_HH

@@ -1,5 +1,5 @@
-#ifndef DZ_CHUNK_HH
-#define DZ_CHUNK_HH
+#ifndef ALPINO_DZ_CHUNK_HH
+#define ALPINO_DZ_CHUNK_HH
 
 #include <QtGlobal>
 
@@ -15,4 +15,4 @@ struct DzChunk
 
 }
 
-#endif // DZ_CHUNK_HH
+#endif  // ALPINO_DZ_CHUNK_HH
