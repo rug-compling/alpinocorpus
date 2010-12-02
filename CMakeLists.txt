@@ -27,8 +27,14 @@ if(QDICTZIP_FOUND)
   include_directories(${QDICTZIP_INCLUDE_DIR})
 endif()
 
+find_package(DBXML REQUIRED)
+if (DBXML_FOUND)
+  include_directories(${DBXML_INCLUDE_DIR})
+endif()
+
 set (HEADERS
   include/AlpinoCorpus/CorpusReader.hh
+  include/AlpinoCorpus/DbCorpusReader.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/DzChunk.hh
@@ -46,6 +52,7 @@ set (HEADERS
 
 set (SOURCES
   src/CorpusReader.cpp
+  src/DbCorpusReader.cpp
   src/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter.cpp
