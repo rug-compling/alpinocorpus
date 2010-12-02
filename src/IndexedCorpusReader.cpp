@@ -93,8 +93,8 @@ bool IndexedCorpusReader::open()
         }
 
         QString name(lineParts[0]);
-        size_t offset = b64_decode(lineParts[1].toAscii());
-        size_t size = b64_decode(lineParts[2].toAscii());
+        size_t offset = util::b64_decode(lineParts[1].toAscii());
+        size_t size   = util::b64_decode(lineParts[2].toAscii());
 
         IndexItemPtr item(new IndexItem(name, offset, size));
         d_indices.push_back(item);

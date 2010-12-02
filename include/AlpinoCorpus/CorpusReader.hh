@@ -8,14 +8,18 @@
 
 namespace alpinocorpus {
 
+/**
+ * Abstract base class for corpus readers.
+ */
 class CorpusReader
 {
 public:
-	virtual ~CorpusReader() {}
+    virtual ~CorpusReader() {}
     virtual bool open() = 0;
     virtual QString read(QString const &entry) = 0;
     virtual QVector<QString> entries() const = 0;
 
+    /** Factory method: open a corpus, determining its type automatically. */
     static INDEXED_CORPUS_EXPORT CorpusReader *newCorpusReader(QString const &corpusPath);
 };
 

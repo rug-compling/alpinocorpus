@@ -14,7 +14,7 @@
 
 using namespace std;
 
-namespace alpinocorpus {
+namespace alpinocorpus { namespace util {
 
 QString readFile(QString const &filename)
 {
@@ -34,4 +34,4 @@ QString readFile(QString const &filename)
     return dataStream.readAll();
 }
 
-}   // namespace alpinocorpus
+} } // namespace alpinocorpus::util

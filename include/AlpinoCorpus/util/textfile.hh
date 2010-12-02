@@ -3,10 +3,10 @@
 
 #include <QString>
 
-namespace alpinocorpus {
+namespace alpinocorpus { namespace util {
 
 QString readFile(QString const &filename);
 
-}
+} } // namespace util
 
 #endif  // ALPINO_TEXT_FILE_HH

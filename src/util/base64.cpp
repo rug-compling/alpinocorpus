@@ -52,7 +52,7 @@
 #include <stdexcept>
 #include <QByteArray>
 
-namespace alpinocorpus {
+namespace alpinocorpus { namespace util {
 
 const unsigned char b64_list[] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -123,4 +123,4 @@ unsigned long b64_decode(QByteArray const &val)
    return v;
 }
 
-}   // namespace alpinocorpus
+} } // namespace alpinocorpus::util

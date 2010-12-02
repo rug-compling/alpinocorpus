@@ -67,7 +67,7 @@ bool DirectoryCorpusReader::open()
 QString DirectoryCorpusReader::read(QString const &entry)
 {
     QString filename(QString("%1/%2").arg(d_directory).arg(entry));
-    return readFile(filename);
+    return util::readFile(filename);
 }
 
 bool DirectoryCorpusReader::readCache()

@@ -9,7 +9,7 @@
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * Lesser General Public License for more utils.
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-namespace alpinocorpus {
+namespace alpinocorpus { namespace util {
 
 /**
  * Parse a string.
@@ -61,6 +61,6 @@ inline std::vector<std::string> stringSplit(std::string str)
 	return strParts;
 }
 
-}
+} } // namespace util
 
 #endif  // ALPINO_STRINGUTIL_HH

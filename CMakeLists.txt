@@ -45,13 +45,13 @@ set (HEADERS
 )
 
 set (SOURCES
-  src/CorpusReader/CorpusReader.cpp
-  src/DirectoryCorpusReader/DirectoryCorpusReader.cpp
-  src/IndexedCorpusReader/IndexedCorpusReader.cpp
-  #src/IndexedCorpusWriter/IndexedCorpusWriter.cpp
-  src/util/textfile/textfile.cpp
+  src/CorpusReader.cpp
+  src/DirectoryCorpusReader.cpp
+  src/IndexedCorpusReader.cpp
+  #src/IndexedCorpusWriter.cpp
+  src/util/textfile.cpp
   src/util/base64.cpp
-  src/IndexNamePair/IndexNamePair.cpp
+  src/IndexNamePair.cpp
 )
 
 add_library(alpino_corpus SHARED 
