@@ -12,7 +12,7 @@ endif(APPLE)
 
 list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
 
-include_directories(${AlpinoCorpus_SOURCE_DIR})
+include_directories(${AlpinoCorpus_SOURCE_DIR}/include)
 
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
 INCLUDE(${QT_USE_FILE})
@@ -28,20 +28,20 @@ if(QDICTZIP_FOUND)
 endif()
 
 set (HEADERS
-  AlpinoCorpus/CorpusReader.hh
-  AlpinoCorpus/DirectoryCorpusReader.hh
-  AlpinoCorpus/DLLDefines.hh
-  AlpinoCorpus/DzChunk.hh
-  AlpinoCorpus/fdstream.hh
-  AlpinoCorpus/gzip.hh
-  AlpinoCorpus/IndexedCorpusReader.hh
-  AlpinoCorpus/IndexedCorpusWriter.hh
-  AlpinoCorpus/IndexNamePair.hh
-  AlpinoCorpus/NullStream.hh
-  AlpinoCorpus/util/base64.hh
-  AlpinoCorpus/util/bufutil.hh
-  AlpinoCorpus/util/stringutil.hh
-  AlpinoCorpus/util/textfile.hh
+  include/AlpinoCorpus/CorpusReader.hh
+  include/AlpinoCorpus/DirectoryCorpusReader.hh
+  include/AlpinoCorpus/DLLDefines.hh
+  include/AlpinoCorpus/DzChunk.hh
+  include/AlpinoCorpus/fdstream.hh
+  include/AlpinoCorpus/gzip.hh
+  include/AlpinoCorpus/IndexedCorpusReader.hh
+  include/AlpinoCorpus/IndexedCorpusWriter.hh
+  include/AlpinoCorpus/IndexNamePair.hh
+  include/AlpinoCorpus/NullStream.hh
+  include/AlpinoCorpus/util/base64.hh
+  include/AlpinoCorpus/util/bufutil.hh
+  include/AlpinoCorpus/util/stringutil.hh
+  include/AlpinoCorpus/util/textfile.hh
 )
 
 set (SOURCES
@@ -67,5 +67,5 @@ install(TARGETS alpino_corpus
   ARCHIVE DESTINATION lib
 )
 
-install(DIRECTORY AlpinoCorpus 
+install(DIRECTORY include/AlpinoCorpus
   DESTINATION include)
