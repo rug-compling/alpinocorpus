@@ -1,4 +1,11 @@
-#include "IndexNamePair.ih"
+#include <cctype>
+#include <string>
+#include <vector>
+
+#include <AlpinoCorpus/IndexNamePair.hh>
+#include <AlpinoCorpus/util/stringutil.hh>
+
+using namespace std;
 
 namespace alpinocorpus {
 
@@ -59,4 +66,4 @@ bool operator<(IndexNamePair const &p1, IndexNamePair const &p2)
 	return false;
 }
 
-}
+}   // namespace alpinocorpus

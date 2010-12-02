@@ -1,4 +1,13 @@
-#include "IndexedCorpusWriter.ih"
+#include <string>
+
+#include <QMutexLocker>
+
+#include <IndexedCorpus/util/base64.hh>
+#include <IndexedCorpus/IndexedCorpusWriter.hh>
+
+using namespace std;
+
+namespace alpinocorpus {
 
 void IndexedCorpusWriter::copy(IndexedCorpusWriter const &other)
 {
@@ -27,3 +36,4 @@ void IndexedCorpusWriter::write(std::string const &name, char const *buf, size_t
 	d_offset += len;
 }
 
+}   // namespace alpinocorpus

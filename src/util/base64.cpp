@@ -52,7 +52,9 @@
 #include <stdexcept>
 #include <QByteArray>
 
-static unsigned char b64_list[] =
+namespace alpinocorpus {
+
+const unsigned char b64_list[] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 #define XX 100
@@ -120,3 +122,5 @@ unsigned long b64_decode(QByteArray const &val)
 
    return v;
 }
+
+}   // namespace alpinocorpus

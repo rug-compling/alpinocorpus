@@ -1,6 +1,22 @@
-#include "textfile.ih"
+#include <algorithm>
+#include <fstream>
+#include <iterator>
+#include <stdexcept>
+#include <vector>
 
-QString alpinocorpus::readFile(QString const &filename)
+#include <QFile>
+#include <QFileInfo>
+#include <QString>
+#include <QTextCodec>
+#include <QTextStream>
+
+#include <AlpinoCorpus/util/textfile.hh>
+
+using namespace std;
+
+namespace alpinocorpus {
+
+QString readFile(QString const &filename)
 {
     QFileInfo p(filename);
 	if (!p.isFile())
@@ -17,3 +33,5 @@ QString alpinocorpus::readFile(QString const &filename)
 
     return dataStream.readAll();
 }
+
+}   // namespace alpinocorpus

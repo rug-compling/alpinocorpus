@@ -1,4 +1,14 @@
-#include "CorpusReader.ih"
+#include <QString>
+#include <QFileInfo>
+
+#include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/DirectoryCorpusReader.hh>
+#include <AlpinoCorpus/IndexedCorpusReader.hh>
+
+namespace alpinocorpus {
+
+char const * const ACT_INDEX_EXT = ".index";
+char const * const ACT_DATA_EXT = ".data.dz";
 
 QString canonicalizePath(QString const &name)
 {
@@ -30,3 +40,5 @@ CorpusReader *CorpusReader::newCorpusReader(QString const &corpusPath)
     else
         return new DirectoryCorpusReader(corpusPath);
 }
+
+}   // namespace alpinocorpus

@@ -1,4 +1,24 @@
-#include "IndexedCorpusReader.ih"
+#include <stdexcept>
+
+#include <QFile>
+#include <QMutexLocker>
+#include <QRegExp>
+#include <QSharedPointer>
+#include <QString>
+#include <QStringList>
+#include <QTextStream>
+#include <QVector>
+#include <QtDebug>
+
+#include <QDictZip/QDictZipFile.hh>
+
+#include <AlpinoCorpus/IndexedCorpusReader.hh>
+#include <AlpinoCorpus/util/base64.hh>
+
+using namespace std;
+
+namespace alpinocorpus {
+
 
 IndexedCorpusReader::IndexedCorpusReader(QString const &dataFilename,
         QString const &indexFilename)
@@ -96,3 +116,5 @@ QString IndexedCorpusReader::read(QString const &filename)
 
     return d_dataFile->read(iter.value()->size);
 }
+
+}   // namespace alpinocorpus

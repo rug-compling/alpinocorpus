@@ -1,4 +1,21 @@
-#include "DirectoryCorpusReader.ih"
+#include <QDateTime>
+#include <QDir>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QString>
+#include <QtDebug>
+
+#include <algorithm>
+#include <iterator>
+#include <stdexcept>
+
+#include <AlpinoCorpus/DirectoryCorpusReader.hh>
+#include <AlpinoCorpus/IndexNamePair.hh>
+#include <AlpinoCorpus/util/textfile.hh>
+
+using namespace std;
+
+namespace alpinocorpus {
 
 DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
     bool cache)
@@ -107,3 +124,5 @@ void DirectoryCorpusReader::writeCache()
       iter != d_entries.end(); ++iter)
     cacheStream << *iter << "\n";
 }
+
+}   // namespace alpinocorpus

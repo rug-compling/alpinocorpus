@@ -1,8 +1,0 @@
-#include <cctype>
-#include <string>
-#include <vector>
-
-#include <AlpinoCorpus/IndexNamePair.hh>
-#include <AlpinoCorpus/util/stringutil.hh>
-
-using namespace std;
