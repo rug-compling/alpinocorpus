@@ -26,14 +26,13 @@ struct IndexItem
 };
 
 typedef QSharedPointer<IndexItem> IndexItemPtr;
-
-typedef QHash<QString, IndexItemPtr> IndexMap;
 typedef QVector<IndexItemPtr> IndexPtrVec;
-
-typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
 
 class IndexedCorpusReader : public CorpusReader
 {
+    typedef QHash<QString, IndexItemPtr> IndexMap;
+    typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
+
 public:
 	IndexedCorpusReader() {}
 	IndexedCorpusReader(IndexedCorpusReader const &other);
