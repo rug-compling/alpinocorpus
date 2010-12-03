@@ -1,4 +1,5 @@
 #include <AlpinoCorpus/DbCorpusReader.hh>
+
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -12,19 +13,27 @@ DbCorpusReader::DbCorpusReader(QString const &path)
 {
 }
 
+DbCorpusReader::~DbCorpusReader()
+{
+}
+
 QVector<QString> DbCorpusReader::entries() const
 {
     // TODO: catch exceptions
 
     QVector<QString> ents;
-    db::XmlContainer &container(const_cast<db::XmlContainer &>(this->container));
-    db::XmlResults r(container.getAllDocuments( db::DBXML_LAZY_DOCS
-                                              | db::DBXML_WELL_FORMED_ONLY
-                                              ));
+    try {
+        db::XmlContainer &container(const_cast<db::XmlContainer &>(this->container));
+        db::XmlResults r(container.getAllDocuments( db::DBXML_LAZY_DOCS
+                                                  | db::DBXML_WELL_FORMED_ONLY
+                                                  ));
 
-    for (db::XmlDocument doc; r.next(doc); )
-        ents.push_back(QString::fromUtf8(doc.getName().c_str()));
-    return ents;
+        for (db::XmlDocument doc; r.next(doc); )
+            ents.push_back(QString::fromUtf8(doc.getName().c_str()));
+        return ents;
+    } catch (db::XmlException const &e) {
+        throw std::runtime_error(e.what());
+    }
 }
 
 bool DbCorpusReader::open()
