@@ -1,5 +1,5 @@
-#ifndef ALPINO_CORPUSWRITER_HH
-#define ALPINO_CORPUSWRITER_HH
+#ifndef ALPINO_INDEXED_CORPUSWRITER_HH
+#define ALPINO_INDEXED_CORPUSWRITER_HH
 
 #include <iostream>
 
@@ -48,4 +48,4 @@ inline IndexedCorpusWriter &IndexedCorpusWriter::operator=(IndexedCorpusWriter c
 
 }
 
-#endif  // ALPINO_CORPUSWRITER_HH
+#endif  // ALPINO_INDEXED_CORPUSWRITER_HH
