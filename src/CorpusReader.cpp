@@ -2,6 +2,7 @@
 #include <QFileInfo>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 
@@ -36,6 +37,11 @@ namespace alpinocorpus {
      */
     CorpusReader *CorpusReader::newCorpusReader(QString const &corpusPath)
     {
+        try {
+            return new DbCorpusReader(corpusPath + ".dbxml");
+        } catch (...) {
+        }
+
         QString canonicalPath(canonicalizePath(corpusPath));
 
         if (dzCorpusExists(canonicalPath))
