@@ -10,14 +10,23 @@ namespace alpinocorpus {
 
 /**
  * Abstract base class for corpus readers.
+ *
+ * A corpus is conceptually a mapping of names to XML documents.
+ * Both are represented as QStrings.
  */
 class CorpusReader
 {
 public:
     virtual ~CorpusReader() {}
+
+    /** Open corpus for reading. Returns true on success, false on failure. */
     virtual bool open() = 0;
-    virtual QString read(QString const &entry) = 0;
+
+    /** Retrieve the names of all treebank entries. */
     virtual QVector<QString> entries() const = 0;
+
+    /** Return content of a single treebank entry. */
+    virtual QString read(QString const &entry) = 0;
 
     /** Factory method: open a corpus, determining its type automatically. */
     static INDEXED_CORPUS_EXPORT CorpusReader *newCorpusReader(QString const &corpusPath);
