@@ -17,12 +17,11 @@ namespace alpinocorpus { namespace util {
 QString readFile(QString const &filename)
 {
     QFileInfo p(filename);
-	if (!p.isFile())
-    {
+    if (!p.isFile()) {
         QByteArray filenameData(filename.toUtf8());
         throw std::runtime_error(std::string("readFile: '")
-				 + filenameData.constData()
-				 + "' is not a regular file");
+                                + filenameData.constData()
+                                + "' is not a regular file");
     }
 
     QFile dataFile(filename);
