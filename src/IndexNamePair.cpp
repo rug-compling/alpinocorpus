@@ -5,8 +5,6 @@
 #include <AlpinoCorpus/IndexNamePair.hh>
 #include <AlpinoCorpus/util/stringutil.hh>
 
-using namespace std;
-
 namespace alpinocorpus {
 
 IndexNamePair::IndexNamePair(QString const &newName) : name(newName)

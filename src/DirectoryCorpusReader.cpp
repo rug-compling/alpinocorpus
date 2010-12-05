@@ -13,8 +13,6 @@
 #include <AlpinoCorpus/IndexNamePair.hh>
 #include <AlpinoCorpus/util/textfile.hh>
 
-using namespace std;
-
 namespace alpinocorpus {
 
 DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
@@ -52,7 +50,7 @@ bool DirectoryCorpusReader::open()
         d_entries.push_back(entry); // Ugly hack to inform readers.
     }
 
-    sort(indexedEntries.begin(), indexedEntries.end());
+    std::sort(indexedEntries.begin(), indexedEntries.end());
 
     d_entries.clear();
     for (QVector<IndexNamePair>::const_iterator iter = indexedEntries.constBegin();

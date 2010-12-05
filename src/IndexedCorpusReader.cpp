@@ -15,10 +15,7 @@
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 #include <AlpinoCorpus/util/base64.hh>
 
-using namespace std;
-
 namespace alpinocorpus {
-
 
 IndexedCorpusReader::IndexedCorpusReader(QString const &dataFilename,
         QString const &indexFilename)
@@ -107,8 +104,8 @@ bool IndexedCorpusReader::open()
 QString IndexedCorpusReader::read(QString const &filename)
 {
     QHash<QString, IndexItemPtr>::const_iterator iter = d_namedIndices.find(filename);
-	if (iter == d_namedIndices.end())
-		throw runtime_error("IndexedCorpusReader::read: requesting unknown data!");
+    if (iter == d_namedIndices.end())
+        throw std::runtime_error("IndexedCorpusReader::read: requesting unknown data!");
 
     QMutexLocker locker(&d_mutex);
 
