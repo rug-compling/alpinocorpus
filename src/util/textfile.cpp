@@ -12,18 +12,16 @@
 
 #include <AlpinoCorpus/util/textfile.hh>
 
-using namespace std;
-
 namespace alpinocorpus { namespace util {
 
 QString readFile(QString const &filename)
 {
     QFileInfo p(filename);
-	if (!p.isFile())
-    {
+    if (!p.isFile()) {
         QByteArray filenameData(filename.toUtf8());
-        throw runtime_error(string("readFile: '") + filenameData.constData() +
-                            "' is not a regular file!");
+        throw std::runtime_error(std::string("readFile: '")
+                                + filenameData.constData()
+                                + "' is not a regular file");
     }
 
     QFile dataFile(filename);
