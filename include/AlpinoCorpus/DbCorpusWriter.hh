@@ -23,6 +23,7 @@ class DbCorpusWriter
     void write(CorpusReader const &corpus);
 
   private:
+    DbXml::XmlUpdateContext &mkUpdateContext(DbXml::XmlUpdateContext &);
     void write(QString const &, QString const &, DbXml::XmlUpdateContext &);
 };
 

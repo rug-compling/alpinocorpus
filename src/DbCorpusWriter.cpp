@@ -1,5 +1,6 @@
 #include <AlpinoCorpus/DbCorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <QtGlobal>
 
 namespace db = DbXml;
 
@@ -22,15 +23,31 @@ namespace alpinocorpus {
         }
     }
 
+    db::XmlUpdateContext &DbCorpusWriter::mkUpdateContext(
+                                            db::XmlUpdateContext &ctx)
+    {
+        // Note: this function may be unnecessary; no exceptions are listed
+        // for XmlManager::createUpdateContext() or the copy constructor,
+        // but the don't have no-throw guarantee either.
+        try {
+            return ctx = mgr.createUpdateContext();
+        } catch (db::XmlException const &e) {
+            std::ostringstream msg;
+            msg << "cannot create XML database update context \"" << name
+                << "\": " << e.what();
+            throw Error(msg.str());
+        }
+    }
+
     void DbCorpusWriter::write(QString const &name, QString const &content)
     {
-        write(name, content, mgr.createUpdateContext());
+        write(name, content, mkUpdateContext());
     }
 
     void DbCorpusWriter::write(CorpusReader const &corpus)
     {
         QVector<QString> entry(corpus.entries);
-        db::XmlUpdateContext ctx(mgr.createUpdateContext());
+        db::XmlUpdateContext ctx(mkUpdateContext());
         for (size_t i=0; i<entry.size(); i++)
             write(entry[i], corpus.read(entry[i]), ctx);
     }
@@ -38,11 +55,8 @@ namespace alpinocorpus {
     void DbCorpusWriter::write(QString const &name, QString const &content,
                                XmlUpdateContext &ctx)
     {
-        // Note: we handle errors here under the assumption that
-        // XmlManager::createUpdateContext() cannot fail.
-        // No exceptions are listed in its documentation, but it doesn't have
-        // no-throw guarantee either.
         try {
+            std::string canonical(name.fromNativeSeparators().toUtf8().data());
             container.putDocument(name, content, ctx, db::WELL_FORMED_ONLY);
         } catch (XmlException const &e) {
             std::ostringstream msg;
