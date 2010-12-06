@@ -1,6 +1,6 @@
 #include <AlpinoCorpus/DbCorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <QtGlobal>
+#include <QDir>
 
 namespace db = DbXml;
 
@@ -28,7 +28,7 @@ namespace alpinocorpus {
     {
         // Note: this function may be unnecessary; no exceptions are listed
         // for XmlManager::createUpdateContext() or the copy constructor,
-        // but the don't have no-throw guarantee either.
+        // but they don't have a no-throw guarantee either.
         try {
             return ctx = mgr.createUpdateContext();
         } catch (db::XmlException const &e) {
@@ -56,7 +56,9 @@ namespace alpinocorpus {
                                XmlUpdateContext &ctx)
     {
         try {
-            std::string canonical(name.fromNativeSeparators().toUtf8().data());
+            std::string canonical(QDir::fromNativeSeparators(name)
+                                  .toUtf8()
+                                  .data());
             container.putDocument(name, content, ctx, db::WELL_FORMED_ONLY);
         } catch (XmlException const &e) {
             std::ostringstream msg;
