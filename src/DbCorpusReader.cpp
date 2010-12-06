@@ -1,4 +1,5 @@
 #include <AlpinoCorpus/DbCorpusReader.hh>
+#include <AlpinoCorpus/Error.hh>
 
 #include <QString>
 #include <sstream>
@@ -40,7 +41,7 @@ QVector<QString> DbCorpusReader::entries() const
             ents.push_back(toQString(doc.getName()));
         return ents;
     } catch (db::XmlException const &e) {
-        throw std::runtime_error(e.what());
+        throw Error(e.what());
     }
 }
 
@@ -80,7 +81,7 @@ QString DbCorpusReader::read(QString const &filename)
             << "\" cannot be read from \"" << container.getName()
             << "\" ("                      << e.what()
             << ")";
-        throw std::runtime_error(msg.str());
+        throw Error(msg.str());
     }
 }
 
