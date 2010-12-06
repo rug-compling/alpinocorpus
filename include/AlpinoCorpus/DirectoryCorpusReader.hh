@@ -8,6 +8,9 @@
 
 namespace alpinocorpus {
 
+/**
+ * Reader for Alpino treebanks represented as a directory of XML files.
+ */
 class DirectoryCorpusReader : public CorpusReader
 {
 public:
