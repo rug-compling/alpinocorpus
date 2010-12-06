@@ -1,7 +1,7 @@
 #ifndef ALPINO_DBCORPUSWRITER_HH
 #define ALPINO_DBCORPUSWRITER_HH
 
-#include <AlpinoCorpus/CorpusWriter.hpp>
+#include <AlpinoCorpus/CorpusWriter.hh>
 #include <dbxml/DbXml.hpp>
 
 namespace alpinocorpus {
@@ -12,12 +12,18 @@ namespace alpinocorpus {
  */
 class DbCorpusWriter
 {
+    DbXml::XmlManager mgr;
+    DbXml::XmlContainer container;
+
   public:
     /** Open path for writing. */
-    DbCorpusWriter(QString const &path);
+    DbCorpusWriter(QString const &path, bool overwrite);
 
-    /** Write item (file) with specified name and (XML) content to corpus. */
-    virtual void write(QString const &name, QString const &content) = 0;
+    void write(QString const &name, QString const &content);
+    void write(CorpusReader const &corpus);
+
+  private:
+    void write(QString const &, QString const &, DbXml::XmlUpdateContext &);
 };
 
 }   // namespace alpinocorpus

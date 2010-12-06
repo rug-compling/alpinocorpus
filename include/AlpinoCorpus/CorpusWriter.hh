@@ -10,8 +10,11 @@ namespace alpinocorpus {
 class CorpusWriter
 {
   public:
-    /** Write item (file) name with content to corpus. */
+    /** Write item with specified name and (XML) content to corpus. */
     virtual void write(QString const &name, QString const &content) = 0;
+
+    /** Write entire corpus to file. */
+    virtual void write(CorpusReader const &corpus) = 0;
 };
 
 }   // namespace alpinocorpus
