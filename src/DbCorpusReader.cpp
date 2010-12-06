@@ -72,7 +72,6 @@ QString DbCorpusReader::read(QString const &filename)
     try {
         db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
         std::string content;
-        // FIXME: this interprets UTF-8 as ASCII
         return toQString(doc.getContent(content));
 
     } catch (db::XmlException const &e) {
