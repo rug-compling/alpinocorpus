@@ -38,6 +38,7 @@ set (HEADERS
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/DzChunk.hh
+  include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/fdstream.hh
   include/AlpinoCorpus/gzip.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
@@ -56,6 +57,7 @@ set (SOURCES
   src/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter.cpp
+  src/OpenError.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
   src/IndexNamePair.cpp

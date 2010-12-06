@@ -15,6 +15,10 @@ class CorpusReader
 {
 public:
     virtual ~CorpusReader() {}
+
+    /** Return canonical name of corpus */
+    virtual QString name() const = 0;
+
     virtual bool open() = 0;
     virtual QString read(QString const &entry) = 0;
     virtual QVector<QString> entries() const = 0;

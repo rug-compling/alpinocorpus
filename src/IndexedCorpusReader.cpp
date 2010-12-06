@@ -1,6 +1,7 @@
 #include <stdexcept>
 
 #include <QFile>
+#include <QFileInfo>
 #include <QMutexLocker>
 #include <QRegExp>
 #include <QSharedPointer>
@@ -12,18 +13,56 @@
 
 #include <QDictZip/QDictZipFile.hh>
 
+#include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 #include <AlpinoCorpus/util/base64.hh>
 
 using namespace std;
 
+namespace {
+    char const * const DATA_EXT = ".data.dz";
+    char const * const INDEX_EXT = ".index";
+}
+
 namespace alpinocorpus {
 
+IndexedCorpusReader::IndexedCorpusReader(QString const &filename)
+{
+    canonicalize(filename);
+    construct();
+}
 
 IndexedCorpusReader::IndexedCorpusReader(QString const &dataFilename,
         QString const &indexFilename)
     : d_dataFilename(dataFilename), d_indexFilename(indexFilename)
 {
+    canonicalize(dataFilename);
+    construct2();
+}
+
+/*
+ * Construct from canonical name only
+ */
+void IndexedCorpusReader::construct()
+{
+    d_dataFilename  = d_canonical + DATA_EXT;
+    d_indexFilename = d_canonical + INDEX_EXT;
+    construct2();
+}
+
+/*
+ * Construct from canonical name and two filenames
+ */
+void IndexedCorpusReader::construct2()
+{
+    // XXX race condition up ahead
+    QFileInfo data(d_dataFilename);
+    if (!data.isFile() || !data.isReadable())
+        throw OpenError(d_dataFilename, "not readable or not a plain file");
+
+    QFileInfo index(d_indexFilename);
+    if (!index.isFile() || !index.isReadable())
+        throw OpenError(d_indexFilename, "not readable or not a plain file");
 }
 
 IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &other)
@@ -35,6 +74,20 @@ IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &o
 	}
 	
 	return *this;
+}
+
+/*
+ * Canonicalize file name. To be called from constructor.
+ */
+void IndexedCorpusReader::canonicalize(QString const &filename)
+{
+    d_canonical = filename;
+    if (filename.endsWith(DATA_EXT))
+        d_canonical.chop(8);
+    else if (filename.endsWith(INDEX_EXT))
+        d_canonical.chop(6);
+    else
+        throw OpenError(filename, "not an indexed (.dz) corpus file");
 }
 
 void IndexedCorpusReader::copy(IndexedCorpusReader const &other)

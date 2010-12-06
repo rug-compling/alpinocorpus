@@ -1,10 +1,18 @@
 #include <AlpinoCorpus/DbCorpusReader.hh>
 
+#include <QString>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
 namespace db = DbXml;
+
+namespace {
+    QString toQString(std::string const &s)
+    {
+        return QString::fromUtf8(s.c_str());
+    }
+}
 
 namespace alpinocorpus {
 
@@ -19,21 +27,26 @@ DbCorpusReader::~DbCorpusReader()
 
 QVector<QString> DbCorpusReader::entries() const
 {
-    // TODO: catch exceptions
-
     QVector<QString> ents;
     try {
+        // The const_cast below should be safe due to locking.
+        // XXX double-check this
         db::XmlContainer &container(const_cast<db::XmlContainer &>(this->container));
         db::XmlResults r(container.getAllDocuments( db::DBXML_LAZY_DOCS
                                                   | db::DBXML_WELL_FORMED_ONLY
                                                   ));
 
         for (db::XmlDocument doc; r.next(doc); )
-            ents.push_back(QString::fromUtf8(doc.getName().c_str()));
+            ents.push_back(toQString(doc.getName()));
         return ents;
     } catch (db::XmlException const &e) {
         throw std::runtime_error(e.what());
     }
+}
+
+QString DbCorpusReader::name() const
+{
+    return toQString(container.getName());
 }
 
 bool DbCorpusReader::open()
@@ -59,7 +72,7 @@ QString DbCorpusReader::read(QString const &filename)
         db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
         std::string content;
         // FIXME: this interprets UTF-8 as ASCII
-        return QString::fromUtf8(doc.getContent(content).c_str());
+        return toQString(doc.getContent(content));
 
     } catch (db::XmlException const &e) {
         std::ostringstream msg;

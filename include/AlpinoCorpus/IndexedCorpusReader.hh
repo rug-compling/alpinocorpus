@@ -36,17 +36,29 @@ class IndexedCorpusReader : public CorpusReader
 public:
 	IndexedCorpusReader() {}
 	IndexedCorpusReader(IndexedCorpusReader const &other);
+
+    /** Construct from a single file (data or index); the other file is sought
+     * for in the same directory.
+     */
+    IndexedCorpusReader(QString const &path);
+    /** Construct from data and index file. */
     IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
 	virtual ~IndexedCorpusReader();
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
     QVector<QString> entries() const;
 	IndexPtrVec const &indices() const;
+    QString name() const { return d_canonical; }
     bool open();
     QString read(QString const &filename);
+
 private:
+    void canonicalize(QString const &);
+    void construct();
+    void construct2();
 	void copy(IndexedCorpusReader const &other);
 	void destroy();
 	
+    QString d_canonical;
     QDictZipFilePtr d_dataFile;
     QString d_dataFilename;
 	IndexPtrVec d_indices;

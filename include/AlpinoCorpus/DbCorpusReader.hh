@@ -21,6 +21,7 @@ class DbCorpusReader : public CorpusReader
   public:
     DbCorpusReader(QString const &);
     ~DbCorpusReader();
+    QString name() const;
     bool open();
     QString read(QString const &);
     QVector<QString> entries() const;
