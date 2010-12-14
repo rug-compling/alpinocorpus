@@ -61,6 +61,8 @@ void IndexedCorpusReader::construct2()
     QFileInfo index(d_indexFilename);
     if (!index.isFile() || !index.isReadable())
         throw OpenError(d_indexFilename, "not readable or not a plain file");
+
+    open();
 }
 
 IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &other)
@@ -113,19 +115,15 @@ QVector<QString> IndexedCorpusReader::entries() const
 	return entries;
 }
 
-bool IndexedCorpusReader::open()
+void IndexedCorpusReader::open()
 {
     QFile indexFile(d_indexFilename);
-    if (!indexFile.open(QFile::ReadOnly)) {
-        qCritical() << "Could not open index file for reading!";
-        return false;
-    }
+    if (!indexFile.open(QFile::ReadOnly))
+        throw OpenError(d_indexFilename);
 
     d_dataFile = QDictZipFilePtr(new QDictZipFile(d_dataFilename));
-    if (!d_dataFile->open(QDictZipFile::ReadOnly)) {
-        qCritical() << "Could not open data file for reading!";
-        return false;
-    }
+    if (!d_dataFile->open(QDictZipFile::ReadOnly))
+        throw OpenError(d_indexFilename);
 
     QTextStream indexStream(&indexFile);
 
@@ -138,10 +136,9 @@ bool IndexedCorpusReader::open()
 
         QStringList lineParts = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 
-        if (lineParts.size() != 3) {
-            qCritical() << "Malformed line in index file!";
-            return false;
-        }
+        if (lineParts.size() != 3)
+            throw OpenError(d_indexFilename,
+                            QString::fromUtf8("malformed line in index file"));
 
         QString name(lineParts[0]);
         size_t offset = util::b64_decode(lineParts[1].toAscii());
@@ -151,8 +148,6 @@ bool IndexedCorpusReader::open()
         d_indices.push_back(item);
         d_namedIndices[name] = item;
     }
-
-    return true;
 }
 
 QString IndexedCorpusReader::read(QString const &filename)

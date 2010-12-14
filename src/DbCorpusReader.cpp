@@ -17,9 +17,18 @@ namespace {
 
 namespace alpinocorpus {
 
-DbCorpusReader::DbCorpusReader(QString const &path)
- : mgr(), container(), qpath(path)
+DbCorpusReader::DbCorpusReader(QString const &qpath)
+ : mgr(), container()
 {
+    std::string path(qpath.toLocal8Bit().data());
+
+    try {
+        db::XmlContainerConfig config;
+        config.setReadOnly(true);
+        container = mgr.openContainer(path, config);
+    } catch (db::XmlException const &e) {
+        throw OpenError(qpath, QString::fromUtf8(e.what()));
+    }
 }
 
 DbCorpusReader::~DbCorpusReader()
@@ -48,21 +57,6 @@ QVector<QString> DbCorpusReader::entries() const
 QString DbCorpusReader::name() const
 {
     return toQString(container.getName());
-}
-
-bool DbCorpusReader::open()
-{
-    std::string path(qpath.toLocal8Bit().data());
-
-    try {
-        db::XmlContainerConfig config;
-        config.setReadOnly(true);
-        container = mgr.openContainer(path, config);
-    } catch (db::XmlException const &e) {
-        return false;
-    }
-
-    return true;
 }
 
 QString DbCorpusReader::read(QString const &filename)

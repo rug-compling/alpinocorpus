@@ -16,14 +16,11 @@ namespace alpinocorpus {
  */
 class CorpusReader
 {
-public:
+  public:
     virtual ~CorpusReader() {}
 
     /** Return canonical name of corpus */
     virtual QString name() const = 0;
-
-    /** Open corpus for reading. Returns true on success, false on failure. */
-    virtual bool open() = 0;
 
     /** Retrieve the names of all treebank entries. */
     virtual QVector<QString> entries() const = 0;

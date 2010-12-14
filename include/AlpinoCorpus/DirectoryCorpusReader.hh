@@ -17,9 +17,10 @@ public:
     DirectoryCorpusReader(QString const &directory, bool cache = true);
     QVector<QString> entries() const;
     QString name() const { return d_directory; }
-    bool open();
     QString read(const QString &entry);
+
 private:
+    void open();
     bool readCache();
     bool useCache();
     void writeCache();

@@ -48,7 +48,6 @@ public:
     QVector<QString> entries() const;
 	IndexPtrVec const &indices() const;
     QString name() const { return d_canonical; }
-    bool open();
     QString read(QString const &filename);
 
 private:
@@ -57,6 +56,7 @@ private:
     void construct2();
 	void copy(IndexedCorpusReader const &other);
 	void destroy();
+    void open();
 	
     QString d_canonical;
     QDictZipFilePtr d_dataFile;

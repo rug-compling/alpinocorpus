@@ -16,13 +16,11 @@ class DbCorpusReader : public CorpusReader
 {
     DbXml::XmlManager mgr;
     DbXml::XmlContainer container;
-    QString qpath;
 
   public:
     DbCorpusReader(QString const &);
     ~DbCorpusReader();
     QString name() const;
-    bool open();
     QString read(QString const &);
     QVector<QString> entries() const;
 };

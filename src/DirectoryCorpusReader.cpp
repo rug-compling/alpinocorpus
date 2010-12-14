@@ -10,6 +10,7 @@
 #include <stdexcept>
 
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
+#include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IndexNamePair.hh>
 #include <AlpinoCorpus/util/textfile.hh>
 
@@ -19,6 +20,7 @@ DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
     bool cache)
     : d_directory(directory), d_cache(cache)
 {
+    open();
 }
 
 QVector<QString> DirectoryCorpusReader::entries() const
@@ -26,17 +28,14 @@ QVector<QString> DirectoryCorpusReader::entries() const
     return d_entries;
 }
 
-bool DirectoryCorpusReader::open()
+void DirectoryCorpusReader::open()
 {
     QDir dir(d_directory, "*.xml");
-    if (!dir.exists() || !dir.isReadable()) {
-        qCritical() <<
-                "DirectoryCorpusReader::DirectoryCorpusReader: Could not read directory entries!";
-        return false;
-    }
+    if (!dir.exists() || !dir.isReadable())
+        throw OpenError(d_directory, "non-existent or not readable");
 
     if (useCache() && readCache())
-      return true;
+      return;
 
     // Retrieve and sort directory entries.
     QDirIterator entryIter(dir, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
@@ -58,8 +57,6 @@ bool DirectoryCorpusReader::open()
         d_entries.push_back(iter->name);
 
     writeCache();
-
-    return true;
 }
 
 QString DirectoryCorpusReader::read(QString const &entry)
