@@ -14,22 +14,20 @@
 namespace alpinocorpus
 {
 
-struct IndexItem
-{
-    IndexItem(QString newName, size_t newOffset, size_t newSize)
-		: name(newName), offset(newOffset), size(newSize) {}
-	IndexItem() : name(""), offset(0), size(0) {}
-
-    QString name;
-	size_t offset;
-	size_t size;
-};
-
-typedef QSharedPointer<IndexItem> IndexItemPtr;
-typedef QVector<IndexItemPtr> IndexPtrVec;
-
 class IndexedCorpusReader : public CorpusReader
 {
+    struct IndexItem
+    {
+        IndexItem(QString newName, size_t newOffset, size_t newSize)
+		    : name(newName), offset(newOffset), size(newSize) {}
+	    IndexItem() : name(""), offset(0), size(0) {}
+
+        QString name;
+	    size_t offset;
+	    size_t size;
+    };
+
+    typedef QSharedPointer<IndexItem> IndexItemPtr;
     typedef QHash<QString, IndexItemPtr> IndexMap;
     typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
 
@@ -46,7 +44,6 @@ public:
 	virtual ~IndexedCorpusReader();
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
     QVector<QString> entries() const;
-	IndexPtrVec const &indices() const;
     QString name() const { return d_canonical; }
     QString read(QString const &filename);
 
@@ -61,7 +58,7 @@ private:
     QString d_canonical;
     QDictZipFilePtr d_dataFile;
     QString d_dataFilename;
-	IndexPtrVec d_indices;
+    QVector<IndexItemPtr> d_indices;
     QString d_indexFilename;
 	IndexMap d_namedIndices;
 
@@ -76,11 +73,6 @@ inline IndexedCorpusReader::IndexedCorpusReader(IndexedCorpusReader const &other
 inline IndexedCorpusReader::~IndexedCorpusReader()
 {
 	destroy();
-}
-
-inline IndexPtrVec const &IndexedCorpusReader::indices() const
-{
-	return d_indices;
 }
 
 }
