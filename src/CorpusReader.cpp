@@ -13,7 +13,7 @@ namespace alpinocorpus {
     CorpusReader *CorpusReader::newCorpusReader(QString const &corpusPath)
     {
         try {
-            return new DbCorpusReader(corpusPath);
+            return new DirectoryCorpusReader(corpusPath);
         } catch (OpenError const &e) {
         }
 
@@ -22,6 +22,6 @@ namespace alpinocorpus {
         } catch (OpenError const &e) {
         }
 
-        return new DirectoryCorpusReader(corpusPath);
+        return new DbCorpusReader(corpusPath);
     }
 }
