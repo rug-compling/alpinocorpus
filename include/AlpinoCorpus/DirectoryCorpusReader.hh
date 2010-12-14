@@ -15,6 +15,8 @@ class DirectoryCorpusReader : public CorpusReader
 {
 public:
     DirectoryCorpusReader(QString const &directory, bool cache = true);
+    EntryIterator begin() const;
+    EntryIterator end() const;
     QVector<QString> entries() const;
     QString name() const { return d_directory; }
     QString read(const QString &entry);

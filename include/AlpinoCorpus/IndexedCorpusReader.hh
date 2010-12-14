@@ -43,6 +43,8 @@ public:
     IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
 	virtual ~IndexedCorpusReader();
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
+    EntryIterator begin() const;
+    EntryIterator end() const;
     QVector<QString> entries() const;
     QString name() const { return d_canonical; }
     QString read(QString const &filename);
