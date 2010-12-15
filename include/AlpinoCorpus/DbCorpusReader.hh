@@ -26,7 +26,6 @@ class DbCorpusReader : public CorpusReader
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
 
-        void copy(IterImpl const *);
         QString const &current() const;
         bool equals(IterImpl const *) const;
         void next();

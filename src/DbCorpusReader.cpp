@@ -36,16 +36,6 @@ DbCorpusReader::DbIter::DbIter(db::XmlManager &mgr)
 {
 }
 
-/* copy constructor, operator= */
-void DbCorpusReader::DbIter::copy(CorpusReader::IterImpl const *other)
-{
-    if (other != this) {
-        DbIter const *i = dynamic_cast<DbIter const *>(other);
-        r   = i->r;
-        cur = i->cur;
-    }
-}
-
 /* operator* */
 QString const &DbCorpusReader::DbIter::current() const { return cur; }
 

@@ -20,7 +20,6 @@ class CorpusReader
   protected:
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
     struct IterImpl {
-        virtual void copy(IterImpl const *);
         virtual QString const &current() const;
         virtual bool equals(IterImpl const *) const;
         virtual void next();
