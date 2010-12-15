@@ -28,7 +28,7 @@ class CorpusReader
   public:
     /** Iterator over entry names */
     class EntryIterator
-        : public std::iterator<std::input_iterator_tag, QString const>
+        : public std::iterator<std::input_iterator_tag, QString>
     {
         QSharedPointer<IterImpl> impl;
 
@@ -46,7 +46,8 @@ class CorpusReader
         { return impl->equals(other.impl.data()); }
         bool operator!=(EntryIterator const &other)
         { return !operator==(other); }
-        value_type &operator*() { return impl->current(); }
+        value_type const &operator*() const { return impl->current(); }
+        //value_type const *operator->() const { return impl->current(); }
     };
 
     virtual ~CorpusReader() {}

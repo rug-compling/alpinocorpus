@@ -25,6 +25,9 @@ DbCorpusReader::DbIter::DbIter(db::XmlContainer &container)
         r = container.getAllDocuments( db::DBXML_LAZY_DOCS
                                      | db::DBXML_WELL_FORMED_ONLY
                                      );
+        db::XmlDocument doc;
+        r.peek(doc);
+        cur = toQString(doc.getName());
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }
