@@ -31,6 +31,17 @@ class IndexedCorpusReader : public CorpusReader
     typedef QHash<QString, IndexItemPtr> IndexMap;
     typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
 
+    class IndexIter : public IterImpl
+    {
+        QVector<IndexItemPtr>::const_iterator iter;
+
+      public:
+        IndexIter(QVector<IndexItemPtr>::const_iterator const &i) : iter(i) { }
+        QString const &current() const;
+        bool equals(IterImpl const *) const;
+        void next();
+    };
+
 public:
 	IndexedCorpusReader() {}
 	IndexedCorpusReader(IndexedCorpusReader const &other);

@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <typeinfo>
 
 #include <QFile>
 #include <QFileInfo>
@@ -76,6 +77,16 @@ IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &o
 	return *this;
 }
 
+CorpusReader::EntryIterator IndexedCorpusReader::begin() const
+{
+    return EntryIterator(new IndexIter(d_indices.constBegin()));
+}
+
+CorpusReader::EntryIterator IndexedCorpusReader::end() const
+{
+    return EntryIterator(new IndexIter(d_indices.constEnd()));
+}
+
 /*
  * Canonicalize file name. To be called from constructor.
  */
@@ -113,6 +124,26 @@ QVector<QString> IndexedCorpusReader::entries() const
 		entries.push_back((*iter)->name);
 	
 	return entries;
+}
+
+QString const &IndexedCorpusReader::IndexIter::current() const
+{
+    return (*iter)->name;
+}
+
+bool IndexedCorpusReader::IndexIter::equals(IterImpl const *other) const
+{
+    try {
+        IndexIter const &that = dynamic_cast<IndexIter const &>(*other);
+        return iter == that.iter;
+    } catch (std::bad_cast const &) {
+        return false;
+    }
+}
+
+void IndexedCorpusReader::IndexIter::next()
+{
+    ++iter;
 }
 
 void IndexedCorpusReader::open()
