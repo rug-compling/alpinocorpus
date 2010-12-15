@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
+#include <typeinfo>
 
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
@@ -31,6 +32,26 @@ CorpusReader::EntryIterator DirectoryCorpusReader::begin() const
 CorpusReader::EntryIterator DirectoryCorpusReader::end() const
 {
     return EntryIterator(new DirIter(d_entries.constEnd()));
+}
+
+QString const &DirectoryCorpusReader::DirIter::current() const
+{
+    return *iter;
+}
+
+bool DirectoryCorpusReader::DirIter::equals(IterImpl const *other) const
+{
+    try {
+        DirIter const &that = dynamic_cast<DirIter const &>(*other);
+        return iter == that.iter;
+    } catch (std::bad_cast const &) {
+        return false;
+    }
+}
+
+void DirectoryCorpusReader::DirIter::next()
+{
+    ++iter;
 }
 
 QVector<QString> DirectoryCorpusReader::entries() const
