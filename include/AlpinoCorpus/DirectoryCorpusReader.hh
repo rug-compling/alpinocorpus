@@ -13,6 +13,17 @@ namespace alpinocorpus {
  */
 class DirectoryCorpusReader : public CorpusReader
 {
+    class DirIter : public IterImpl
+    {
+        QVector<QString>::const_iterator iter;
+
+      public:
+        DirIter(QVector<QString>::const_iterator const &i) : iter(i) { }
+        QString const &current() const;
+        bool equals(IterImpl const *) const;
+        void next();
+    };
+
 public:
     DirectoryCorpusReader(QString const &directory, bool cache = true);
     EntryIterator begin() const;

@@ -23,6 +23,16 @@ DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
     open();
 }
 
+CorpusReader::EntryIterator DirectoryCorpusReader::begin() const
+{
+    return EntryIterator(new DirIter(d_entries.constBegin()));
+}
+
+CorpusReader::EntryIterator DirectoryCorpusReader::end() const
+{
+    return EntryIterator(new DirIter(d_entries.constEnd()));
+}
+
 QVector<QString> DirectoryCorpusReader::entries() const
 {
     return d_entries;
