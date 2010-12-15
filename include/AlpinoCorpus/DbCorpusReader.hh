@@ -17,6 +17,21 @@ class DbCorpusReader : public CorpusReader
     DbXml::XmlManager mgr;
     DbXml::XmlContainer container;
 
+    class DbIter : public CorpusReader::IterImpl
+    {
+        QString cur;
+        DbXml::XmlResults r;
+
+      public:
+        DbIter(DbXml::XmlContainer &);
+        DbIter(DbXml::XmlManager &);
+
+        void copy(IterImpl const *);
+        QString const &current() const;
+        bool equals(IterImpl const *) const;
+        void next();
+    };
+
   public:
     DbCorpusReader(QString const &);
     ~DbCorpusReader();

@@ -1,6 +1,7 @@
 #ifndef ALPINO_CORPUSREADER_HH
 #define ALPINO_CORPUSREADER_HH
 
+#include <QSharedPointer>
 #include <QString>
 #include <QVector>
 
@@ -16,32 +17,37 @@ namespace alpinocorpus {
  */
 class CorpusReader
 {
+  protected:
+    // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
+    struct IterImpl {
+        virtual void copy(IterImpl const *);
+        virtual QString const &current() const;
+        virtual bool equals(IterImpl const *) const;
+        virtual void next();
+    };
+
   public:
     /** Iterator over entry names */
     class EntryIterator
         : public std::iterator<std::input_iterator_tag, QString const>
     {
+        QSharedPointer<IterImpl> impl;
+
       public:
-        EntryIterator(EntryIterator const &other) { copy(other); }
-        EntryIterator &operator++() { next(); return *this; }
+        EntryIterator(IterImpl *p) : impl(p) { }
+        EntryIterator(EntryIterator const &other) : impl(other.impl) { }
+        EntryIterator &operator++() { impl->next(); return *this; }
         EntryIterator operator++(int)
         {
             EntryIterator r(*this);
             operator++();
             return r;
         }
-        bool operator==(EntryIterator const &other) { return equals(other); }
-        bool operator!=(EntryIterator const &other) { return !equals(other); }
-        value_type &operator*() { return current(); }
-
-      protected:
-        EntryIterator() { }
-
-      private:
-        virtual void copy(EntryIterator const &);
-        virtual value_type &current();
-        virtual bool equals(EntryIterator const &);
-        virtual void next();
+        bool operator==(EntryIterator const &other)
+        { return impl->equals(other.impl.data()); }
+        bool operator!=(EntryIterator const &other)
+        { return !operator==(other); }
+        value_type &operator*() { return impl->current(); }
     };
 
     virtual ~CorpusReader() {}
