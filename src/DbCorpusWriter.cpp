@@ -46,10 +46,10 @@ namespace alpinocorpus {
 
     void DbCorpusWriter::write(CorpusReader const &corpus)
     {
-        QVector<QString> entry(corpus.entries);
         db::XmlUpdateContext ctx(mkUpdateContext());
-        for (size_t i=0; i<entry.size(); i++)
-            write(entry[i], corpus.read(entry[i]), ctx);
+        for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
+             i != end; ++i)
+            write(*i, corpus.read(*i), ctx);
     }
 
     void DbCorpusWriter::write(QString const &name, QString const &content,

@@ -19,7 +19,11 @@ class DbCorpusWriter
     /** Open path for writing. */
     DbCorpusWriter(QString const &path, bool overwrite);
 
+    /**
+     * Will write name as a portable (Unix, UTF-8) pathname.
+     */
     void write(QString const &name, QString const &content);
+
     void write(CorpusReader const &corpus);
 
   private:
