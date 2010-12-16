@@ -33,4 +33,4 @@ class DbCorpusWriter
 
 }   // namespace alpinocorpus
 
-#endif  ALPINO_DBCORPUSWRITER_HH
+#endif  // ALPINO_DBCORPUSWRITER_HH
