@@ -8,18 +8,18 @@ namespace alpinocorpus {
     DbCorpusWriter::DbCorpusWriter(QString const &qpath, bool overwrite)
      : mgr(), container()
     {
+        std::string path(qpath.toLocal8Bit().data());
+
         try {
             db::XmlContainerConfig config;
             config.setReadOnly(false);
-
-            std::string path(qpath.toLocal8Bit().data());
 
             if (overwrite)
                 container = mgr.createContainer(path, config);
             else
                 container = mgr.openContainer(path, config);
         } catch (XmlException const &e) {
-            throw OpenError(e.what());
+            throw OpenError(path, e.what());
         }
     }
 
