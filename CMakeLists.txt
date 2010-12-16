@@ -43,7 +43,7 @@ set (HEADERS
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/gzip.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
-  include/AlpinoCorpus/IndexedCorpusWriter.hh
+  #include/AlpinoCorpus/IndexedCorpusWriter.hh
   include/AlpinoCorpus/IndexNamePair.hh
   include/AlpinoCorpus/NullStream.hh
   include/AlpinoCorpus/util/base64.hh
