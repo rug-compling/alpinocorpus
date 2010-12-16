@@ -67,8 +67,11 @@ class CorpusReader
     /** Return content of a single treebank entry. */
     virtual QString read(QString const &entry) = 0;
 
-    /** Factory method: open a corpus, determining its type automatically. */
-    static INDEXED_CORPUS_EXPORT CorpusReader *newCorpusReader(QString const &corpusPath);
+    /**
+     * Factory method: open a corpus, determining its type automatically.
+     * The caller is responsible for deleting the object returned.
+     */
+    static INDEXED_CORPUS_EXPORT CorpusReader *open(QString const &corpusPath);
 };
 
 }

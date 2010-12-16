@@ -7,10 +7,7 @@
 #include <QString>
 
 namespace alpinocorpus {
-    /*
-     * XXX Should return some kind of smart pointer
-     */
-    CorpusReader *CorpusReader::newCorpusReader(QString const &corpusPath)
+    CorpusReader *CorpusReader::open(QString const &corpusPath)
     {
         try {
             return new DirectoryCorpusReader(corpusPath);
