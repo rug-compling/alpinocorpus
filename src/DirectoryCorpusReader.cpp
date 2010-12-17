@@ -5,14 +5,12 @@
 #include <QString>
 #include <QtDebug>
 
-#include <algorithm>
 #include <iterator>
 #include <stdexcept>
 #include <typeinfo>
 
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <AlpinoCorpus/IndexNamePair.hh>
 #include <AlpinoCorpus/util/textfile.hh>
 
 namespace alpinocorpus {
@@ -25,28 +23,17 @@ DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
     if (!dir.exists() || !dir.isReadable())
         throw OpenError(d_directory, "non-existent or not readable");
 
-    if (wantCache && readCache())
-      return;
-
-    // Retrieve and sort directory entries.
-    QDirIterator entryIter(dir, QDirIterator::Subdirectories
-                              | QDirIterator::FollowSymlinks);
-    QVector<IndexNamePair> indexedEntries;
-    while (entryIter.hasNext()) {
-        QString entry = entryIter.next();
-        entry = entry.remove(0, d_directory.length());
-        if (entry[0] == '/')
-            entry.remove(0, 1);
-        indexedEntries.push_back(entry);
-        d_entries.push_back(entry); // Ugly hack to inform readers.
+    if (!wantCache || !readCache()) {
+        QDirIterator entryIter(dir, QDirIterator::Subdirectories
+                                  | QDirIterator::FollowSymlinks);
+        while (entryIter.hasNext()) {
+            QString entry = entryIter.next();
+            entry.remove(0, d_directory.length());
+            if (entry[0] == QDir::separator())
+                entry.remove(0, 1);
+            d_entries.push_back(entry);
+        }
     }
-
-    std::sort(indexedEntries.begin(), indexedEntries.end());
-
-    d_entries.clear();
-    for (QVector<IndexNamePair>::const_iterator iter = indexedEntries.constBegin();
-            iter != indexedEntries.constEnd(); ++iter)
-        d_entries.push_back(iter->name);
 
     if (wantCache)
         writeCache();

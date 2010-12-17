@@ -45,7 +45,6 @@ set (HEADERS
   include/AlpinoCorpus/gzip.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/AlpinoCorpus/IndexNamePair.hh
   include/AlpinoCorpus/NullStream.hh
   include/AlpinoCorpus/util/base64.hh
   include/AlpinoCorpus/util/bufutil.hh
@@ -63,7 +62,6 @@ set (SOURCES
   src/OpenError.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
-  src/IndexNamePair.cpp
 )
 
 add_library(alpino_corpus SHARED 
