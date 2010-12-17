@@ -74,10 +74,10 @@ add_library(alpino_corpus SHARED
 target_link_libraries(alpino_corpus ${QT_LIBRARIES})
 target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
 
-add_executable(alpinocvt src/alpinocvt/main.cpp)
-target_link_libraries(alpinocvt alpino_corpus)
-target_link_libraries(alpinocvt ${DBXML_LIBRARY})
-target_link_libraries(alpinocvt ${QT_LIBRARIES})
+add_executable(alpino2db src/alpino2db/main.cpp)
+target_link_libraries(alpino2db alpino_corpus)
+target_link_libraries(alpino2db ${DBXML_LIBRARY})
+target_link_libraries(alpino2db ${QT_LIBRARIES})
 target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
 
 install(TARGETS alpino_corpus
