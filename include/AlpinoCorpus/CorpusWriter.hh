@@ -1,9 +1,6 @@
 #ifndef ALPINO_CORPUSWRITER_HH
 #define ALPINO_CORPUSWRITER_HH
 
-#include <AlpinoCorpus/CorpusReader.hh>
-#include <QString>
-
 namespace alpinocorpus {
 
 /**

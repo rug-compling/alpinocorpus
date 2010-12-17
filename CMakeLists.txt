@@ -37,7 +37,6 @@ endif()
 set (HEADERS
   include/AlpinoCorpus/CorpusReader.hh
   include/AlpinoCorpus/DbCorpusReader.hh
-  include/AlpinoCorpus/DbCorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/DzChunk.hh
@@ -56,7 +55,6 @@ set (HEADERS
 set (SOURCES
   src/CorpusReader.cpp
   src/DbCorpusReader.cpp
-  src/DbCorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter.cpp

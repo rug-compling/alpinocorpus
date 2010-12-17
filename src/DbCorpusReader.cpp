@@ -14,7 +14,7 @@ namespace {
     {
         return QString::fromUtf8(s.c_str());
     }
-}
+};
 
 namespace alpinocorpus {
 
