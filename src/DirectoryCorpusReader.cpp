@@ -21,7 +21,35 @@ DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
                                              bool wantCache)
  : d_directory(directory)
 {
-    open(wantCache);
+    QDir dir(d_directory, "*.xml");
+    if (!dir.exists() || !dir.isReadable())
+        throw OpenError(d_directory, "non-existent or not readable");
+
+    if (wantCache && readCache())
+      return;
+
+    // Retrieve and sort directory entries.
+    QDirIterator entryIter(dir, QDirIterator::Subdirectories
+                              | QDirIterator::FollowSymlinks);
+    QVector<IndexNamePair> indexedEntries;
+    while (entryIter.hasNext()) {
+        QString entry = entryIter.next();
+        entry = entry.remove(0, d_directory.length());
+        if (entry[0] == '/')
+            entry.remove(0, 1);
+        indexedEntries.push_back(entry);
+        d_entries.push_back(entry); // Ugly hack to inform readers.
+    }
+
+    std::sort(indexedEntries.begin(), indexedEntries.end());
+
+    d_entries.clear();
+    for (QVector<IndexNamePair>::const_iterator iter = indexedEntries.constBegin();
+            iter != indexedEntries.constEnd(); ++iter)
+        d_entries.push_back(iter->name);
+
+    if (wantCache)
+        writeCache();
 }
 
 CorpusReader::EntryIterator DirectoryCorpusReader::begin() const
@@ -57,38 +85,6 @@ void DirectoryCorpusReader::DirIter::next()
 QVector<QString> DirectoryCorpusReader::entries() const
 {
     return d_entries;
-}
-
-void DirectoryCorpusReader::open(bool wantCache)
-{
-    QDir dir(d_directory, "*.xml");
-    if (!dir.exists() || !dir.isReadable())
-        throw OpenError(d_directory, "non-existent or not readable");
-
-    if (wantCache && readCache())
-      return;
-
-    // Retrieve and sort directory entries.
-    QDirIterator entryIter(dir, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-    QVector<IndexNamePair> indexedEntries;
-    while (entryIter.hasNext()) {
-        QString entry = entryIter.next();
-        entry = entry.remove(0, d_directory.length());
-        if (entry[0] == '/')
-            entry.remove(0, 1);
-        indexedEntries.push_back(entry);
-        d_entries.push_back(entry); // Ugly hack to inform readers.
-    }
-
-    std::sort(indexedEntries.begin(), indexedEntries.end());
-
-    d_entries.clear();
-    for (QVector<IndexNamePair>::const_iterator iter = indexedEntries.constBegin();
-            iter != indexedEntries.constEnd(); ++iter)
-        d_entries.push_back(iter->name);
-
-    if (wantCache)
-        writeCache();
 }
 
 QString DirectoryCorpusReader::read(QString const &entry)

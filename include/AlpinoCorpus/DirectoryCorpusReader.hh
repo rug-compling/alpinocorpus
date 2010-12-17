@@ -41,7 +41,6 @@ public:
     QString read(const QString &entry);
 
 private:
-    void open(bool);
     bool readCache();
     void writeCache();
 
