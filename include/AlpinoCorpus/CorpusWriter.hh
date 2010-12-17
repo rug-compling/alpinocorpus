@@ -1,6 +1,9 @@
 #ifndef ALPINO_CORPUSWRITER_HH
 #define ALPINO_CORPUSWRITER_HH
 
+#include <AlpinoCorpus/CorpusReader.hh>
+#include <QString>
+
 namespace alpinocorpus {
 
 /**
@@ -14,7 +17,7 @@ class CorpusWriter
     virtual void write(QString const &name, QString const &content) = 0;
 
     /** Write entire corpus to file. */
-    virtual void write(CorpusReader const &corpus) = 0;
+    virtual void write(CorpusReader &corpus) = 0;
 };
 
 }   // namespace alpinocorpus
