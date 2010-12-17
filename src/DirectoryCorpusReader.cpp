@@ -18,10 +18,10 @@
 namespace alpinocorpus {
 
 DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
-    bool cache)
-    : d_directory(directory), d_cache(cache)
+                                             bool wantCache)
+ : d_directory(directory)
 {
-    open();
+    open(wantCache);
 }
 
 CorpusReader::EntryIterator DirectoryCorpusReader::begin() const
@@ -59,13 +59,13 @@ QVector<QString> DirectoryCorpusReader::entries() const
     return d_entries;
 }
 
-void DirectoryCorpusReader::open()
+void DirectoryCorpusReader::open(bool wantCache)
 {
     QDir dir(d_directory, "*.xml");
     if (!dir.exists() || !dir.isReadable())
         throw OpenError(d_directory, "non-existent or not readable");
 
-    if (useCache() && readCache())
+    if (wantCache && readCache())
       return;
 
     // Retrieve and sort directory entries.
@@ -87,7 +87,8 @@ void DirectoryCorpusReader::open()
             iter != indexedEntries.constEnd(); ++iter)
         d_entries.push_back(iter->name);
 
-    writeCache();
+    if (wantCache)
+        writeCache();
 }
 
 QString DirectoryCorpusReader::read(QString const &entry)
@@ -96,49 +97,33 @@ QString DirectoryCorpusReader::read(QString const &entry)
     return util::readFile(filename);
 }
 
+/**
+ * Read directory cache file. Returns true on success.
+ */
 bool DirectoryCorpusReader::readCache()
 {
-  QFile cacheFile(QString("%1.dir_index").arg(d_directory));
-  if (!cacheFile.exists() || !cacheFile.open(QFile::ReadOnly)) {
-    qWarning() << "DirectoryCorpusReader::readCache: Directory cache exists, but could not be opened!";
-    return false;
-  }
+    QFile cache(QString("%1.dir_index").arg(d_directory));
 
-  QTextStream cacheStream(&cacheFile);
-  while (true)
-  {
-    QString line(cacheStream.readLine());
-    if (line.isNull())
-      break;
+    if (!cache.exists()
+     || QFileInfo(d_directory).lastModified() > QFileInfo(cache).lastModified()
+     || !cache.open(QFile::ReadOnly))
+        return false;
 
-    d_entries.push_back(line);
-  }
+    // XXX no error handling below
+    QTextStream cacheStream(&cache);
+    while (true) {
+        QString line(cacheStream.readLine());
+        if (line.isNull())
+            break;
 
-  return true;
-}
+        d_entries.push_back(line);
+    }
 
-bool DirectoryCorpusReader::useCache()
-{
-  if (d_cache == false)
-    return false;
-
-  QString cachePath(QString("%1.dir_index").arg(d_directory));
-  QFileInfo cacheInfo(cachePath);
-  if (!cacheInfo.exists())
-    return false;
-
-  QFileInfo dirInfo(d_directory);
-  if (dirInfo.lastModified() > cacheInfo.lastModified())
-    return false;
-
-  return true;
+    return true;
 }
 
 void DirectoryCorpusReader::writeCache()
 {
-   if (d_cache == false)
-     return;
-
   QString cachePath(QString("%1.dir_index").arg(d_directory));
   QFile cacheFile(cachePath);
   if (!cacheFile.open(QFile::WriteOnly))
