@@ -49,9 +49,18 @@ namespace alpinocorpus {
     {
         db::XmlUpdateContext ctx;
         mkUpdateContext(ctx);
+        BatchError err;
+
         for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
              i != end; ++i)
-            write(*i, corpus.read(*i), ctx);
+            try {
+                write(*i, corpus.read(*i), ctx);
+            } catch (Error const &e) {
+                err.append(e);
+            }
+
+        if (!err.empty())
+            throw err;
     }
 
     /*

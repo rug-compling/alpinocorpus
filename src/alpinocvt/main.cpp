@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         QScopedPointer<CorpusReader> reader(CorpusReader::open(args[1]));
         DbCorpusWriter(args[2], true).write(*reader);
     } catch (alpinocorpus::Error const &e) {
-        std::cerr << argv[0] << ": error: " << e.what() << std::endl;
+        std::cerr << argv[0] << ": " << e.what() << std::endl;
         return 1;
     }
 

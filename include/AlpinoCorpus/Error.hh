@@ -14,6 +14,41 @@ namespace alpinocorpus {
         {
         }
         virtual ~Error() throw() {}
+
+      protected:
+        explicit Error() : std::runtime_error("") {}
+    };
+
+    /**
+     * Error in batch processing/conversion of large corpora.
+     * Logically encapsulates a set of Errors.
+     */
+    class BatchError : public Error
+    {
+        // We can't use an ostringstream because the result of its str()
+        // method would go out of scope at the end of what(), so we'd
+        // return a dangling pointer.
+        std::string msg;
+        size_t n;
+
+      public:
+        explicit BatchError() : msg("Errors in batch conversion:\n"), n(0) { }
+        ~BatchError() throw() {}
+
+        /** Add an exception to the list */
+        void append(Error const &e)
+        {
+            msg += "    ";
+            msg += e.what();
+            msg += '\n';
+            n++;
+        }
+
+        /** True iff no sub-errors recorded */
+        bool empty() const { return n==0; }
+
+        /** Returns a (multi-line) report from the appended Errors. */
+        virtual char const *what() const throw() { return msg.c_str(); }
     };
 
     /**
