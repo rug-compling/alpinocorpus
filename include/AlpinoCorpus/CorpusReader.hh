@@ -67,6 +67,9 @@ class CorpusReader
     /** Return content of a single treebank entry. */
     virtual QString read(QString const &entry) = 0;
 
+    /** The number of entries in the corpus. */
+    virtual size_t size() const = 0;
+
     /**
      * Factory method: open a corpus, determining its type automatically.
      * The caller is responsible for deleting the object returned.
