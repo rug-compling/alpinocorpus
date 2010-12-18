@@ -26,7 +26,7 @@ class CorpusReader
     };
 
   public:
-    /** Iterator over entry names */
+    /** Forward iterator over entry names */
     class EntryIterator
         : public std::iterator<std::input_iterator_tag, QString>
     {
