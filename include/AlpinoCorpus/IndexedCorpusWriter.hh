@@ -1,12 +1,9 @@
 #ifndef ALPINO_INDEXED_CORPUSWRITER_HH
 #define ALPINO_INDEXED_CORPUSWRITER_HH
 
-#include <iostream>
-
 #include <QMutex>
 #include <QSharedPointer>
-
-#include <AlpinoCorpus/NullStream.hh>
+#include <iostream>
 
 namespace alpinocorpus
 {
@@ -15,6 +12,11 @@ typedef QSharedPointer<std::ostream> ostreamPtr;
 
 class IndexedCorpusWriter
 {
+    struct NullStream : std::ostream
+    {
+        NullStream() : std::ios(0), std::ostream(0) {}
+    };
+
 public:
 	IndexedCorpusWriter(ostreamPtr dataStream, ostreamPtr indexStream) :
 		d_dataStream(dataStream), d_indexStream(indexStream), d_offset(0) {}
