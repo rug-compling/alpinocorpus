@@ -55,7 +55,10 @@ class CorpusReader
     /** Return canonical name of corpus */
     virtual QString name() const = 0;
 
-    /** Retrieve the names of all treebank entries. */
+    /**
+     * Retrieve the names of all treebank entries.
+     * @deprecated Use the iterator interface instead.
+     */
     virtual QVector<QString> entries() const = 0;
 
     /** Iterator to begin of entry names */
