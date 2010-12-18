@@ -10,33 +10,36 @@
 namespace db = DbXml;
 
 namespace {
-    QString toQString(std::string const &s)
+    const u_int32_t FLAGS = db::DBXML_LAZY_DOCS | db::DBXML_WELL_FORMED_ONLY;
+
+    /* We handle Unicode strings exclusively */
+    std::string toStdString(QString const &s)
     {
-        return QString::fromUtf8(s.c_str());
+        return std::string(s.toUtf8().constData());
     }
+    QString toQString(char const *s) { return QString::fromUtf8(s); }
+    QString toQString(std::string const &s) { return toQString(c.c_str()); }
 }
 
 namespace alpinocorpus {
-
-/* begin() */
-DbCorpusReader::DbIter::DbIter(db::XmlContainer &container)
-{
-    try {
-        r = container.getAllDocuments( db::DBXML_LAZY_DOCS
-                                     | db::DBXML_WELL_FORMED_ONLY
-                                     );
-        db::XmlDocument doc;
-        r.peek(doc);
-        cur = toQString(doc.getName());
-    } catch (db::XmlException const &e) {
-        throw alpinocorpus::Error(e.what());
-    }
-}
 
 /* end() */
 DbCorpusReader::DbIter::DbIter(db::XmlManager &mgr)
  : r(mgr.createResults())   // builds empty XmlResults
 {
+}
+
+/* begin(), query() */
+DbCorpusReader::DbIter::DbIter(db::XmlResults &r_)
+ : r(r_)
+{
+    try {
+        db::XmlDocument doc;
+        r.peek(doc);
+        cur = toQString(doc.getName());
+    } catch (db::XmlException const &e) {
+        throw Error(e.what());
+    }
 }
 
 /* operator* */
@@ -53,7 +56,8 @@ bool DbCorpusReader::DbIter::equals(IterImpl const *that) const
         if (!self.r.hasNext() && !other->r.hasNext())
             return true;        // both at end()
         return self.r == other->r;
-    } catch (std::bad_cast const &e) {
+    }
+    catch (std::bad_cast const &e) {
         return false;
     }
 }
@@ -80,7 +84,7 @@ DbCorpusReader::DbCorpusReader(QString const &qpath)
         config.setReadOnly(true);
         container = mgr.openContainer(path, config);
     } catch (db::XmlException const &e) {
-        throw OpenError(qpath, QString::fromUtf8(e.what()));
+        throw OpenError(qpath, toQString(e.what()));
     }
 }
 
@@ -90,7 +94,17 @@ DbCorpusReader::~DbCorpusReader()
 
 CorpusReader::EntryIterator DbCorpusReader::begin() const
 {
-    return EntryIterator(new DbIter(const_cast<db::XmlContainer &>(container)));
+    try {
+        // The const_cast below should be safe due to locking.
+        // XXX double-check this
+        db::XmlContainer &cont(const_cast<db::XmlContainer &>(container));
+
+        db::XmlResults r(cont.getAllDocuments(FLAGS));
+        return EntryIterator(new DbIter(r));
+    }
+    catch (db::XmlException const &e) {
+        throw alpinocorpus::Error(e.what());
+    }
 }
 
 CorpusReader::EntryIterator DbCorpusReader::end() const
@@ -102,17 +116,11 @@ QVector<QString> DbCorpusReader::entries() const
 {
     QVector<QString> ents;
     try {
-        // The const_cast below should be safe due to locking.
-        // XXX double-check this
-        db::XmlContainer &container(const_cast<db::XmlContainer &>(this->container));
-        db::XmlResults r(container.getAllDocuments( db::DBXML_LAZY_DOCS
-                                                  | db::DBXML_WELL_FORMED_ONLY
-                                                  ));
-
-        for (db::XmlDocument doc; r.next(doc); )
-            ents.push_back(toQString(doc.getName()));
+        for (EntryIterator i(begin()), to(end()); i != to; ++i)
+            ents.push_back(*i);
         return ents;
-    } catch (db::XmlException const &e) {
+    }
+    catch (db::XmlException const &e) {
         throw Error(e.what());
     }
 }
@@ -122,16 +130,31 @@ QString DbCorpusReader::name() const
     return toQString(container.getName());
 }
 
+EntryIterator DbCorpusReader::query(QString const &qq) const
+{
+    try {
+        // The const_cast below should be safe due to locking.
+        // XXX double-check this
+        db::XmlManager &m(const_cast<db::XmlManager &>(mgr));
+
+        db::XmlQueryContext ctx;
+        return EntryIterator(new DbIter(mgr.query(toStdString(q), ctx, FLAGS)));
+    }
+    catch (db::XmlException const &e) {
+        throw Error(e.what());
+    }
+}
+
 QString DbCorpusReader::read(QString const &filename)
 {
-    std::string name(filename.toUtf8().data());
+    std::string name(toStdString(filename));
 
     try {
         db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
         std::string content;
         return toQString(doc.getContent(content));
-
-    } catch (db::XmlException const &e) {
+    }
+    catch (db::XmlException const &e) {
         std::ostringstream msg;
         msg << "entry \""                  << name
             << "\" cannot be read from \"" << container.getName()
