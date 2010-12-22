@@ -37,6 +37,8 @@ class DbCorpusReader : public CorpusReader
     EntryIterator begin() const;
     EntryIterator end() const;
     QString name() const;
+    /** Execute XPath query. The end of the range is given by end(). */
+    EntryIterator query(QString const &) const;
     QString read(QString const &);
     size_t size() const { return container.getNumDocuments(); }
     QVector<QString> entries() const;

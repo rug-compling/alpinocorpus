@@ -9,10 +9,7 @@ namespace alpinocorpus {
     class Error : public std::runtime_error
     {
       public:
-        explicit Error(std::string const &msg)
-         : std::runtime_error(msg)
-        {
-        }
+        explicit Error(std::string const &msg) : std::runtime_error(msg) {}
         virtual ~Error() throw() {}
 
       protected:
