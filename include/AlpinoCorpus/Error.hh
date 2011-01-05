@@ -52,6 +52,21 @@ namespace alpinocorpus {
     };
 
     /**
+     * Corpus contains duplicate key
+     */
+    class DuplicateKey : public Error
+    {
+        explicit DuplicateKey(QString const &key)
+         : Error(construct(key))
+        {
+        }
+        ~DuplicateKey() throw() {}
+
+      private:
+        static std::string construct(QString const &);
+    };
+
+    /**
      * Construction/open error from corpus readers and writers
      */
     class OpenError : public Error

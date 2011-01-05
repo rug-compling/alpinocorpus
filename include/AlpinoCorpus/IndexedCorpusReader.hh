@@ -59,6 +59,7 @@ public:
     QVector<QString> entries() const;
     QString name() const { return d_canonical; }
     QString read(QString const &filename);
+    size_t size() const { return d_indices.size(); }
 
 private:
     void canonicalize(QString const &);

@@ -38,6 +38,7 @@ class DbCorpusReader : public CorpusReader
     EntryIterator end() const;
     QString name() const;
     QString read(QString const &);
+    size_t size() const { return container.getNumDocuments(); }
     QVector<QString> entries() const;
 };
 

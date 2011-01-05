@@ -4,6 +4,11 @@
 #include <sstream>
 
 namespace alpinocorpus {
+    std::string DuplicateKey::construct(QString const &key)
+    {
+        return std::string("duplicate key: ") + qPrintable(key);
+    }
+
     /*
      * Construct error message from path and optional extra information
      */
@@ -14,7 +19,7 @@ namespace alpinocorpus {
 
     std::string OpenError::construct(QString const &path, QString const &extra)
     {
-        return construct(path, extra.toLocal8Bit().data());
+        return construct(path, qPrintable(data));
     }
 
     std::string OpenError::construct(QString const &path, char const *extra)
