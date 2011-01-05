@@ -23,8 +23,8 @@ class DbCorpusReader : public CorpusReader
         DbXml::XmlResults r;
 
       public:
-        DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
+        DbIter(DbXml::XmlResults const &);
 
         QString const &current() const;
         bool equals(IterImpl const *) const;
