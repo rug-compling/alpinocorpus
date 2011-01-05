@@ -45,7 +45,6 @@ set (HEADERS
   include/AlpinoCorpus/gzip.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/AlpinoCorpus/NullStream.hh
   include/AlpinoCorpus/util/base64.hh
   include/AlpinoCorpus/util/bufutil.hh
   include/AlpinoCorpus/util/stringutil.hh
@@ -59,7 +58,7 @@ set (SOURCES
   src/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter.cpp
-  src/OpenError.cpp
+  src/Error.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
 )

@@ -36,10 +36,14 @@ class DbCorpusReader : public CorpusReader
     ~DbCorpusReader();
     EntryIterator begin() const;
     EntryIterator end() const;
+    QVector<QString> entries() const;
     QString name() const;
     QString read(QString const &);
-    size_t size() const { return container.getNumDocuments(); }
-    QVector<QString> entries() const;
+
+    size_t size() const
+    {
+        return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
+    }
 };
 
 }   // namespace alpinocorpus
