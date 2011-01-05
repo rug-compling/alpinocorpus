@@ -19,7 +19,7 @@ namespace alpinocorpus {
 
     std::string OpenError::construct(QString const &path, QString const &extra)
     {
-        return construct(path, qPrintable(data));
+        return construct(path, qPrintable(extra));
     }
 
     std::string OpenError::construct(QString const &path, char const *extra)

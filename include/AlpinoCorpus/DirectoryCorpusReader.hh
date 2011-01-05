@@ -25,7 +25,15 @@ class DirectoryCorpusReader : public CorpusReader
     };
 
 public:
+    /**
+     * Open directory dir for reading.
+     *
+     * If cache is true, attempt to read the directory's cache file if present
+     * or write one if not present.
+     * Failure to read or write the cache file is not signalled to the caller.
+     */
     DirectoryCorpusReader(QString const &directory, bool cache = true);
+
     EntryIterator begin() const;
     EntryIterator end() const;
     QVector<QString> entries() const;
@@ -34,14 +42,11 @@ public:
     size_t size() const { return d_entries.size(); }
 
 private:
-    void open();
     bool readCache();
-    bool useCache();
     void writeCache();
 
     QString d_directory;
     QVector<QString> d_entries;
-    bool d_cache;
 };
 
 }
