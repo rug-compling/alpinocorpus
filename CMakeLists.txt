@@ -8,7 +8,7 @@ endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 set(CMAKE_CXX_FLAGS "-pthread")
 
 if(APPLE)
-  set (CMAKE_OSX_ARCHITECTURES "i386;x86_64")
+  set (CMAKE_OSX_ARCHITECTURES "x86_64")
   set (CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
 endif(APPLE)
 
@@ -76,6 +76,7 @@ target_link_libraries(alpino2db alpino_corpus)
 target_link_libraries(alpino2db ${DBXML_LIBRARY})
 target_link_libraries(alpino2db ${QT_LIBRARIES})
 target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
+target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
