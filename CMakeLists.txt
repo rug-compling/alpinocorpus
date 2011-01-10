@@ -5,8 +5,10 @@ if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
 endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
+set(CMAKE_CXX_FLAGS "-pthread")
+
 if(APPLE)
-  set (CMAKE_OSX_ARCHITECTURES "i386;x86_64")
+  set (CMAKE_OSX_ARCHITECTURES "x86_64")
   set (CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
 endif(APPLE)
 
@@ -27,16 +29,22 @@ if(QDICTZIP_FOUND)
   include_directories(${QDICTZIP_INCLUDE_DIR})
 endif()
 
+find_package(DBXML REQUIRED)
+if (DBXML_FOUND)
+  include_directories(${DBXML_INCLUDE_DIR})
+endif()
+
 set (HEADERS
   include/AlpinoCorpus/CorpusReader.hh
+  include/AlpinoCorpus/DbCorpusReader.hh
+  include/AlpinoCorpus/DbCorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/DzChunk.hh
+  include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/gzip.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
-  include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/AlpinoCorpus/IndexNamePair.hh
-  include/AlpinoCorpus/NullStream.hh
+  #include/AlpinoCorpus/IndexedCorpusWriter.hh
   include/AlpinoCorpus/util/base64.hh
   include/AlpinoCorpus/util/bufutil.hh
   include/AlpinoCorpus/util/stringutil.hh
@@ -45,12 +53,14 @@ set (HEADERS
 
 set (SOURCES
   src/CorpusReader.cpp
+  src/DbCorpusReader.cpp
+  src/DbCorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter.cpp
+  src/Error.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
-  src/IndexNamePair.cpp
 )
 
 add_library(alpino_corpus SHARED 
@@ -60,6 +70,13 @@ add_library(alpino_corpus SHARED
 
 target_link_libraries(alpino_corpus ${QT_LIBRARIES})
 target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
+
+add_executable(alpino2db src/alpino2db/main.cpp)
+target_link_libraries(alpino2db alpino_corpus)
+target_link_libraries(alpino2db ${DBXML_LIBRARY})
+target_link_libraries(alpino2db ${QT_LIBRARIES})
+target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
+target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib

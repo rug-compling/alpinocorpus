@@ -31,19 +31,45 @@ class IndexedCorpusReader : public CorpusReader
     typedef QHash<QString, IndexItemPtr> IndexMap;
     typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
 
+    class IndexIter : public IterImpl
+    {
+        QVector<IndexItemPtr>::const_iterator iter;
+
+      public:
+        IndexIter(QVector<IndexItemPtr>::const_iterator const &i) : iter(i) { }
+        QString const &current() const;
+        bool equals(IterImpl const *) const;
+        void next();
+    };
+
 public:
 	IndexedCorpusReader() {}
 	IndexedCorpusReader(IndexedCorpusReader const &other);
+
+    /** Construct from a single file (data or index); the other file is sought
+     * for in the same directory.
+     */
+    IndexedCorpusReader(QString const &path);
+    /** Construct from data and index file. */
     IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
 	virtual ~IndexedCorpusReader();
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
+    EntryIterator begin() const;
+    EntryIterator end() const;
     QVector<QString> entries() const;
-    bool open();
+    QString name() const { return d_canonical; }
     QString read(QString const &filename);
+    size_t size() const { return d_indices.size(); }
+
 private:
+    void canonicalize(QString const &);
+    void construct();
+    void construct2();
 	void copy(IndexedCorpusReader const &other);
 	void destroy();
+    void open();
 	
+    QString d_canonical;
     QDictZipFilePtr d_dataFile;
     QString d_dataFilename;
     QVector<IndexItemPtr> d_indices;
