@@ -1,6 +1,9 @@
 #include <AlpinoCorpus/DbCorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <QDir>
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
 #include <sstream>
 
 namespace db = DbXml;
@@ -17,11 +20,15 @@ namespace alpinocorpus {
 
             std::string path(qpath.toLocal8Bit().data());
 
-            if (overwrite)
+            if (overwrite) {
+                if (std::remove(path.c_str()) != 0 && errno != ENOENT)
+                    throw OpenError(qpath,
+                                    QString("cannot remove file: %1")
+                                        .arg(std::strerror(errno)));
                 container = mgr.createContainer(path, config,
                                                 db::XmlContainer
                                                   ::WholedocContainer);
-            else
+            } else
                 container = mgr.openContainer(path, config);
         } catch (db::XmlException const &e) {
             throw OpenError(qpath, e.what());
