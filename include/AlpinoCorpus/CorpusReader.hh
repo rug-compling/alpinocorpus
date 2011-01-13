@@ -6,7 +6,6 @@
 #include <QVector>
 
 #include <AlpinoCorpus/DLLDefines.hh>
-#include <iterator>
 
 namespace alpinocorpus {
 
@@ -24,13 +23,12 @@ class CorpusReader
         virtual QString const &current() const = 0;
         virtual bool equals(IterImpl const *) const = 0;
         virtual void next() = 0;
-        virtual void prev() = 0;
     };
 
   public:
-    /** Iterator over entry names */
+    /** Forward iterator over entry names */
     class EntryIterator
-        : public std::iterator<std::bidirectional_iterator_tag, QString>
+        : public std::iterator<std::input_iterator_tag, QString>
     {
         QSharedPointer<IterImpl> impl;
 
@@ -42,13 +40,6 @@ class CorpusReader
         {
             EntryIterator r(*this);
             operator++();
-            return r;
-        }
-        EntryIterator &operator--() { impl->prev(); return *this; }
-        EntryIterator operator--(int)
-        {
-            EntryIterator r(*this);
-            operator--();
             return r;
         }
         bool operator==(EntryIterator const &other)

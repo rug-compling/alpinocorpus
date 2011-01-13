@@ -143,12 +143,7 @@ bool IndexedCorpusReader::IndexIter::equals(IterImpl const *other) const
 
 void IndexedCorpusReader::IndexIter::next()
 {
-    (void)++iter;
-}
-
-void IndexedCorpusReader::IndexIter::prev()
-{
-    (void)--iter;
+    ++iter;
 }
 
 void IndexedCorpusReader::open()
