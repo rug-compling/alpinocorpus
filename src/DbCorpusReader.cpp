@@ -70,6 +70,18 @@ void DbCorpusReader::DbIter::next()
     }
 }
 
+/* operator-- */
+void DbCorpusReader::DbIter::prev()
+{
+    try {
+        db::XmlDocument doc;
+        r.previous(doc);
+        cur = toQString(doc.getName());
+    } catch (db::XmlException const &e) {
+        throw alpinocorpus::Error(e.what());
+    }
+}
+
 DbCorpusReader::DbCorpusReader(QString const &qpath)
  : mgr(), container()
 {

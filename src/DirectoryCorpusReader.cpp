@@ -66,7 +66,12 @@ bool DirectoryCorpusReader::DirIter::equals(IterImpl const *other) const
 
 void DirectoryCorpusReader::DirIter::next()
 {
-    ++iter;
+    (void)++iter;
+}
+
+void DirectoryCorpusReader::DirIter::prev()
+{
+    (void)--iter;
 }
 
 QVector<QString> DirectoryCorpusReader::entries() const

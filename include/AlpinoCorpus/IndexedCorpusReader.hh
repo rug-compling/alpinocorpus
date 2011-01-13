@@ -40,6 +40,7 @@ class IndexedCorpusReader : public CorpusReader
         QString const &current() const;
         bool equals(IterImpl const *) const;
         void next();
+        void prev();
     };
 
 public:
