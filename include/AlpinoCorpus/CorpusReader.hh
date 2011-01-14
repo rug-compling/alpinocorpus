@@ -23,7 +23,6 @@ class CorpusReader
         virtual QString const &current() const = 0;
         virtual bool equals(IterImpl const *) const = 0;
         virtual void next() = 0;
-        virtual size_t size() const { throw SizeNotAvailable(); }
     };
 
   public:
@@ -49,10 +48,6 @@ class CorpusReader
         { return !operator==(other); }
         value_type const &operator*() const { return impl->current(); }
         //value_type const *operator->() const { return impl->current(); }
-
-        /** Size of corpus (subset) pointed to */
-        size_t size() const throw(SizeNotAvailable)
-        { return impl.size(); }
     };
 
     virtual ~CorpusReader() {}

@@ -83,16 +83,4 @@ namespace alpinocorpus {
         static std::string construct(QString const &path, QString const &extra);
         static std::string construct(QString const &path, char const *extra);
     };
-
-    /**
-     * Thrown by EntryIterator if the size of a corpus (subset) cannot be
-     * determined.
-     */
-    class SizeNotAvailable : public Error
-    {
-      public:
-        explicit SizeNotAvailable()
-         : Error("size of corpus subset not available") { }
-        ~SizeNotAvailable() throw() { }
-    };
 }
