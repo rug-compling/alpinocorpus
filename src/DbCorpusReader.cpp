@@ -18,7 +18,7 @@ namespace {
         return std::string(s.toUtf8().constData());
     }
     QString toQString(char const *s) { return QString::fromUtf8(s); }
-    QString toQString(std::string const &s) { return toQString(c.c_str()); }
+    QString toQString(std::string const &s) { return toQString(s.c_str()); }
 }
 
 namespace alpinocorpus {
@@ -30,7 +30,7 @@ DbCorpusReader::DbIter::DbIter(db::XmlManager &mgr)
 }
 
 /* begin(), query() */
-DbCorpusReader::DbIter::DbIter(db::XmlResults &r_)
+DbCorpusReader::DbIter::DbIter(db::XmlResults const &r_)
  : r(r_)
 {
     try {
@@ -130,7 +130,7 @@ QString DbCorpusReader::name() const
     return toQString(container.getName());
 }
 
-EntryIterator DbCorpusReader::query(QString const &qq) const
+CorpusReader::EntryIterator DbCorpusReader::query(QString const &q) const
 {
     try {
         // The const_cast below should be safe due to locking.
@@ -138,7 +138,7 @@ EntryIterator DbCorpusReader::query(QString const &qq) const
         db::XmlManager &m(const_cast<db::XmlManager &>(mgr));
 
         db::XmlQueryContext ctx;
-        return EntryIterator(new DbIter(mgr.query(toStdString(q), ctx, FLAGS)));
+        return EntryIterator(new DbIter(m.query(toStdString(q), ctx, FLAGS)));
     }
     catch (db::XmlException const &e) {
         throw Error(e.what());

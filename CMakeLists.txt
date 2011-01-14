@@ -8,7 +8,7 @@ endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 set(CMAKE_CXX_FLAGS "-pthread")
 
 if(APPLE)
-  set (CMAKE_OSX_ARCHITECTURES "i386;x86_64")
+  set (CMAKE_OSX_ARCHITECTURES "x86_64")
   set (CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
 endif(APPLE)
 
@@ -45,8 +45,6 @@ set (HEADERS
   include/AlpinoCorpus/gzip.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/AlpinoCorpus/IndexNamePair.hh
-  include/AlpinoCorpus/NullStream.hh
   include/AlpinoCorpus/util/base64.hh
   include/AlpinoCorpus/util/bufutil.hh
   include/AlpinoCorpus/util/stringutil.hh
@@ -60,10 +58,9 @@ set (SOURCES
   src/DirectoryCorpusReader.cpp
   src/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter.cpp
-  src/OpenError.cpp
+  src/Error.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
-  src/IndexNamePair.cpp
 )
 
 add_library(alpino_corpus SHARED 
@@ -79,6 +76,7 @@ target_link_libraries(alpino2db alpino_corpus)
 target_link_libraries(alpino2db ${DBXML_LIBRARY})
 target_link_libraries(alpino2db ${QT_LIBRARIES})
 target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
+target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
