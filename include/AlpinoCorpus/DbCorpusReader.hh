@@ -36,7 +36,6 @@ class DbCorpusReader : public CorpusReader
     ~DbCorpusReader();
     EntryIterator begin() const;
     EntryIterator end() const;
-    QVector<QString> entries() const;
     QString name() const;
     QString read(QString const &);
 

@@ -36,7 +36,6 @@ public:
 
     EntryIterator begin() const;
     EntryIterator end() const;
-    QVector<QString> entries() const;
     QString name() const { return d_directory; }
     QString read(const QString &entry);
     size_t size() const { return d_entries.size(); }

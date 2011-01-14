@@ -115,17 +115,6 @@ void IndexedCorpusReader::destroy()
     d_dataFile.clear();
 }
 
-QVector<QString> IndexedCorpusReader::entries() const
-{
-    QVector<QString> entries;
-	
-    for (QVector<IndexItemPtr>::const_iterator iter = d_indices.constBegin();
-            iter != d_indices.constEnd(); ++iter)
-		entries.push_back((*iter)->name);
-	
-	return entries;
-}
-
 QString const &IndexedCorpusReader::IndexIter::current() const
 {
     return (*iter)->name;

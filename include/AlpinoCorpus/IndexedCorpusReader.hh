@@ -56,7 +56,6 @@ public:
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
     EntryIterator begin() const;
     EntryIterator end() const;
-    QVector<QString> entries() const;
     QString name() const { return d_canonical; }
     QString read(QString const &filename);
     size_t size() const { return d_indices.size(); }

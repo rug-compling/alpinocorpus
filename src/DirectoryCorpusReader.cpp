@@ -69,11 +69,6 @@ void DirectoryCorpusReader::DirIter::next()
     ++iter;
 }
 
-QVector<QString> DirectoryCorpusReader::entries() const
-{
-    return d_entries;
-}
-
 QString DirectoryCorpusReader::read(QString const &entry)
 {
     QString filename(QString("%1/%2").arg(d_directory).arg(entry));

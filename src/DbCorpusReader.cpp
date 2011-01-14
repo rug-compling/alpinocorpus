@@ -98,25 +98,6 @@ CorpusReader::EntryIterator DbCorpusReader::end() const
     return EntryIterator(new DbIter(const_cast<db::XmlManager &>(mgr)));
 }
 
-QVector<QString> DbCorpusReader::entries() const
-{
-    QVector<QString> ents;
-    try {
-        // The const_cast below should be safe due to locking.
-        // XXX double-check this
-        db::XmlContainer &container(const_cast<db::XmlContainer &>(this->container));
-        db::XmlResults r(container.getAllDocuments( db::DBXML_LAZY_DOCS
-                                                  | db::DBXML_WELL_FORMED_ONLY
-                                                  ));
-
-        for (db::XmlDocument doc; r.next(doc); )
-            ents.push_back(toQString(doc.getName()));
-        return ents;
-    } catch (db::XmlException const &e) {
-        throw Error(e.what());
-    }
-}
-
 QString DbCorpusReader::name() const
 {
     return toQString(container.getName());
