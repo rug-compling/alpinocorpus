@@ -19,14 +19,13 @@ class DbCorpusReader : public CorpusReader
 
     class DbIter : public CorpusReader::IterImpl
     {
-        QString cur;
         DbXml::XmlResults r;
 
       public:
         DbIter(DbXml::XmlManager &);
         DbIter(DbXml::XmlResults const &);
 
-        QString const &current() const;
+        QString current() const;
         bool equals(IterImpl const *) const;
         void next();
     };
@@ -36,7 +35,6 @@ class DbCorpusReader : public CorpusReader
     ~DbCorpusReader();
     EntryIterator begin() const;
     EntryIterator end() const;
-    QVector<QString> entries() const;
     QString name() const;
     /** Execute XPath query. The end of the range is given by end(). */
     EntryIterator query(QString const &) const;

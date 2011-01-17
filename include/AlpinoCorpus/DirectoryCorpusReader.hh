@@ -19,7 +19,7 @@ class DirectoryCorpusReader : public CorpusReader
 
       public:
         DirIter(QVector<QString>::const_iterator const &i) : iter(i) { }
-        QString const &current() const;
+        QString current() const;
         bool equals(IterImpl const *) const;
         void next();
     };
@@ -36,7 +36,6 @@ public:
 
     EntryIterator begin() const;
     EntryIterator end() const;
-    QVector<QString> entries() const;
     QString name() const { return d_directory; }
     QString read(const QString &entry);
     size_t size() const { return d_entries.size(); }

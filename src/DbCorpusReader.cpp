@@ -34,16 +34,21 @@ DbCorpusReader::DbIter::DbIter(db::XmlResults const &r_)
  : r(r_)
 {
     try {
-        db::XmlDocument doc;
-        r.peek(doc);
-        cur = toQString(doc.getName());
+        r = container.getAllDocuments( db::DBXML_LAZY_DOCS
+                                     | db::DBXML_WELL_FORMED_ONLY
+                                     );
     } catch (db::XmlException const &e) {
         throw Error(e.what());
     }
 }
 
 /* operator* */
-QString const &DbCorpusReader::DbIter::current() const { return cur; }
+QString DbCorpusReader::DbIter::current() const
+{
+    db::XmlDocument doc;
+    const_cast<db::XmlResults &>(r).peek(doc);
+    return toQString(doc.getName());
+}
 
 /* operator== */
 bool DbCorpusReader::DbIter::equals(IterImpl const *that) const
@@ -68,7 +73,6 @@ void DbCorpusReader::DbIter::next()
     try {
         db::XmlDocument doc;
         r.next(doc);
-        cur = toQString(doc.getName());
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }
@@ -110,19 +114,6 @@ CorpusReader::EntryIterator DbCorpusReader::begin() const
 CorpusReader::EntryIterator DbCorpusReader::end() const
 {
     return EntryIterator(new DbIter(const_cast<db::XmlManager &>(mgr)));
-}
-
-QVector<QString> DbCorpusReader::entries() const
-{
-    QVector<QString> ents;
-    try {
-        for (EntryIterator i(begin()), to(end()); i != to; ++i)
-            ents.push_back(*i);
-        return ents;
-    }
-    catch (db::XmlException const &e) {
-        throw Error(e.what());
-    }
 }
 
 QString DbCorpusReader::name() const

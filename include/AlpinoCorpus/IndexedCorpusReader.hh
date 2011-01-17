@@ -37,7 +37,7 @@ class IndexedCorpusReader : public CorpusReader
 
       public:
         IndexIter(QVector<IndexItemPtr>::const_iterator const &i) : iter(i) { }
-        QString const &current() const;
+        QString current() const;
         bool equals(IterImpl const *) const;
         void next();
     };
@@ -56,7 +56,6 @@ public:
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
     EntryIterator begin() const;
     EntryIterator end() const;
-    QVector<QString> entries() const;
     QString name() const { return d_canonical; }
     QString read(QString const &filename);
     size_t size() const { return d_indices.size(); }

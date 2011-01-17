@@ -49,7 +49,7 @@ CorpusReader::EntryIterator DirectoryCorpusReader::end() const
     return EntryIterator(new DirIter(d_entries.constEnd()));
 }
 
-QString const &DirectoryCorpusReader::DirIter::current() const
+QString DirectoryCorpusReader::DirIter::current() const
 {
     return *iter;
 }
@@ -67,11 +67,6 @@ bool DirectoryCorpusReader::DirIter::equals(IterImpl const *other) const
 void DirectoryCorpusReader::DirIter::next()
 {
     ++iter;
-}
-
-QVector<QString> DirectoryCorpusReader::entries() const
-{
-    return d_entries;
 }
 
 QString DirectoryCorpusReader::read(QString const &entry)
