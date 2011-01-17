@@ -25,9 +25,6 @@ DbCorpusReader::DbIter::DbIter(db::XmlContainer &container)
         r = container.getAllDocuments( db::DBXML_LAZY_DOCS
                                      | db::DBXML_WELL_FORMED_ONLY
                                      );
-        db::XmlDocument doc;
-        r.peek(doc);
-        cur = toQString(doc.getName());
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }
@@ -40,7 +37,12 @@ DbCorpusReader::DbIter::DbIter(db::XmlManager &mgr)
 }
 
 /* operator* */
-QString const &DbCorpusReader::DbIter::current() const { return cur; }
+QString DbCorpusReader::DbIter::current() const
+{
+    db::XmlDocument doc;
+    const_cast<db::XmlResults &>(r).peek(doc);
+    return toQString(doc.getName());
+}
 
 /* operator== */
 bool DbCorpusReader::DbIter::equals(IterImpl const *that) const
@@ -64,7 +66,6 @@ void DbCorpusReader::DbIter::next()
     try {
         db::XmlDocument doc;
         r.next(doc);
-        cur = toQString(doc.getName());
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }

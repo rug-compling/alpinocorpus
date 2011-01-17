@@ -115,7 +115,7 @@ void IndexedCorpusReader::destroy()
     d_dataFile.clear();
 }
 
-QString const &IndexedCorpusReader::IndexIter::current() const
+QString IndexedCorpusReader::IndexIter::current() const
 {
     return (*iter)->name;
 }

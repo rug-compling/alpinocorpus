@@ -49,7 +49,7 @@ CorpusReader::EntryIterator DirectoryCorpusReader::end() const
     return EntryIterator(new DirIter(d_entries.constEnd()));
 }
 
-QString const &DirectoryCorpusReader::DirIter::current() const
+QString DirectoryCorpusReader::DirIter::current() const
 {
     return *iter;
 }

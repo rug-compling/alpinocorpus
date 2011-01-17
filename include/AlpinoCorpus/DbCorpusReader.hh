@@ -19,14 +19,13 @@ class DbCorpusReader : public CorpusReader
 
     class DbIter : public CorpusReader::IterImpl
     {
-        QString cur;
         DbXml::XmlResults r;
 
       public:
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
 
-        QString const &current() const;
+        QString current() const;
         bool equals(IterImpl const *) const;
         void next();
     };
