@@ -106,10 +106,14 @@ namespace alpinocorpus {
             container.putDocument(canonical, content.toUtf8().data(), ctx,
                                   db::DBXML_WELL_FORMED_ONLY);
         } catch (db::XmlException const &e) {
-            std::ostringstream msg;
-            msg << "cannot write document \"" << name.toLocal8Bit().data()
-                << "\": " << e.what();
-            throw Error(msg.str());
+            if (e.getExceptionCode() == db::XmlException::UNIQUE_ERROR)
+                throw DuplicateKey(name);
+            else {
+                std::ostringstream msg;
+                msg << "cannot write document \"" << name.toLocal8Bit().data()
+                    << "\": " << e.what();
+                throw Error(msg.str());
+            }
         }
     }
 }
