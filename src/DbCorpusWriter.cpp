@@ -56,10 +56,28 @@ namespace alpinocorpus {
         write(name, content, mkUpdateContext(ctx));
     }
 
-    void DbCorpusWriter::write(CorpusReader &corpus)
+    void DbCorpusWriter::write(CorpusReader const &corpus, bool fail_first)
     {
         db::XmlUpdateContext ctx;
         mkUpdateContext(ctx);
+
+        if (fail_first)
+            writeFailFirst(corpus, ctx);
+        else
+            writeFailSafe(corpus, ctx);
+    }
+
+    void DbCorpusWriter::writeFailFirst(CorpusReader const &corpus,
+                                        db::XmlUpdateContext &ctx)
+    {
+        for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
+             i != end; ++i)
+            write(*i, corpus.read(*i), ctx);
+    }
+
+    void DbCorpusWriter::writeFailSafe(CorpusReader const &corpus,
+                                       db::XmlUpdateContext &ctx)
+    {
         BatchError err;
 
         for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
