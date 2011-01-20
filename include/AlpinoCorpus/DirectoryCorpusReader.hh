@@ -37,7 +37,7 @@ public:
     EntryIterator begin() const;
     EntryIterator end() const;
     QString name() const { return d_directory; }
-    QString read(const QString &entry);
+    QString read(const QString &entry) const;
     size_t size() const { return d_entries.size(); }
 
 private:

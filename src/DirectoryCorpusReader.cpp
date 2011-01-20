@@ -69,7 +69,7 @@ void DirectoryCorpusReader::DirIter::next()
     ++iter;
 }
 
-QString DirectoryCorpusReader::read(QString const &entry)
+QString DirectoryCorpusReader::read(QString const &entry) const
 {
     QString filename(QString("%1/%2").arg(d_directory).arg(entry));
     return util::readFile(filename);

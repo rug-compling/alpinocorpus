@@ -14,8 +14,11 @@ namespace alpinocorpus {
  */
 class DbCorpusReader : public CorpusReader
 {
-    DbXml::XmlManager mgr;
-    DbXml::XmlContainer container;
+    // XXX mutable is hideous, but saves a lot of const_casts: the read
+    // methods are nominally const (don't change future behavior and are
+    // thread-safe), but DB XML doesn't expose const reading methods.
+    DbXml::XmlManager   mutable mgr;
+    DbXml::XmlContainer mutable container;
 
     class DbIter : public CorpusReader::IterImpl
     {
@@ -36,7 +39,7 @@ class DbCorpusReader : public CorpusReader
     EntryIterator begin() const;
     EntryIterator end() const;
     QString name() const;
-    QString read(QString const &);
+    QString read(QString const &) const;
 
     size_t size() const
     {

@@ -91,12 +91,12 @@ DbCorpusReader::~DbCorpusReader()
 
 CorpusReader::EntryIterator DbCorpusReader::begin() const
 {
-    return EntryIterator(new DbIter(const_cast<db::XmlContainer &>(container)));
+    return EntryIterator(new DbIter(container));
 }
 
 CorpusReader::EntryIterator DbCorpusReader::end() const
 {
-    return EntryIterator(new DbIter(const_cast<db::XmlManager &>(mgr)));
+    return EntryIterator(new DbIter(mgr));
 }
 
 QString DbCorpusReader::name() const
@@ -104,7 +104,7 @@ QString DbCorpusReader::name() const
     return toQString(container.getName());
 }
 
-QString DbCorpusReader::read(QString const &filename)
+QString DbCorpusReader::read(QString const &filename) const
 {
     std::string name(filename.toUtf8().data());
 

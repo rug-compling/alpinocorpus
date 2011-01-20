@@ -62,7 +62,7 @@ class CorpusReader
     virtual EntryIterator end() const = 0;
 
     /** Return content of a single treebank entry. */
-    virtual QString read(QString const &entry) = 0;
+    virtual QString read(QString const &entry) const = 0;
 
     /** The number of entries in the corpus. */
     virtual size_t size() const = 0;
