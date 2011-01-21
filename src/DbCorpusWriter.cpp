@@ -14,8 +14,6 @@ namespace alpinocorpus {
     {
         try {
             db::XmlContainerConfig config;
-            config.setCompressionName(db::XmlContainerConfig
-                                        ::DEFAULT_COMPRESSION);
             config.setReadOnly(false);
 
             std::string path(qpath.toLocal8Bit().data());
@@ -27,7 +25,7 @@ namespace alpinocorpus {
                                         .arg(std::strerror(errno)));
                 container = mgr.createContainer(path, config,
                                                 db::XmlContainer
-                                                  ::WholedocContainer);
+                                                  ::NodeContainer);
             } else
                 container = mgr.openContainer(path, config);
         } catch (db::XmlException const &e) {
