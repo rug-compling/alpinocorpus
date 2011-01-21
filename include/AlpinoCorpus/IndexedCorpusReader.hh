@@ -5,7 +5,7 @@
 #include <QMutex>
 #include <QSharedPointer>
 #include <QString>
-#include <QVector>
+#include <vector>
 
 #include <QDictZip/QDictZipFile.hh>
 
@@ -18,25 +18,26 @@ class IndexedCorpusReader : public CorpusReader
 {
     struct IndexItem
     {
-        IndexItem(QString newName, size_t newOffset, size_t newSize)
-		    : name(newName), offset(newOffset), size(newSize) {}
-	    IndexItem() : name(""), offset(0), size(0) {}
+        IndexItem(QString const &newName, size_t newOffset, size_t newSize)
+         : name(newName), offset(newOffset), size(newSize) {}
+        IndexItem() : name(""), offset(0), size(0) {}
 
         QString name;
-	    size_t offset;
-	    size_t size;
+        size_t offset;
+        size_t size;
     };
 
     typedef QSharedPointer<IndexItem> IndexItemPtr;
     typedef QHash<QString, IndexItemPtr> IndexMap;
     typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
+    typedef std::vector<IndexItemPtr> ItemVector;
 
     class IndexIter : public IterImpl
     {
-        QVector<IndexItemPtr>::const_iterator iter;
+        ItemVector::const_iterator iter;
 
       public:
-        IndexIter(QVector<IndexItemPtr>::const_iterator const &i) : iter(i) { }
+        IndexIter(ItemVector::const_iterator const &i) : iter(i) { }
         QString current() const;
         bool equals(IterImpl const *) const;
         void next();

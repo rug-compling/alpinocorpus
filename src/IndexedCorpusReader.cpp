@@ -9,7 +9,6 @@
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
-#include <QVector>
 #include <QtDebug>
 
 #include <QDictZip/QDictZipFile.hh>
@@ -77,12 +76,14 @@ IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &o
 
 CorpusReader::EntryIterator IndexedCorpusReader::getBegin() const
 {
-    return EntryIterator(new IndexIter(d_indices.constBegin()));
+    ItemVector::const_iterator begin(d_indices.begin());
+    return EntryIterator(new IndexIter(begin));
 }
 
 CorpusReader::EntryIterator IndexedCorpusReader::getEnd() const
 {
-    return EntryIterator(new IndexIter(d_indices.constEnd()));
+    ItemVector::const_iterator end(d_indices.end());
+    return EntryIterator(new IndexIter(end));
 }
 
 /*
