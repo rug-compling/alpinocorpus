@@ -100,7 +100,6 @@ bool DirectoryCorpusReader::readCache()
      || !cache.open(QFile::ReadOnly))
         return false;
 
-    // XXX no error handling below
     QTextStream cacheStream(&cache);
     while (true) {
         QString line(cacheStream.readLine());
@@ -110,7 +109,12 @@ bool DirectoryCorpusReader::readCache()
         d_entries.push_back(line);
     }
 
-    return true;
+    if (cacheStream.atEnd())
+        return true;
+    else {      // I/O error occurred
+        d_entries.clear();
+        return false;
+    }
 }
 
 void DirectoryCorpusReader::writeCache()
