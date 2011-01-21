@@ -8,7 +8,7 @@ namespace alpinocorpus {
 
 /**
  * Corpus writer for DB XML-based file format.
- * See <AlpinoCorpus/DbCorpusReader> for file format.
+ * See <AlpinoCorpus/DbCorpusReader.hh> for file format.
  */
 class DbCorpusWriter
 {
