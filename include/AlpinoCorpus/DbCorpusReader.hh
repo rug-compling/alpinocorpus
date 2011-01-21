@@ -27,6 +27,7 @@ class DbCorpusReader : public CorpusReader
       public:
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
+        DbIter(DbXml::XmlResults const &);
 
         QString current() const;
         bool equals(IterImpl const *) const;
@@ -41,6 +42,7 @@ class DbCorpusReader : public CorpusReader
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
     QString readEntry(QString const &) const;
+    EntryIterator runQuery(QString const &) const;
 
     size_t getSize() const
     {

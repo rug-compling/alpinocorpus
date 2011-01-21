@@ -30,6 +30,12 @@ DbCorpusReader::DbIter::DbIter(db::XmlContainer &container)
     }
 }
 
+/* query */
+DbCorpusReader::DbIter::DbIter(db::XmlResults const &r_)
+ : r(r_)
+{
+}
+
 /* end() */
 DbCorpusReader::DbIter::DbIter(db::XmlManager &mgr)
  : r(mgr.createResults())   // builds empty XmlResults
@@ -117,6 +123,17 @@ QString DbCorpusReader::readEntry(QString const &filename) const
             << ")";
         throw Error(msg.str());
     }
+}
+
+CorpusReader::EntryIterator DbCorpusReader::runQuery(QString const &query) const
+{
+    db::XmlQueryContext ctx;    // XXX should this be in the iterator?
+    // XXX use DBXML_DOCUMENT_PROJECTION and return to whole-doc containers?
+    db::XmlResults r(mgr.query(query.toUtf8().data(), ctx,
+                               db::DBXML_LAZY_DOCS | db::DBXML_WELL_FORMED_ONLY
+                              ));
+
+    return EntryIterator(new DbIter(r));
 }
 
 }   // namespace alpinocorpus
