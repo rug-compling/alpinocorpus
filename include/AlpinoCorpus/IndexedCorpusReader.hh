@@ -5,7 +5,7 @@
 #include <QMutex>
 #include <QSharedPointer>
 #include <QString>
-#include <QVector>
+#include <vector>
 
 #include <QDictZip/QDictZipFile.hh>
 
@@ -18,25 +18,26 @@ class IndexedCorpusReader : public CorpusReader
 {
     struct IndexItem
     {
-        IndexItem(QString newName, size_t newOffset, size_t newSize)
-		    : name(newName), offset(newOffset), size(newSize) {}
-	    IndexItem() : name(""), offset(0), size(0) {}
+        IndexItem(QString const &newName, size_t newOffset, size_t newSize)
+         : name(newName), offset(newOffset), size(newSize) {}
+        IndexItem() : name(""), offset(0), size(0) {}
 
         QString name;
-	    size_t offset;
-	    size_t size;
+        size_t offset;
+        size_t size;
     };
 
     typedef QSharedPointer<IndexItem> IndexItemPtr;
     typedef QHash<QString, IndexItemPtr> IndexMap;
     typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
+    typedef std::vector<IndexItemPtr> ItemVector;
 
     class IndexIter : public IterImpl
     {
-        QVector<IndexItemPtr>::const_iterator iter;
+        ItemVector::const_iterator iter;
 
       public:
-        IndexIter(QVector<IndexItemPtr>::const_iterator const &i) : iter(i) { }
+        IndexIter(ItemVector::const_iterator const &i) : iter(i) { }
         QString current() const;
         bool equals(IterImpl const *) const;
         void next();
@@ -54,25 +55,23 @@ public:
     IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
 	virtual ~IndexedCorpusReader();
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
-    EntryIterator begin() const;
-    EntryIterator end() const;
-    QString name() const { return d_canonical; }
-    QString read(QString const &filename);
-    size_t size() const { return d_indices.size(); }
+    //QString name() const { return d_canonical; }
 
 private:
-    void canonicalize(QString const &);
-    void construct();
-    void construct2();
+    virtual EntryIterator getBegin() const;
+    virtual EntryIterator getEnd() const;
+    virtual QString readEntry(QString const &filename) const;
+    virtual size_t getSize() const { return d_indices.size(); }
+
+    static void canonicalize(QString &);
+    void construct(QString const &);
+    void construct(QString const &, QString const &, QString const &);
 	void copy(IndexedCorpusReader const &other);
 	void destroy();
-    void open();
+    void open(QString const &, QString const &);
 	
-    QString d_canonical;
     QDictZipFilePtr d_dataFile;
-    QString d_dataFilename;
     QVector<IndexItemPtr> d_indices;
-    QString d_indexFilename;
 	IndexMap d_namedIndices;
 
 	QMutex d_mutex;

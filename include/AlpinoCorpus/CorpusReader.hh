@@ -17,6 +17,8 @@ namespace alpinocorpus {
  */
 class CorpusReader
 {
+    QString name_;
+
   protected:
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
     struct IterImpl {
@@ -24,6 +26,8 @@ class CorpusReader
         virtual bool equals(IterImpl const *) const = 0;
         virtual void next() = 0;
     };
+
+    void setName(QString const &n) { name_ = n; }
 
   public:
     /** Forward iterator over entry names */
@@ -53,25 +57,31 @@ class CorpusReader
     virtual ~CorpusReader() {}
 
     /** Return canonical name of corpus */
-    virtual QString name() const = 0;
+    QString const &name() const { return name_; }
 
     /** Iterator to begin of entry names */
-    virtual EntryIterator begin() const = 0;
+    EntryIterator begin() const { return getBegin(); }
 
     /** Iterator to end of entry names */
-    virtual EntryIterator end() const = 0;
+    EntryIterator end() const { return getEnd(); }
 
     /** Return content of a single treebank entry. */
-    virtual QString read(QString const &entry) = 0;
+    QString read(QString const &entry) const { return readEntry(entry); }
 
     /** The number of entries in the corpus. */
-    virtual size_t size() const = 0;
+    size_t size() const { return getSize(); }
 
     /**
      * Factory method: open a corpus, determining its type automatically.
      * The caller is responsible for deleting the object returned.
      */
     static INDEXED_CORPUS_EXPORT CorpusReader *open(QString const &corpusPath);
+
+  private:
+    virtual EntryIterator getBegin() const = 0;
+    virtual EntryIterator getEnd() const = 0;
+    virtual QString readEntry(QString const &entry) const = 0;
+    virtual size_t getSize() const = 0;
 };
 
 }

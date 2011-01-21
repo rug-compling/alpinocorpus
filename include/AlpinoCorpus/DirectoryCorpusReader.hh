@@ -1,8 +1,9 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_HH
 #define ALPINO_DIRECTORYCORPUSREADER_HH
 
+#include <QDir>
 #include <QString>
-#include <QVector>
+#include <vector>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -13,12 +14,14 @@ namespace alpinocorpus {
  */
 class DirectoryCorpusReader : public CorpusReader
 {
+    typedef std::vector<QString> StrVector;
+
     class DirIter : public IterImpl
     {
-        QVector<QString>::const_iterator iter;
+        StrVector::const_iterator iter;
 
       public:
-        DirIter(QVector<QString>::const_iterator const &i) : iter(i) { }
+        DirIter(StrVector::const_iterator const &i) : iter(i) { }
         QString current() const;
         bool equals(IterImpl const *) const;
         void next();
@@ -34,18 +37,20 @@ public:
      */
     DirectoryCorpusReader(QString const &directory, bool cache = true);
 
-    EntryIterator begin() const;
-    EntryIterator end() const;
-    QString name() const { return d_directory; }
-    QString read(const QString &entry);
-    size_t size() const { return d_entries.size(); }
+    //QString name() const { return d_directory; }
 
 private:
+    virtual EntryIterator getBegin() const;
+    virtual EntryIterator getEnd() const;
+    virtual QString readEntry(const QString &entry) const;
+    virtual size_t getSize() const { return d_entries.size(); }
+
+    void cacheFile(QFile &) const;
     bool readCache();
     void writeCache();
 
-    QString d_directory;
-    QVector<QString> d_entries;
+    QDir d_directory;
+    StrVector d_entries;
 };
 
 }

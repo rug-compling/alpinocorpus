@@ -53,6 +53,7 @@ namespace alpinocorpus {
      */
     class DuplicateKey : public Error
     {
+      public:
         explicit DuplicateKey(QString const &key)
          : Error(construct(key))
         {

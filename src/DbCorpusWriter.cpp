@@ -14,8 +14,6 @@ namespace alpinocorpus {
     {
         try {
             db::XmlContainerConfig config;
-            config.setCompressionName(db::XmlContainerConfig
-                                        ::DEFAULT_COMPRESSION);
             config.setReadOnly(false);
 
             std::string path(qpath.toLocal8Bit().data());
@@ -27,7 +25,7 @@ namespace alpinocorpus {
                                         .arg(std::strerror(errno)));
                 container = mgr.createContainer(path, config,
                                                 db::XmlContainer
-                                                  ::WholedocContainer);
+                                                  ::NodeContainer);
             } else
                 container = mgr.openContainer(path, config);
         } catch (db::XmlException const &e) {
@@ -56,10 +54,28 @@ namespace alpinocorpus {
         write(name, content, mkUpdateContext(ctx));
     }
 
-    void DbCorpusWriter::write(CorpusReader &corpus)
+    void DbCorpusWriter::write(CorpusReader const &corpus, bool fail_first)
     {
         db::XmlUpdateContext ctx;
         mkUpdateContext(ctx);
+
+        if (fail_first)
+            writeFailFirst(corpus, ctx);
+        else
+            writeFailSafe(corpus, ctx);
+    }
+
+    void DbCorpusWriter::writeFailFirst(CorpusReader const &corpus,
+                                        db::XmlUpdateContext &ctx)
+    {
+        for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
+             i != end; ++i)
+            write(*i, corpus.read(*i), ctx);
+    }
+
+    void DbCorpusWriter::writeFailSafe(CorpusReader const &corpus,
+                                       db::XmlUpdateContext &ctx)
+    {
         BatchError err;
 
         for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
@@ -88,10 +104,14 @@ namespace alpinocorpus {
             container.putDocument(canonical, content.toUtf8().data(), ctx,
                                   db::DBXML_WELL_FORMED_ONLY);
         } catch (db::XmlException const &e) {
-            std::ostringstream msg;
-            msg << "cannot write document \"" << name.toLocal8Bit().data()
-                << "\": " << e.what();
-            throw Error(msg.str());
+            if (e.getExceptionCode() == db::XmlException::UNIQUE_ERROR)
+                throw DuplicateKey(name);
+            else {
+                std::ostringstream msg;
+                msg << "cannot write document \"" << name.toLocal8Bit().data()
+                    << "\": " << e.what();
+                throw Error(msg.str());
+            }
         }
     }
 }
