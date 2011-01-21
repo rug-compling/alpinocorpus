@@ -43,12 +43,12 @@ DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
 
 CorpusReader::EntryIterator DirectoryCorpusReader::getBegin() const
 {
-    return EntryIterator(new DirIter(d_entries.constBegin()));
+    return EntryIterator(new DirIter(d_entries.begin()));
 }
 
 CorpusReader::EntryIterator DirectoryCorpusReader::getEnd() const
 {
-    return EntryIterator(new DirIter(d_entries.constEnd()));
+    return EntryIterator(new DirIter(d_entries.end()));
 }
 
 QString DirectoryCorpusReader::DirIter::current() const
@@ -119,16 +119,15 @@ bool DirectoryCorpusReader::readCache()
 
 void DirectoryCorpusReader::writeCache()
 {
-  QFile cache;
-  cacheFile(cache);
-  if (!cache.open(QFile::WriteOnly))
-    return;
+    QFile cache;
+    cacheFile(cache);
+    if (!cache.open(QFile::WriteOnly))
+        return;
 
-  QTextStream cacheStream(&cache);
-  // QTextStreamIterator???
-  for (QVector<QString>::iterator iter = d_entries.begin();
-      iter != d_entries.end(); ++iter)
-    cacheStream << *iter << "\n";
+    QTextStream cacheStream(&cache);
+    for (StrVector::const_iterator i(d_entries.begin()), end(d_entries.end());
+         i != end; ++i)
+    cacheStream << *i << "\n";
 }
 
 }   // namespace alpinocorpus
