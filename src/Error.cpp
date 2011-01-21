@@ -9,6 +9,13 @@ namespace alpinocorpus {
         return std::string("duplicate key: ") + qPrintable(key);
     }
 
+    std::string NotImplemented::construct(char const *type, char const *func)
+    {
+        std::ostringstream msg;
+        msg << func << " not implemented in class " << type;
+        return msg.str();
+    }
+
     /*
      * Construct error message from path and optional extra information
      */

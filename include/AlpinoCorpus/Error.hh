@@ -55,13 +55,25 @@ namespace alpinocorpus {
     {
       public:
         explicit DuplicateKey(QString const &key)
-         : Error(construct(key))
-        {
-        }
+         : Error(construct(key)) {}
         ~DuplicateKey() throw() {}
 
       private:
         static std::string construct(QString const &);
+    };
+
+    /**
+     * Functionality not implemented (yet)
+     */
+    class NotImplemented : public Error
+    {
+      public:
+        explicit NotImplemented(char const *type, char const *func)
+         : Error(construct(type, func)) {}
+        ~NotImplemented() throw() {}
+
+      private:
+        std::string construct(char const *, char const *);
     };
 
     /**
@@ -71,9 +83,9 @@ namespace alpinocorpus {
     {
       public:
         explicit OpenError(QString const &path)
-         : Error(construct(path)) { }
+         : Error(construct(path)) {}
         explicit OpenError(QString const &path, QString const &extra)
-         : Error(construct(path, extra)) { }
+         : Error(construct(path, extra)) {}
         ~OpenError() throw() {}
 
       private:

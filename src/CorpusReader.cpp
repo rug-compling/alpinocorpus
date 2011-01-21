@@ -5,6 +5,7 @@
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 
 #include <QString>
+#include <typeinfo>
 
 namespace alpinocorpus {
     CorpusReader *CorpusReader::open(QString const &corpusPath)
@@ -20,5 +21,10 @@ namespace alpinocorpus {
         }
 
         return new DbCorpusReader(corpusPath);
+    }
+
+    CorpusReader::EntryIterator CorpusReader::runQuery(QString const &) const
+    {
+        throw NotImplemented(typeid(*this).name(), "XQuery functionality");
     }
 }
