@@ -54,25 +54,23 @@ public:
     IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
 	virtual ~IndexedCorpusReader();
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
-    EntryIterator begin() const;
-    EntryIterator end() const;
-    QString name() const { return d_canonical; }
-    QString read(QString const &filename) const;
-    size_t size() const { return d_indices.size(); }
+    //QString name() const { return d_canonical; }
 
 private:
-    void canonicalize(QString const &);
-    void construct();
-    void construct2();
+    virtual EntryIterator getBegin() const;
+    virtual EntryIterator getEnd() const;
+    virtual QString readEntry(QString const &filename) const;
+    virtual size_t getSize() const { return d_indices.size(); }
+
+    static void canonicalize(QString &);
+    void construct(QString const &);
+    void construct(QString const &, QString const &, QString const &);
 	void copy(IndexedCorpusReader const &other);
 	void destroy();
-    void open();
+    void open(QString const &, QString const &);
 	
-    QString d_canonical;
     QDictZipFilePtr d_dataFile;
-    QString d_dataFilename;
     QVector<IndexItemPtr> d_indices;
-    QString d_indexFilename;
 	IndexMap d_namedIndices;
 
 	QMutex d_mutex;

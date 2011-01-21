@@ -36,12 +36,13 @@ class DbCorpusReader : public CorpusReader
   public:
     DbCorpusReader(QString const &);
     ~DbCorpusReader();
-    EntryIterator begin() const;
-    EntryIterator end() const;
-    QString name() const;
-    QString read(QString const &) const;
 
-    size_t size() const
+  private:
+    EntryIterator getBegin() const;
+    EntryIterator getEnd() const;
+    QString readEntry(QString const &) const;
+
+    size_t getSize() const
     {
         return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
     }

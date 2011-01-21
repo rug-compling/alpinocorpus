@@ -80,6 +80,7 @@ DbCorpusReader::DbCorpusReader(QString const &qpath)
         db::XmlContainerConfig config;
         config.setReadOnly(true);
         container = mgr.openContainer(path, config);
+        setName(toQString(container.getName()));
     } catch (db::XmlException const &e) {
         throw OpenError(qpath, QString::fromUtf8(e.what()));
     }
@@ -89,22 +90,17 @@ DbCorpusReader::~DbCorpusReader()
 {
 }
 
-CorpusReader::EntryIterator DbCorpusReader::begin() const
+CorpusReader::EntryIterator DbCorpusReader::getBegin() const
 {
     return EntryIterator(new DbIter(container));
 }
 
-CorpusReader::EntryIterator DbCorpusReader::end() const
+CorpusReader::EntryIterator DbCorpusReader::getEnd() const
 {
     return EntryIterator(new DbIter(mgr));
 }
 
-QString DbCorpusReader::name() const
-{
-    return toQString(container.getName());
-}
-
-QString DbCorpusReader::read(QString const &filename) const
+QString DbCorpusReader::readEntry(QString const &filename) const
 {
     std::string name(filename.toUtf8().data());
 

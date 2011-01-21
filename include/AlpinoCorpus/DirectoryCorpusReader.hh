@@ -1,6 +1,7 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_HH
 #define ALPINO_DIRECTORYCORPUSREADER_HH
 
+#include <QDir>
 #include <QString>
 #include <QVector>
 
@@ -34,17 +35,19 @@ public:
      */
     DirectoryCorpusReader(QString const &directory, bool cache = true);
 
-    EntryIterator begin() const;
-    EntryIterator end() const;
-    QString name() const { return d_directory; }
-    QString read(const QString &entry) const;
-    size_t size() const { return d_entries.size(); }
+    //QString name() const { return d_directory; }
 
 private:
+    virtual EntryIterator getBegin() const;
+    virtual EntryIterator getEnd() const;
+    virtual QString readEntry(const QString &entry) const;
+    virtual size_t getSize() const { return d_entries.size(); }
+
+    void cacheFile(QFile &) const;
     bool readCache();
     void writeCache();
 
-    QString d_directory;
+    QDir d_directory;
     QVector<QString> d_entries;
 };
 

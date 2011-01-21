@@ -27,43 +27,41 @@ namespace alpinocorpus {
 
 IndexedCorpusReader::IndexedCorpusReader(QString const &filename)
 {
-    canonicalize(filename);
-    construct();
+    QString canonical(filename);
+    canonicalize(canonical);
+    construct(canonical);
 }
 
-IndexedCorpusReader::IndexedCorpusReader(QString const &dataFilename,
-        QString const &indexFilename)
-    : d_dataFilename(dataFilename), d_indexFilename(indexFilename)
+IndexedCorpusReader::IndexedCorpusReader(QString const &dataPath,
+                                         QString const &indexPath)
 {
-    canonicalize(dataFilename);
-    construct2();
+    QString canonical(dataPath);
+    canonicalize(canonical);
+    construct(canonical, dataPath, indexPath);
 }
 
-/*
- * Construct from canonical name only
- */
-void IndexedCorpusReader::construct()
+void IndexedCorpusReader::construct(QString const &canonical)
 {
-    d_dataFilename  = d_canonical + DATA_EXT;
-    d_indexFilename = d_canonical + INDEX_EXT;
-    construct2();
+    QString dataPath  = canonical + DATA_EXT;
+    QString indexPath = canonical + INDEX_EXT;
+    construct(canonical, dataPath, indexPath);
 }
 
-/*
- * Construct from canonical name and two filenames
- */
-void IndexedCorpusReader::construct2()
+void IndexedCorpusReader::construct(QString const &canonical,
+                                    QString const &dataPath,
+                                    QString const &indexPath)
 {
     // XXX race condition up ahead
-    QFileInfo data(d_dataFilename);
+    QFileInfo data(dataPath);
     if (!data.isFile() || !data.isReadable())
-        throw OpenError(d_dataFilename, "not readable or not a plain file");
+        throw OpenError(dataPath, "not readable or not a plain file");
 
-    QFileInfo index(d_indexFilename);
+    QFileInfo index(indexPath);
     if (!index.isFile() || !index.isReadable())
-        throw OpenError(d_indexFilename, "not readable or not a plain file");
+        throw OpenError(indexPath, "not readable or not a plain file");
 
-    open();
+    open(dataPath, indexPath);
+    setName(canonical);
 }
 
 IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &other)
@@ -77,12 +75,12 @@ IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &o
 	return *this;
 }
 
-CorpusReader::EntryIterator IndexedCorpusReader::begin() const
+CorpusReader::EntryIterator IndexedCorpusReader::getBegin() const
 {
     return EntryIterator(new IndexIter(d_indices.constBegin()));
 }
 
-CorpusReader::EntryIterator IndexedCorpusReader::end() const
+CorpusReader::EntryIterator IndexedCorpusReader::getEnd() const
 {
     return EntryIterator(new IndexIter(d_indices.constEnd()));
 }
@@ -90,13 +88,12 @@ CorpusReader::EntryIterator IndexedCorpusReader::end() const
 /*
  * Canonicalize file name. To be called from constructor.
  */
-void IndexedCorpusReader::canonicalize(QString const &filename)
+void IndexedCorpusReader::canonicalize(QString &filename)
 {
-    d_canonical = filename;
     if (filename.endsWith(DATA_EXT))
-        d_canonical.chop(8);
+        filename.chop(8);
     else if (filename.endsWith(INDEX_EXT))
-        d_canonical.chop(6);
+        filename.chop(6);
     else
         throw OpenError(filename, "not an indexed (.dz) corpus file");
 }
@@ -135,15 +132,16 @@ void IndexedCorpusReader::IndexIter::next()
     ++iter;
 }
 
-void IndexedCorpusReader::open()
+void IndexedCorpusReader::open(QString const &dataPath,
+                               QString const &indexPath)
 {
-    QFile indexFile(d_indexFilename);
+    QFile indexFile(indexPath);
     if (!indexFile.open(QFile::ReadOnly))
-        throw OpenError(d_indexFilename);
+        throw OpenError(indexPath);
 
-    d_dataFile = QDictZipFilePtr(new QDictZipFile(d_dataFilename));
+    d_dataFile = QDictZipFilePtr(new QDictZipFile(dataPath));
     if (!d_dataFile->open(QDictZipFile::ReadOnly))
-        throw OpenError(d_indexFilename);
+        throw OpenError(indexPath);
 
     QTextStream indexStream(&indexFile);
 
@@ -157,7 +155,7 @@ void IndexedCorpusReader::open()
         QStringList lineParts = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 
         if (lineParts.size() != 3)
-            throw OpenError(d_indexFilename,
+            throw OpenError(indexPath,
                             QString::fromUtf8("malformed line in index file"));
 
         QString name(lineParts[0]);
@@ -170,7 +168,7 @@ void IndexedCorpusReader::open()
     }
 }
 
-QString IndexedCorpusReader::read(QString const &filename) const
+QString IndexedCorpusReader::readEntry(QString const &filename) const
 {
     QHash<QString, IndexItemPtr>::const_iterator iter = d_namedIndices.find(filename);
     if (iter == d_namedIndices.end())
