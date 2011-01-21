@@ -1,3 +1,12 @@
+/*
+ * Oracle Berkeley DB XML-based treebank reader.
+ * Written by Lars Buitinck.
+ *
+ * The basic format is explained in the header. An additional notes:
+ *  - We use DBML_WELL_FORMED_ONLY to prevent having to read the DTD.
+ *    This only works because the DTD does not define entities.
+ */
+
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 
