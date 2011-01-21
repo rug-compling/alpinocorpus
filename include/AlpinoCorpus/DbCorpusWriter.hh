@@ -1,7 +1,8 @@
 #ifndef ALPINO_DBCORPUSWRITER_HH
 #define ALPINO_DBCORPUSWRITER_HH
 
-#include <AlpinoCorpus/CorpusWriter.hh>
+#include <AlpinoCorpus/CorpusReader.hh>
+#include <QString>
 #include <dbxml/DbXml.hpp>
 
 namespace alpinocorpus {
