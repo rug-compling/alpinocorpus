@@ -37,6 +37,7 @@ class CorpusReader
         QSharedPointer<IterImpl> impl;
 
       public:
+        EntryIterator() {}
         EntryIterator(IterImpl *p) : impl(p) { }
         EntryIterator(EntryIterator const &other) : impl(other.impl) { }
         EntryIterator &operator++() { impl->next(); return *this; }
