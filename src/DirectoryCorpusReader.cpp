@@ -53,7 +53,7 @@ CorpusReader::EntryIterator DirectoryCorpusReader::getEnd() const
 
 QString DirectoryCorpusReader::DirIter::current() const
 {
-    return *iter;
+    return QDir::fromNativeSeparators(*iter);
 }
 
 bool DirectoryCorpusReader::DirIter::equals(IterImpl const *other) const
