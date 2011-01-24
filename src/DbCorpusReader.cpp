@@ -95,7 +95,7 @@ DbCorpusReader::DbCorpusReader(QString const &qpath)
         db::XmlContainerConfig config;
         config.setReadOnly(true);
         container = mgr.openContainer(path, config);
-        setName(toQString(container.getName()));
+        setNameAndCollection(qpath);
     } catch (db::XmlException const &e) {
         throw OpenError(qpath, QString::fromUtf8(e.what()));
     }
@@ -134,15 +134,42 @@ QString DbCorpusReader::readEntry(QString const &filename) const
     }
 }
 
+
 CorpusReader::EntryIterator DbCorpusReader::runQuery(QString const &query) const
 {
-    db::XmlQueryContext ctx;    // XXX should this be in the iterator?
     // XXX use DBXML_DOCUMENT_PROJECTION and return to whole-doc containers?
-    db::XmlResults r(mgr.query(query.toUtf8().data(), ctx,
-                               db::DBXML_LAZY_DOCS | db::DBXML_WELL_FORMED_ONLY
-                              ));
 
-    return EntryIterator(new DbIter(r));
+    try {
+        db::XmlQueryContext ctx
+            = mgr.createQueryContext(db::XmlQueryContext::LiveValues,
+                                     db::XmlQueryContext::Eager);
+        ctx.setDefaultCollection(collection);
+        db::XmlResults r(mgr.query(query.toUtf8().data(), ctx,
+                                     db::DBXML_LAZY_DOCS
+                                   | db::DBXML_WELL_FORMED_ONLY
+                                  ));
+        return EntryIterator(new DbIter(r));
+    } catch (db::XmlException const &e) {
+        throw alpinocorpus::Error(e.what());
+    }
+
+}
+
+/*
+ * Set corpus name to container name; set collection to a usable collection
+ * name.
+ *
+ * The collection name is used for querying. We set it to the absolute path
+ * so we can still run queries after a chdir().
+ * For some reason, DB XML strips off a leading slash in the filename,
+ * so we prepend an extra one.
+ */
+void DbCorpusReader::setNameAndCollection(QString const &path)
+{
+    //collection = QFileInfo(path).absoluteFilePath().toLocal8Bit().data();
+
+    setName(toQString(container.getName()));
+    collection = std::string("/") + name().toLocal8Bit().data();
 }
 
 }   // namespace alpinocorpus

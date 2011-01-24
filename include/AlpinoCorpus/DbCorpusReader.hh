@@ -19,6 +19,7 @@ class DbCorpusReader : public CorpusReader
     // thread-safe), but DB XML doesn't expose const reading methods.
     DbXml::XmlManager   mutable mgr;
     DbXml::XmlContainer mutable container;
+    std::string collection;
 
     class DbIter : public CorpusReader::IterImpl
     {
@@ -39,6 +40,8 @@ class DbCorpusReader : public CorpusReader
     ~DbCorpusReader();
 
   private:
+    void setNameAndCollection(QString const &);
+
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
     QString readEntry(QString const &) const;
