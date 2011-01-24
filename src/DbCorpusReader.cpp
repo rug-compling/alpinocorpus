@@ -134,6 +134,10 @@ QString DbCorpusReader::readEntry(QString const &filename) const
     }
 }
 
+CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
+{
+    return runQuery(QString("collection('')" + query));
+}
 
 CorpusReader::EntryIterator DbCorpusReader::runQuery(QString const &query) const
 {
@@ -152,7 +156,6 @@ CorpusReader::EntryIterator DbCorpusReader::runQuery(QString const &query) const
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }
-
 }
 
 /*
