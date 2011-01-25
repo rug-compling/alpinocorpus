@@ -23,7 +23,22 @@ namespace alpinocorpus {
         return new DbCorpusReader(corpusPath);
     }
 
-    CorpusReader::EntryIterator CorpusReader::runQuery(QString const &) const
+    CorpusReader::EntryIterator CorpusReader::query(CorpusReader::Dialect d,
+                                                    QString const &q) const
+    {
+        switch (d) {
+          case XPATH:  return runXPath(q);
+          case XQUERY: return runXQuery(q);
+          default:     throw NotImplemented("unknown query language");
+        }
+    }
+
+    CorpusReader::EntryIterator CorpusReader::runXPath(QString const &) const
+    {
+        throw NotImplemented(typeid(*this).name(), "XQuery functionality");
+    }
+
+    CorpusReader::EntryIterator CorpusReader::runXQuery(QString const &) const
     {
         throw NotImplemented(typeid(*this).name(), "XQuery functionality");
     }

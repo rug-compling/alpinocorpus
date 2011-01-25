@@ -68,6 +68,7 @@ namespace alpinocorpus {
     class NotImplemented : public Error
     {
       public:
+        explicit NotImplemented(char const *func) : Error(func) {}
         explicit NotImplemented(char const *type, char const *func)
          : Error(construct(type, func)) {}
         ~NotImplemented() throw() {}

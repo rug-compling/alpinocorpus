@@ -136,10 +136,11 @@ QString DbCorpusReader::readEntry(QString const &filename) const
 
 CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
 {
-    return runQuery(QString("collection('')" + query));
+    return runXQuery(QString("collection('')" + query));
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runQuery(QString const &query) const
+CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query)
+    const
 {
     // XXX use DBXML_DOCUMENT_PROJECTION and return to whole-doc containers?
 

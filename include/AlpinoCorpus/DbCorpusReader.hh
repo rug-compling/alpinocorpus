@@ -46,7 +46,7 @@ class DbCorpusReader : public CorpusReader
     EntryIterator getEnd() const;
     QString readEntry(QString const &) const;
     EntryIterator runXPath(QString const &) const;
-    EntryIterator runQuery(QString const &) const;
+    EntryIterator runXQuery(QString const &) const;
 
     size_t getSize() const
     {

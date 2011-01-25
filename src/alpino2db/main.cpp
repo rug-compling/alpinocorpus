@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
         DbCorpusWriter wr(args[to], true);
         CorpusReader::EntryIterator i, end(rd->end());
         if (query)
-            i = rd->query(args[query]);
+            i = rd->query(CorpusReader::XPATH, args[query]);
         else
             i = rd->begin();
         for (; i != end; ++i)

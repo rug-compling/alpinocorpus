@@ -66,8 +66,10 @@ class CorpusReader
     /** Iterator to end of entry names */
     EntryIterator end() const { return getEnd(); }
 
-    /** Execute XPath query. The end of the range is given by end(). */
-    EntryIterator query(QString const &q) const { return runQuery(q); }
+    enum Dialect { XPATH, XQUERY };
+
+    /** Execute query. The end of the range is given by end(). */
+    EntryIterator query(Dialect d, QString const &q) const;
 
     /** Return content of a single treebank entry. */
     QString read(QString const &entry) const { return readEntry(entry); }
@@ -86,7 +88,8 @@ class CorpusReader
     virtual EntryIterator getEnd() const = 0;
     virtual size_t getSize() const = 0;
     virtual QString readEntry(QString const &entry) const = 0;
-    virtual EntryIterator runQuery(QString const &) const;
+    virtual EntryIterator runXPath(QString const &) const;
+    virtual EntryIterator runXQuery(QString const &) const;
 };
 
 }
