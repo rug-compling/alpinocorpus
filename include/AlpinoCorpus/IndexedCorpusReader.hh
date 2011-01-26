@@ -47,7 +47,8 @@ public:
 	IndexedCorpusReader() {}
 	IndexedCorpusReader(IndexedCorpusReader const &other);
 
-    /** Construct from a single file (data or index); the other file is sought
+    /**
+     * Construct from a single file (data or index); the other file is sought
      * for in the same directory.
      */
     IndexedCorpusReader(QString const &path);
@@ -55,7 +56,6 @@ public:
     IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
 	virtual ~IndexedCorpusReader();
 	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
-    //QString name() const { return d_canonical; }
 
 private:
     virtual EntryIterator getBegin() const;
