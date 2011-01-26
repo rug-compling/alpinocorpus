@@ -30,8 +30,9 @@
 namespace alpinocorpus { namespace util {
 
 /**
- * Parse a string.
- * @The string to be parsed.
+ * Parse a string into any type according to the type's operator>>
+ * (aka lexical cast).
+ * @arg \c str The string to be parsed.
  */
 template <typename T>
 T parseString(std::string const &str)
@@ -41,15 +42,14 @@ T parseString(std::string const &str)
 	iss >> val;
 
 	if (!iss)
-		throw std::invalid_argument("Error parsing: " + 
-str);
+		throw std::invalid_argument("Error parsing: " + str);
 
 	return val;
 }
 
 /**
  * Split a string on whitespace.
- * @str The string to be split.
+ * @arg \c str The string to be split.
  */
 inline std::vector<std::string> stringSplit(std::string str)
 {
