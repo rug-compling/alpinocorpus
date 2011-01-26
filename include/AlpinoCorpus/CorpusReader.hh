@@ -6,6 +6,7 @@
 #include <QVector>
 
 #include <AlpinoCorpus/DLLDefines.hh>
+#include <AlpinoCorpus/util/NonCopyable.hh>
 
 namespace alpinocorpus {
 
@@ -15,7 +16,7 @@ namespace alpinocorpus {
  * A corpus is conceptually a mapping of names to XML documents.
  * Both are represented as QStrings.
  */
-class CorpusReader
+class CorpusReader : public util::NonCopyable
 {
     QString name_;
 

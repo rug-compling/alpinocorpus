@@ -44,9 +44,6 @@ class IndexedCorpusReader : public CorpusReader
     };
 
 public:
-	IndexedCorpusReader() {}
-	IndexedCorpusReader(IndexedCorpusReader const &other);
-
     /**
      * Construct from a single file (data or index); the other file is sought
      * for in the same directory.
@@ -54,8 +51,7 @@ public:
     IndexedCorpusReader(QString const &path);
     /** Construct from data and index file. */
     IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
-	virtual ~IndexedCorpusReader();
-	IndexedCorpusReader &operator=(IndexedCorpusReader const &other);
+    virtual ~IndexedCorpusReader() {}
 
 private:
     virtual EntryIterator getBegin() const;
@@ -66,8 +62,6 @@ private:
     static void canonicalize(QString &);
     void construct(QString const &);
     void construct(QString const &, QString const &, QString const &);
-	void copy(IndexedCorpusReader const &other);
-	void destroy();
     void open(QString const &, QString const &);
 	
     QDictZipFilePtr d_dataFile;
@@ -76,16 +70,6 @@ private:
 
 	QMutex d_mutex;
 };
-
-inline IndexedCorpusReader::IndexedCorpusReader(IndexedCorpusReader const &other)
-{
-	copy(other);
-}
-
-inline IndexedCorpusReader::~IndexedCorpusReader()
-{
-	destroy();
-}
 
 }
 

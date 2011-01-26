@@ -2,6 +2,7 @@
 #define ALPINO_DBCORPUSWRITER_HH
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/util/NonCopyable.hh>
 #include <QString>
 #include <dbxml/DbXml.hpp>
 
@@ -11,7 +12,7 @@ namespace alpinocorpus {
  * Corpus writer for DB XML-based file format.
  * See <AlpinoCorpus/DbCorpusReader.hh> for file format.
  */
-class DbCorpusWriter
+class DbCorpusWriter : public util::NonCopyable
 {
     DbXml::XmlManager mgr;
     DbXml::XmlContainer container;

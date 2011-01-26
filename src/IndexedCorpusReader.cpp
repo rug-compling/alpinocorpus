@@ -63,17 +63,6 @@ void IndexedCorpusReader::construct(QString const &canonical,
     setName(canonical);
 }
 
-IndexedCorpusReader &IndexedCorpusReader::operator=(IndexedCorpusReader const &other)
-{
-	if (this != &other)
-	{
-		destroy();
-		copy(other);
-	}
-	
-	return *this;
-}
-
 CorpusReader::EntryIterator IndexedCorpusReader::getBegin() const
 {
     ItemVector::const_iterator begin(d_indices.begin());
@@ -97,20 +86,6 @@ void IndexedCorpusReader::canonicalize(QString &filename)
         filename.chop(6);
     else
         throw OpenError(filename, "not an indexed (.dz) corpus file");
-}
-
-void IndexedCorpusReader::copy(IndexedCorpusReader const &other)
-{
-    d_dataFile = other.d_dataFile;
-	d_namedIndices = other.d_namedIndices;
-	d_indices = other.d_indices;
-}
-
-void IndexedCorpusReader::destroy()
-{
-    d_namedIndices.clear();
-    d_indices.clear();
-    d_dataFile.clear();
 }
 
 QString IndexedCorpusReader::IndexIter::current() const
