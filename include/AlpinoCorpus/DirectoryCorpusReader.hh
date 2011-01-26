@@ -37,8 +37,6 @@ public:
      */
     DirectoryCorpusReader(QString const &directory, bool cache = true);
 
-    //QString name() const { return d_directory; }
-
 private:
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
