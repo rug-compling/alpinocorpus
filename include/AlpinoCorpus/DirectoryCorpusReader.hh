@@ -43,7 +43,7 @@ private:
     virtual QString readEntry(const QString &entry) const;
     virtual size_t getSize() const { return d_entries.size(); }
 
-    void cacheFile(QFile &) const;
+    QString cachePath() const;
     bool readCache();
     void writeCache();
 
