@@ -45,8 +45,6 @@ set (HEADERS
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
   include/AlpinoCorpus/util/base64.hh
-  include/AlpinoCorpus/util/bufutil.hh
-  include/AlpinoCorpus/util/stringutil.hh
   include/AlpinoCorpus/util/textfile.hh
 )
 
