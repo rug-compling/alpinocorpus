@@ -41,11 +41,10 @@ set (HEADERS
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
-  include/AlpinoCorpus/gzip.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/AlpinoCorpus/util/base64.hh
-  include/AlpinoCorpus/util/textfile.hh
+  include/util/base64.hh
+  include/util/textfile.hh
 )
 
 set (SOURCES

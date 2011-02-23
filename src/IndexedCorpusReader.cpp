@@ -15,7 +15,7 @@
 
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
-#include <AlpinoCorpus/util/base64.hh>
+#include <util/base64.hh>
 
 namespace {
     char const * const DATA_EXT = ".data.dz";
