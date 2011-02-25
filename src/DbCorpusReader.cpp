@@ -150,7 +150,7 @@ CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query)
     try {
         db::XmlQueryContext ctx
             = mgr.createQueryContext(db::XmlQueryContext::LiveValues,
-                                     db::XmlQueryContext::Eager);
+                                     db::XmlQueryContext::Lazy);
         ctx.setDefaultCollection(collection);
         db::XmlResults r(mgr.query(query.toUtf8().data(), ctx,
                                      db::DBXML_LAZY_DOCS
