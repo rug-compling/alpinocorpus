@@ -40,16 +40,12 @@ set (HEADERS
   include/AlpinoCorpus/DbCorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
-  include/AlpinoCorpus/DzChunk.hh
   include/AlpinoCorpus/Error.hh
-  include/AlpinoCorpus/gzip.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/AlpinoCorpus/util/NonCopyable.hh
-  include/AlpinoCorpus/util/base64.hh
-  include/AlpinoCorpus/util/bufutil.hh
-  include/AlpinoCorpus/util/stringutil.hh
-  include/AlpinoCorpus/util/textfile.hh
+  include/util/NonCopyable.hh
+  include/util/base64.hh
+  include/util/textfile.hh
 )
 
 set (SOURCES

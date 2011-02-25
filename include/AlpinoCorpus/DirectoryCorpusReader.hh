@@ -37,15 +37,13 @@ public:
      */
     DirectoryCorpusReader(QString const &directory, bool cache = true);
 
-    //QString name() const { return d_directory; }
-
 private:
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
     virtual QString readEntry(const QString &entry) const;
     virtual size_t getSize() const { return d_entries.size(); }
 
-    void cacheFile(QFile &) const;
+    QString cachePath() const;
     bool readCache();
     void writeCache();
 

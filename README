@@ -1,7 +1,5 @@
 libcorpus
 =========
-Daniël de Kok <me@danieldk.eu>
-Lars Buitinck <larsmans@gmail.com>
 
 Introduction
 ------------
@@ -34,6 +32,12 @@ Requirements
 - Qt version 4.6 or later.
 
 Execute 'cmake .', followed by 'make' in the source directory.
+
+Contributors
+------------
+
+Daniël de Kok <me@danieldk.eu>
+Lars Buitinck <larsmans@gmail.com>
 
 License
 -------

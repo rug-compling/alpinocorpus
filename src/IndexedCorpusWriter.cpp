@@ -2,8 +2,8 @@
 
 #include <QMutexLocker>
 
-#include <IndexedCorpus/util/base64.hh>
 #include <IndexedCorpus/IndexedCorpusWriter.hh>
+#include <util/base64.hh>
 
 using namespace std;
 

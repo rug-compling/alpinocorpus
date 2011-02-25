@@ -11,7 +11,7 @@
 
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <AlpinoCorpus/util/textfile.hh>
+#include <util/textfile.hh>
 
 namespace alpinocorpus {
 
@@ -76,13 +76,13 @@ QString DirectoryCorpusReader::readEntry(QString const &entry) const
     return util::readFile(d_directory.filePath(entry));
 }
 
-void DirectoryCorpusReader::cacheFile(QFile &) const
+QString DirectoryCorpusReader::cachePath() const
 {
     // XXX: putting the index outside the directory
     // is a fundamental design flaw. --Lars
-    QFile cache(QString("%1/../%2.dir_index")
-                .arg(d_directory.path())
-                .arg(d_directory.dirName()));
+    return QString("%1/../%2.dir_index")
+            .arg(d_directory.path())
+            .arg(d_directory.dirName());
 }
 
 
@@ -91,8 +91,7 @@ void DirectoryCorpusReader::cacheFile(QFile &) const
  */
 bool DirectoryCorpusReader::readCache()
 {
-    QFile cache;
-    cacheFile(cache);
+    QFile cache(cachePath());
 
     if (!cache.exists()
      || QFileInfo(d_directory.path()).lastModified()
@@ -119,8 +118,7 @@ bool DirectoryCorpusReader::readCache()
 
 void DirectoryCorpusReader::writeCache()
 {
-    QFile cache;
-    cacheFile(cache);
+    QFile cache(cachePath());
     if (!cache.open(QFile::WriteOnly))
         return;
 
