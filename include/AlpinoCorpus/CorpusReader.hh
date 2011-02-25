@@ -6,7 +6,7 @@
 #include <QVector>
 
 #include <AlpinoCorpus/DLLDefines.hh>
-#include <AlpinoCorpus/util/NonCopyable.hh>
+#include <util/NonCopyable.hh>
 
 namespace alpinocorpus {
 

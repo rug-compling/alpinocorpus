@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
+#include <iostream>
 
 namespace db = DbXml;
 
@@ -95,6 +96,8 @@ DbCorpusReader::DbCorpusReader(QString const &qpath)
         db::XmlContainerConfig config;
         config.setReadOnly(true);
         container = mgr.openContainer(path, config);
+        // Nasty: using a hard-coded alias to work use in the xpath queries.
+        container.addAlias("corpus"); 
         setNameAndCollection(qpath);
     } catch (db::XmlException const &e) {
         throw OpenError(qpath, QString::fromUtf8(e.what()));
@@ -136,7 +139,7 @@ QString DbCorpusReader::readEntry(QString const &filename) const
 
 CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
 {
-    return runXQuery(QString("collection('')" + query));
+    return runXQuery(QString("collection('corpus')" + query));
 }
 
 CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query)
@@ -173,6 +176,7 @@ void DbCorpusReader::setNameAndCollection(QString const &path)
     //collection = QFileInfo(path).absoluteFilePath().toLocal8Bit().data();
 
     setName(toQString(container.getName()));
+    
     collection = std::string("/") + name().toLocal8Bit().data();
 }
 
