@@ -26,6 +26,10 @@ class CorpusReader : public util::NonCopyable
         virtual QString current() const = 0;
         virtual bool equals(IterImpl const *) const = 0;
         virtual void next() = 0;
+
+        // Query iterators must override this
+        virtual QString contents(CorpusReader const &rdr) const
+        { return rdr.read(current()); }
     };
 
     void setName(QString const &n) { name_ = n; }
@@ -54,6 +58,14 @@ class CorpusReader : public util::NonCopyable
         { return !operator==(other); }
         value_type operator*() const { return impl->current(); }
         //value_type const *operator->() const { return impl->current(); }
+
+        /**
+         * Get contents of entry pointed to by iterator.
+         * This will be the full file contents for an ordinary iterator,
+         * but only the matching part for a query iterator.
+         */
+        QString contents(CorpusReader const &rdr) const
+        { return impl->contents(rdr); }
     };
 
     virtual ~CorpusReader() {}

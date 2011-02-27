@@ -56,7 +56,7 @@ DbCorpusReader::DbIter::DbIter(db::XmlManager &mgr)
 QString DbCorpusReader::DbIter::current() const
 {
     db::XmlDocument doc;
-    const_cast<db::XmlResults &>(r).peek(doc);
+    r.peek(doc);
     return toQString(doc.getName());
 }
 
@@ -85,6 +85,18 @@ void DbCorpusReader::DbIter::next()
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }
+}
+
+DbCorpusReader::QueryIter::QueryIter(db::XmlResults const &r)
+ : DbIter(r)
+{
+}
+
+QString DbCorpusReader::QueryIter::contents(CorpusReader const &) const
+{
+    db::XmlValue v;
+    r.peek(v);
+    return toQString(v.asString());
 }
 
 DbCorpusReader::DbCorpusReader(QString const &qpath)
@@ -156,7 +168,7 @@ CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query)
                                      db::DBXML_LAZY_DOCS
                                    | db::DBXML_WELL_FORMED_ONLY
                                   ));
-        return EntryIterator(new DbIter(r));
+        return EntryIterator(new QueryIter(r));
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }

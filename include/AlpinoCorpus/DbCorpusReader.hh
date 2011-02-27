@@ -23,16 +23,24 @@ class DbCorpusReader : public CorpusReader
 
     class DbIter : public CorpusReader::IterImpl
     {
-        DbXml::XmlResults r;
-
       public:
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
-        DbIter(DbXml::XmlResults const &);
 
         QString current() const;
         bool equals(IterImpl const *) const;
         void next();
+
+      protected:
+        mutable DbXml::XmlResults r;
+
+        DbIter(DbXml::XmlResults const &);
+    };
+
+    struct QueryIter : public DbIter
+    {
+        QueryIter(DbXml::XmlResults const &);
+        QString contents(CorpusReader const &) const;
     };
 
   public:
