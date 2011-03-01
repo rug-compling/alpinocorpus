@@ -1,0 +1,12 @@
+The file maxh.txt contains the first few sentences of the novel Max Havelaar
+by Multatuli (Eduard Douwes Dekker, 1820-1887), which is in the public domain.
+The file is encoded in ISO 8859-1 (Latin-1). The full book is available at:
+
+    http://gutenberg.org/ebooks/11024
+
+The sentences were manually tokenized. The directory test_suite/ contains
+uncorrected parses of these sentences.
+
+The parses were made with the command
+
+    Alpino -fast -flag treebank test_suite end_hook=xml -parse < maxh.txt

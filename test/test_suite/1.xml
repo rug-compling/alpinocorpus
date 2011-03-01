@@ -1,1 +1,41 @@
-one
+<?xml version="1.0" encoding="UTF-8"?>
+<alpino_ds version="1.3">
+  <node begin="0" cat="top" end="15" id="0" rel="top">
+    <node begin="5" end="6" frame="punct(komma)" id="1" lcat="punct" pos="punct" rel="--" root="," sense="," special="komma" word=","/>
+    <node begin="11" end="12" frame="punct(komma)" id="2" lcat="punct" pos="punct" rel="--" root="," sense="," special="komma" word=","/>
+    <node begin="0" cat="conj" end="14" id="3" rel="--">
+      <node begin="0" cat="smain" end="5" id="4" rel="cnj">
+        <node begin="0" case="nom" def="def" end="1" frame="pronoun(nwh,fir,sg,de,nom,def)" gen="de" id="5" index="1" lcat="np" num="sg" per="fir" pos="pron" rel="su" root="ik" sense="ik" wh="nwh" word="Ik"/>
+        <node begin="1" end="2" frame="verb(unacc,sg1,copula)" id="6" infl="sg1" lcat="smain" pos="verb" rel="hd" root="ben" sc="copula" sense="ben" tense="present" word="ben"/>
+        <node begin="2" cat="np" end="5" id="7" rel="predc">
+          <node begin="2" end="3" frame="noun(de,count,sg)" gen="de" id="8" lcat="np" num="sg" pos="noun" rel="hd" root="makelaar" sense="makelaar" word="makelaar"/>
+          <node begin="3" cat="pp" end="5" id="9" rel="mod">
+            <node begin="3" end="4" frame="preposition(in,[])" id="10" lcat="pp" pos="prep" rel="hd" root="in" sense="in" word="in"/>
+            <node begin="4" end="5" frame="noun(both,both,both)" gen="both" id="11" lcat="np" num="both" pos="noun" rel="obj1" root="koffi" sense="koffi" word="koffi"/>
+          </node>
+        </node>
+      </node>
+      <node begin="6" end="7" frame="conj(en)" id="12" lcat="vg" pos="vg" rel="crd" root="en" sense="en" word="en"/>
+      <node begin="0" cat="smain" end="14" id="13" rel="cnj">
+        <node begin="0" end="1" id="14" index="1" rel="su"/>
+        <node begin="7" end="8" frame="verb(hebben,sg1,ld_pp)" id="15" infl="sg1" lcat="smain" pos="verb" rel="hd" root="woon" sc="ld_pp" sense="woon" tense="present" word="woon"/>
+        <node begin="8" cat="pp" end="14" id="16" rel="ld">
+          <node begin="8" end="9" frame="preposition(op,[af,na])" id="17" lcat="pp" pos="prep" rel="hd" root="op" sense="op" word="op"/>
+          <node begin="9" cat="np" end="14" id="18" rel="obj1">
+            <node begin="9" end="10" frame="determiner(de)" id="19" infl="de" lcat="detp" pos="det" rel="det" root="de" sense="de" word="de"/>
+            <node begin="10" end="11" frame="noun(de,count,sg)" gen="de" id="20" lcat="np" num="sg" pos="noun" rel="hd" root="Laurier_gracht" sense="Laurier_gracht" word="Lauriergracht"/>
+            <node begin="12" cat="mwu" end="14" id="21" mwu_root="N_37" mwu_sense="N_37" rel="app">
+              <node begin="12" end="13" frame="proper_name(both)" id="22" lcat="np" num="both" pos="name" rel="mwp" root="N" sense="N" word="N"/>
+              <node begin="13" end="14" frame="proper_name(both)" id="23" lcat="np" num="both" pos="name" rel="mwp" root="37" sense="37" word="37"/>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+    <node begin="14" end="15" frame="punct(punt)" id="24" lcat="punct" pos="punct" rel="--" root="." sense="." special="punt" word="."/>
+  </node>
+  <sentence>Ik ben makelaar in koffi , en woon op de Lauriergracht , N 37 .</sentence>
+  <comments>
+    <comment>Q#1|Ik ben makelaar in koffi , en woon op de Lauriergracht , N 37 .|1|1|-0.13120098637195912</comment>
+  </comments>
+</alpino_ds>
