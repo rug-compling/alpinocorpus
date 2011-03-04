@@ -96,7 +96,7 @@ QString DbCorpusReader::QueryIter::contents(CorpusReader const &) const
 {
     db::XmlValue v;
     r.peek(v);
-    return toQString(v.asString());
+    return toQString(v.getNodeValue());
 }
 
 DbCorpusReader::DbCorpusReader(QString const &qpath)
