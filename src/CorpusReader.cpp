@@ -84,7 +84,8 @@ namespace alpinocorpus {
         
         while (d_buffer.isEmpty() && d_itr != d_end)
         {
-            parseFile(*d_itr);
+            d_file = *d_itr;
+            parseFile(d_file);
             
             ++d_itr;
         }

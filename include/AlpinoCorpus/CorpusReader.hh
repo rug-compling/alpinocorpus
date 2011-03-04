@@ -107,8 +107,8 @@ class CorpusReader : public util::NonCopyable
       QSharedPointer<CorpusReader const> d_corpus;
       EntryIterator d_itr;
       EntryIterator d_end;
-      QByteArray d_query;
       QString d_file;
+      QByteArray d_query;
       QQueue<QString> d_buffer;
 
       public:
