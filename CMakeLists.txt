@@ -34,6 +34,11 @@ if (DBXML_FOUND)
   include_directories(${DBXML_INCLUDE_DIR})
 endif()
 
+find_package(LibXml2 REQUIRED)
+if(LIBXML2_FOUND)
+  include_directories(${LIBXML2_INCLUDE_DIR})
+endif()
+
 set (HEADERS
   include/AlpinoCorpus/CorpusReader.hh
   include/AlpinoCorpus/DbCorpusReader.hh
@@ -68,6 +73,7 @@ add_library(alpino_corpus SHARED
 target_link_libraries(alpino_corpus ${QT_LIBRARIES})
 target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
+target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
 add_executable(alpino2db src/alpino2db/main.cpp)
 target_link_libraries(alpino2db alpino_corpus)

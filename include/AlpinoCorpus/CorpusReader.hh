@@ -5,6 +5,12 @@
 #include <QString>
 #include <QVector>
 
+// for FilterIter
+#include <QByteArray>
+#include <QQueue>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <util/NonCopyable.hh>
 
@@ -52,9 +58,9 @@ class CorpusReader : public util::NonCopyable
             operator++();
             return r;
         }
-        bool operator==(EntryIterator const &other)
+        bool operator==(EntryIterator const &other) const
         { return impl->equals(other.impl.data()); }
-        bool operator!=(EntryIterator const &other)
+        bool operator!=(EntryIterator const &other) const
         { return !operator==(other); }
         value_type operator*() const { return impl->current(); }
         //value_type const *operator->() const { return impl->current(); }
@@ -95,6 +101,26 @@ class CorpusReader : public util::NonCopyable
      * The caller is responsible for deleting the object returned.
      */
     static INDEXED_CORPUS_EXPORT CorpusReader *open(QString const &corpusPath);
+
+  protected:
+    class FilterIter : public IterImpl {
+      QSharedPointer<CorpusReader const> d_corpus;
+      EntryIterator d_itr;
+      EntryIterator d_end;
+      QByteArray d_query;
+      QString d_file;
+      QQueue<QString> d_buffer;
+
+      public:
+        FilterIter(CorpusReader const *, EntryIterator, EntryIterator, QString const &);
+        QString current() const;
+        bool equals(IterImpl const *) const;
+        void next();
+        QString contents(CorpusReader const &) const;
+      
+      private:
+        void parseFile(QString const &);
+    };
 
   private:
     virtual EntryIterator getBegin() const = 0;
