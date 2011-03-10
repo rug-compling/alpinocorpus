@@ -11,7 +11,7 @@
 
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <util/textfile.hh>
+#include <AlpinoCorpus/util/textfile.hh>
 
 namespace alpinocorpus {
 

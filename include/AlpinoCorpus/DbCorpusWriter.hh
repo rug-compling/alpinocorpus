@@ -2,7 +2,7 @@
 #define ALPINO_DBCORPUSWRITER_HH
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <util/NonCopyable.hh>
+#include <AlpinoCorpus/util/NonCopyable.hh>
 #include <QString>
 #include <dbxml/DbXml.hpp>
 

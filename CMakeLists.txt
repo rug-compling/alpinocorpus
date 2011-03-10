@@ -48,9 +48,9 @@ set (HEADERS
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/util/NonCopyable.hh
-  include/util/base64.hh
-  include/util/textfile.hh
+  include/AlpinoCorpus/util/NonCopyable.hh
+  include/AlpinoCorpus/util/base64.hh
+  include/AlpinoCorpus/util/textfile.hh
 )
 
 set(SOURCES

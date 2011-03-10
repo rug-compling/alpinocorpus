@@ -10,7 +10,7 @@
 #include <QTextCodec>
 #include <QTextStream>
 
-#include <util/textfile.hh>
+#include <AlpinoCorpus/util/textfile.hh>
 
 namespace alpinocorpus { namespace util {
 

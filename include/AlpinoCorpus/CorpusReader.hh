@@ -12,7 +12,7 @@
 #include <libxml/xpath.h>
 
 #include <AlpinoCorpus/DLLDefines.hh>
-#include <util/NonCopyable.hh>
+#include <AlpinoCorpus/util/NonCopyable.hh>
 
 namespace alpinocorpus {
 
