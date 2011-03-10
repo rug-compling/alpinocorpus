@@ -1,1 +1,111 @@
-four
+<?xml version="1.0" encoding="UTF-8"?>
+<alpino_ds version="1.3">
+  <node begin="0" cat="top" end="44" id="0" rel="top">
+    <node begin="5" end="6" frame="particle(af)" id="1" lcat="--" pos="part" rel="--" root="af" sense="af" word="af"/>
+    <node begin="6" end="7" frame="punct(komma)" id="2" lcat="punct" pos="punct" rel="--" root="," sense="," special="komma" word=","/>
+    <node begin="11" end="12" frame="punct(komma)" id="3" lcat="punct" pos="punct" rel="--" root="," sense="," special="komma" word=","/>
+    <node begin="19" end="20" frame="punct(komma)" id="4" lcat="punct" pos="punct" rel="--" root="," sense="," special="komma" word=","/>
+    <node begin="32" end="33" frame="punct(komma)" id="5" lcat="punct" pos="punct" rel="--" root="," sense="," special="komma" word=","/>
+    <node begin="37" end="38" frame="punct(komma)" id="6" lcat="punct" pos="punct" rel="--" root="," sense="," special="komma" word=","/>
+    <node begin="0" cat="du" end="43" id="7" rel="--">
+      <node begin="0" cat="smain" end="5" id="8" rel="dp">
+        <node begin="0" cat="pp" end="2" id="9" rel="mod">
+          <node begin="0" end="1" frame="preposition(sedert,[])" id="10" lcat="pp" pos="prep" rel="hd" root="sedert" sense="sedert" word="Sedert"/>
+          <node begin="1" end="2" frame="tmp_noun(het,count,pl)" gen="het" id="11" lcat="np" num="pl" pos="noun" rel="obj1" root="jaar" sense="jaar" special="tmp" word="jaren"/>
+        </node>
+        <node begin="2" end="3" frame="verb(hebben,sg1,transitive)" id="12" infl="sg1" lcat="smain" pos="verb" rel="hd" root="vraag" sc="transitive" sense="vraag" tense="present" word="vraag"/>
+        <node begin="3" case="nom" def="def" end="4" frame="pronoun(nwh,fir,sg,de,nom,def)" gen="de" id="13" lcat="np" num="sg" per="fir" pos="pron" rel="su" root="ik" sense="ik" wh="nwh" word="ik"/>
+        <node begin="4" end="5" frame="proper_name(both)" id="14" lcat="np" num="both" pos="name" rel="obj1" root="my" sense="my" word="my"/>
+      </node>
+      <node begin="7" cat="conj" end="43" id="15" rel="dp">
+        <node begin="7" cat="whq" end="11" id="16" rel="cnj">
+          <node begin="7" end="8" frame="waar_adverb(tot)" id="17" index="1" lcat="pp" pos="pp" rel="whd" root="waartoe" sense="waartoe" special="waar" word="waartoe"/>
+          <node begin="7" cat="inf" end="11" id="18" rel="body">
+            <node begin="7" end="8" id="19" index="1" rel="mod"/>
+            <node begin="8" cat="np" end="10" id="20" rel="obj1">
+              <node begin="8" end="9" frame="determiner(zulke,nwh,nmod,pro,yparg)" id="21" infl="zulke" lcat="detp" pos="det" rel="det" root="zulk" sense="zulk" wh="nwh" word="zulke"/>
+              <node begin="9" end="10" frame="noun(het,count,pl)" gen="het" id="22" lcat="np" num="pl" pos="noun" rel="hd" root="ding" sense="ding" word="dingen"/>
+            </node>
+            <node begin="10" end="11" frame="verb(hebben,inf,transitive)" id="23" infl="inf" lcat="inf" pos="verb" rel="hd" root="dien" sc="transitive" sense="dien" word="dienen"/>
+          </node>
+        </node>
+        <node begin="12" end="13" frame="conj(en)" id="24" lcat="vg" pos="vg" rel="crd" root="en" sense="en" word="en"/>
+        <node begin="13" cat="smain" end="43" id="25" rel="cnj">
+          <node begin="13" case="nom" def="def" end="14" frame="pronoun(nwh,fir,sg,de,nom,def)" gen="de" id="26" lcat="np" num="sg" per="fir" pos="pron" rel="su" root="ik" sense="ik" wh="nwh" word="ik"/>
+          <node begin="14" end="15" frame="verb(hebben,sg1,nonp_copula)" id="27" infl="sg1" lcat="smain" pos="verb" rel="hd" root="sta" sc="nonp_copula" sense="sta" tense="present" word="sta"/>
+          <node begin="15" cat="ppart" end="43" id="28" rel="predc">
+            <node aform="base" begin="15" end="16" frame="adjective(ge_no_e(padv),pp(over))" id="29" infl="no_e" lcat="ppart" pos="adj" rel="hd" root="verbaasd" sc="pp(over)" sense="verbaasd-over" vform="psp" word="verbaasd"/>
+            <node begin="16" cat="pp" end="43" id="30" rel="pc">
+              <node begin="16" end="17" frame="preposition(over,[heen])" id="31" lcat="pp" pos="prep" rel="hd" root="over" sense="over" word="over"/>
+              <node begin="17" cat="np" end="43" id="32" rel="obj1">
+                <node begin="17" end="18" frame="determiner(de)" id="33" infl="de" lcat="detp" pos="det" rel="det" root="de" sense="de" word="de"/>
+                <node begin="18" end="19" frame="noun(de,count,sg)" gen="de" id="34" lcat="np" num="sg" pos="noun" rel="hd" root="onbeschaamdheid" sense="onbeschaamdheid" word="onbeschaamdheid"/>
+                <node begin="20" cat="rel" end="43" id="35" rel="mod">
+                  <node begin="20" end="21" frame="waar_adverb(met)" id="36" index="2" lcat="pp" pos="pp" rel="rhd" root="waarmede" sense="waarmede" special="waar" word="waarmede"/>
+                  <node begin="20" cat="ssub" end="43" id="37" rel="body">
+                    <node begin="20" end="21" id="38" index="2" rel="mod"/>
+                    <node begin="21" cat="conj" end="25" id="39" index="3" rel="su">
+                      <node begin="21" cat="np" end="23" id="40" rel="cnj">
+                        <node begin="21" end="22" frame="determiner(een)" id="41" index="4" infl="een" lcat="detp" pos="det" rel="det" root="een" sense="een" word="een"/>
+                        <node begin="22" end="23" frame="noun(de,count,sg)" gen="de" id="42" lcat="np" num="sg" pos="noun" rel="hd" root="dichter" sense="dichter" word="dichter"/>
+                      </node>
+                      <node begin="23" end="24" frame="conj(of)" id="43" lcat="vg" pos="vg" rel="crd" root="of" sense="of" word="of"/>
+                      <node begin="21" cat="np" end="25" id="44" rel="cnj">
+                        <node begin="21" end="22" id="45" index="4" rel="det"/>
+                        <node begin="24" end="25" frame="noun(de,count,sg)" gen="de" id="46" lcat="np" num="sg" pos="noun" rel="hd" root="roman_verteller" sense="roman_verteller" word="romanverteller"/>
+                      </node>
+                    </node>
+                    <node begin="30" end="31" frame="verb(hebben,sg3,subj_control(te_inf))" id="47" infl="sg3" lcat="ssub" pos="verb" rel="hd" root="durf" sc="subj_control(te_inf)" sense="durf" tense="present" word="durft"/>
+                    <node begin="21" cat="inf" end="43" id="48" rel="vc">
+                      <node begin="21" end="25" id="49" index="3" rel="su"/>
+                      <node begin="25" case="both" def="def" end="26" frame="pronoun(nwh,u,sg,de,both,def)" gen="de" id="50" lcat="np" num="sg" per="u" pos="pron" rel="obj2" root="u" sense="u" wh="nwh" word="u"/>
+                      <node begin="27" cat="mwu" end="30" id="51" mwu_root="op_de_mouw" mwu_sense="op_de_mouw" rel="svp">
+                        <node begin="27" end="28" frame="fixed_part([op,de,mouw])" id="52" lcat="fixed" pos="fixed" rel="mwp" root="op" sense="op" word="op"/>
+                        <node begin="28" end="29" frame="fixed_part([op,de,mouw])" id="53" lcat="fixed" pos="fixed" rel="mwp" root="de" sense="de" word="de"/>
+                        <node begin="29" end="30" frame="fixed_part([op,de,mouw])" id="54" lcat="fixed" pos="fixed" rel="mwp" root="mouw" sense="mouw" word="mouw"/>
+                      </node>
+                      <node begin="31" end="32" frame="verb(hebben,inf,fixed([[op,de,mouw],{[acc,dat]}],norm_passive))" id="55" infl="inf" lcat="inf" pos="verb" rel="hd" root="speld" sc="fixed([[op,de,mouw],{[acc,dat]}],norm_passive)" sense="op-de-mouw-speld" word="spelden"/>
+                      <node begin="26" cat="np" end="43" id="56" rel="obj1">
+                        <node begin="26" end="27" frame="meas_mod_noun(het,mass,sg)" gen="het" id="57" lcat="np" num="sg" pos="noun" rel="hd" root="iets" sense="iets" special="meas_mod" word="iets"/>
+                        <node begin="33" cat="rel" end="43" id="58" rel="mod">
+                          <node begin="33" case="no_obl" end="34" frame="rel_pronoun(het,no_obl)" gen="het" id="59" index="5" lcat="np" pos="pron" rel="rhd" root="dat" sense="dat" wh="rel" word="dat"/>
+                          <node begin="33" cat="conj" end="43" id="60" rel="body">
+                            <node begin="33" cat="ssub" end="37" id="61" rel="cnj">
+                              <node begin="33" end="34" id="62" index="5" rel="su"/>
+                              <node begin="33" cat="ppart" end="36" id="63" rel="vc">
+                                <node begin="33" end="34" id="64" index="5" rel="su"/>
+                                <node begin="34" end="35" frame="tmp_adverb" id="65" lcat="advp" pos="adv" rel="mod" root="nooit" sense="nooit" special="tmp" word="nooit"/>
+                                <node begin="35" end="36" frame="verb(unacc,psp,intransitive)" id="66" infl="psp" lcat="ppart" pos="verb" rel="hd" root="gebeur" sc="intransitive" sense="gebeur" word="gebeurd"/>
+                              </node>
+                              <node begin="36" end="37" frame="verb(unacc,sg_heeft,aux_psp_zijn)" id="67" infl="sg_heeft" lcat="ssub" pos="verb" rel="hd" root="ben" sc="aux_psp_zijn" sense="ben" tense="present" word="is"/>
+                            </node>
+                            <node begin="38" end="39" frame="conj(en)" id="68" lcat="vg" pos="vg" rel="crd" root="en" sense="en" word="en"/>
+                            <node begin="33" cat="ssub" end="43" id="69" rel="cnj">
+                              <node begin="33" end="34" id="70" index="5" rel="su"/>
+                              <node begin="33" cat="inf" end="42" id="71" rel="vc">
+                                <node begin="33" end="34" id="72" index="5" rel="su"/>
+                                <node begin="39" end="40" frame="sentence_adverb" id="73" lcat="advp" pos="adv" rel="mod" root="meestal" sense="meestal" special="sentence" word="meestal"/>
+                                <node begin="40" end="41" frame="adverb" id="74" lcat="advp" pos="adv" rel="mod" root="niet" sense="niet" word="niet"/>
+                                <node begin="41" end="42" frame="verb(unacc,inf,intransitive)" id="75" infl="inf" lcat="inf" pos="verb" rel="hd" root="gebeur" sc="intransitive" sense="gebeur" word="gebeuren"/>
+                              </node>
+                              <node begin="42" end="43" frame="verb('hebben/zijn',modal_not_u,aux(inf))" id="76" infl="modal_not_u" lcat="ssub" pos="verb" rel="hd" root="kan" sc="aux(inf)" sense="kan" tense="present" word="kan"/>
+                            </node>
+                          </node>
+                        </node>
+                      </node>
+                    </node>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+    <node begin="43" end="44" frame="punct(punt)" id="77" lcat="punct" pos="punct" rel="--" root="." sense="." special="punt" word="."/>
+  </node>
+  <sentence>Sedert jaren vraag ik my af , waartoe zulke dingen dienen , en ik sta verbaasd over de onbeschaamdheid , waarmede een dichter of romanverteller u iets op de mouw durft spelden , dat nooit gebeurd is , en meestal niet gebeuren kan .</sentence>
+  <comments>
+    <comment>Q#4|Sedert jaren vraag ik my af , waartoe zulke dingen dienen , en ik sta verbaasd over de onbeschaamdheid , waarmede een dichter of romanverteller u iets op de mouw durft spelden , dat nooit gebeurd is , en meestal niet gebeuren kan .|1|3|-0.3033155967075101</comment>
+  </comments>
+</alpino_ds>
