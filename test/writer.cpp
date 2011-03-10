@@ -1,48 +1,45 @@
-#include <gtest/gtest.h>
+#include <QString>
+#include <QtTest/QTest>
+
+#include <cstdio>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusWriter.hh>
-#include <cstdio>
-#include <QString>
+
+#include "writer.hh"
 
 namespace ac = alpinocorpus;
 
 static char const db_path[] = "test_suite.dact";
 
-class DbCorpusWriterTest : public ::testing::Test
+void DbCorpusWriterTest::canOpenDbForWriting()
 {
-  protected:
-    ac::CorpusReader *reader;
-    ac::DbCorpusWriter *writer;
-
-    virtual void SetUp()
-    {
-        reader = ac::CorpusReader::open("test_suite");
-    }
-
-    virtual void TearDown()
-    {
-        (void)std::remove(db_path);
-        delete reader;
-    }
-};
-
-TEST_F(DbCorpusWriterTest, CanOpenDbForWriting)
-{
-    writer = new ac::DbCorpusWriter(QString(db_path), true);
-    ASSERT_TRUE(writer != NULL);
+    ac::DbCorpusWriter *writer = new ac::DbCorpusWriter(QString(db_path), true);
+    QVERIFY(writer != 0);
+    delete writer;
+    std::remove(db_path);
 }
 
-TEST_F(DbCorpusWriterTest, CanWriteEntireReader)
+void DbCorpusWriterTest::canWriteEntireReader()
 {
-    writer->write(*reader);
+    // Open the directory-based corpus as a reference.
+    ac::CorpusReader *dir_rdr = ac::CorpusReader::open("test_suite");
+    QVERIFY(dir_rdr != 0);
+    
+    // Write DBXML corpus.
+    ac::DbCorpusWriter *writer = new ac::DbCorpusWriter(QString(db_path), true);
+    QVERIFY(writer != 0);
+    writer->write(*dir_rdr);
+    delete writer;
+
+    // Check corpus correctness
     ac::CorpusReader *wrtr_rdr = ac::CorpusReader::open(QString(db_path));
-    ASSERT_EQ(reader->size(), wrtr_rdr->size());
+    QCOMPARE(dir_rdr->size(), wrtr_rdr->size());
+    
+    // Cleanup
     delete wrtr_rdr;
+    delete dir_rdr;
+    std::remove(db_path);
 }
 
-int main(int argc, char *argv[])
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+QTEST_MAIN(DbCorpusWriterTest);

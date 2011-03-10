@@ -16,7 +16,7 @@ list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
 
 include_directories(${AlpinoCorpus_SOURCE_DIR}/include)
 
-find_package(Qt4 COMPONENTS QtCore REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtTest REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
 find_package(ZLIB REQUIRED)
@@ -34,7 +34,7 @@ if (DBXML_FOUND)
   include_directories(${DBXML_INCLUDE_DIR})
 endif()
 
-set (HEADERS
+set(HEADERS
   include/AlpinoCorpus/CorpusReader.hh
   include/AlpinoCorpus/DbCorpusReader.hh
   include/AlpinoCorpus/DbCorpusWriter.hh
@@ -47,7 +47,7 @@ set (HEADERS
   include/util/textfile.hh
 )
 
-set (SOURCES
+set(SOURCES
   src/CorpusReader.cpp
   src/DbCorpusReader.cpp
   src/DbCorpusWriter.cpp
@@ -79,3 +79,11 @@ install(TARGETS alpino_corpus
 
 install(DIRECTORY include/AlpinoCorpus
   DESTINATION include)
+
+# Unit tests
+
+qt4_wrap_cpp(writer_test_MOC_SRCS test/writer.hh)
+add_executable(writer_test test/writer.cpp ${writer_test_MOC_SRCS})
+target_link_libraries(writer_test alpino_corpus)
+target_link_libraries(writer_test ${QT_LIBRARIES})
+#add_test(writer writer_test)
