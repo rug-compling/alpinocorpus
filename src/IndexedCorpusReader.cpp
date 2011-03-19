@@ -11,7 +11,7 @@
 #include <QTextStream>
 #include <QtDebug>
 
-#include <QDictZip/QDictZipFile.hh>
+#include <AlpinoCorpus/QDictZipFile.hh>
 
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IndexedCorpusReader.hh>

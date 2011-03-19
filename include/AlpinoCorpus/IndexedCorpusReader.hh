@@ -7,9 +7,8 @@
 #include <QString>
 #include <vector>
 
-#include <QDictZip/QDictZipFile.hh>
-
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/QDictZipFile.hh>
 
 namespace alpinocorpus
 {

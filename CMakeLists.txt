@@ -24,11 +24,6 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
-find_package(QDictZip REQUIRED)
-if(QDICTZIP_FOUND)
-  include_directories(${QDICTZIP_INCLUDE_DIR})
-endif()
-
 find_package(DBXML REQUIRED)
 if (DBXML_FOUND)
   include_directories(${DBXML_INCLUDE_DIR})
@@ -45,9 +40,11 @@ set (HEADERS
   include/AlpinoCorpus/DbCorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
+  include/AlpinoCorpus/DzChunk.hh
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
+  include/AlpinoCorpus/QDictZipFile.hh
   include/AlpinoCorpus/util/NonCopyable.hh
   include/AlpinoCorpus/util/base64.hh
   include/AlpinoCorpus/util/textfile.hh
@@ -58,9 +55,10 @@ set(SOURCES
   src/DbCorpusReader.cpp
   src/DbCorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
+  src/Error.cpp
   src/IndexedCorpusReader.cpp
   #src/IndexedCorpusWriter.cpp
-  src/Error.cpp
+  src/QDictZipFile.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
 )
@@ -71,7 +69,7 @@ add_library(alpino_corpus SHARED
 )
 
 target_link_libraries(alpino_corpus ${QT_LIBRARIES})
-target_link_libraries(alpino_corpus ${QDICTZIP_LIBRARIES})
+target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
