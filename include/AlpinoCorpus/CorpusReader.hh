@@ -59,7 +59,14 @@ class CorpusReader : public util::NonCopyable
             return r;
         }
         bool operator==(EntryIterator const &other) const
-        { return impl->equals(other.impl.data()); }
+        {
+            if (!impl)
+                return !other.impl;
+            else if (!other.impl)
+                return !impl;
+            else
+                return impl->equals(other.impl.data());
+        }
         bool operator!=(EntryIterator const &other) const
         { return !operator==(other); }
         value_type operator*() const { return impl->current(); }
