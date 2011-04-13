@@ -22,7 +22,7 @@ namespace alpinocorpus {
  * A corpus is conceptually a mapping of names to XML documents.
  * Both are represented as QStrings.
  */
-class CorpusReader : public util::NonCopyable
+class CorpusReader : private util::NonCopyable
 {
     QString name_;
 
