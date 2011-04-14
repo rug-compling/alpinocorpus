@@ -39,7 +39,7 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator CorpusReader::runXPath(QString const &query) const
     {
         //throw NotImplemented(typeid(*this).name(), "XQuery functionality");
-        return EntryIterator(new FilterIter(this, getBegin(), getEnd(), query));
+        return EntryIterator(new FilterIter(*this, getBegin(), getEnd(), query));
     }
 
     CorpusReader::EntryIterator CorpusReader::runXQuery(QString const &) const
@@ -47,7 +47,7 @@ namespace alpinocorpus {
         throw NotImplemented(typeid(*this).name(), "XQuery functionality");
     }
     
-    CorpusReader::FilterIter::FilterIter(CorpusReader const *corpus,
+    CorpusReader::FilterIter::FilterIter(CorpusReader const &corpus,
         EntryIterator itr, EntryIterator end, QString const &query)
     :
         d_corpus(corpus),
@@ -100,7 +100,7 @@ namespace alpinocorpus {
     
     void CorpusReader::FilterIter::parseFile(QString const &file)
     {
-        QString xml(d_corpus->read(file));
+        QString xml(d_corpus.read(file));
         QByteArray xmlData(xml.toUtf8());
         
         xmlDocPtr doc = xmlParseMemory(xmlData.constData(), xmlData.size());

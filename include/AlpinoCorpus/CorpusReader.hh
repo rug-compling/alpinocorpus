@@ -111,7 +111,7 @@ class CorpusReader : private util::NonCopyable
 
   protected:
     class FilterIter : public IterImpl {
-      QSharedPointer<CorpusReader const> d_corpus;
+      CorpusReader const &d_corpus;
       EntryIterator d_itr;
       EntryIterator d_end;
       QString d_file;
@@ -119,7 +119,7 @@ class CorpusReader : private util::NonCopyable
       QQueue<QString> d_buffer;
 
       public:
-        FilterIter(CorpusReader const *, EntryIterator, EntryIterator, QString const &);
+        FilterIter(CorpusReader const &, EntryIterator, EntryIterator, QString const &);
         QString current() const;
         bool equals(IterImpl const *) const;
         void next();
