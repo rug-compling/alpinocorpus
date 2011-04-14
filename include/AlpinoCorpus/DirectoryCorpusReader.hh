@@ -23,7 +23,7 @@ class DirectoryCorpusReader : public CorpusReader
       public:
         DirIter(StrVector::const_iterator const &i) : iter(i) { }
         QString current() const;
-        bool equals(IterImpl const *) const;
+        bool equals(IterImpl const &) const;
         void next();
     };
 

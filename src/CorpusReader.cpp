@@ -63,7 +63,7 @@ namespace alpinocorpus {
         return d_file;
     }
     
-    bool CorpusReader::FilterIter::equals(IterImpl const *itr) const
+    bool CorpusReader::FilterIter::equals(IterImpl const &itr) const
     {
         try {
             // TODO fix me to be more like isEqual instead of hasNext.

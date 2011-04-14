@@ -56,10 +56,10 @@ QString DirectoryCorpusReader::DirIter::current() const
     return QDir::fromNativeSeparators(*iter);
 }
 
-bool DirectoryCorpusReader::DirIter::equals(IterImpl const *other) const
+bool DirectoryCorpusReader::DirIter::equals(IterImpl const &other) const
 {
     try {
-        DirIter const &that = dynamic_cast<DirIter const &>(*other);
+        DirIter const &that = dynamic_cast<DirIter const &>(other);
         return iter == that.iter;
     } catch (std::bad_cast const &) {
         return false;

@@ -93,10 +93,10 @@ QString IndexedCorpusReader::IndexIter::current() const
     return (*iter)->name;
 }
 
-bool IndexedCorpusReader::IndexIter::equals(IterImpl const *other) const
+bool IndexedCorpusReader::IndexIter::equals(IterImpl const &other) const
 {
     try {
-        IndexIter const &that = dynamic_cast<IndexIter const &>(*other);
+        IndexIter const &that = dynamic_cast<IndexIter const &>(other);
         return iter == that.iter;
     } catch (std::bad_cast const &) {
         return false;

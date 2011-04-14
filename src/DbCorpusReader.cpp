@@ -61,12 +61,12 @@ QString DbCorpusReader::DbIter::current() const
 }
 
 /* operator== */
-bool DbCorpusReader::DbIter::equals(IterImpl const *that) const
+bool DbCorpusReader::DbIter::equals(IterImpl const &that) const
 {
     try {
         // The const_casts are needed because hasNext() is not const.
         // XXX should be safe.
-        DbIter &other= const_cast<DbIter&>(dynamic_cast<DbIter const &>(*that));
+        DbIter &other= const_cast<DbIter&>(dynamic_cast<DbIter const &>(that));
         DbIter &self = const_cast<DbIter&>(*this);
         if (!self.r.hasNext() && !other.r.hasNext())
             return true;        // both at end()

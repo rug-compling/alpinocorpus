@@ -30,7 +30,7 @@ class CorpusReader : private util::NonCopyable
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
     struct IterImpl {
         virtual QString current() const = 0;
-        virtual bool equals(IterImpl const *) const = 0;
+        virtual bool equals(IterImpl const &) const = 0;
         virtual void next() = 0;
 
         // Query iterators must override this
@@ -65,7 +65,7 @@ class CorpusReader : private util::NonCopyable
             else if (!other.impl)
                 return !impl;
             else
-                return impl->equals(other.impl.data());
+                return impl->equals(*other.impl.data());
         }
         bool operator!=(EntryIterator const &other) const
         { return !operator==(other); }
@@ -121,7 +121,7 @@ class CorpusReader : private util::NonCopyable
       public:
         FilterIter(CorpusReader const &, EntryIterator, EntryIterator, QString const &);
         QString current() const;
-        bool equals(IterImpl const *) const;
+        bool equals(IterImpl const &) const;
         void next();
         QString contents(CorpusReader const &) const;
       
