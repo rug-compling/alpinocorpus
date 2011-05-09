@@ -25,6 +25,31 @@ namespace alpinocorpus {
 
         return new DbCorpusReader(corpusPath);
     }
+    
+    bool CorpusReader::EntryIterator::operator==(EntryIterator const &other) const
+    {
+        if (!impl)
+            return !other.impl;
+        else if (!other.impl)
+            return !impl;
+        else
+            return impl->equals(*other.impl.data());
+    }
+    
+    CorpusReader::EntryIterator &CorpusReader::EntryIterator::operator++()
+    {
+        impl->next();
+        return *this;
+    }
+
+    
+    CorpusReader::EntryIterator CorpusReader::EntryIterator::operator++(int)
+    {
+        EntryIterator r(*this);
+        operator++();
+        return r;
+    }
+
 
     CorpusReader::EntryIterator CorpusReader::query(CorpusReader::Dialect d,
                                                     QString const &q) const

@@ -24,8 +24,6 @@ namespace alpinocorpus {
  */
 class CorpusReader : private util::NonCopyable
 {
-    QString name_;
-
   protected:
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
     struct IterImpl {
@@ -34,12 +32,11 @@ class CorpusReader : private util::NonCopyable
         virtual void next() = 0;
 
         // Query iterators must override this
-        virtual QString contents(CorpusReader const &rdr) const
-        { return rdr.read(current()); }
+        virtual QString contents(CorpusReader const &rdr) const;
     };
 
-    void setName(QString const &n) { name_ = n; }
-
+    void setName(QString const &n);
+    
   public:
     /** Forward iterator over entry names */
     class EntryIterator
@@ -51,24 +48,10 @@ class CorpusReader : private util::NonCopyable
         EntryIterator() {}
         EntryIterator(IterImpl *p) : impl(p) { }
         EntryIterator(EntryIterator const &other) : impl(other.impl) { }
-        EntryIterator &operator++() { impl->next(); return *this; }
-        EntryIterator operator++(int)
-        {
-            EntryIterator r(*this);
-            operator++();
-            return r;
-        }
-        bool operator==(EntryIterator const &other) const
-        {
-            if (!impl)
-                return !other.impl;
-            else if (!other.impl)
-                return !impl;
-            else
-                return impl->equals(*other.impl.data());
-        }
-        bool operator!=(EntryIterator const &other) const
-        { return !operator==(other); }
+        EntryIterator &operator++();
+        EntryIterator operator++(int);
+        bool operator==(EntryIterator const &other) const;
+        bool operator!=(EntryIterator const &other) const;
         value_type operator*() const { return impl->current(); }
         //value_type const *operator->() const { return impl->current(); }
 
@@ -77,20 +60,19 @@ class CorpusReader : private util::NonCopyable
          * This will be the full file contents for an ordinary iterator,
          * but only the matching part for a query iterator.
          */
-        QString contents(CorpusReader const &rdr) const
-        { return impl->contents(rdr); }
+        QString contents(CorpusReader const &rdr) const;
     };
 
     virtual ~CorpusReader() {}
 
     /** Return canonical name of corpus */
-    QString const &name() const { return name_; }
+    QString const &name() const;
 
     /** Iterator to begin of entry names */
-    EntryIterator begin() const { return getBegin(); }
+    EntryIterator begin() const;
 
     /** Iterator to end of entry names */
-    EntryIterator end() const { return getEnd(); }
+    EntryIterator end() const;
 
     enum Dialect { XPATH, XQUERY };
 
@@ -98,10 +80,10 @@ class CorpusReader : private util::NonCopyable
     EntryIterator query(Dialect d, QString const &q) const;
 
     /** Return content of a single treebank entry. */
-    QString read(QString const &entry) const { return readEntry(entry); }
+    QString read(QString const &entry) const;
 
     /** The number of entries in the corpus. */
-    size_t size() const { return getSize(); }
+    size_t size() const;
 
     /**
      * Factory method: open a corpus, determining its type automatically.
@@ -111,13 +93,6 @@ class CorpusReader : private util::NonCopyable
 
   protected:
     class FilterIter : public IterImpl {
-      CorpusReader const &d_corpus;
-      EntryIterator d_itr;
-      EntryIterator d_end;
-      QString d_file;
-      QByteArray d_query;
-      QQueue<QString> d_buffer;
-
       public:
         FilterIter(CorpusReader const &, EntryIterator, EntryIterator, QString const &);
         QString current() const;
@@ -127,6 +102,13 @@ class CorpusReader : private util::NonCopyable
       
       private:
         void parseFile(QString const &);
+        
+        CorpusReader const &d_corpus;
+        EntryIterator d_itr;
+        EntryIterator d_end;
+        QString d_file;
+        QByteArray d_query;
+        QQueue<QString> d_buffer;
     };
 
   private:
@@ -136,7 +118,58 @@ class CorpusReader : private util::NonCopyable
     virtual QString readEntry(QString const &entry) const = 0;
     virtual EntryIterator runXPath(QString const &) const;
     virtual EntryIterator runXQuery(QString const &) const;
+    
+    QString d_name;
 };
+
+inline CorpusReader::EntryIterator CorpusReader::begin() const
+{
+    return getBegin();
+}
+    
+inline CorpusReader::EntryIterator CorpusReader::end() const
+{
+    return getEnd();
+}
+    
+inline QString const &CorpusReader::name() const
+{
+    return d_name;
+}
+
+inline QString CorpusReader::read(QString const &entry) const
+{
+    return readEntry(entry);
+}
+
+inline void CorpusReader::setName(QString const &n)
+{
+    d_name = n;
+}
+
+inline size_t CorpusReader::size() const
+{
+    return getSize();
+}
+
+    
+inline QString CorpusReader::IterImpl::contents(CorpusReader const &rdr) const
+{
+    return rdr.read(current());
+}
+
+    
+inline bool CorpusReader::EntryIterator::operator!=(EntryIterator const &other) const
+{
+    return !operator==(other);
+}
+
+inline QString CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
+{
+    return impl->contents(rdr);
+}
+
+
 
 }
 
