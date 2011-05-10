@@ -57,8 +57,8 @@ class CorpusReader : private util::NonCopyable
 
         /**
          * Get contents of entry pointed to by iterator.
-         * This will be the full file contents for an ordinary iterator,
-         * but only the matching part for a query iterator.
+         * This will be a null string for an ordinary iterator,
+         * and the matching part for a query iterator.
          */
         QString contents(CorpusReader const &rdr) const;
     };
@@ -155,7 +155,8 @@ inline size_t CorpusReader::size() const
     
 inline QString CorpusReader::IterImpl::contents(CorpusReader const &rdr) const
 {
-    return rdr.read(current());
+    //return rdr.read(current());
+    return QString();
 }
 
     
