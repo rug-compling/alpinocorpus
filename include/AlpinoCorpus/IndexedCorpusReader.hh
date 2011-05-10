@@ -5,7 +5,7 @@
 #include <QMutex>
 #include <QSharedPointer>
 #include <QString>
-#include <vector>
+#include <QVector>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/QDictZipFile.hh>
@@ -29,7 +29,7 @@ class IndexedCorpusReader : public CorpusReader
     typedef QSharedPointer<IndexItem> IndexItemPtr;
     typedef QHash<QString, IndexItemPtr> IndexMap;
     typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
-    typedef std::vector<IndexItemPtr> ItemVector;
+    typedef QVector<IndexItemPtr> ItemVector;
 
     class IndexIter : public IterImpl
     {

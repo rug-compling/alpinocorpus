@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
-#include <vector>
 
 #include <QFile>
 #include <QFileInfo>

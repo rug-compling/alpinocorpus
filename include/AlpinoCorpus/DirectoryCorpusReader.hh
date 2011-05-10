@@ -3,7 +3,7 @@
 
 #include <QDir>
 #include <QString>
-#include <vector>
+#include <QVector>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -14,7 +14,7 @@ namespace alpinocorpus {
  */
 class DirectoryCorpusReader : public CorpusReader
 {
-    typedef std::vector<QString> StrVector;
+    typedef QVector<QString> StrVector;
 
     class DirIter : public IterImpl
     {
