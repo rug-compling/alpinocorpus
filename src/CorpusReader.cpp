@@ -158,14 +158,16 @@ namespace alpinocorpus {
         {
             for (int i = 0; i < xpathObj->nodesetval->nodeNr; ++i)
             {
-                xmlNode *node = xpathObj->nodesetval->nodeTab[i];
-                QString value;
+                xmlChar *str = xmlNodeListGetString(doc, xpathObj->nodesetval->nodeTab[i]->children, 1);
                 
-                for (xmlNodePtr child = node->children; child; child = child->next)
-                    value += QString::fromUtf8(reinterpret_cast<const char *>(child->content));
+                QString value(QString::fromUtf8(reinterpret_cast<const char *>(str)));
                 
-                if (!value.isEmpty())
-                d_buffer.enqueue(value);
+                xmlFree(str);
+                
+                if (value.trimmed().isEmpty())
+                    d_buffer.enqueue(QString());
+                else
+                    d_buffer.enqueue(value);
             }
         }
 
