@@ -1,3 +1,6 @@
+#ifndef ALPINO_ERROR_HH
+#define ALPINO_ERROR_HH
+
 #include <QString>
 #include <stdexcept>
 #include <string>
@@ -95,3 +98,5 @@ namespace alpinocorpus {
         static std::string construct(QString const &path, char const *extra);
     };
 }
+
+#endif // ALPINO_ERROR_HH
