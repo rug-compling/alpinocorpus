@@ -102,10 +102,7 @@ namespace alpinocorpus {
     void CorpusReader::FilterIter::next()
     {
         if (!d_buffer.isEmpty())
-        {
             d_buffer.dequeue();
-            return;
-        }
         
         while (d_buffer.isEmpty() && d_itr != d_end)
         {
