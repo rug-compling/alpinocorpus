@@ -153,9 +153,21 @@ namespace alpinocorpus {
             xmlFreeDoc(doc);
             throw Error("XPathMapper::run: could not evaluate XPath expression.");
         }
-        
+
         if (xpathObj->nodesetval && xpathObj->nodesetval->nodeNr > 0)
-            d_buffer.enqueue(xml);            
+        {
+            for (int i = 0; i < xpathObj->nodesetval->nodeNr; ++i)
+            {
+                xmlNode *node = xpathObj->nodesetval->nodeTab[i];
+                QString value;
+                
+                for (xmlNodePtr child = node->children; child; child = child->next)
+                    value += QString::fromUtf8(reinterpret_cast<const char *>(child->content));
+                
+                if (!value.isEmpty())
+                d_buffer.enqueue(value);
+            }
+        }
 
         xmlXPathFreeObject(xpathObj);
         xmlXPathFreeContext(ctx);
