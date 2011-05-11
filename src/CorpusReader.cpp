@@ -129,7 +129,7 @@ namespace alpinocorpus {
         
         if (!doc)
         {
-            qWarning() << "XPathMapper::run: could not parse XML data: " << *d_itr;
+            qWarning() << "CorpusReader::FilterIter::parseFile: could not parse XML data: " << *d_itr;
             return;
         }
         
@@ -138,7 +138,7 @@ namespace alpinocorpus {
         if (!ctx)
         {
             xmlFreeDoc(doc);
-            qWarning() << "XPathMapper::run: could not construct XPath context from document: " << *d_itr;
+            qWarning() << "CorpusReader::FilterIter::parseFile: could not construct XPath context from document: " << *d_itr;
             return;
         }
 
@@ -148,7 +148,7 @@ namespace alpinocorpus {
         {
             xmlXPathFreeContext(ctx);
             xmlFreeDoc(doc);
-            throw Error("XPathMapper::run: could not evaluate XPath expression.");
+            throw Error("CorpusReader::FilterIter::parseFile: could not evaluate XPath expression.");
         }
 
         if (xpathObj->nodesetval && xpathObj->nodesetval->nodeNr > 0)
