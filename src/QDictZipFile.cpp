@@ -25,11 +25,15 @@
 #include <QString>
 #include <QTemporaryFile>
 
-#if _MSC_VER >= 1600
-#include <cstdint>
+#ifdef _MSC_VER
+    #if _MSC_VER >= 1600
+        #include <cstdint>
+    #else
+        #include <AlpinoCorpus/util/vs_stdint.h>
+    #endif // _MSC_VER >= 1600
 #else
-#include <stdint.h>
-#endif
+    #include <stdint.h>
+#endif // _MSC_VER
 
 #include <cstddef>
 #include <limits>

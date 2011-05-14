@@ -31,7 +31,6 @@
 
 #include <zlib.h>
 
-#include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/DzChunk.hh>
 
 namespace alpinocorpus {
@@ -51,7 +50,7 @@ size_t const DZ_PREF_UNCOMPRESSED_SIZE = static_cast<size_t>((DZ_MAX_COMPRESSED_
  * chunk is independent, compression is slightly worse than stock gzip.
  */
 
-class INDEXED_CORPUS_EXPORT QDictZipFile : public QIODevice
+class QDictZipFile : public QIODevice
 {
 public:
     /*!

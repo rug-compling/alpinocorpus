@@ -6,13 +6,15 @@
 #include <QString>
 #include <dbxml/DbXml.hpp>
 
+#include <AlpinoCorpus/DLLDefines.hh>
+
 namespace alpinocorpus {
 
 /**
  * Corpus writer for DB XML-based file format.
  * See <AlpinoCorpus/DbCorpusReader.hh> for file format.
  */
-class DbCorpusWriter : public util::NonCopyable
+class ALPINO_CORPUS_EXPORT DbCorpusWriter : public util::NonCopyable
 {
     DbXml::XmlManager mgr;
     DbXml::XmlContainer container;

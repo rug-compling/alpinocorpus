@@ -22,7 +22,7 @@ namespace alpinocorpus {
  * A corpus is conceptually a mapping of names to XML documents.
  * Both are represented as QStrings.
  */
-class CorpusReader : private util::NonCopyable
+class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 {
   protected:
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
@@ -39,7 +39,7 @@ class CorpusReader : private util::NonCopyable
     
   public:
     /** Forward iterator over entry names */
-    class EntryIterator
+    class ALPINO_CORPUS_EXPORT EntryIterator
         : public std::iterator<std::input_iterator_tag, QString>
     {
         QSharedPointer<IterImpl> impl;
@@ -89,7 +89,7 @@ class CorpusReader : private util::NonCopyable
      * Factory method: open a corpus, determining its type automatically.
      * The caller is responsible for deleting the object returned.
      */
-    static INDEXED_CORPUS_EXPORT CorpusReader *open(QString const &corpusPath);
+    static CorpusReader *open(QString const &corpusPath);
 
   protected:
     class FilterIter : public IterImpl {

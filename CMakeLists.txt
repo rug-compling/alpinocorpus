@@ -29,6 +29,11 @@ if (DBXML_FOUND)
   include_directories(${DBXML_INCLUDE_DIR})
 endif()
 
+find_package(Iconv REQUIRED)
+if(ICONV_FOUND)
+  include_directories(${ICONV_INCLUDE_DIR})
+endif()
+
 find_package(LibXml2 REQUIRED)
 if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
