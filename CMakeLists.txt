@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(AlpinoCorpus)
 
+set (ALPINOCORPUS_VERSION "0.0.1")
+
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
 endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
@@ -72,6 +74,9 @@ add_library(alpino_corpus SHARED
 	${SOURCES}
 	${HEADERS}
 )
+
+set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
+  SOVERSION 0)
 
 target_link_libraries(alpino_corpus ${QT_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
