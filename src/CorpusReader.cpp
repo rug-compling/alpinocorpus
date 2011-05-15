@@ -8,6 +8,9 @@
 #include <typeinfo>
 
 #include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+
 #include <QDebug>
 
 namespace alpinocorpus {

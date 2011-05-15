@@ -8,8 +8,6 @@
 // for FilterIter
 #include <QByteArray>
 #include <QQueue>
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
 
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
