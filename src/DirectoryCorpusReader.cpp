@@ -27,7 +27,7 @@ DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
         QDirIterator entryIter(dir, QDirIterator::Subdirectories
                                   | QDirIterator::FollowSymlinks);
         while (entryIter.hasNext()) {
-            QString entry = entryIter.next();
+			QString entry = QDir::toNativeSeparators(entryIter.next());
             entry.remove(0, directory.length());
             if (entry[0] == QDir::separator())
                 entry.remove(0, 1);
