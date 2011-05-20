@@ -39,11 +39,10 @@
 #include <limits>
 #include <stdexcept>
 
-#include <zlib.h>
-
 #include <AlpinoCorpus/QDictZipFile.hh>
 #include <AlpinoCorpus/util/bufutil.hh>
 
+#include <zlib.h>
 
 namespace alpinocorpus {
 
@@ -100,7 +99,8 @@ size_t const GZ_TRAILER_CRC32 = 0;
 size_t const GZ_TRAILER_ISIZE = 4;
 
 QDictZipFile::QDictZipFile(QString const &filename, QObject *parent)
-    : QIODevice(parent), d_filename(filename), d_crc32(0), d_size(0)
+    : QIODevice(parent), d_filename(filename), d_crc32(0), d_size(0),
+    d_zStream(new z_stream)
 {
 }
 
@@ -115,19 +115,19 @@ QDictZipFile::~QDictZipFile()
     QByteArray zBuf;
     zBuf.resize(DZ_PREF_UNCOMPRESSED_SIZE);
 
-    d_zStream.next_in = reinterpret_cast<Bytef *>(d_buffer.data());
-    d_zStream.avail_in = 0;
-    d_zStream.next_out = reinterpret_cast<Bytef *>(zBuf.data());
-    d_zStream.avail_out = DZ_PREF_UNCOMPRESSED_SIZE;
+    d_zStream->next_in = reinterpret_cast<Bytef *>(d_buffer.data());
+    d_zStream->avail_in = 0;
+    d_zStream->next_out = reinterpret_cast<Bytef *>(zBuf.data());
+    d_zStream->avail_out = DZ_PREF_UNCOMPRESSED_SIZE;
 
-    if (deflate(&d_zStream, Z_FINISH) != Z_STREAM_END)
-      qWarning("QDictZipFile::~QDictZipFile(): %s", d_zStream.msg);
+    if (deflate(d_zStream.data(), Z_FINISH) != Z_STREAM_END)
+      qWarning("QDictZipFile::~QDictZipFile(): %s", d_zStream->msg);
 
-    size_t zSize = DZ_PREF_UNCOMPRESSED_SIZE - d_zStream.avail_out;
+    size_t zSize = DZ_PREF_UNCOMPRESSED_SIZE - d_zStream->avail_out;
 
     d_tempFile->write(zBuf.constData(), zSize);
 
-    switch (deflateEnd(&d_zStream)) {
+    switch (deflateEnd(d_zStream.data())) {
     case Z_STREAM_ERROR:
         qWarning("QDictZipFile::~QDictZipFile(): stream state inconsistent");
     case Z_DATA_ERROR:
@@ -168,17 +168,17 @@ void QDictZipFile::flushBuffer()
     QByteArray zBuf;
     zBuf.resize(DZ_PREF_UNCOMPRESSED_SIZE);
 
-    d_zStream.next_in = reinterpret_cast<Bytef *>(d_buffer.data());
-    d_zStream.avail_in = d_bufferPos;
-    d_zStream.next_out = reinterpret_cast<Bytef *>(zBuf.data());
-    d_zStream.avail_out = DZ_PREF_UNCOMPRESSED_SIZE;
+    d_zStream->next_in = reinterpret_cast<Bytef *>(d_buffer.data());
+    d_zStream->avail_in = d_bufferPos;
+    d_zStream->next_out = reinterpret_cast<Bytef *>(zBuf.data());
+    d_zStream->avail_out = DZ_PREF_UNCOMPRESSED_SIZE;
 
-    if (deflate(&d_zStream, Z_FULL_FLUSH) != Z_OK) {
-      qWarning("QDictZipFile::~QDictZipFile(): %s", d_zStream.msg);
+    if (deflate(d_zStream.data(), Z_FULL_FLUSH) != Z_OK) {
+      qWarning("QDictZipFile::~QDictZipFile(): %s", d_zStream->msg);
       return;
     }
 
-    size_t zSize = DZ_PREF_UNCOMPRESSED_SIZE - d_zStream.avail_out;
+    size_t zSize = DZ_PREF_UNCOMPRESSED_SIZE - d_zStream->avail_out;
 
     d_tempFile->write(zBuf.constData(), zSize);
 
@@ -529,16 +529,16 @@ bool QDictZipFile::writeOpen()
         return false;
     }
 
-    d_zStream.next_in = Z_NULL;
-    d_zStream.avail_in = 0;
-    d_zStream.next_out = Z_NULL;
-    d_zStream.avail_out = 0;
-    d_zStream.zalloc = Z_NULL;
-    d_zStream.zfree = Z_NULL;
+    d_zStream->next_in = Z_NULL;
+    d_zStream->avail_in = 0;
+    d_zStream->next_out = Z_NULL;
+    d_zStream->avail_out = 0;
+    d_zStream->zalloc = Z_NULL;
+    d_zStream->zfree = Z_NULL;
 
-    if (deflateInit2(&d_zStream, Z_BEST_COMPRESSION, Z_DEFLATED, -15,
+    if (deflateInit2(d_zStream.data(), Z_BEST_COMPRESSION, Z_DEFLATED, -15,
 		     Z_BEST_COMPRESSION, Z_DEFAULT_STRATEGY) != Z_OK) {
-      qWarning("QDictZipFile::writeOpen: %s", d_zStream.msg);
+      qWarning("QDictZipFile::writeOpen: %s", d_zStream->msg);
       return false;
     }
 

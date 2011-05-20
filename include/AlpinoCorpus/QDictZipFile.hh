@@ -29,12 +29,15 @@
 #include <QTemporaryFile>
 #include <QVector>
 
-#include <zlib.h>
-
 #include <AlpinoCorpus/DzChunk.hh>
 
-namespace alpinocorpus {
+extern "C" {
+struct z_stream_s;
+typedef z_stream_s z_stream;
+}
 
+namespace alpinocorpus {
+    
 size_t const DZ_MAX_COMPRESSED_SIZE = 0xffffUL;
 size_t const DZ_MAX_UNCOMPRESSED_SIZE = static_cast<size_t>(DZ_MAX_COMPRESSED_SIZE - 12) * 0.999;
 
@@ -110,7 +113,7 @@ private:
     QSharedPointer<QTemporaryFile> d_tempFile;
     QByteArray d_header;
     qint64 d_chunkLen;
-    uLong d_crc32;
+    unsigned long d_crc32;
     qint64 d_dataOffset;
     qint64 d_curChunk;
     QVector<DzChunk> d_chunks;
@@ -118,7 +121,7 @@ private:
     qint64 d_bufferSize;
     qint64 d_bufferPos;
     size_t d_size;
-    z_stream d_zStream;
+    QSharedPointer<z_stream> d_zStream;
 };
 
 }
