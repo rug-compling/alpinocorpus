@@ -7,6 +7,7 @@
  *    This only works because the DTD does not define entities.
  */
 
+#include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 
@@ -16,6 +17,8 @@
 #include <string>
 #include <typeinfo>
 #include <iostream>
+
+#include <dbxml/DbXml.hpp>
 
 namespace db = DbXml;
 
@@ -28,8 +31,66 @@ namespace {
 
 namespace alpinocorpus {
 
+class DbCorpusReaderPrivate : public CorpusReader
+{
+    // XXX mutable is hideous, but saves a lot of const_casts: the read
+    // methods are nominally const (don't change future behavior and are
+    // thread-safe), but DB XML doesn't expose const reading methods.
+    DbXml::XmlManager   mutable mgr;
+    DbXml::XmlContainer mutable container;
+    std::string collection;
+    
+    class DbIter : public CorpusReader::IterImpl
+    {
+    public:
+        DbIter(DbXml::XmlContainer &);
+        DbIter(DbXml::XmlManager &);
+        
+        QString current() const;
+        bool equals(IterImpl const &) const;
+        void next();
+        
+    protected:
+        mutable DbXml::XmlResults r;
+        
+        DbIter(DbXml::XmlResults const &);
+    };
+    
+    struct QueryIter : public DbIter
+    {
+        QueryIter(DbXml::XmlResults const &);
+        QString contents(CorpusReader const &) const;
+    };
+    
+public:
+    DbCorpusReaderPrivate(QString const &);
+    ~DbCorpusReaderPrivate();
+    EntryIterator getBegin() const;
+    EntryIterator getEnd() const;
+    size_t getSize() const
+    {
+        return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
+    }
+    QString readEntry(QString const &) const;
+    EntryIterator runXPath(QString const &) const;
+    EntryIterator runXQuery(QString const &) const;
+    
+private:
+    void setNameAndCollection(QString const &);
+    
+};
+    
+DbCorpusReader::DbCorpusReader(QString const &name) :
+    d_private(new DbCorpusReaderPrivate(name))
+{
+}
+
+DbCorpusReader::~DbCorpusReader()
+{
+}
+
 /* begin() */
-DbCorpusReader::DbIter::DbIter(db::XmlContainer &container)
+DbCorpusReaderPrivate::DbIter::DbIter(db::XmlContainer &container)
 {
     try {
         r = container.getAllDocuments( db::DBXML_LAZY_DOCS
@@ -41,19 +102,19 @@ DbCorpusReader::DbIter::DbIter(db::XmlContainer &container)
 }
 
 /* query */
-DbCorpusReader::DbIter::DbIter(db::XmlResults const &r_)
+DbCorpusReaderPrivate::DbIter::DbIter(db::XmlResults const &r_)
  : r(r_)
 {
 }
 
 /* end() */
-DbCorpusReader::DbIter::DbIter(db::XmlManager &mgr)
+DbCorpusReaderPrivate::DbIter::DbIter(db::XmlManager &mgr)
  : r(mgr.createResults())   // builds empty XmlResults
 {
 }
 
 /* operator* */
-QString DbCorpusReader::DbIter::current() const
+QString DbCorpusReaderPrivate::DbIter::current() const
 {
     db::XmlDocument doc;
     r.peek(doc);
@@ -61,7 +122,7 @@ QString DbCorpusReader::DbIter::current() const
 }
 
 /* operator== */
-bool DbCorpusReader::DbIter::equals(IterImpl const &that) const
+bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
 {
     try {
         // The const_casts are needed because hasNext() is not const.
@@ -77,7 +138,7 @@ bool DbCorpusReader::DbIter::equals(IterImpl const &that) const
 }
 
 /* operator++ */
-void DbCorpusReader::DbIter::next()
+void DbCorpusReaderPrivate::DbIter::next()
 {
     try {
         db::XmlDocument doc;
@@ -87,19 +148,49 @@ void DbCorpusReader::DbIter::next()
     }
 }
 
-DbCorpusReader::QueryIter::QueryIter(db::XmlResults const &r)
+DbCorpusReaderPrivate::QueryIter::QueryIter(db::XmlResults const &r)
  : DbIter(r)
 {
 }
 
-QString DbCorpusReader::QueryIter::contents(CorpusReader const &) const
+QString DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) const
 {
     db::XmlValue v;
     r.peek(v);
     return toQString(v.getNodeValue());
 }
+    
+CorpusReader::EntryIterator DbCorpusReader::getBegin() const
+{
+    return d_private->getBegin();
+}
 
-DbCorpusReader::DbCorpusReader(QString const &qpath)
+CorpusReader::EntryIterator DbCorpusReader::getEnd() const
+{
+    return d_private->getEnd();
+}
+
+size_t DbCorpusReader::getSize() const
+{
+    return d_private->getSize();
+}
+
+QString DbCorpusReader::readEntry(const QString &entry) const
+{
+    return d_private->readEntry(entry);
+}
+
+CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
+{
+    return d_private->runXPath(query);
+}
+
+CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query) const
+{
+    return d_private->runXQuery(query);
+}
+    
+DbCorpusReaderPrivate::DbCorpusReaderPrivate(QString const &qpath)
  : mgr(), container()
 {
     std::string path(qpath.toLocal8Bit().data());
@@ -116,21 +207,21 @@ DbCorpusReader::DbCorpusReader(QString const &qpath)
     }
 }
 
-DbCorpusReader::~DbCorpusReader()
+DbCorpusReaderPrivate::~DbCorpusReaderPrivate()
 {
 }
 
-CorpusReader::EntryIterator DbCorpusReader::getBegin() const
+CorpusReader::EntryIterator DbCorpusReaderPrivate::getBegin() const
 {
     return EntryIterator(new DbIter(container));
 }
 
-CorpusReader::EntryIterator DbCorpusReader::getEnd() const
+CorpusReader::EntryIterator DbCorpusReaderPrivate::getEnd() const
 {
     return EntryIterator(new DbIter(mgr));
 }
 
-QString DbCorpusReader::readEntry(QString const &filename) const
+QString DbCorpusReaderPrivate::readEntry(QString const &filename) const
 {
     std::string name(filename.toUtf8().data());
 
@@ -149,12 +240,12 @@ QString DbCorpusReader::readEntry(QString const &filename) const
     }
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
+CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(QString const &query) const
 {
     return runXQuery(QString("collection('corpus')" + query));
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query)
+CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(QString const &query)
     const
 {
     // XXX use DBXML_DOCUMENT_PROJECTION and return to whole-doc containers?
@@ -183,7 +274,7 @@ CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query)
  * For some reason, DB XML strips off a leading slash in the filename,
  * so we prepend an extra one.
  */
-void DbCorpusReader::setNameAndCollection(QString const &path)
+void DbCorpusReaderPrivate::setNameAndCollection(QString const &path)
 {
     //collection = QFileInfo(path).absoluteFilePath().toLocal8Bit().data();
 
