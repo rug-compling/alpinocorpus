@@ -129,8 +129,12 @@ bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
         // XXX should be safe.
         DbIter &other= const_cast<DbIter&>(dynamic_cast<DbIter const &>(that));
         DbIter &self = const_cast<DbIter&>(*this);
-        if (!self.r.hasNext() && !other.r.hasNext())
-            return true;        // both at end()
+        try {
+            if (!self.r.hasNext() && !other.r.hasNext())
+                return true;        // both at end()
+        } catch (db::XmlException const &e) {
+            throw alpinocorpus::Error(e.what());
+        }
         return self.r == other.r;
     } catch (std::bad_cast const &e) {
         return false;
