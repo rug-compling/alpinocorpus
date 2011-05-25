@@ -20,6 +20,7 @@ class DbCorpusReader : public CorpusReader
     ~DbCorpusReader();
 
   private:
+    bool validQuery(Dialect d, bool variables, QString const &query) const;
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
     QString readEntry(QString const &) const;

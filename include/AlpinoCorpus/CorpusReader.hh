@@ -133,7 +133,7 @@ inline CorpusReader::EntryIterator CorpusReader::end() const
 {
     return getEnd();
 }
-    
+
 inline bool CorpusReader::isValidQuery(Dialect d, bool variables, QString const &query) const
 {
     return validQuery(d, variables, query);
