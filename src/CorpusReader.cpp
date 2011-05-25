@@ -9,9 +9,16 @@
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <libxml/xmlerror.h>
 #include <libxml/xpath.h>
 
 #include <QDebug>
+
+namespace {
+    void ignoreStructuredError(void *userdata, xmlErrorPtr err)
+    {
+    }
+}
 
 namespace alpinocorpus {
     CorpusReader *CorpusReader::open(QString const &corpusPath)
@@ -27,6 +34,37 @@ namespace alpinocorpus {
         }
 
         return new DbCorpusReader(corpusPath);
+    }
+    
+    bool CorpusReader::validQuery(Dialect d, bool variables, QString const &query) const
+    {
+        if (d != XPATH)
+            return false;
+        
+        if (query.trimmed().isEmpty())
+            return true;
+                
+        QByteArray expr(query.toUtf8());
+        
+        // Prepare context
+        xmlXPathContextPtr ctx = xmlXPathNewContext(0);
+        if (!variables)
+            ctx->flags = XML_XPATH_NOVAR;
+        xmlSetStructuredErrorFunc(ctx, &ignoreStructuredError);
+        
+        // Compile expression
+        xmlXPathCompExprPtr r = xmlXPathCtxtCompile(ctx,
+                                                    reinterpret_cast<xmlChar const *>(expr.constData()));
+        
+        if (!r) {
+            xmlXPathFreeContext(ctx);
+            return false;
+        }
+        
+        xmlXPathFreeCompExpr(r);
+        xmlXPathFreeContext(ctx);
+        
+        return true;
     }
     
     bool CorpusReader::EntryIterator::operator==(EntryIterator const &other) const

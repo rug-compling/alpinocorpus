@@ -74,6 +74,9 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 
     enum Dialect { XPATH, XQUERY };
 
+    /** Is a query valid? */
+    bool isValidQuery(Dialect d, bool variables, QString const &query) const;
+    
     /** Execute query. The end of the range is given by end(). */
     EntryIterator query(Dialect d, QString const &q) const;
 
@@ -82,7 +85,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 
     /** The number of entries in the corpus. */
     size_t size() const;
-
+    
     /**
      * Factory method: open a corpus, determining its type automatically.
      * The caller is responsible for deleting the object returned.
@@ -116,6 +119,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual QString readEntry(QString const &entry) const = 0;
     virtual EntryIterator runXPath(QString const &) const;
     virtual EntryIterator runXQuery(QString const &) const;
+    virtual bool validQuery(Dialect d, bool variables, QString const &query) const;
     
     QString d_name;
 };
@@ -130,6 +134,11 @@ inline CorpusReader::EntryIterator CorpusReader::end() const
     return getEnd();
 }
     
+inline bool CorpusReader::isValidQuery(Dialect d, bool variables, QString const &query) const
+{
+    return validQuery(d, variables, query);
+}
+
 inline QString const &CorpusReader::name() const
 {
     return d_name;
