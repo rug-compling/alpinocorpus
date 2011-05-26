@@ -36,7 +36,7 @@ namespace alpinocorpus {
         return new DbCorpusReader(corpusPath);
     }
     
-    bool CorpusReader::validQuery(Dialect d, bool variables, QString const &query) const
+    bool CorpusReader::validQuery(QueryDialect d, bool variables, QString const &query) const
     {
         if (d != XPATH)
             return false;
@@ -92,8 +92,8 @@ namespace alpinocorpus {
     }
 
 
-    CorpusReader::EntryIterator CorpusReader::query(CorpusReader::Dialect d,
-                                                    QString const &q) const
+    CorpusReader::EntryIterator CorpusReader::query(QueryDialect d,
+        QString const &q) const
     {
         switch (d) {
           case XPATH:  return runXPath(q);

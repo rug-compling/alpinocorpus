@@ -71,7 +71,7 @@ public:
     {
         return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
     }
-    bool validQuery(Dialect d, bool variables, QString const &query) const;
+    bool validQuery(QueryDialect d, bool variables, QString const &query) const;
     QString readEntry(QString const &) const;
     EntryIterator runXPath(QString const &) const;
     EntryIterator runXQuery(QString const &) const;
@@ -180,7 +180,7 @@ size_t DbCorpusReader::getSize() const
     return d_private->getSize();
 }
     
-bool DbCorpusReader::validQuery(Dialect d, bool variables, QString const &query) const
+bool DbCorpusReader::validQuery(QueryDialect d, bool variables, QString const &query) const
 {
     return d_private->isValidQuery(d, variables, query);
 }
@@ -232,7 +232,7 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::getEnd() const
     return EntryIterator(new DbIter(mgr));
 }
 
-bool DbCorpusReaderPrivate::validQuery(Dialect d, bool variables, QString const &query) const
+bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, QString const &query) const
 {
     try {
         db::XmlQueryContext ctx = mgr.createQueryContext();

@@ -72,13 +72,13 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     /** Iterator to end of entry names */
     EntryIterator end() const;
 
-    enum Dialect { XPATH, XQUERY };
+    enum QueryDialect { XPATH, XQUERY };
 
     /** Is a query valid? */
-    bool isValidQuery(Dialect d, bool variables, QString const &query) const;
+    bool isValidQuery(QueryDialect d, bool variables, QString const &q) const;
     
     /** Execute query. The end of the range is given by end(). */
-    EntryIterator query(Dialect d, QString const &q) const;
+    EntryIterator query(QueryDialect d, QString const &q) const;
 
     /** Return content of a single treebank entry. */
     QString read(QString const &entry) const;
@@ -119,7 +119,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual QString readEntry(QString const &entry) const = 0;
     virtual EntryIterator runXPath(QString const &) const;
     virtual EntryIterator runXQuery(QString const &) const;
-    virtual bool validQuery(Dialect d, bool variables, QString const &query) const;
+    virtual bool validQuery(QueryDialect d, bool variables, QString const &q) const;
     
     QString d_name;
 };
@@ -134,9 +134,9 @@ inline CorpusReader::EntryIterator CorpusReader::end() const
     return getEnd();
 }
 
-inline bool CorpusReader::isValidQuery(Dialect d, bool variables, QString const &query) const
+inline bool CorpusReader::isValidQuery(QueryDialect d, bool variables, QString const &q) const
 {
-    return validQuery(d, variables, query);
+    return validQuery(d, variables, q);
 }
 
 inline QString const &CorpusReader::name() const
