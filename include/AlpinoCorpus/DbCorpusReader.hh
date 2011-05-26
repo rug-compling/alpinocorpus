@@ -24,6 +24,8 @@ class DbCorpusReader : public CorpusReader
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
     QString readEntry(QString const &) const;
+    QString readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
+        QString const &attr, QString const &value) const;
     EntryIterator runXPath(QString const &) const;
     EntryIterator runXQuery(QString const &) const;
     size_t getSize() const;

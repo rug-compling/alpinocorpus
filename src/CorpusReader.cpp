@@ -35,6 +35,12 @@ namespace alpinocorpus {
 
         return new DbCorpusReader(corpusPath);
     }
+    QString CorpusReader::readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
+        QString const &attr, QString const &value) const
+    {
+        // XXX
+        throw NotImplemented("Query marking is not yet implemented!");
+    }
     
     bool CorpusReader::validQuery(QueryDialect d, bool variables, QString const &query) const
     {

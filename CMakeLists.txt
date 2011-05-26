@@ -26,6 +26,16 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
+find_package(XERCESC REQUIRED)
+if (XERCESC_FOUND)
+  include_directories(${XERCESC_INCLUDE_DIR})
+endif()
+
+find_package(XQILLA REQUIRED)
+if (XQILLA_FOUND)
+  include_directories(${XQILLA_INCLUDE_DIR})
+endif()
+
 find_package(DBXML REQUIRED)
 if (DBXML_FOUND)
   include_directories(${DBXML_INCLUDE_DIR})
@@ -80,6 +90,8 @@ set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
 
 target_link_libraries(alpino_corpus ${QT_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
+target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
+target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 

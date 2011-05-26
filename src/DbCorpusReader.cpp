@@ -11,6 +11,7 @@
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 
+#include <QScopedPointer>
 #include <QString>
 #include <sstream>
 #include <stdexcept>
@@ -19,8 +20,16 @@
 #include <iostream>
 
 #include <dbxml/DbXml.hpp>
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
+#include <xercesc/framework/MemBufFormatTarget.hpp>
+#include <xercesc/framework/Wrapper4InputSource.hpp>
+
+#include <xqilla/xqilla-dom3.hpp>
 
 namespace db = DbXml;
+
+namespace xerces = XERCES_CPP_NAMESPACE;
 
 namespace {
     QString toQString(std::string const &s)
@@ -73,6 +82,8 @@ public:
     }
     bool validQuery(QueryDialect d, bool variables, QString const &query) const;
     QString readEntry(QString const &) const;
+    QString readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
+        QString const &attr, QString const &value) const;
     EntryIterator runXPath(QString const &) const;
     EntryIterator runXQuery(QString const &) const;
     
@@ -190,6 +201,12 @@ QString DbCorpusReader::readEntry(const QString &entry) const
 {
     return d_private->readEntry(entry);
 }
+    
+QString DbCorpusReader::readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
+    QString const &attr, QString const &value) const
+{
+    return d_private->readEntryMarkQuery(entry, d, query, attr, value);
+}
 
 CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
 {
@@ -263,6 +280,114 @@ QString DbCorpusReaderPrivate::readEntry(QString const &filename) const
             << ")";
         throw Error(msg.str());
     }
+}
+    
+QString DbCorpusReaderPrivate::readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
+    QString const &attr, QString const &value) const
+{
+    std::string name(entry.toUtf8().data());
+    std::string content;
+    QByteArray attrArray(attr.toUtf8());
+    QByteArray valArray(value.toUtf8());
+    
+    try {
+        db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
+        doc.getContent(content);
+    } catch (db::XmlException const &e) {
+        std::ostringstream msg;
+        msg << "entry \""                  << name
+        << "\" cannot be read from \"" << container.getName()
+        << "\" ("                      << e.what()
+        << ")";
+        throw Error(msg.str());
+    }
+
+    QByteArray utf8Query(query.toUtf8());
+    
+    // Prepare the DOM parser.
+    xerces::DOMImplementation *xqillaImplementation =
+        xerces::DOMImplementationRegistry::getDOMImplementation(X("XPath2 3.0"));
+    QScopedPointer<xerces::DOMLSParser> parser(xqillaImplementation->createLSParser(
+        xerces::DOMImplementationLS::MODE_SYNCHRONOUS, 0));
+    
+    // Parse the document.
+    xerces::MemBufInputSource xmlInput(reinterpret_cast<XMLByte const *>(content.c_str()),
+        content.size(), "input");
+
+    xerces::Wrapper4InputSource domInput(&xmlInput, false);
+
+    xerces::DOMDocument *document;
+    try {
+        document = parser->parse(&domInput);
+    } catch (xerces::DOMException const &e) {
+        throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
+    }
+    
+    xerces::DOMXPathExpression *expression;
+    try {
+        expression = document->createExpression(X(utf8Query.constData()), 0);
+    } catch (xerces::DOMXPathException const &) {
+        throw Error("Could not parse expression.");
+    } catch (xerces::DOMException const &) {
+        throw Error("Could not resolve namespace prefixes.");
+    }
+
+    QScopedPointer<xerces::DOMXPathResult> result;
+    try {
+        result.reset(expression->evaluate(document,
+            xerces::DOMXPathResult::ITERATOR_RESULT_TYPE, 0));
+    } catch (xerces::DOMXPathException const &e) {
+        throw Error("Could not retrieve an iterator over evaluation results.");
+    } catch (xerces::DOMException &e) {
+        throw Error("Could not evaluate the expression on the given document.");
+    }
+        
+    QList<xerces::DOMNode *> markNodes;
+    
+    while (result->iterateNext())
+    {
+        xerces::DOMNode *node = result->getNodeValue();
+        
+        // Skip non-element nodes
+        if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
+            continue;
+        
+        markNodes.append(node);
+    }
+    
+    for (QList<xerces::DOMNode *>::iterator iter = markNodes.begin();
+         iter != markNodes.end(); ++iter)
+    {
+        xerces::DOMNode *node = *iter;
+        
+        xerces::DOMNamedNodeMap *map = node->getAttributes();
+        if (map == 0)
+            continue;
+               
+        // Create new attribute node.
+        xerces::DOMAttr *attr;
+        try {
+            attr = document->createAttribute(X(attrArray.constData()));
+        } catch (xerces::DOMException const &e) {
+            throw Error("Attribute name contains invalid character.");
+        }
+        attr->setNodeValue(X(valArray.constData()));
+        
+        map->setNamedItem(attr);
+        
+    }
+
+    // Serialize DOM tree
+    QScopedPointer<xerces::DOMLSSerializer> serializer(xqillaImplementation->createLSSerializer());
+    QScopedPointer<xerces::DOMLSOutput> output(xqillaImplementation->createLSOutput());
+    xerces::MemBufFormatTarget target;
+    output->setByteStream(&target);
+    serializer->write(document, output.data());
+    
+    QByteArray outArray(reinterpret_cast<char const *>(target.getRawBuffer()),
+        target.getLen());
+        
+    return QString::fromUtf8(outArray);
 }
 
 CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(QString const &query) const

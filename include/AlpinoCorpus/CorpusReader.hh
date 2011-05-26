@@ -82,6 +82,13 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 
     /** Return content of a single treebank entry. */
     QString read(QString const &entry) const;
+    
+    /**
+     * Return content of a single treebank entry, marking matching elements using the
+     * given attribute and value.
+     */
+    QString readMarkQuery(QString const &entry, QueryDialect d, QString const &query,
+        QString const &attr, QString const &value) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -117,6 +124,8 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator getEnd() const = 0;
     virtual size_t getSize() const = 0;
     virtual QString readEntry(QString const &entry) const = 0;
+    virtual QString readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
+        QString const &attr, QString const &value) const;
     virtual EntryIterator runXPath(QString const &) const;
     virtual EntryIterator runXQuery(QString const &) const;
     virtual bool validQuery(QueryDialect d, bool variables, QString const &q) const;
@@ -147,6 +156,12 @@ inline QString const &CorpusReader::name() const
 inline QString CorpusReader::read(QString const &entry) const
 {
     return readEntry(entry);
+}
+
+inline QString CorpusReader::readMarkQuery(QString const &entry, QueryDialect d,
+    QString const &query, QString const &attr, QString const &value) const
+{
+    return readEntryMarkQuery(entry, d, query, attr, value);
 }
 
 inline void CorpusReader::setName(QString const &n)
