@@ -25,6 +25,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
   protected:
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
     struct IterImpl {
+        virtual ~IterImpl() {}
         virtual QString current() const = 0;
         virtual bool equals(IterImpl const &) const = 0;
         virtual void next() = 0;
@@ -46,6 +47,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         EntryIterator() {}
         EntryIterator(IterImpl *p) : impl(p) { }
         EntryIterator(EntryIterator const &other) : impl(other.impl) { }
+        virtual ~EntryIterator() {}
         EntryIterator &operator++();
         EntryIterator operator++(int);
         bool operator==(EntryIterator const &other) const;

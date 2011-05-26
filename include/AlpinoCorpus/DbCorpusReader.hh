@@ -17,7 +17,7 @@ class DbCorpusReader : public CorpusReader
 {
   public:
     DbCorpusReader(QString const &);
-    ~DbCorpusReader();
+    virtual ~DbCorpusReader();
 
   private:
     bool validQuery(QueryDialect d, bool variables, QString const &query) const;

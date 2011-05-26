@@ -73,7 +73,7 @@ class DbCorpusReaderPrivate : public CorpusReader
     
 public:
     DbCorpusReaderPrivate(QString const &);
-    ~DbCorpusReaderPrivate();
+    virtual ~DbCorpusReaderPrivate();
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
     size_t getSize() const
@@ -323,9 +323,9 @@ QString DbCorpusReaderPrivate::readEntryMarkQuery(QString const &entry, QueryDia
         throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
     }
     
-    xerces::DOMXPathExpression *expression;
+    QScopedPointer<xerces::DOMXPathExpression> expression;
     try {
-        expression = document->createExpression(X(utf8Query.constData()), 0);
+        expression.reset(document->createExpression(X(utf8Query.constData()), 0));
     } catch (xerces::DOMXPathException const &) {
         throw Error("Could not parse expression.");
     } catch (xerces::DOMException const &) {
