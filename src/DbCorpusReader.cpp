@@ -11,7 +11,6 @@
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 
-#include <QScopedPointer>
 #include <QString>
 #include <sstream>
 #include <stdexcept>
@@ -307,7 +306,7 @@ QString DbCorpusReaderPrivate::readEntryMarkQuery(QString const &entry, QueryDia
     // Prepare the DOM parser.
     xerces::DOMImplementation *xqillaImplementation =
         xerces::DOMImplementationRegistry::getDOMImplementation(X("XPath2 3.0"));
-    QScopedPointer<xerces::DOMLSParser> parser(xqillaImplementation->createLSParser(
+    AutoRelease<xerces::DOMLSParser> parser(xqillaImplementation->createLSParser(
         xerces::DOMImplementationLS::MODE_SYNCHRONOUS, 0));
     
     // Parse the document.
@@ -323,18 +322,18 @@ QString DbCorpusReaderPrivate::readEntryMarkQuery(QString const &entry, QueryDia
         throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
     }
     
-    QScopedPointer<xerces::DOMXPathExpression> expression;
+    AutoRelease<xerces::DOMXPathExpression> expression(0);
     try {
-        expression.reset(document->createExpression(X(utf8Query.constData()), 0));
+        expression.set(document->createExpression(X(utf8Query.constData()), 0));
     } catch (xerces::DOMXPathException const &) {
         throw Error("Could not parse expression.");
     } catch (xerces::DOMException const &) {
         throw Error("Could not resolve namespace prefixes.");
     }
 
-    QScopedPointer<xerces::DOMXPathResult> result;
+    AutoRelease<xerces::DOMXPathResult> result(0);
     try {
-        result.reset(expression->evaluate(document,
+        result.set(expression->evaluate(document,
             xerces::DOMXPathResult::ITERATOR_RESULT_TYPE, 0));
     } catch (xerces::DOMXPathException const &e) {
         throw Error("Could not retrieve an iterator over evaluation results.");
@@ -378,11 +377,11 @@ QString DbCorpusReaderPrivate::readEntryMarkQuery(QString const &entry, QueryDia
     }
 
     // Serialize DOM tree
-    QScopedPointer<xerces::DOMLSSerializer> serializer(xqillaImplementation->createLSSerializer());
-    QScopedPointer<xerces::DOMLSOutput> output(xqillaImplementation->createLSOutput());
+    AutoRelease<xerces::DOMLSSerializer> serializer(xqillaImplementation->createLSSerializer());
+    AutoRelease<xerces::DOMLSOutput> output(xqillaImplementation->createLSOutput());
     xerces::MemBufFormatTarget target;
     output->setByteStream(&target);
-    serializer->write(document, output.data());
+    serializer->write(document, output.get());
     
     QByteArray outArray(reinterpret_cast<char const *>(target.getRawBuffer()),
         target.getLen());
