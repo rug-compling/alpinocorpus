@@ -62,6 +62,15 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
          */
         QString contents(CorpusReader const &rdr) const;
     };
+    
+    struct MarkerQuery {
+        MarkerQuery(QString const &newQuery, QString const &newAttr,
+            QString const &newValue) :
+            query(newQuery), attr(newAttr), value(newValue) {}
+        QString query;
+        QString attr;
+        QString value;
+    };
 
     virtual ~CorpusReader() {}
 
@@ -89,8 +98,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      * Return content of a single treebank entry, marking matching elements using the
      * given attribute and value.
      */
-    QString readMarkQuery(QString const &entry, QueryDialect d, QString const &query,
-        QString const &attr, QString const &value) const;
+    QString readMarkQueries(QString const &entry, QList<MarkerQuery> const &queries) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -126,8 +134,8 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator getEnd() const = 0;
     virtual size_t getSize() const = 0;
     virtual QString readEntry(QString const &entry) const = 0;
-    virtual QString readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
-        QString const &attr, QString const &value) const;
+    virtual QString readEntryMarkQueries(QString const &entry,
+        QList<MarkerQuery> const &queries) const;
     virtual EntryIterator runXPath(QString const &) const;
     virtual EntryIterator runXQuery(QString const &) const;
     virtual bool validQuery(QueryDialect d, bool variables, QString const &q) const;
@@ -160,10 +168,10 @@ inline QString CorpusReader::read(QString const &entry) const
     return readEntry(entry);
 }
 
-inline QString CorpusReader::readMarkQuery(QString const &entry, QueryDialect d,
-    QString const &query, QString const &attr, QString const &value) const
+inline QString CorpusReader::readMarkQueries(QString const &entry,
+    QList<MarkerQuery> const &queries) const
 {
-    return readEntryMarkQuery(entry, d, query, attr, value);
+    return readEntryMarkQueries(entry, queries);
 }
 
 inline void CorpusReader::setName(QString const &n)

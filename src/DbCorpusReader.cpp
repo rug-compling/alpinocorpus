@@ -81,8 +81,7 @@ public:
     }
     bool validQuery(QueryDialect d, bool variables, QString const &query) const;
     QString readEntry(QString const &) const;
-    QString readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
-        QString const &attr, QString const &value) const;
+    QString readEntryMarkQueries(QString const &entry, QList<MarkerQuery> const &queries) const;
     EntryIterator runXPath(QString const &) const;
     EntryIterator runXQuery(QString const &) const;
     
@@ -201,10 +200,10 @@ QString DbCorpusReader::readEntry(const QString &entry) const
     return d_private->readEntry(entry);
 }
     
-QString DbCorpusReader::readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
-    QString const &attr, QString const &value) const
+QString DbCorpusReader::readEntryMarkQueries(QString const &entry, 
+    QList<MarkerQuery> const &queries) const
 {
-    return d_private->readEntryMarkQuery(entry, d, query, attr, value);
+    return d_private->readEntryMarkQueries(entry, queries);
 }
 
 CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
@@ -281,13 +280,11 @@ QString DbCorpusReaderPrivate::readEntry(QString const &filename) const
     }
 }
     
-QString DbCorpusReaderPrivate::readEntryMarkQuery(QString const &entry, QueryDialect d, QString const &query,
-    QString const &attr, QString const &value) const
+QString DbCorpusReaderPrivate::readEntryMarkQueries(QString const &entry,
+    QList<MarkerQuery> const &queries) const
 {
     std::string name(entry.toUtf8().data());
     std::string content;
-    QByteArray attrArray(attr.toUtf8());
-    QByteArray valArray(value.toUtf8());
     
     try {
         db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
@@ -301,8 +298,6 @@ QString DbCorpusReaderPrivate::readEntryMarkQuery(QString const &entry, QueryDia
         throw Error(msg.str());
     }
 
-    QByteArray utf8Query(query.toUtf8());
-    
     // Prepare the DOM parser.
     xerces::DOMImplementation *xqillaImplementation =
         xerces::DOMImplementationRegistry::getDOMImplementation(X("XPath2 3.0"));
@@ -321,59 +316,67 @@ QString DbCorpusReaderPrivate::readEntryMarkQuery(QString const &entry, QueryDia
     } catch (xerces::DOMException const &e) {
         throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
     }
-    
-    AutoRelease<xerces::DOMXPathExpression> expression(0);
-    try {
-        expression.set(document->createExpression(X(utf8Query.constData()), 0));
-    } catch (xerces::DOMXPathException const &) {
-        throw Error("Could not parse expression.");
-    } catch (xerces::DOMException const &) {
-        throw Error("Could not resolve namespace prefixes.");
-    }
 
-    AutoRelease<xerces::DOMXPathResult> result(0);
-    try {
-        result.set(expression->evaluate(document,
-            xerces::DOMXPathResult::ITERATOR_RESULT_TYPE, 0));
-    } catch (xerces::DOMXPathException const &e) {
-        throw Error("Could not retrieve an iterator over evaluation results.");
-    } catch (xerces::DOMException &e) {
-        throw Error("Could not evaluate the expression on the given document.");
-    }
-        
-    QList<xerces::DOMNode *> markNodes;
-    
-    while (result->iterateNext())
+    for (QList<MarkerQuery>::const_iterator iter = queries.begin();
+         iter != queries.end(); ++iter)
     {
-        xerces::DOMNode *node = result->getNodeValue();
-        
-        // Skip non-element nodes
-        if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
-            continue;
-        
-        markNodes.append(node);
-    }
-    
-    for (QList<xerces::DOMNode *>::iterator iter = markNodes.begin();
-         iter != markNodes.end(); ++iter)
-    {
-        xerces::DOMNode *node = *iter;
-        
-        xerces::DOMNamedNodeMap *map = node->getAttributes();
-        if (map == 0)
-            continue;
-               
-        // Create new attribute node.
-        xerces::DOMAttr *attr;
+        QByteArray utf8Query(iter->query.toUtf8());
+        QByteArray attrArray(iter->attr.toUtf8());
+        QByteArray valArray(iter->value.toUtf8());
+
+        AutoRelease<xerces::DOMXPathExpression> expression(0);
         try {
-            attr = document->createAttribute(X(attrArray.constData()));
-        } catch (xerces::DOMException const &e) {
-            throw Error("Attribute name contains invalid character.");
+            expression.set(document->createExpression(X(utf8Query.constData()), 0));
+        } catch (xerces::DOMXPathException const &) {
+            throw Error("Could not parse expression.");
+        } catch (xerces::DOMException const &) {
+            throw Error("Could not resolve namespace prefixes.");
         }
-        attr->setNodeValue(X(valArray.constData()));
+
+        AutoRelease<xerces::DOMXPathResult> result(0);
+        try {
+            result.set(expression->evaluate(document,
+                                            xerces::DOMXPathResult::ITERATOR_RESULT_TYPE, 0));
+        } catch (xerces::DOMXPathException const &e) {
+            throw Error("Could not retrieve an iterator over evaluation results.");
+        } catch (xerces::DOMException &e) {
+            throw Error("Could not evaluate the expression on the given document.");
+        }
         
-        map->setNamedItem(attr);
+        QList<xerces::DOMNode *> markNodes;
         
+        while (result->iterateNext())
+        {
+            xerces::DOMNode *node = result->getNodeValue();
+            
+            // Skip non-element nodes
+            if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
+                continue;
+            
+            markNodes.append(node);
+        }
+        
+        for (QList<xerces::DOMNode *>::iterator iter = markNodes.begin();
+             iter != markNodes.end(); ++iter)
+        {
+            xerces::DOMNode *node = *iter;
+            
+            xerces::DOMNamedNodeMap *map = node->getAttributes();
+            if (map == 0)
+                continue;
+            
+            // Create new attribute node.
+            xerces::DOMAttr *attr;
+            try {
+                attr = document->createAttribute(X(attrArray.constData()));
+            } catch (xerces::DOMException const &e) {
+                throw Error("Attribute name contains invalid character.");
+            }
+            attr->setNodeValue(X(valArray.constData()));
+            
+            map->setNamedItem(attr);
+            
+        }
     }
 
     // Serialize DOM tree
