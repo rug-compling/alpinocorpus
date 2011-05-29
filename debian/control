@@ -1,0 +1,27 @@
+Source: alpino-corpus
+Priority: extra
+Maintainer: Daniël de Kok <me@danieldk.eu>
+Build-Depends: debhelper (>= 7.0.50~), cmake (>= 2.8.0), cdbs (>= 0.4.62), libxqilla-dev, libxerces-c-dev, libdbxml-dev (>= 2.5.16), libxml2-dev (>= 2.7.8), libqt4-dev (>= 4.7.0), zlib1g-dev (>= 1.2.3)
+Standards-Version: 3.9.1
+Section: libs
+Homepage: http://github.com/rug-compling/dact 
+Vcs-Git: git://github.com/rug-compling/alpinocorpus.git
+Vcs-Browser: https://github.com/rug-compling/alpinocorpus
+
+Package: libalpino-corpus-dev
+Section: libdevel
+Architecture: any
+Depends: libdbxml-dev (>= 2.5.16), libqt4-dev (>= 4.7.0), zlib1g-dev, libalpino-corpus0 (= ${binary:Version}), ${misc:Depends}
+Description: Library for processing XML-based treebanks (development headers)
+ AlpinoCorpus is a library for processing XML-based treebanks. It can read
+ XML corpora in various formats and provides querying facilities.
+ .
+ This package contains development headers.
+
+Package: libalpino-corpus0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Library for processing XML-based treebanks
+ AlpinoCorpus is a library for processing XML-based treebanks. It can read
+ XML corpora in various formats and provides querying facilities.
