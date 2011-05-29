@@ -219,7 +219,7 @@ CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query) cons
 DbCorpusReaderPrivate::DbCorpusReaderPrivate(QString const &qpath)
  : mgr(), container()
 {
-    std::string path(qpath.toLocal8Bit().data());
+    std::string path(qpath.toUtf8().data());
 
     try {
         db::XmlContainerConfig config;
