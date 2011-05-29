@@ -12,6 +12,7 @@
 #include <AlpinoCorpus/Error.hh>
 
 #include <QString>
+#include <QUrl>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -431,8 +432,9 @@ void DbCorpusReaderPrivate::setNameAndCollection(QString const &path)
     //collection = QFileInfo(path).absoluteFilePath().toLocal8Bit().data();
 
     setName(toQString(container.getName()));
-    
-    collection = std::string("/") + name().toLocal8Bit().data();
+
+	QString uri = QString("/%1").arg(name());
+	collection = std::string(QUrl::toPercentEncoding(uri));
 }
 
 }   // namespace alpinocorpus
