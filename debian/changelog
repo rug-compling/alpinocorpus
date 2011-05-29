@@ -1,3 +1,9 @@
+alpino-corpus (0.2.0-1) natty; urgency=low
+
+  * rebased to 0.0.2
+
+ -- Daniël de Kok <me@danieldk.eu>  Sun, 29 May 2011 15:44:23 +0200
+
 alpino-corpus (0.1.0-1) natty; urgency=low
 
   * Initial Release.
