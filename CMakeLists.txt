@@ -93,7 +93,7 @@ add_library(alpino_corpus SHARED
 set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
   SOVERSION 0)
 
-target_link_libraries(alpino_corpus ${QT_LIBRARIES})
+target_link_libraries(alpino_corpus ${QT_QTCORE_LIBRARY})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
 target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
 target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
@@ -102,7 +102,7 @@ target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
 add_executable(alpino2db src/alpino2db/main.cpp)
 target_link_libraries(alpino2db alpino_corpus)
-target_link_libraries(alpino2db ${QT_LIBRARIES})
+target_link_libraries(alpino2db ${QT_QTCORE_LIBRARY})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
