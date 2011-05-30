@@ -20,7 +20,39 @@ namespace {
     }
 }
 
-namespace alpinocorpus {
+namespace alpinocorpus {    
+
+    bool CorpusReader::EntryIterator::operator!=(EntryIterator const &other) const
+    {
+        return !operator==(other);
+    }
+    
+    
+    CorpusReader::EntryIterator CorpusReader::begin() const
+    {
+        return getBegin();
+    }
+    
+    QString CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
+    {
+        return impl->contents(rdr);
+    }
+    
+    CorpusReader::EntryIterator CorpusReader::end() const
+    {
+        return getEnd();
+    }
+    
+    bool CorpusReader::isValidQuery(QueryDialect d, bool variables, QString const &q) const
+    {
+        return validQuery(d, variables, q);
+    }
+    
+    QString const &CorpusReader::name() const
+    {
+        return d_name;
+    }
+        
     CorpusReader *CorpusReader::open(QString const &corpusPath)
     {
         try {
@@ -35,6 +67,18 @@ namespace alpinocorpus {
 
         return new DbCorpusReader(corpusPath);
     }
+
+    QString CorpusReader::read(QString const &entry) const
+    {
+        return readEntry(entry);
+    }
+    
+    QString CorpusReader::readMarkQueries(QString const &entry,
+        QList<MarkerQuery> const &queries) const
+    {
+        return readEntryMarkQueries(entry, queries);
+    }
+        
     QString CorpusReader::readEntryMarkQueries(QString const &entry,
         QList<MarkerQuery> const &queries) const
     {
@@ -112,6 +156,16 @@ namespace alpinocorpus {
         return QString(newXmlData);
     }
     
+    void CorpusReader::setName(QString const &n)
+    {
+        d_name = n;
+    }
+    
+    size_t CorpusReader::size() const
+    {
+        return getSize();
+    }
+    
     bool CorpusReader::validQuery(QueryDialect d, bool variables, QString const &query) const
     {
         if (d != XPATH)
@@ -141,6 +195,11 @@ namespace alpinocorpus {
         xmlXPathFreeContext(ctx);
         
         return true;
+    }
+    
+    CorpusReader::EntryIterator::value_type CorpusReader::EntryIterator::operator*() const
+    {
+        return impl->current();
     }
     
     bool CorpusReader::EntryIterator::operator==(EntryIterator const &other) const
@@ -289,4 +348,11 @@ namespace alpinocorpus {
         xmlXPathFreeContext(ctx);
         xmlFreeDoc(doc);
     }
+    
+    QString CorpusReader::IterImpl::contents(CorpusReader const &rdr) const
+    {
+        //return rdr.read(current());
+        return QString();
+    }
+    
 }

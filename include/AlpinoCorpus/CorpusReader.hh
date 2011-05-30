@@ -52,7 +52,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         EntryIterator operator++(int);
         bool operator==(EntryIterator const &other) const;
         bool operator!=(EntryIterator const &other) const;
-        value_type operator*() const { return impl->current(); }
+        value_type operator*() const;
         //value_type const *operator->() const { return impl->current(); }
 
         /**
@@ -142,67 +142,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     
     QString d_name;
 };
-
-inline CorpusReader::EntryIterator CorpusReader::begin() const
-{
-    return getBegin();
-}
-    
-inline CorpusReader::EntryIterator CorpusReader::end() const
-{
-    return getEnd();
-}
-
-inline bool CorpusReader::isValidQuery(QueryDialect d, bool variables, QString const &q) const
-{
-    return validQuery(d, variables, q);
-}
-
-inline QString const &CorpusReader::name() const
-{
-    return d_name;
-}
-
-inline QString CorpusReader::read(QString const &entry) const
-{
-    return readEntry(entry);
-}
-
-inline QString CorpusReader::readMarkQueries(QString const &entry,
-    QList<MarkerQuery> const &queries) const
-{
-    return readEntryMarkQueries(entry, queries);
-}
-
-inline void CorpusReader::setName(QString const &n)
-{
-    d_name = n;
-}
-
-inline size_t CorpusReader::size() const
-{
-    return getSize();
-}
-
-    
-inline QString CorpusReader::IterImpl::contents(CorpusReader const &rdr) const
-{
-    //return rdr.read(current());
-    return QString();
-}
-
-    
-inline bool CorpusReader::EntryIterator::operator!=(EntryIterator const &other) const
-{
-    return !operator==(other);
-}
-
-inline QString CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
-{
-    return impl->contents(rdr);
-}
-
-
 
 }
 
