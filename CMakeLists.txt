@@ -53,6 +53,7 @@ endif()
 
 set (HEADERS
   include/AlpinoCorpus/CorpusReader.hh
+  include/AlpinoCorpus/CorpusWriter.hh
   include/AlpinoCorpus/DbCorpusReader.hh
   include/AlpinoCorpus/DbCorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh

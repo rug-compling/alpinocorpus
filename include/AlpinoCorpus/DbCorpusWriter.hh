@@ -2,7 +2,7 @@
 #define ALPINO_DBCORPUSWRITER_HH
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <AlpinoCorpus/util/NonCopyable.hh>
+#include <AlpinoCorpus/CorpusWriter.hh>
 #include <QSharedPointer>
 #include <QString>
 
@@ -16,7 +16,7 @@ class DbCorpusWriterPrivate;
  * Corpus writer for DB XML-based file format.
  * See <AlpinoCorpus/DbCorpusReader.hh> for file format.
  */
-class ALPINO_CORPUS_EXPORT DbCorpusWriter : public util::NonCopyable
+class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
 {
   public:
     /** Open path for writing. */
