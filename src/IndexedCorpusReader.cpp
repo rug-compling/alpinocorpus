@@ -148,11 +148,12 @@ QString IndexedCorpusReader::readEntry(QString const &filename) const
 {
     QHash<QString, IndexItemPtr>::const_iterator iter = d_namedIndices.find(filename);
     if (iter == d_namedIndices.end())
-        throw std::runtime_error("IndexedCorpusReader::read: requesting unknown data!");
+        throw Error("IndexedCorpusReader::read: requesting unknown data!");
 
     QMutexLocker locker(const_cast<QMutex *>(&d_mutex));
 
-    d_dataFile->seek(iter.value()->offset);
+    if (!d_dataFile->seek(iter.value()->offset))
+        throw Error("Seek on compressed data failed.");
 
     return d_dataFile->read(iter.value()->size);
 }
