@@ -64,8 +64,10 @@ set (HEADERS
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
   include/AlpinoCorpus/QDictZipFile.hh
   include/AlpinoCorpus/util/NonCopyable.hh
-  include/AlpinoCorpus/util/base64.hh
-  include/AlpinoCorpus/util/textfile.hh
+  include/util/base64.hh
+  include/util/bufutil.hh
+  include/util/textfile.hh
+  include/util/vs_stdint.h
 )
 
 set(SOURCES

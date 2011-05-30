@@ -40,7 +40,7 @@
 #include <stdexcept>
 
 #include <AlpinoCorpus/QDictZipFile.hh>
-#include <AlpinoCorpus/util/bufutil.hh>
+#include <util/bufutil.hh>
 
 #include <zlib.h>
 
