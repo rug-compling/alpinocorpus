@@ -37,13 +37,13 @@ namespace alpinocorpus {
     DbCorpusWriter::~DbCorpusWriter()
     {}
     
-    void DbCorpusWriter::write(QString const &name, QString const &content)
+    void DbCorpusWriter::writeEntry(QString const &name, QString const &content)
     {
         db::XmlUpdateContext ctx;
         d_private->write(name, content, d_private->mkUpdateContext(ctx));
     }
     
-    void DbCorpusWriter::write(CorpusReader const &corpus, bool fail_first)
+    void DbCorpusWriter::writeEntry(CorpusReader const &corpus, bool fail_first)
     {
         db::XmlUpdateContext ctx;
         d_private->mkUpdateContext(ctx);

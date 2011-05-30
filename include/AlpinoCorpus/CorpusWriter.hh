@@ -15,7 +15,7 @@ namespace alpinocorpus {
         /**
          * Will write name as a portable (Unix, UTF-8) pathname.
          */
-        virtual void write(QString const &name, QString const &content) = 0;
+        void write(QString const &name, QString const &content);
         
         /**
          * Write the contents of an entire CorpusReader.
@@ -25,8 +25,10 @@ namespace alpinocorpus {
          *
          * @bug Weakly exception-safe: does not clean up in fail-first mode.
          */
-        virtual void write(CorpusReader const &corpus, bool failsafe = false) = 0;
-  
+        void write(CorpusReader const &corpus, bool failsafe = false);
+    private:
+        virtual void writeEntry(QString const &name, QString const &content) = 0;
+        virtual void writeEntry(CorpusReader const &corpus, bool failsafe = false) = 0;
     };
 }
 

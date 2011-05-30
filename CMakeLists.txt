@@ -72,6 +72,7 @@ set (HEADERS
 
 set(SOURCES
   src/CorpusReader.cpp
+  src/CorpusWriter.cpp
   src/DbCorpusReader.cpp
   src/DbCorpusWriter.cpp
   src/DirectoryCorpusReader.cpp

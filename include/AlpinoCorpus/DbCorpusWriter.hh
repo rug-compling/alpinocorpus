@@ -23,11 +23,12 @@ class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
     DbCorpusWriter(QString const &path, bool overwrite);
     ~DbCorpusWriter();
 
+  private:
     /**
      * Will write name as a portable (Unix, UTF-8) pathname.
      */
-    void write(QString const &name, QString const &content);
-
+    void writeEntry(QString const &name, QString const &content);
+    
     /**
      * Write the contents of an entire CorpusReader.
      * If the second argument is false, fails with an alpinocorpus::Error
@@ -36,9 +37,8 @@ class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
      *
      * @bug Weakly exception-safe: does not clean up in fail-first mode.
      */
-    void write(CorpusReader const &corpus, bool failsafe = false);
+    void writeEntry(CorpusReader const &corpus, bool failsafe = false);
 
-  private:    
     QSharedPointer<DbCorpusWriterPrivate> d_private;
 };
 
