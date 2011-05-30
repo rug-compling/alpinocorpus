@@ -67,6 +67,7 @@ set (HEADERS
   include/util/bufutil.hh
   include/util/textfile.hh
   include/util/vs_stdint.h
+  src/IndexedCorpusReaderPrivate.hh
   src/QDictZipFilePrivate.hh
 )
 
@@ -78,6 +79,7 @@ set(SOURCES
   src/DirectoryCorpusReader.cpp
   src/Error.cpp
   src/IndexedCorpusReader.cpp
+  src/IndexedCorpusReaderPrivate.cpp
   #src/IndexedCorpusWriter.cpp
   src/QDictZipFile.cpp
   src/QDictZipFilePrivate.cpp
