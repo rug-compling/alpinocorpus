@@ -1,32 +1,20 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_HH
 #define ALPINO_DIRECTORYCORPUSREADER_HH
 
-#include <QDir>
+#include <QSharedPointer>
 #include <QString>
-#include <QVector>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
 namespace alpinocorpus {
+
+class DirectoryCorpusReaderPrivate;
 
 /**
  * Reader for Alpino treebanks represented as a directory of XML files.
  */
 class DirectoryCorpusReader : public CorpusReader
 {
-    typedef QVector<QString> StrVector;
-
-    class DirIter : public IterImpl
-    {
-        StrVector::const_iterator iter;
-
-      public:
-        DirIter(StrVector::const_iterator const &i) : iter(i) { }
-        QString current() const;
-        bool equals(IterImpl const &) const;
-        void next();
-    };
-
 public:
     /**
      * Open directory dir for reading.
@@ -35,20 +23,16 @@ public:
      * or write one if not present.
      * Failure to read or write the cache file is not signalled to the caller.
      */
-    DirectoryCorpusReader(QString const &directory, bool cache = true);
+    DirectoryCorpusReader(QString const &directory, bool wantCache = true);
+    ~DirectoryCorpusReader();
 
 private:
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(const QString &entry) const;
-    virtual size_t getSize() const { return d_entries.size(); }
+    virtual QString readEntry(QString const &entry) const;
+    virtual size_t getSize() const;
 
-    QString cachePath() const;
-    bool readCache();
-    void writeCache();
-
-    QDir d_directory;
-    StrVector d_entries;
+    QSharedPointer<DirectoryCorpusReaderPrivate> d_private;
 };
 
 }
