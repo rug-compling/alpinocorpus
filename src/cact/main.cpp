@@ -67,9 +67,6 @@ void writeDactCorpus(QString const &treebank, QString const &treebankOut,
     }
 }
 
-/*
- * Convert corpus to DBXML format
- */
 int main(int argc, char *argv[])
 {
   QCoreApplication app(argc, argv);
