@@ -104,9 +104,9 @@ target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
-add_executable(alpino2db src/alpino2db/main.cpp)
-target_link_libraries(alpino2db alpino_corpus)
-target_link_libraries(alpino2db ${QT_QTCORE_LIBRARY})
+add_executable(cact src/cact/main.cpp)
+target_link_libraries(cact alpino_corpus)
+target_link_libraries(cact ${QT_QTCORE_LIBRARY})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
