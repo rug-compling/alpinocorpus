@@ -6,6 +6,8 @@
 #include <QFileInfo>
 #include <QRegExp>
 #include <QScopedPointer>
+#include <QSet>
+#include <QString>
 #include <QStringList>
 #include <QTextStream>
 
@@ -49,15 +51,20 @@ void writeDactCorpus(QString const &treebank, QString const &treebankOut,
     throw std::runtime_error("Attempting to write to the source treebank.");
   
   QScopedPointer<CorpusReader> rd(CorpusReader::open(treebank));
-  
+    
   DbCorpusWriter wr(treebankOut, true);
   CorpusReader::EntryIterator i, end(rd->end());
   if (query.isNull())
     i = rd->begin();
   else
     i = rd->query(CorpusReader::XPATH, query);
+  
+  QSet<QString> seen;
   for (; i != end; ++i)
-    wr.write(*i, rd->read(*i));
+    if (!seen.contains(*i)) {
+      wr.write(*i, rd->read(*i));
+      seen.insert(*i);
+    }
 }
 
 /*
