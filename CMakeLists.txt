@@ -89,6 +89,15 @@ set(SOURCES
   src/util/base64.cpp
 )
 
+set(CACT_SOURCES
+  src/cact/ProgramOptions.cpp
+  src/cact/main.cpp
+)
+
+set(CACT_HEADERS
+  src/cact/ProgramOptions.hh
+)
+
 add_library(alpino_corpus SHARED 
 	${SOURCES}
 	${HEADERS}
@@ -104,7 +113,7 @@ target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
-add_executable(cact src/cact/main.cpp)
+add_executable(cact ${CACT_SOURCES} ${CACT_HEADERS})
 target_link_libraries(cact alpino_corpus)
 target_link_libraries(cact ${QT_QTCORE_LIBRARY})
 
