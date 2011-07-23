@@ -40,6 +40,8 @@ Requirements
 - A C++ compiler.
 - Qt version 4.7 or later.
 - Berkeley DB XML 2.5.16 or later.
+- libxml2
+- libxslt
 
 Execute 'cmake .', followed by 'make' in the source directory.
 
