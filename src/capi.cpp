@@ -44,11 +44,24 @@ alpinocorpus_iter_p alpinocorpus_entry_iter(alpinocorpus_reader_p corpus)
     return i;        
 }
 
+alpinocorpus_iter_p alpinocorpus_query_iter(alpinocorpus_reader_p reader, char const *query)
+{
+    alpinocorpus::CorpusReader::EntryIterator iter =
+        reader->corpusReader->query(alpinocorpus::CorpusReader::XPATH, query);
+    
+    if (iter == reader->corpusReader->end())
+        return NULL;
+    
+    alpinocorpus_iter_p i = new alpinocorpus_iter_t(iter);
+    
+    return i;    
+}
+
 void alpinocorpus_iter_next(alpinocorpus_reader_p reader, alpinocorpus_iter_p *iter)
 {
     if (++(*iter)->entryIter == reader->corpusReader->end()) {
         free(*iter);
-        *iter = 0;
+        *iter = NULL;
     }
 }
     
