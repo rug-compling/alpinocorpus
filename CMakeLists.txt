@@ -63,6 +63,7 @@ set (HEADERS
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
   include/AlpinoCorpus/QDictZipFile.hh
   include/AlpinoCorpus/util/NonCopyable.hh
+  include/AlpinoCorpus/capi.h
   include/util/base64.hh
   include/util/bufutil.hh
   include/util/textfile.hh
@@ -85,6 +86,7 @@ set(SOURCES
   #src/IndexedCorpusWriter.cpp
   src/QDictZipFile.cpp
   src/QDictZipFilePrivate.cpp
+  src/capi.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
 )
