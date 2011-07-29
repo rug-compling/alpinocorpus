@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstring>
+#include <exception>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/capi.h>
@@ -23,7 +24,14 @@ struct alpinocorpus_iter_t {
 
 alpinocorpus_reader_p alpinocorpus_open(char const *path)
 {
-    alpinocorpus::CorpusReader *reader = alpinocorpus::CorpusReader::open(path);
+
+    alpinocorpus::CorpusReader *reader;
+    
+    try {
+        reader = alpinocorpus::CorpusReader::open(path);
+    } catch (std::exception const &e) {
+        return NULL;
+    }
     
     return new alpinocorpus_reader_t(reader);
 }
@@ -46,9 +54,14 @@ alpinocorpus_iter_p alpinocorpus_entry_iter(alpinocorpus_reader_p corpus)
 
 alpinocorpus_iter_p alpinocorpus_query_iter(alpinocorpus_reader_p reader, char const *query)
 {
-    alpinocorpus::CorpusReader::EntryIterator iter =
-        reader->corpusReader->query(alpinocorpus::CorpusReader::XPATH, query);
+    alpinocorpus::CorpusReader::EntryIterator iter;
     
+    try {
+        iter = reader->corpusReader->query(alpinocorpus::CorpusReader::XPATH, query);
+    } catch (std::exception const &e) {
+        return NULL;
+    }
+        
     if (iter == reader->corpusReader->end())
         return NULL;
     
@@ -67,7 +80,13 @@ void alpinocorpus_iter_next(alpinocorpus_reader_p reader, alpinocorpus_iter_p *i
     
 char *alpinocorpus_iter_value(alpinocorpus_iter_p iter)
 {
-    QString entry = *(iter->entryIter);
+    QString entry;
+    try {
+        entry = *(iter->entryIter);
+    } catch (std::exception const &e) {
+        return NULL;
+    }
+    
     QByteArray data = entry.toUtf8();
     size_t len = strlen(data.constData()) + 1;
     char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
