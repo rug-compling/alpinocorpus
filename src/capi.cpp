@@ -22,7 +22,7 @@ struct alpinocorpus_iter_t {
     alpinocorpus::CorpusReader::EntryIterator entryIter;
 };
 
-alpinocorpus_reader_p alpinocorpus_open(char const *path)
+alpinocorpus_reader alpinocorpus_open(char const *path)
 {
 
     alpinocorpus::CorpusReader *reader;
@@ -36,23 +36,23 @@ alpinocorpus_reader_p alpinocorpus_open(char const *path)
     return new alpinocorpus_reader_t(reader);
 }
     
-void alpinocorpus_close(alpinocorpus_reader_p reader)
+void alpinocorpus_close(alpinocorpus_reader reader)
 {
     delete reader->corpusReader;
     delete reader;
 }
 
-alpinocorpus_iter_p alpinocorpus_entry_iter(alpinocorpus_reader_p corpus)
+alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
 {
     if (corpus->corpusReader->begin() == corpus->corpusReader->end())
         return NULL;
     
-    alpinocorpus_iter_p i = new alpinocorpus_iter_t(corpus->corpusReader->begin());
+    alpinocorpus_iter i = new alpinocorpus_iter_t(corpus->corpusReader->begin());
     
     return i;        
 }
 
-alpinocorpus_iter_p alpinocorpus_query_iter(alpinocorpus_reader_p reader, char const *query)
+alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query)
 {
     alpinocorpus::CorpusReader::EntryIterator iter;
     
@@ -65,12 +65,12 @@ alpinocorpus_iter_p alpinocorpus_query_iter(alpinocorpus_reader_p reader, char c
     if (iter == reader->corpusReader->end())
         return NULL;
     
-    alpinocorpus_iter_p i = new alpinocorpus_iter_t(iter);
+    alpinocorpus_iter i = new alpinocorpus_iter_t(iter);
     
     return i;    
 }
 
-void alpinocorpus_iter_next(alpinocorpus_reader_p reader, alpinocorpus_iter_p *iter)
+void alpinocorpus_iter_next(alpinocorpus_reader reader, alpinocorpus_iter *iter)
 {
     if (++(*iter)->entryIter == reader->corpusReader->end()) {
         free(*iter);
@@ -78,7 +78,7 @@ void alpinocorpus_iter_next(alpinocorpus_reader_p reader, alpinocorpus_iter_p *i
     }
 }
     
-char *alpinocorpus_iter_value(alpinocorpus_iter_p iter)
+char *alpinocorpus_iter_value(alpinocorpus_iter iter)
 {
     QString entry;
     try {
@@ -94,7 +94,7 @@ char *alpinocorpus_iter_value(alpinocorpus_iter_p iter)
     return cstr;    
 }
 
-char *alpinocorpus_read(alpinocorpus_reader_p reader, char const *entry)
+char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
 {
     QString str = reader->corpusReader->read(entry);
     QByteArray data = str.toUtf8();
