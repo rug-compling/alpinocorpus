@@ -1,14 +1,28 @@
 require 'ffi'
 
-module AlpinoCorpusLibC
-    extend FFI::Library
-    ffi_lib FFI::Library::LIBC
+module EntriesIterate
+  def entriesIterate(ptrPtr)
+    while !ptrPtr.get_pointer(0).null? do
+      # Retrieve iterate value as a pointer, we have to free it.
+      iter = ptrPtr.get_pointer(0)
+      strPtr = AlpinoCorpus::alpinocorpus_iter_value(iter)
 
-    attach_function :free, [:pointer], :void
+      # Convert and yield the string.
+      str = strPtr.get_string(0)
+      yield str
+
+      # Free the C string.
+      AlpinoCorpusLibC::free(strPtr)
+
+      AlpinoCorpus::alpinocorpus_iter_next(@reader, ptrPtr)
+    end
+  end
 end
+
 
 module AlpinoCorpus
   extend FFI::Library
+
   ffi_lib 'alpino_corpus'
 
   attach_function :alpinocorpus_open, [:string], :pointer
@@ -23,6 +37,9 @@ module AlpinoCorpus
   end
 
   class Reader
+    include Enumerable
+    include EntriesIterate
+
     def initialize(path)
       @reader = AlpinoCorpus::alpinocorpus_open(path)
 
@@ -33,12 +50,14 @@ module AlpinoCorpus
       ObjectSpace.define_finalizer(self, self.class.finalize(@reader))
     end
 
-    def entries(&blk)
+    def each(&blk)
       iter = AlpinoCorpus::alpinocorpus_entry_iter(@reader)
       ptrPtr = FFI::MemoryPointer.new(:pointer, 1)
       ptrPtr.put_pointer(0, iter)
 
       entriesIterate(ptrPtr, &blk)
+
+      self
     end
 
     def read(name)
@@ -55,25 +74,27 @@ module AlpinoCorpus
       str
     end
 
-    def entriesIterate(ptrPtr)
-      while !ptrPtr.get_pointer(0).null? do
-        # Retrieve iterate value as a pointer, we have to free it.
-        iter = ptrPtr.get_pointer(0)
-        strPtr = AlpinoCorpus::alpinocorpus_iter_value(iter)
 
-        # Convert and yield the string.
-        str = strPtr.get_string(0)
-        yield str
-
-        # Free the C string.
-        AlpinoCorpusLibC::free(strPtr)
-
-        AlpinoCorpus::alpinocorpus_iter_next(@reader, ptrPtr)
-      end
+    def query(query)
+      Query.new(@reader, query)
     end
 
-    def query(query, &blk)
-      iter = AlpinoCorpus::alpinocorpus_query_iter(@reader, query)
+    def self.finalize(reader)
+      proc { AlpinoCorpus::alpinocorpus_close(reader) }
+    end
+  end
+
+  class Query
+    include Enumerable
+    include EntriesIterate
+
+    def initialize(reader, query)
+      @reader = reader
+      @query = query
+    end
+
+    def each(&blk)
+      iter = AlpinoCorpus::alpinocorpus_query_iter(@reader, @query)
       if iter.null?
         raise AlpinoCorpusException, "Could not execute query."
       end
@@ -82,10 +103,17 @@ module AlpinoCorpus
       ptrPtr.put_pointer(0, iter)
 
       entriesIterate(ptrPtr, &blk)
-    end
 
-    def self.finalize(reader)
-      proc { AlpinoCorpus::alpinocorpus_close(reader) }
+      self
     end
   end
+end
+
+private
+
+module AlpinoCorpusLibC
+    extend FFI::Library
+    ffi_lib FFI::Library::LIBC
+
+    attach_function :free, [:pointer], :void
 end
