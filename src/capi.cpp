@@ -90,17 +90,23 @@ char *alpinocorpus_iter_value(alpinocorpus_iter iter)
     QByteArray data = entry.toUtf8();
     size_t len = strlen(data.constData()) + 1;
     char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
-    strcpy(cstr, data.constData());
+    strlcpy(cstr, data.constData(), len);
     return cstr;    
 }
 
 char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
 {
-    QString str = reader->corpusReader->read(entry);
+    QString str;
+    try{ 
+        str = reader->corpusReader->read(entry);
+    } catch (std::exception const &e) {
+        return NULL;
+    }
+    
     QByteArray data = str.toUtf8();
     size_t len = strlen(data.constData()) + 1;
     char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
-    strcpy(cstr, data.constData());
+    strlcpy(cstr, data.constData(), len);
     return cstr;
 }
 
