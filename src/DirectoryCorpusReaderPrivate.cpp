@@ -55,9 +55,9 @@ CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEnd() const
     return EntryIterator(new DirIter(d_entries.end()));
 }
 
-QString DirectoryCorpusReaderPrivate::DirIter::current() const
+std::string DirectoryCorpusReaderPrivate::DirIter::current() const
 {
-    return QDir::fromNativeSeparators(*iter);
+    return QDir::fromNativeSeparators(*iter).toUtf8().constData();
 }
 
 bool DirectoryCorpusReaderPrivate::DirIter::equals(IterImpl const &other) const
@@ -75,9 +75,9 @@ void DirectoryCorpusReaderPrivate::DirIter::next()
     ++iter;
 }
 
-QString DirectoryCorpusReaderPrivate::readEntry(QString const &entry) const
+QString DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) const
 {
-    return util::readFile(d_directory.filePath(entry));
+    return util::readFile(d_directory.filePath(QString::fromUtf8(entry.c_str())));
 }
 
 QString DirectoryCorpusReaderPrivate::cachePath() const

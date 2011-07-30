@@ -35,7 +35,7 @@ size_t IndexedCorpusReader::getSize() const
     return d_private->getSize();
 }
 
-QString IndexedCorpusReader::readEntry(QString const &filename) const
+QString IndexedCorpusReader::readEntry(std::string const &filename) const
 {
   return d_private->readEntry(filename);
 }

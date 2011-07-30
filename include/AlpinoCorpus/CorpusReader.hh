@@ -27,7 +27,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
     struct IterImpl {
         virtual ~IterImpl() {}
-        virtual QString current() const = 0;
+        virtual std::string current() const = 0;
         virtual bool equals(IterImpl const &) const = 0;
         virtual void next() = 0;
 
@@ -40,7 +40,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
   public:
     /** Forward iterator over entry names */
     class ALPINO_CORPUS_EXPORT EntryIterator
-        : public std::iterator<std::input_iterator_tag, QString>
+    : public std::iterator<std::input_iterator_tag, std::string>
     {
         std::tr1::shared_ptr<IterImpl> impl;
 
@@ -93,13 +93,13 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     EntryIterator query(QueryDialect d, std::string const &q) const;
 
     /** Return content of a single treebank entry. */
-    QString read(QString const &entry) const;
+    QString read(std::string const &entry) const;
     
     /**
      * Return content of a single treebank entry, marking matching elements using the
      * given attribute and value.
      */
-    QString readMarkQueries(QString const &entry, QList<MarkerQuery> const &queries) const;
+    QString readMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -114,18 +114,18 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     class FilterIter : public IterImpl {
       public:
         FilterIter(CorpusReader const &, EntryIterator, EntryIterator, std::string const &);
-        QString current() const;
+        std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
         QString contents(CorpusReader const &) const;
       
       private:
-        void parseFile(QString const &);
+        void parseFile(std::string const &);
         
         CorpusReader const &d_corpus;
         EntryIterator d_itr;
         EntryIterator d_end;
-        QString d_file;
+        std::string d_file;
         std::string d_query;
         QQueue<QString> d_buffer;
     };
@@ -134,8 +134,8 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator getBegin() const = 0;
     virtual EntryIterator getEnd() const = 0;
     virtual size_t getSize() const = 0;
-    virtual QString readEntry(QString const &entry) const = 0;
-    virtual QString readEntryMarkQueries(QString const &entry,
+    virtual QString readEntry(std::string const &entry) const = 0;
+    virtual QString readEntryMarkQueries(std::string const &entry,
         QList<MarkerQuery> const &queries) const;
     virtual EntryIterator runXPath(std::string const &) const;
     virtual EntryIterator runXQuery(std::string const &) const;

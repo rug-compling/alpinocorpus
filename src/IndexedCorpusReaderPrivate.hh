@@ -1,9 +1,9 @@
 #ifndef ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
 #define ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
 
+#include <tr1/unordered_map>
 #include <tr1/memory>
 
-#include <QHash>
 #include <QMutex>
 #include <QString>
 #include <QVector>
@@ -16,11 +16,11 @@ namespace alpinocorpus
 
 struct IndexItem
 {
-    IndexItem(QString const &newName, size_t newOffset, size_t newSize)
+    IndexItem(std::string const &newName, size_t newOffset, size_t newSize)
      : name(newName), offset(newOffset), size(newSize) {}
     IndexItem() : name(""), offset(0), size(0) {}
 
-    QString name;
+    std::string name;
     size_t offset;
     size_t size;
 };
@@ -28,7 +28,7 @@ struct IndexItem
 class IndexedCorpusReaderPrivate : public CorpusReader
 {
     typedef std::tr1::shared_ptr<IndexItem> IndexItemPtr;
-    typedef QHash<QString, IndexItemPtr> IndexMap;
+    typedef std::tr1::unordered_map<std::string, IndexItemPtr> IndexMap;
     typedef std::tr1::shared_ptr<QDictZipFile> QDictZipFilePtr;
     typedef QVector<IndexItemPtr> ItemVector;
 
@@ -38,7 +38,7 @@ class IndexedCorpusReaderPrivate : public CorpusReader
 
       public:
         IndexIter(ItemVector::const_iterator const &i) : iter(i) { }
-        QString current() const;
+        std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
     };
@@ -55,7 +55,7 @@ public:
 
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(QString const &filename) const;
+    virtual QString readEntry(std::string const &filename) const;
     virtual size_t getSize() const;
 
 private:

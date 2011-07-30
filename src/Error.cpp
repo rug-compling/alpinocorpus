@@ -4,9 +4,9 @@
 #include <sstream>
 
 namespace alpinocorpus {
-    std::string DuplicateKey::construct(QString const &key)
+    std::string DuplicateKey::construct(std::string const &key)
     {
-        return std::string("duplicate key: ") + qPrintable(key);
+        return std::string("duplicate key: ") + key;
     }
 
     std::string NotImplemented::construct(char const *type, char const *func)

@@ -4,7 +4,7 @@
 #include <AlpinoCorpus/CorpusWriter.hh>
 
 namespace alpinocorpus {
-    void CorpusWriter::write(QString const &name, QString const &content)
+    void CorpusWriter::write(std::string const &name, QString const &content)
     {
         writeEntry(name, content);
     }

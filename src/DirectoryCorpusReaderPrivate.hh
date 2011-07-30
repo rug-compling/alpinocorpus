@@ -22,7 +22,7 @@ class DirectoryCorpusReaderPrivate : public CorpusReader
 
       public:
         DirIter(StrVector::const_iterator const &i) : iter(i) { }
-        QString current() const;
+        std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
     };
@@ -40,7 +40,7 @@ public:
 
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(const QString &entry) const;
+    virtual QString readEntry(std::string const &entry) const;
     virtual size_t getSize() const { return d_entries.size(); }
 
 private:

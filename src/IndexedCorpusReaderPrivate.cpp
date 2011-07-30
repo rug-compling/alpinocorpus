@@ -1,5 +1,8 @@
 #include <stdexcept>
+#include <string>
 #include <typeinfo>
+
+#include <tr1/unordered_map>
 
 #include <QFile>
 #include <QFileInfo>
@@ -93,7 +96,7 @@ void IndexedCorpusReaderPrivate::canonicalize(QString &filename)
         throw OpenError(filename, "not an indexed (.dz) corpus file");
 }
 
-QString IndexedCorpusReaderPrivate::IndexIter::current() const
+std::string IndexedCorpusReaderPrivate::IndexIter::current() const
 {
     return (*iter)->name;
 }
@@ -139,7 +142,7 @@ void IndexedCorpusReaderPrivate::open(QString const &dataPath,
             throw OpenError(indexPath,
                             QString::fromUtf8("malformed line in index file"));
 
-        QString name(lineParts[0]);
+        std::string name(lineParts[0].toUtf8().constData());
         size_t offset = util::b64_decode(lineParts[1].toAscii());
         size_t size   = util::b64_decode(lineParts[2].toAscii());
 
@@ -149,18 +152,18 @@ void IndexedCorpusReaderPrivate::open(QString const &dataPath,
     }
 }
 
-QString IndexedCorpusReaderPrivate::readEntry(QString const &filename) const
+    QString IndexedCorpusReaderPrivate::readEntry(std::string const &filename) const
 {
-    QHash<QString, IndexItemPtr>::const_iterator iter = d_namedIndices.find(filename);
+    IndexMap::const_iterator iter = d_namedIndices.find(filename);
     if (iter == d_namedIndices.end())
         throw Error("IndexedCorpusReaderPrivate::read: requesting unknown data!");
 
     QMutexLocker locker(const_cast<QMutex *>(&d_mutex));
 
-    if (!d_dataFile->seek(iter.value()->offset))
+    if (!d_dataFile->seek(iter->second->offset))
         throw Error("Seek on compressed data failed.");
 
-    return d_dataFile->read(iter.value()->size);
+    return d_dataFile->read(iter->second->size);
 }
 
 }   // namespace alpinocorpus

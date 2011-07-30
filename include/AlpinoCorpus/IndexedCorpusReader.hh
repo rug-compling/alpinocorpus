@@ -27,7 +27,7 @@ public:
 private:
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(QString const &filename) const;
+    virtual QString readEntry(std::string const &filename) const;
     virtual size_t getSize() const;
 
     std::tr1::shared_ptr<IndexedCorpusReaderPrivate> d_private;

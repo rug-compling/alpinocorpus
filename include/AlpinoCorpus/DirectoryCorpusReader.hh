@@ -30,7 +30,7 @@ public:
 private:
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(QString const &entry) const;
+    virtual QString readEntry(std::string const &entry) const;
     virtual size_t getSize() const;
 
     std::tr1::shared_ptr<DirectoryCorpusReaderPrivate> d_private;

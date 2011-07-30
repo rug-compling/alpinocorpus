@@ -1,4 +1,5 @@
 #include <string>
+#include <tr1/unordered_set>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusWriter.hh>
@@ -8,7 +9,6 @@
 #include <QFileInfo>
 #include <QRegExp>
 #include <QScopedPointer>
-#include <QSet>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
@@ -33,7 +33,7 @@ void listCorpus(QString const &treebank, std::string const &query)
 
   QTextStream outStream(stdout);
   for (; i != end; ++i)
-    outStream << *i << "\n";
+      outStream << QString::fromUtf8((*i).c_str()) << "\n";
   
 }
 
@@ -54,16 +54,16 @@ void writeDactCorpus(QString const &treebank, QString const &treebankOut,
   
   QScopedPointer<CorpusReader> rd(CorpusReader::open(treebank));
     
-  DbCorpusWriter wr(treebankOut, true);
+  DbCorpusWriter wr(treebankOut.toUtf8().constData(), true);
   CorpusReader::EntryIterator i, end(rd->end());
   if (query.empty())
     i = rd->begin();
   else
     i = rd->query(CorpusReader::XPATH, query);
   
-  QSet<QString> seen;
+  std::tr1::unordered_set<std::string> seen;
   for (; i != end; ++i)
-    if (!seen.contains(*i)) {
+    if (seen.find(*i) == seen.end()) {
       wr.write(*i, rd->read(*i));
       seen.insert(*i);
     }

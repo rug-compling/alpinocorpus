@@ -70,18 +70,18 @@ namespace alpinocorpus {
         return new DbCorpusReader(corpusPath);
     }
 
-    QString CorpusReader::read(QString const &entry) const
+    QString CorpusReader::read(std::string const &entry) const
     {
         return readEntry(entry);
     }
     
-    QString CorpusReader::readMarkQueries(QString const &entry,
+    QString CorpusReader::readMarkQueries(std::string const &entry,
         QList<MarkerQuery> const &queries) const
     {
         return readEntryMarkQueries(entry, queries);
     }
         
-    QString CorpusReader::readEntryMarkQueries(QString const &entry,
+    QString CorpusReader::readEntryMarkQueries(std::string const &entry,
         QList<MarkerQuery> const &queries) const
     {
         QByteArray xmlData = readEntry(entry).toUtf8();
@@ -261,7 +261,7 @@ namespace alpinocorpus {
         next();
     }
     
-    QString CorpusReader::FilterIter::current() const
+    std::string CorpusReader::FilterIter::current() const
     {
         return d_file;
     }
@@ -298,7 +298,7 @@ namespace alpinocorpus {
             : d_buffer.head();
     }
     
-    void CorpusReader::FilterIter::parseFile(QString const &file)
+    void CorpusReader::FilterIter::parseFile(std::string const &file)
     {
         QString xml(d_corpus.read(file));
         QByteArray xmlData(xml.toUtf8());
@@ -307,7 +307,7 @@ namespace alpinocorpus {
         
         if (!doc)
         {
-            qWarning() << "CorpusReader::FilterIter::parseFile: could not parse XML data: " << *d_itr;
+            qWarning() << "CorpusReader::FilterIter::parseFile: could not parse XML data: " << QString::fromUtf8((*d_itr).c_str());
             return;
         }
         
@@ -316,7 +316,7 @@ namespace alpinocorpus {
         if (!ctx)
         {
             xmlFreeDoc(doc);
-            qWarning() << "CorpusReader::FilterIter::parseFile: could not construct XPath context from document: " << *d_itr;
+            qWarning() << "CorpusReader::FilterIter::parseFile: could not construct XPath context from document: " << QString::fromUtf8((*d_itr).c_str());
             return;
         }
 

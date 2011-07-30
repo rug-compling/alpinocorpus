@@ -55,7 +55,7 @@ class DbCorpusReaderPrivate : public CorpusReader
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
         
-        QString current() const;
+        std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
         
@@ -81,8 +81,8 @@ public:
         return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
     }
     bool validQuery(QueryDialect d, bool variables, QString const &query) const;
-    QString readEntry(QString const &) const;
-    QString readEntryMarkQueries(QString const &entry, QList<MarkerQuery> const &queries) const;
+    QString readEntry(std::string const &) const;
+    QString readEntryMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
     EntryIterator runXPath(std::string const &) const;
     EntryIterator runXQuery(std::string const &) const;
     
@@ -125,11 +125,11 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlManager &mgr)
 }
 
 /* operator* */
-QString DbCorpusReaderPrivate::DbIter::current() const
+std::string DbCorpusReaderPrivate::DbIter::current() const
 {
     db::XmlDocument doc;
     r.peek(doc);
-    return toQString(doc.getName());
+    return doc.getName();
 }
 
 /* operator== */
@@ -196,12 +196,12 @@ bool DbCorpusReader::validQuery(QueryDialect d, bool variables, QString const &q
 }
 
 
-QString DbCorpusReader::readEntry(const QString &entry) const
+QString DbCorpusReader::readEntry(std::string const &entry) const
 {
     return d_private->readEntry(entry);
 }
     
-QString DbCorpusReader::readEntryMarkQueries(QString const &entry, 
+QString DbCorpusReader::readEntryMarkQueries(std::string const &entry, 
     QList<MarkerQuery> const &queries) const
 {
     return d_private->readEntryMarkQueries(entry, queries);
@@ -262,18 +262,16 @@ bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, QString c
 }
 
 
-QString DbCorpusReaderPrivate::readEntry(QString const &filename) const
+    QString DbCorpusReaderPrivate::readEntry(std::string const &filename) const
 {
-    std::string name(filename.toUtf8().data());
-
     try {
-        db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
+        db::XmlDocument doc(container.getDocument(filename, db::DBXML_LAZY_DOCS));
         std::string content;
         return toQString(doc.getContent(content));
 
     } catch (db::XmlException const &e) {
         std::ostringstream msg;
-        msg << "entry \""                  << name
+        msg << "entry \""                  << filename
             << "\" cannot be read from \"" << container.getName()
             << "\" ("                      << e.what()
             << ")";
@@ -281,18 +279,17 @@ QString DbCorpusReaderPrivate::readEntry(QString const &filename) const
     }
 }
     
-QString DbCorpusReaderPrivate::readEntryMarkQueries(QString const &entry,
+QString DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
     QList<MarkerQuery> const &queries) const
 {
-    std::string name(entry.toUtf8().data());
     std::string content;
     
     try {
-        db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
+        db::XmlDocument doc(container.getDocument(entry, db::DBXML_LAZY_DOCS));
         doc.getContent(content);
     } catch (db::XmlException const &e) {
         std::ostringstream msg;
-        msg << "entry \""                  << name
+        msg << "entry \""                  << entry
         << "\" cannot be read from \"" << container.getName()
         << "\" ("                      << e.what()
         << ")";

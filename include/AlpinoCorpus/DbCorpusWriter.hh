@@ -1,6 +1,7 @@
 #ifndef ALPINO_DBCORPUSWRITER_HH
 #define ALPINO_DBCORPUSWRITER_HH
 
+#include <string>
 #include <tr1/memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -28,7 +29,7 @@ class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
     /**
      * Will write name as a portable (Unix, UTF-8) pathname.
      */
-    void writeEntry(QString const &name, QString const &content);
+    void writeEntry(std::string const &name, QString const &content);
     
     /**
      * Write the contents of an entire CorpusReader.
