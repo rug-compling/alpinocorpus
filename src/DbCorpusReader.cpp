@@ -83,8 +83,8 @@ public:
     bool validQuery(QueryDialect d, bool variables, QString const &query) const;
     QString readEntry(QString const &) const;
     QString readEntryMarkQueries(QString const &entry, QList<MarkerQuery> const &queries) const;
-    EntryIterator runXPath(QString const &) const;
-    EntryIterator runXQuery(QString const &) const;
+    EntryIterator runXPath(std::string const &) const;
+    EntryIterator runXQuery(std::string const &) const;
     
 private:
     void setNameAndCollection(QString const &);
@@ -207,12 +207,12 @@ QString DbCorpusReader::readEntryMarkQueries(QString const &entry,
     return d_private->readEntryMarkQueries(entry, queries);
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
+CorpusReader::EntryIterator DbCorpusReader::runXPath(std::string const &query) const
 {
     return d_private->runXPath(query);
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query) const
+CorpusReader::EntryIterator DbCorpusReader::runXQuery(std::string const &query) const
 {
     return d_private->runXQuery(query);
 }
@@ -393,12 +393,12 @@ QString DbCorpusReaderPrivate::readEntryMarkQueries(QString const &entry,
     return QString::fromUtf8(outArray);
 }
 
-CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(QString const &query) const
+CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(std::string const &query) const
 {
-    return runXQuery(QString("collection('corpus')" + query));
+    return runXQuery(std::string("collection('corpus')" + query));
 }
 
-CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(QString const &query)
+CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &query)
     const
 {
     // XXX use DBXML_DOCUMENT_PROJECTION and return to whole-doc containers?
@@ -408,7 +408,7 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(QString const &quer
             = mgr.createQueryContext(db::XmlQueryContext::LiveValues,
                                      db::XmlQueryContext::Lazy);
         ctx.setDefaultCollection(collection);
-        db::XmlResults r(mgr.query(query.toUtf8().data(), ctx,
+        db::XmlResults r(mgr.query(query, ctx,
                                      db::DBXML_LAZY_DOCS
                                    | db::DBXML_WELL_FORMED_ONLY
                                   ));

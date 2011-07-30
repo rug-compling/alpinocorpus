@@ -1,9 +1,8 @@
 #include <algorithm>
 #include <iterator>
+#include <map>
 #include <stdexcept>
 #include <string>
-
-#include <QString>
 
 #include "ProgramOptions.hh"
 
@@ -28,10 +27,10 @@ ProgramOptions::ProgramOptions(int argc, char const *argv[], char const *optStri
   std::copy(argv + optind, argv + argc, std::back_inserter(d_arguments));
 }
 
-QString const &ProgramOptions::optionValue(char option) const
+std::string const &ProgramOptions::optionValue(char option) const
 {
-	QMap<char, QString>::const_iterator iter = d_optionValues.find(option);
+    std::map<char, std::string>::const_iterator iter = d_optionValues.find(option);
 	if (iter == d_optionValues.end())
 		throw std::runtime_error("Tried to extract the value for an option without argument.");
-	return iter.value();
+	return iter->second;
 }

@@ -1,10 +1,10 @@
 #ifndef ALPINO_CORPUSREADER_HH
 #define ALPINO_CORPUSREADER_HH
 
+#include <string>
 #include <tr1/memory>
 
 #include <QString>
-#include <QVector>
 
 // for FilterIter
 #include <QByteArray>
@@ -90,7 +90,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     bool isValidQuery(QueryDialect d, bool variables, QString const &q) const;
     
     /** Execute query. The end of the range is given by end(). */
-    EntryIterator query(QueryDialect d, QString const &q) const;
+    EntryIterator query(QueryDialect d, std::string const &q) const;
 
     /** Return content of a single treebank entry. */
     QString read(QString const &entry) const;
@@ -113,7 +113,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
   protected:
     class FilterIter : public IterImpl {
       public:
-        FilterIter(CorpusReader const &, EntryIterator, EntryIterator, QString const &);
+        FilterIter(CorpusReader const &, EntryIterator, EntryIterator, std::string const &);
         QString current() const;
         bool equals(IterImpl const &) const;
         void next();
@@ -126,7 +126,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         EntryIterator d_itr;
         EntryIterator d_end;
         QString d_file;
-        QByteArray d_query;
+        std::string d_query;
         QQueue<QString> d_buffer;
     };
 
@@ -137,8 +137,8 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual QString readEntry(QString const &entry) const = 0;
     virtual QString readEntryMarkQueries(QString const &entry,
         QList<MarkerQuery> const &queries) const;
-    virtual EntryIterator runXPath(QString const &) const;
-    virtual EntryIterator runXQuery(QString const &) const;
+    virtual EntryIterator runXPath(std::string const &) const;
+    virtual EntryIterator runXQuery(std::string const &) const;
     virtual bool validQuery(QueryDialect d, bool variables, QString const &q) const;
     
     QString d_name;

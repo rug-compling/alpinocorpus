@@ -1,3 +1,5 @@
+#include <string>
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
@@ -228,7 +230,7 @@ namespace alpinocorpus {
 
 
     CorpusReader::EntryIterator CorpusReader::query(QueryDialect d,
-        QString const &q) const
+        std::string const &q) const
     {
         switch (d) {
           case XPATH:  return runXPath(q);
@@ -237,24 +239,24 @@ namespace alpinocorpus {
         }
     }
 
-    CorpusReader::EntryIterator CorpusReader::runXPath(QString const &query) const
+    CorpusReader::EntryIterator CorpusReader::runXPath(std::string const &query) const
     {
         //throw NotImplemented(typeid(*this).name(), "XQuery functionality");
         return EntryIterator(new FilterIter(*this, getBegin(), getEnd(), query));
     }
 
-    CorpusReader::EntryIterator CorpusReader::runXQuery(QString const &) const
+    CorpusReader::EntryIterator CorpusReader::runXQuery(std::string const &) const
     {
         throw NotImplemented(typeid(*this).name(), "XQuery functionality");
     }
     
     CorpusReader::FilterIter::FilterIter(CorpusReader const &corpus,
-        EntryIterator itr, EntryIterator end, QString const &query)
+        EntryIterator itr, EntryIterator end, std::string const &query)
     :
         d_corpus(corpus),
         d_itr(itr),
         d_end(end),
-        d_query(query.toUtf8())
+        d_query(query)
     {
         next();
     }
@@ -319,7 +321,7 @@ namespace alpinocorpus {
         }
 
         xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(
-            reinterpret_cast<xmlChar const *>(d_query.constData()), ctx);
+            reinterpret_cast<xmlChar const *>(d_query.c_str()), ctx);
         if (!xpathObj)
         {
             xmlXPathFreeContext(ctx);
