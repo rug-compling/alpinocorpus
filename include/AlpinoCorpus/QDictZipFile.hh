@@ -20,11 +20,12 @@
 #ifndef DICTZIPFILE_HH
 #define DICTZIPFILE_HH
 
+#include <tr1/memory>
+
 #include <QByteArray>
 #include <QFile>
 #include <QIODevice>
 #include <QObject>
-#include <QSharedPointer>
 #include <QString>
 #include <QTemporaryFile>
 #include <QVector>
@@ -80,7 +81,7 @@ protected:
     qint64 readData(char *data, qint64 maxlen);
     qint64 writeData(const char *data, qint64 len);
 private:
-    QSharedPointer<QDictZipFilePrivate> d_private;
+    std::tr1::shared_ptr<QDictZipFilePrivate> d_private;
 };
 
 }

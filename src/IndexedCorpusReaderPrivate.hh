@@ -1,9 +1,10 @@
 #ifndef ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
 #define ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
 
+#include <tr1/memory>
+
 #include <QHash>
 #include <QMutex>
-#include <QSharedPointer>
 #include <QString>
 #include <QVector>
 
@@ -26,9 +27,9 @@ struct IndexItem
 
 class IndexedCorpusReaderPrivate : public CorpusReader
 {
-    typedef QSharedPointer<IndexItem> IndexItemPtr;
+    typedef std::tr1::shared_ptr<IndexItem> IndexItemPtr;
     typedef QHash<QString, IndexItemPtr> IndexMap;
-    typedef QSharedPointer<QDictZipFile> QDictZipFilePtr;
+    typedef std::tr1::shared_ptr<QDictZipFile> QDictZipFilePtr;
     typedef QVector<IndexItemPtr> ItemVector;
 
     class IndexIter : public IterImpl

@@ -1,4 +1,3 @@
-#include <QSharedPointer>
 #include <QString>
 
 #include <AlpinoCorpus/IndexedCorpusReader.hh>

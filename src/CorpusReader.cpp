@@ -209,7 +209,7 @@ namespace alpinocorpus {
         else if (!other.impl)
             return !impl;
         else
-            return impl->equals(*other.impl.data());
+            return impl->equals(*other.impl.get());
     }
     
     CorpusReader::EntryIterator &CorpusReader::EntryIterator::operator++()

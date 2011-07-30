@@ -1,7 +1,6 @@
 #include <QDateTime>
 #include <QFile>
 #include <QIODevice>
-#include <QSharedPointer>
 #include <QString>
 #include <QTemporaryFile>
 
@@ -54,14 +53,14 @@ QDictZipFilePrivate::~QDictZipFilePrivate()
     d_zStream->next_out = reinterpret_cast<Bytef *>(zBuf.data());
     d_zStream->avail_out = DZ_PREF_UNCOMPRESSED_SIZE;
     
-    if (deflate(d_zStream.data(), Z_FINISH) != Z_STREAM_END)
+    if (deflate(d_zStream.get(), Z_FINISH) != Z_STREAM_END)
         qWarning("QDictZipFilePrivate::~QDictZipFilePrivate(): %s", d_zStream->msg);
     
     size_t zSize = DZ_PREF_UNCOMPRESSED_SIZE - d_zStream->avail_out;
     
     d_tempFile->write(zBuf.constData(), zSize);
     
-    switch (deflateEnd(d_zStream.data())) {
+    switch (deflateEnd(d_zStream.get())) {
         case Z_STREAM_ERROR:
             qWarning("QDictZipFilePrivate::~QDictZipFilePrivate(): stream state inconsistent");
         case Z_DATA_ERROR:
@@ -107,7 +106,7 @@ void QDictZipFilePrivate::flushBuffer()
     d_zStream->next_out = reinterpret_cast<Bytef *>(zBuf.data());
     d_zStream->avail_out = DZ_PREF_UNCOMPRESSED_SIZE;
     
-    if (deflate(d_zStream.data(), Z_FULL_FLUSH) != Z_OK) {
+    if (deflate(d_zStream.get(), Z_FULL_FLUSH) != Z_OK) {
         qWarning("QDictZipFilePrivate::~flushBuffer(): %s", d_zStream->msg);
         return;
     }
@@ -345,7 +344,7 @@ void QDictZipFilePrivate::skipOptional()
 
 bool QDictZipFilePrivate::readOpen()
 {
-    d_file = QSharedPointer<QFile>(new QFile(d_filename));
+    d_file.reset(new QFile(d_filename));
     bool r = d_file->open(QFile::ReadOnly);
     if (!r)
         return r;
@@ -451,13 +450,13 @@ void QDictZipFilePrivate::writeHeader()
 
 bool QDictZipFilePrivate::writeOpen()
 {
-    d_tempFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile);
+    d_tempFile.reset(new QTemporaryFile);
     if (!d_tempFile->open()) {
         qWarning("Could not open a temporary file for writing.");
         return false;
     }
     
-    d_file = QSharedPointer<QFile>(new QFile(d_filename));
+    d_file.reset(new QFile(d_filename));
     if (!d_file->open(QIODevice::WriteOnly)) {
         qWarning("Could not open target file for writing.");
         return false;
@@ -470,7 +469,7 @@ bool QDictZipFilePrivate::writeOpen()
     d_zStream->zalloc = Z_NULL;
     d_zStream->zfree = Z_NULL;
     
-    if (deflateInit2(d_zStream.data(), Z_BEST_COMPRESSION, Z_DEFLATED, -15,
+    if (deflateInit2(d_zStream.get(), Z_BEST_COMPRESSION, Z_DEFLATED, -15,
                      Z_BEST_COMPRESSION, Z_DEFAULT_STRATEGY) != Z_OK) {
         qWarning("QDictZipFilePrivate::writeOpen: %s", d_zStream->msg);
         return false;

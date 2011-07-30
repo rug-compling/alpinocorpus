@@ -1,7 +1,8 @@
 #ifndef ALPINO_INDEXED_CORPUSREADER_HH
 #define ALPINO_INDEXED_CORPUSREADER_HH
 
-#include <QSharedPointer>
+#include <tr1/memory>
+
 #include <QString>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -29,7 +30,7 @@ private:
     virtual QString readEntry(QString const &filename) const;
     virtual size_t getSize() const;
 
-    QSharedPointer<IndexedCorpusReaderPrivate> d_private;
+    std::tr1::shared_ptr<IndexedCorpusReaderPrivate> d_private;
 };
 
 }

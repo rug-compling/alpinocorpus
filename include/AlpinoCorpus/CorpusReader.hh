@@ -1,7 +1,8 @@
 #ifndef ALPINO_CORPUSREADER_HH
 #define ALPINO_CORPUSREADER_HH
 
-#include <QSharedPointer>
+#include <tr1/memory>
+
 #include <QString>
 #include <QVector>
 
@@ -41,7 +42,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     class ALPINO_CORPUS_EXPORT EntryIterator
         : public std::iterator<std::input_iterator_tag, QString>
     {
-        QSharedPointer<IterImpl> impl;
+        std::tr1::shared_ptr<IterImpl> impl;
 
       public:
         EntryIterator() {}

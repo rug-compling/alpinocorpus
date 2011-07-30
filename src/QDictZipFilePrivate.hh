@@ -20,9 +20,10 @@
 #ifndef ALPINO_DICTZIPFILE_PRIVATE_HH
 #define ALPINO_DICTZIPFILE_PRIVATE_HH
 
+#include <tr1/memory>
+
 #include <QByteArray>
 #include <QIODevice>
-#include <QSharedPointer>
 #include <QString>
 #include <QVector>
 
@@ -163,8 +164,8 @@ namespace alpinocorpus {
         void writeZData();
         
         QString d_filename;
-        QSharedPointer<QFile> d_file;
-        QSharedPointer<QTemporaryFile> d_tempFile;
+        std::tr1::shared_ptr<QFile> d_file;
+        std::tr1::shared_ptr<QTemporaryFile> d_tempFile;
         QByteArray d_header;
         qint64 d_chunkLen;
         unsigned long d_crc32;
@@ -175,7 +176,7 @@ namespace alpinocorpus {
         qint64 d_bufferSize;
         qint64 d_bufferPos;
         size_t d_size;
-        QSharedPointer<z_stream> d_zStream;
+        std::tr1::shared_ptr<z_stream> d_zStream;
     };
 }
 

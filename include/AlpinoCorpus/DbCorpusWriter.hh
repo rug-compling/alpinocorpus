@@ -1,9 +1,10 @@
 #ifndef ALPINO_DBCORPUSWRITER_HH
 #define ALPINO_DBCORPUSWRITER_HH
 
+#include <tr1/memory>
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
-#include <QSharedPointer>
 #include <QString>
 
 #include <AlpinoCorpus/DLLDefines.hh>
@@ -39,7 +40,7 @@ class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
      */
     void writeEntry(CorpusReader const &corpus, bool failsafe = false);
 
-    QSharedPointer<DbCorpusWriterPrivate> d_private;
+    std::tr1::shared_ptr<DbCorpusWriterPrivate> d_private;
 };
 
 }   // namespace alpinocorpus

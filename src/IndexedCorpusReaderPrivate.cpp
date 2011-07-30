@@ -5,7 +5,6 @@
 #include <QFileInfo>
 #include <QMutexLocker>
 #include <QRegExp>
-#include <QSharedPointer>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>

@@ -1,7 +1,8 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_HH
 #define ALPINO_DIRECTORYCORPUSREADER_HH
 
-#include <QSharedPointer>
+#include <tr1/memory>
+
 #include <QString>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -32,7 +33,7 @@ private:
     virtual QString readEntry(QString const &entry) const;
     virtual size_t getSize() const;
 
-    QSharedPointer<DirectoryCorpusReaderPrivate> d_private;
+    std::tr1::shared_ptr<DirectoryCorpusReaderPrivate> d_private;
 };
 
 }
