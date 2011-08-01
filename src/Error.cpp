@@ -26,7 +26,7 @@ namespace alpinocorpus {
 
     std::string OpenError::construct(std::string const &path, std::string const &extra)
     {
-        return construct(path, extra);
+        return construct(path, extra.c_str());
     }
 
     std::string OpenError::construct(std::string const &path, char const *extra)
