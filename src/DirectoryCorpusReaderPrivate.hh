@@ -1,9 +1,12 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_PRIVATE_HH
 #define ALPINO_DIRECTORYCORPUSREADER_PRIVATE_HH
 
-#include <QDir>
+#include <string>
+#include <vector>
+
+#include <boost/filesystem.hpp>
+
 #include <QString>
-#include <QVector>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -14,7 +17,7 @@ namespace alpinocorpus {
  */
 class DirectoryCorpusReaderPrivate : public CorpusReader
 {
-    typedef QVector<QString> StrVector;
+    typedef std::vector<std::string> StrVector;
 
     class DirIter : public IterImpl
     {
@@ -44,11 +47,11 @@ public:
     virtual size_t getSize() const { return d_entries.size(); }
 
 private:
-    QString cachePath() const;
+    boost::filesystem::path cachePath() const;
     bool readCache();
     void writeCache();
 
-    QDir d_directory;
+    boost::filesystem::path d_directory;
     StrVector d_entries;
 };
 

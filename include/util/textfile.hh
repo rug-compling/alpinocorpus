@@ -5,7 +5,7 @@
 
 namespace alpinocorpus { namespace util {
 
-QString readFile(QString const &filename);
+std::string readFile(std::string const &filename);
 
 } } // namespace util
 

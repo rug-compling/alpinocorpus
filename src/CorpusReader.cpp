@@ -300,9 +300,9 @@ namespace alpinocorpus {
     void CorpusReader::FilterIter::parseFile(std::string const &file)
     {
         std::string xml(d_corpus.read(file));
-        
+
         xmlDocPtr doc = xmlParseMemory(xml.c_str(), xml.size());
-        
+
         if (!doc)
         {
             qWarning() << "CorpusReader::FilterIter::parseFile: could not parse XML data: " << QString::fromUtf8((*d_itr).c_str());
@@ -317,7 +317,7 @@ namespace alpinocorpus {
             qWarning() << "CorpusReader::FilterIter::parseFile: could not construct XPath context from document: " << QString::fromUtf8((*d_itr).c_str());
             return;
         }
-
+        
         xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(
             reinterpret_cast<xmlChar const *>(d_query.c_str()), ctx);
         if (!xpathObj)
@@ -333,7 +333,9 @@ namespace alpinocorpus {
             {
                 xmlChar *str = xmlNodeListGetString(doc, xpathObj->nodesetval->nodeTab[i]->children, 1);
                 
-                std::string value(reinterpret_cast<const char *>(str));
+                std::string value;
+                if (str != 0) // XXX - is this correct?
+                    value = reinterpret_cast<const char *>(str);
                 
                 xmlFree(str);
                 

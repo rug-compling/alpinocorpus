@@ -18,6 +18,11 @@ list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
 
 include_directories(${AlpinoCorpus_SOURCE_DIR}/include)
 
+find_package(Boost 1.47.0 COMPONENTS system filesystem REQUIRED)
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
 find_package(Qt4 COMPONENTS QtCore QtTest REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
@@ -106,6 +111,7 @@ add_library(alpino_corpus SHARED
 set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
   SOVERSION 0)
 
+target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${QT_QTCORE_LIBRARY})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
 target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
