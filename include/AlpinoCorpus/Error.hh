@@ -5,8 +5,6 @@
 #include <stdexcept>
 #include <string>
 
-#include <QString>
-
 namespace alpinocorpus {
     /**
      * Base class for errors generated inside the alpinocorpus namespace
@@ -90,13 +88,13 @@ namespace alpinocorpus {
       public:
         explicit OpenError(std::string const &path)
          : Error(construct(path)) {}
-        explicit OpenError(std::string const &path, QString const &extra)
+        explicit OpenError(std::string const &path, std::string const &extra)
          : Error(construct(path, extra)) {}
         ~OpenError() throw() {}
 
       private:
         static std::string construct(std::string const &path);
-        static std::string construct(std::string const &path, QString const &extra);
+        static std::string construct(std::string const &path, std::string const &extra);
         static std::string construct(std::string const &path, char const *extra);
     };
 }

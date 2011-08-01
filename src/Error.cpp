@@ -3,8 +3,6 @@
 #include <string>
 #include <sstream>
 
-#include <QString>
-
 namespace alpinocorpus {
     std::string DuplicateKey::construct(std::string const &key)
     {
@@ -26,9 +24,9 @@ namespace alpinocorpus {
         return construct(path, "");
     }
 
-    std::string OpenError::construct(std::string const &path, QString const &extra)
+    std::string OpenError::construct(std::string const &path, std::string const &extra)
     {
-        return construct(path, qPrintable(extra));
+        return construct(path, extra);
     }
 
     std::string OpenError::construct(std::string const &path, char const *extra)

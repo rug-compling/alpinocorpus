@@ -68,8 +68,8 @@ namespace alpinocorpus {
             if (overwrite) {
                 if (std::remove(path.c_str()) != 0 && errno != ENOENT)
                     throw OpenError(path,
-                                    QString("cannot remove file: %1")
-                                        .arg(std::strerror(errno)));
+                                    std::string("cannot remove file: ") +
+                                    std::strerror(errno));
                 d_container = d_mgr.createContainer(path, config,
                                                     db::XmlContainer
                                                     ::NodeContainer);

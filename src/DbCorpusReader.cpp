@@ -228,7 +228,7 @@ DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
         container.addAlias("corpus"); 
         setNameAndCollection(path);
     } catch (db::XmlException const &e) {
-        throw OpenError(path, QString::fromUtf8(e.what()));
+        throw OpenError(path, e.what());
     }
 }
 

@@ -149,8 +149,7 @@ void IndexedCorpusReaderPrivate::open(std::string const &dataPath,
         QStringList lineParts = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 
         if (lineParts.size() != 3)
-            throw OpenError(indexPath,
-                            QString::fromUtf8("malformed line in index file"));
+            throw OpenError(indexPath, "malformed line in index file");
 
         std::string name(lineParts[0].toUtf8().constData());
         size_t offset = util::b64_decode(lineParts[1].toAscii());
