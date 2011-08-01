@@ -4,8 +4,6 @@
 #include <string>
 #include <tr1/memory>
 
-#include <QString>
-
 // for FilterIter
 #include <QQueue>
 
@@ -18,7 +16,7 @@ namespace alpinocorpus {
  * Abstract base class for corpus readers.
  *
  * A corpus is conceptually a mapping of names to XML documents.
- * Both are represented as QStrings.
+ * Both are represented as strings.
  */
 class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 {
@@ -64,12 +62,12 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     };
     
     struct MarkerQuery {
-        MarkerQuery(QString const &newQuery, QString const &newAttr,
-            QString const &newValue) :
+        MarkerQuery(std::string const &newQuery, std::string const &newAttr,
+            std::string const &newValue) :
             query(newQuery), attr(newAttr), value(newValue) {}
-        QString query;
-        QString attr;
-        QString value;
+        std::string query;
+        std::string attr;
+        std::string value;
     };
 
     virtual ~CorpusReader() {}

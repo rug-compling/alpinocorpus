@@ -315,13 +315,9 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
     for (QList<MarkerQuery>::const_iterator iter = queries.begin();
          iter != queries.end(); ++iter)
     {
-        QByteArray utf8Query(iter->query.toUtf8());
-        QByteArray attrArray(iter->attr.toUtf8());
-        QByteArray valArray(iter->value.toUtf8());
-
         AutoRelease<xerces::DOMXPathExpression> expression(0);
         try {
-            expression.set(document->createExpression(X(utf8Query.constData()), 0));
+            expression.set(document->createExpression(X(iter->query.c_str()), 0));
         } catch (xerces::DOMXPathException const &) {
             throw Error("Could not parse expression.");
         } catch (xerces::DOMException const &) {
@@ -351,10 +347,10 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
             markNodes.append(node);
         }
         
-        for (QList<xerces::DOMNode *>::iterator iter = markNodes.begin();
-             iter != markNodes.end(); ++iter)
+        for (QList<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
+             nodeIter != markNodes.end(); ++iter)
         {
-            xerces::DOMNode *node = *iter;
+            xerces::DOMNode *node = *nodeIter;
             
             xerces::DOMNamedNodeMap *map = node->getAttributes();
             if (map == 0)
@@ -363,11 +359,11 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
             // Create new attribute node.
             xerces::DOMAttr *attr;
             try {
-                attr = document->createAttribute(X(attrArray.constData()));
+                attr = document->createAttribute(X(iter->attr.c_str()));
             } catch (xerces::DOMException const &e) {
                 throw Error("Attribute name contains invalid character.");
             }
-            attr->setNodeValue(X(valArray.constData()));
+            attr->setNodeValue(X(iter->value.c_str()));
             
             map->setNamedItem(attr);
             

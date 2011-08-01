@@ -92,11 +92,7 @@ namespace alpinocorpus {
 
         for (QList<MarkerQuery>::const_iterator iter = queries.begin();
              iter != queries.end(); ++iter)
-        {
-            QByteArray query(iter->query.toUtf8());
-            QByteArray attr(iter->attr.toUtf8());
-            QByteArray value(iter->value.toUtf8());
-            
+        {            
             xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
             if (xpathCtx == 0) {
                 xmlFreeDoc(doc);
@@ -104,11 +100,11 @@ namespace alpinocorpus {
             }
             
             xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(
-                reinterpret_cast<xmlChar const *>(query.constData()), xpathCtx);
+                reinterpret_cast<xmlChar const *>(iter->query.c_str()), xpathCtx);
             if (xpathObj == 0) {
                 xmlXPathFreeContext(xpathCtx);
                 xmlFreeDoc(doc);
-                throw Error(std::string("Could not evaluate expression:") + query.constData());
+                throw Error(std::string("Could not evaluate expression:") + iter->query);
             }
             
             if (xpathObj->nodesetval == 0)
@@ -129,14 +125,14 @@ namespace alpinocorpus {
             for (QList<xmlNodePtr>::iterator nodeIter = nodes.begin();
                  nodeIter != nodes.end(); ++nodeIter) {
                 xmlAttrPtr attrPtr = xmlSetProp(*nodeIter,
-                    reinterpret_cast<xmlChar const *>(attr.constData()),
-                    reinterpret_cast<xmlChar const *>(value.data()));
+                    reinterpret_cast<xmlChar const *>(iter->attr.c_str()),
+                    reinterpret_cast<xmlChar const *>(iter->value.c_str()));
                 if (attrPtr == 0) {
                     xmlXPathFreeObject(xpathObj);
                     xmlXPathFreeContext(xpathCtx);
                     xmlFreeDoc(doc);
-                    throw Error(std::string("Could not set attribute '") + attr.constData() +
-                        "' for the expression: " + query.constData());
+                    throw Error(std::string("Could not set attribute '") + iter->attr +
+                        "' for the expression: " + iter->query);
                     
                 }
             }
