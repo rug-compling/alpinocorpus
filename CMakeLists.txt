@@ -66,11 +66,12 @@ set (HEADERS
   include/AlpinoCorpus/DbCorpusReader.hh
   include/AlpinoCorpus/DbCorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
+  include/AlpinoCorpus/DzIstream.hh
+  include/AlpinoCorpus/DzIstreamBuf.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/AlpinoCorpus/QDictZipFile.hh
   include/AlpinoCorpus/util/NonCopyable.hh
   include/util/base64.hh
   include/util/bufutil.hh
@@ -78,7 +79,7 @@ set (HEADERS
   include/util/vs_stdint.h
   src/DirectoryCorpusReaderPrivate.hh
   src/IndexedCorpusReaderPrivate.hh
-  src/QDictZipFilePrivate.hh
+  src/gzip.hh
 )
 
 set(SOURCES
@@ -88,12 +89,12 @@ set(SOURCES
   src/DbCorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
+  src/DzIstream.cpp
+  src/DzIstreamBuf.cpp
   src/Error.cpp
   src/IndexedCorpusReader.cpp
   src/IndexedCorpusReaderPrivate.cpp
   #src/IndexedCorpusWriter.cpp
-  src/QDictZipFile.cpp
-  src/QDictZipFilePrivate.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
 )

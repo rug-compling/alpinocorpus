@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
+#include <vector>
 
 #include <tr1/unordered_map>
 
@@ -15,8 +16,7 @@
 
 #include <QString>
 
-#include <AlpinoCorpus/QDictZipFile.hh>
-
+#include <AlpinoCorpus/DzIstream.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <util/base64.hh>
 
@@ -137,8 +137,8 @@ void IndexedCorpusReaderPrivate::open(std::string const &dataPath,
     if (!indexStream)
         throw OpenError(indexPath);
 
-    d_dataFile = QDictZipFilePtr(new QDictZipFile(QString::fromUtf8(dataPath.c_str())));
-    if (!d_dataFile->open(QDictZipFile::ReadOnly))
+    d_dataStream = DzIstreamPtr(new DzIstream(dataPath.c_str()));
+    if (!d_dataStream)
         throw OpenError(indexPath);
 
     // Read indices
@@ -172,11 +172,13 @@ std::string IndexedCorpusReaderPrivate::readEntry(std::string const &filename) c
 #if defined(BOOST_HAS_THREADS)
     boost::mutex::scoped_lock lock(d_readMutex);
 #endif
+    
+    std::vector<unsigned char> data(iter->second->size);
+    d_dataStream->seekg(iter->second->offset, std::ios::beg);
+    d_dataStream->read(reinterpret_cast<char *>(&data[0]), iter->second->size);
 
-    if (!d_dataFile->seek(iter->second->offset))
-        throw Error("Seek on compressed data failed.");
 
-    return d_dataFile->read(iter->second->size).constData();
+    return std::string(reinterpret_cast<char const *>(&data[0]), data.size());
 }
 
 }   // namespace alpinocorpus

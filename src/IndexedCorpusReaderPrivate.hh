@@ -13,12 +13,11 @@
 #endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <AlpinoCorpus/QDictZipFile.hh>
+#include <AlpinoCorpus/DzIstream.hh>
 
 namespace alpinocorpus
 {
-
-struct IndexItem
+    struct IndexItem
 {
     IndexItem(std::string const &newName, size_t newOffset, size_t newSize)
      : name(newName), offset(newOffset), size(newSize) {}
@@ -33,7 +32,7 @@ class IndexedCorpusReaderPrivate : public CorpusReader
 {
     typedef std::tr1::shared_ptr<IndexItem> IndexItemPtr;
     typedef std::tr1::unordered_map<std::string, IndexItemPtr> IndexMap;
-    typedef std::tr1::shared_ptr<QDictZipFile> QDictZipFilePtr;
+    typedef std::tr1::shared_ptr<DzIstream> DzIstreamPtr;
     typedef std::vector<IndexItemPtr> ItemVector;
 
     class IndexIter : public IterImpl
@@ -68,7 +67,7 @@ private:
     void construct(std::string const &, std::string const &, std::string const &);
     void open(std::string const &, std::string const &);
 	
-    QDictZipFilePtr d_dataFile;
+    DzIstreamPtr d_dataStream;
     std::vector<IndexItemPtr> d_indices;
 	IndexMap d_namedIndices;
 
