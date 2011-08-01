@@ -45,7 +45,7 @@ namespace alpinocorpus {
         return getEnd();
     }
     
-    bool CorpusReader::isValidQuery(QueryDialect d, bool variables, QString const &q) const
+    bool CorpusReader::isValidQuery(QueryDialect d, bool variables, std::string const &q) const
     {
         return validQuery(d, variables, q);
     }
@@ -168,16 +168,15 @@ namespace alpinocorpus {
         return getSize();
     }
     
-    bool CorpusReader::validQuery(QueryDialect d, bool variables, QString const &query) const
+    bool CorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
     {
         if (d != XPATH)
             return false;
         
-        if (query.trimmed().isEmpty())
+        // XXX - strip/trim
+        if (query.empty())
             return true;
-                
-        QByteArray expr(query.toUtf8());
-        
+
         // Prepare context
         xmlXPathContextPtr ctx = xmlXPathNewContext(0);
         if (!variables)
@@ -186,7 +185,7 @@ namespace alpinocorpus {
         
         // Compile expression
         xmlXPathCompExprPtr r = xmlXPathCtxtCompile(ctx,
-                                                    reinterpret_cast<xmlChar const *>(expr.constData()));
+                                                    reinterpret_cast<xmlChar const *>(query.c_str()));
         
         if (!r) {
             xmlXPathFreeContext(ctx);

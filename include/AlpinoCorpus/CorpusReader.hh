@@ -86,7 +86,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     enum QueryDialect { XPATH, XQUERY };
 
     /** Is a query valid? */
-    bool isValidQuery(QueryDialect d, bool variables, QString const &q) const;
+    bool isValidQuery(QueryDialect d, bool variables, std::string const &q) const;
     
     /** Execute query. The end of the range is given by end(). */
     EntryIterator query(QueryDialect d, std::string const &q) const;
@@ -138,7 +138,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         QList<MarkerQuery> const &queries) const;
     virtual EntryIterator runXPath(std::string const &) const;
     virtual EntryIterator runXQuery(std::string const &) const;
-    virtual bool validQuery(QueryDialect d, bool variables, QString const &q) const;
+    virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;
     
     std::string d_name;
 };

@@ -80,7 +80,7 @@ public:
     {
         return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
     }
-    bool validQuery(QueryDialect d, bool variables, QString const &query) const;
+    bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
     QString readEntry(std::string const &) const;
     QString readEntryMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
     EntryIterator runXPath(std::string const &) const;
@@ -190,7 +190,7 @@ size_t DbCorpusReader::getSize() const
     return d_private->getSize();
 }
     
-bool DbCorpusReader::validQuery(QueryDialect d, bool variables, QString const &query) const
+bool DbCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     return d_private->isValidQuery(d, variables, query);
 }
@@ -246,12 +246,11 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::getEnd() const
     return EntryIterator(new DbIter(mgr));
 }
 
-bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, QString const &query) const
+    bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     try {
         db::XmlQueryContext ctx = mgr.createQueryContext();
-        QByteArray queryData(query.toUtf8());
-        mgr.prepare(queryData.constData(), ctx);
+        mgr.prepare(query, ctx);
     } catch (db::XmlException const &e) {
         return false;
     }
