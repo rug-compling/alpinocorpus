@@ -1,13 +1,8 @@
-#include <QDateTime>
-#include <QFile>
-#include <QFileInfo>
-#include <QString>
-#include <QtDebug>
-
 #include <algorithm>
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
+#include <string>
 #include <typeinfo>
 
 #include <boost/filesystem.hpp>
