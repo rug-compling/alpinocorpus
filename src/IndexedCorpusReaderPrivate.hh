@@ -4,9 +4,13 @@
 #include <string>
 #include <tr1/unordered_map>
 #include <tr1/memory>
+#include <vector>
 
-#include <QMutex>
-#include <QVector>
+#include <boost/config.hpp>
+
+#if defined(BOOST_HAS_THREADS)
+#include <boost/thread/mutex.hpp>
+#endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/QDictZipFile.hh>
@@ -30,7 +34,7 @@ class IndexedCorpusReaderPrivate : public CorpusReader
     typedef std::tr1::shared_ptr<IndexItem> IndexItemPtr;
     typedef std::tr1::unordered_map<std::string, IndexItemPtr> IndexMap;
     typedef std::tr1::shared_ptr<QDictZipFile> QDictZipFilePtr;
-    typedef QVector<IndexItemPtr> ItemVector;
+    typedef std::vector<IndexItemPtr> ItemVector;
 
     class IndexIter : public IterImpl
     {
@@ -65,10 +69,12 @@ private:
     void open(std::string const &, std::string const &);
 	
     QDictZipFilePtr d_dataFile;
-    QVector<IndexItemPtr> d_indices;
+    std::vector<IndexItemPtr> d_indices;
 	IndexMap d_namedIndices;
 
-	QMutex d_mutex;
+#if defined(BOOST_HAS_THREADS)
+    mutable boost::mutex d_readMutex;
+#endif
 };
 
 }

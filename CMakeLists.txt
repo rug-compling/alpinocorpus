@@ -18,7 +18,10 @@ list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
 
 include_directories(${AlpinoCorpus_SOURCE_DIR}/include)
 
-find_package(Boost 1.47.0 COMPONENTS system filesystem REQUIRED)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+
+find_package(Boost 1.47.0 COMPONENTS system filesystem thread REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
