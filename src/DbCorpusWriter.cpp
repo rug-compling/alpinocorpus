@@ -58,15 +58,16 @@ namespace alpinocorpus {
     DbCorpusWriterPrivate::DbCorpusWriterPrivate(QString const &qpath, bool overwrite)
         : d_mgr(), d_container()
     {
+        std::string path(qpath.toLocal8Bit().data());
+
         try {
             db::XmlContainerConfig config;
             config.setReadOnly(false);
 
-            std::string path(qpath.toLocal8Bit().data());
 
             if (overwrite) {
                 if (std::remove(path.c_str()) != 0 && errno != ENOENT)
-                    throw OpenError(qpath,
+                    throw OpenError(path,
                                     QString("cannot remove file: %1")
                                         .arg(std::strerror(errno)));
                 d_container = d_mgr.createContainer(path, config,
@@ -75,7 +76,7 @@ namespace alpinocorpus {
             } else
                 d_container = d_mgr.openContainer(path, config);
         } catch (db::XmlException const &e) {
-            throw OpenError(qpath, e.what());
+            throw OpenError(path, e.what());
         }
     }
 

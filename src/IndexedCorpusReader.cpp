@@ -5,13 +5,13 @@
 
 namespace alpinocorpus {
 
-IndexedCorpusReader::IndexedCorpusReader(QString const &filename)
+IndexedCorpusReader::IndexedCorpusReader(std::string const &filename)
     : d_private(new IndexedCorpusReaderPrivate(filename))
 {
 }
 
-IndexedCorpusReader::IndexedCorpusReader(QString const &dataPath,
-    QString const &indexPath)
+IndexedCorpusReader::IndexedCorpusReader(std::string const &dataPath,
+    std::string const &indexPath)
     : d_private(new IndexedCorpusReaderPrivate(dataPath, indexPath))
 {
 }

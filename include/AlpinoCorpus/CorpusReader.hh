@@ -7,7 +7,6 @@
 #include <QString>
 
 // for FilterIter
-#include <QByteArray>
 #include <QQueue>
 
 #include <AlpinoCorpus/DLLDefines.hh>
@@ -35,7 +34,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         virtual QString contents(CorpusReader const &rdr) const;
     };
 
-    void setName(QString const &n);
+    void setName(std::string const &n);
     
   public:
     /** Forward iterator over entry names */
@@ -76,7 +75,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual ~CorpusReader() {}
 
     /** Return canonical name of corpus */
-    QString const &name() const;
+    std::string const &name() const;
 
     /** Iterator to begin of entry names */
     EntryIterator begin() const;
@@ -108,7 +107,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      * Factory method: open a corpus, determining its type automatically.
      * The caller is responsible for deleting the object returned.
      */
-    static CorpusReader *open(QString const &corpusPath);
+    static CorpusReader *open(std::string const &corpusPath);
 
   protected:
     class FilterIter : public IterImpl {
@@ -141,7 +140,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator runXQuery(std::string const &) const;
     virtual bool validQuery(QueryDialect d, bool variables, QString const &q) const;
     
-    QString d_name;
+    std::string d_name;
 };
 
 }

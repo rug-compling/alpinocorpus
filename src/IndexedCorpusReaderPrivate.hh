@@ -48,9 +48,9 @@ public:
      * Construct from a single file (data or index); the other file is sought
      * for in the same directory.
      */
-    IndexedCorpusReaderPrivate(QString const &path);
+    IndexedCorpusReaderPrivate(std::string const &path);
     /** Construct from data and index file. */
-    IndexedCorpusReaderPrivate(QString const &dataFilename, QString const &indexFilename);
+    IndexedCorpusReaderPrivate(std::string const &dataFilename, std::string const &indexFilename);
     virtual ~IndexedCorpusReaderPrivate() {}
 
     virtual EntryIterator getBegin() const;
@@ -59,10 +59,10 @@ public:
     virtual size_t getSize() const;
 
 private:
-    static void canonicalize(QString &);
-    void construct(QString const &);
-    void construct(QString const &, QString const &, QString const &);
-    void open(QString const &, QString const &);
+    static void canonicalize(std::string &);
+    void construct(std::string const &);
+    void construct(std::string const &, std::string const &, std::string const &);
+    void open(std::string const &, std::string const &);
 	
     QDictZipFilePtr d_dataFile;
     QVector<IndexItemPtr> d_indices;

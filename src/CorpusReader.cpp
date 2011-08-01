@@ -50,12 +50,12 @@ namespace alpinocorpus {
         return validQuery(d, variables, q);
     }
     
-    QString const &CorpusReader::name() const
+    std::string const &CorpusReader::name() const
     {
         return d_name;
     }
         
-    CorpusReader *CorpusReader::open(QString const &corpusPath)
+    CorpusReader *CorpusReader::open(std::string const &corpusPath)
     {
         try {
             return new DirectoryCorpusReader(corpusPath);
@@ -158,7 +158,7 @@ namespace alpinocorpus {
         return QString(newXmlData);
     }
     
-    void CorpusReader::setName(QString const &n)
+    void CorpusReader::setName(std::string const &n)
     {
         d_name = n;
     }

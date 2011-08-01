@@ -88,16 +88,16 @@ namespace alpinocorpus {
     class OpenError : public Error
     {
       public:
-        explicit OpenError(QString const &path)
+        explicit OpenError(std::string const &path)
          : Error(construct(path)) {}
-        explicit OpenError(QString const &path, QString const &extra)
+        explicit OpenError(std::string const &path, QString const &extra)
          : Error(construct(path, extra)) {}
         ~OpenError() throw() {}
 
       private:
-        static std::string construct(QString const &path);
-        static std::string construct(QString const &path, QString const &extra);
-        static std::string construct(QString const &path, char const *extra);
+        static std::string construct(std::string const &path);
+        static std::string construct(std::string const &path, QString const &extra);
+        static std::string construct(std::string const &path, char const *extra);
     };
 }
 

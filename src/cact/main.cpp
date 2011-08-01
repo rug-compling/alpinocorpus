@@ -23,7 +23,7 @@ using alpinocorpus::DbCorpusWriter;
 
 void listCorpus(QString const &treebank, std::string const &query)
 {
-  QScopedPointer<CorpusReader> rd(CorpusReader::open(treebank));
+  QScopedPointer<CorpusReader> rd(CorpusReader::open(treebank.toUtf8().constData()));
   CorpusReader::EntryIterator i, end(rd->end());
   
   if (query.empty())
@@ -52,7 +52,7 @@ void writeDactCorpus(QString const &treebank, QString const &treebankOut,
       QFileInfo(treebank).absoluteFilePath())
     throw std::runtime_error("Attempting to write to the source treebank.");
   
-  QScopedPointer<CorpusReader> rd(CorpusReader::open(treebank));
+  QScopedPointer<CorpusReader> rd(CorpusReader::open(treebank.toUtf8().constData()));
     
   DbCorpusWriter wr(treebankOut.toUtf8().constData(), true);
   CorpusReader::EntryIterator i, end(rd->end());

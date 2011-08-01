@@ -19,20 +19,20 @@ namespace alpinocorpus {
     /*
      * Construct error message from path and optional extra information
      */
-    std::string OpenError::construct(QString const &path)
+    std::string OpenError::construct(std::string const &path)
     {
         return construct(path, "");
     }
 
-    std::string OpenError::construct(QString const &path, QString const &extra)
+    std::string OpenError::construct(std::string const &path, QString const &extra)
     {
         return construct(path, qPrintable(extra));
     }
 
-    std::string OpenError::construct(QString const &path, char const *extra)
+    std::string OpenError::construct(std::string const &path, char const *extra)
     {
         std::ostringstream msg;
-        msg << "Cannot open \"" << qPrintable(path) << "\"";
+        msg << "Cannot open \"" << path << "\"";
         if (*extra)
             msg << ": " << extra;
         return msg.str();

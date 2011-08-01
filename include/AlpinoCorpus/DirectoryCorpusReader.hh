@@ -24,7 +24,7 @@ public:
      * or write one if not present.
      * Failure to read or write the cache file is not signalled to the caller.
      */
-    DirectoryCorpusReader(QString const &directory, bool wantCache = true);
+    DirectoryCorpusReader(std::string const &directory, bool wantCache = true);
     ~DirectoryCorpusReader();
 
 private:

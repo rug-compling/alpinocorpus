@@ -19,7 +19,7 @@ class DbCorpusReaderPrivate;
 class DbCorpusReader : public CorpusReader
 {
   public:
-    DbCorpusReader(QString const &);
+    DbCorpusReader(std::string const &);
     virtual ~DbCorpusReader();
 
   private:

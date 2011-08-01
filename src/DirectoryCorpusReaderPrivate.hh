@@ -35,7 +35,7 @@ public:
      * or write one if not present.
      * Failure to read or write the cache file is not signalled to the caller.
      */
-    DirectoryCorpusReaderPrivate(QString const &directory, bool cache = true);
+    DirectoryCorpusReaderPrivate(std::string const &directory, bool cache = true);
     virtual ~DirectoryCorpusReaderPrivate();
 
     virtual EntryIterator getBegin() const;

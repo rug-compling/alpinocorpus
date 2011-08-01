@@ -17,10 +17,10 @@
 namespace alpinocorpus {
 
 DirectoryCorpusReaderPrivate::DirectoryCorpusReaderPrivate(
-    QString const &directory, bool wantCache)
- : d_directory(directory)
+    std::string const &directory, bool wantCache)
+    : d_directory(QString::fromUtf8(directory.c_str()))
 {
-    QDir dir(directory, "*.xml");
+    QDir dir(QString::fromUtf8(directory.c_str()), "*.xml");
     if (!dir.exists() || !dir.isReadable())
         throw OpenError(directory, "non-existent or not readable");
 

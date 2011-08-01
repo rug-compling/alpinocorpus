@@ -72,7 +72,7 @@ class DbCorpusReaderPrivate : public CorpusReader
     };
     
 public:
-    DbCorpusReaderPrivate(QString const &);
+    DbCorpusReaderPrivate(std::string const &);
     virtual ~DbCorpusReaderPrivate();
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
@@ -87,11 +87,11 @@ public:
     EntryIterator runXQuery(std::string const &) const;
     
 private:
-    void setNameAndCollection(QString const &);
+    void setNameAndCollection(std::string const &);
     
 };
     
-DbCorpusReader::DbCorpusReader(QString const &name) :
+DbCorpusReader::DbCorpusReader(std::string const &name) :
     d_private(new DbCorpusReaderPrivate(name))
 {
 }
@@ -217,20 +217,18 @@ CorpusReader::EntryIterator DbCorpusReader::runXQuery(std::string const &query) 
     return d_private->runXQuery(query);
 }
     
-DbCorpusReaderPrivate::DbCorpusReaderPrivate(QString const &qpath)
+DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
  : mgr(), container()
 {
-    std::string path(qpath.toUtf8().data());
-
     try {
         db::XmlContainerConfig config;
         config.setReadOnly(true);
         container = mgr.openContainer(path, config);
         // Nasty: using a hard-coded alias to work use in the xpath queries.
         container.addAlias("corpus"); 
-        setNameAndCollection(qpath);
+        setNameAndCollection(path);
     } catch (db::XmlException const &e) {
-        throw OpenError(qpath, QString::fromUtf8(e.what()));
+        throw OpenError(path, QString::fromUtf8(e.what()));
     }
 }
 
@@ -424,13 +422,13 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &
  * For some reason, DB XML strips off a leading slash in the filename,
  * so we prepend an extra one.
  */
-void DbCorpusReaderPrivate::setNameAndCollection(QString const &path)
+void DbCorpusReaderPrivate::setNameAndCollection(std::string const &path)
 {
     //collection = QFileInfo(path).absoluteFilePath().toLocal8Bit().data();
 
-    setName(toQString(container.getName()));
+    setName(container.getName());
 
-	QString uri = QString("/%1").arg(name());
+	QString uri = QString("/%1").arg(QString::fromUtf8(name().c_str()));
 	collection = std::string(QUrl::toPercentEncoding(uri));
 }
 

@@ -27,38 +27,38 @@ namespace {
 
 namespace alpinocorpus {
 
-IndexedCorpusReaderPrivate::IndexedCorpusReaderPrivate(QString const &filename)
+IndexedCorpusReaderPrivate::IndexedCorpusReaderPrivate(std::string const &filename)
 {
-    QString canonical(filename);
+    std::string canonical(filename);
     canonicalize(canonical);
     construct(canonical);
 }
 
-IndexedCorpusReaderPrivate::IndexedCorpusReaderPrivate(QString const &dataPath,
-                                         QString const &indexPath)
+    IndexedCorpusReaderPrivate::IndexedCorpusReaderPrivate(std::string const &dataPath,
+    std::string const &indexPath)
 {
-    QString canonical(dataPath);
+    std::string canonical(dataPath);
     canonicalize(canonical);
     construct(canonical, dataPath, indexPath);
 }
 
-void IndexedCorpusReaderPrivate::construct(QString const &canonical)
+void IndexedCorpusReaderPrivate::construct(std::string const &canonical)
 {
-    QString dataPath  = canonical + DATA_EXT;
-    QString indexPath = canonical + INDEX_EXT;
+    std::string dataPath  = canonical + DATA_EXT;
+    std::string indexPath = canonical + INDEX_EXT;
     construct(canonical, dataPath, indexPath);
 }
 
-void IndexedCorpusReaderPrivate::construct(QString const &canonical,
-                                    QString const &dataPath,
-                                    QString const &indexPath)
+void IndexedCorpusReaderPrivate::construct(std::string const &canonical,
+    std::string const &dataPath,
+    std::string const &indexPath)
 {
     // XXX race condition up ahead
-    QFileInfo data(dataPath);
+    QFileInfo data(QString::fromUtf8(dataPath.c_str()));
     if (!data.isFile() || !data.isReadable())
         throw OpenError(dataPath, "not readable or not a plain file");
 
-    QFileInfo index(indexPath);
+    QFileInfo index(QString::fromUtf8(indexPath.c_str()));
     if (!index.isFile() || !index.isReadable())
         throw OpenError(indexPath, "not readable or not a plain file");
 
@@ -83,15 +83,25 @@ size_t IndexedCorpusReaderPrivate::getSize() const
   return d_indices.size();
 }
 
+bool endsWith(std::string const &str, std::string const &end)
+{
+    size_t pos = str.rfind(end);
+    
+    if (pos == std::string::npos)
+        return false;
+        
+    return (pos + end.size() == str.size());
+}
+    
 /*
  * Canonicalize file name. To be called from constructor.
  */
-void IndexedCorpusReaderPrivate::canonicalize(QString &filename)
+void IndexedCorpusReaderPrivate::canonicalize(std::string &filename)
 {
-    if (filename.endsWith(DATA_EXT))
-        filename.chop(8);
-    else if (filename.endsWith(INDEX_EXT))
-        filename.chop(6);
+    if (endsWith(filename, DATA_EXT))
+        filename = filename.substr(0, filename.size() - 8);
+    else if (endsWith(filename, INDEX_EXT))
+        filename = filename.substr(0, filename.size() - 6);
     else
         throw OpenError(filename, "not an indexed (.dz) corpus file");
 }
@@ -116,14 +126,14 @@ void IndexedCorpusReaderPrivate::IndexIter::next()
     ++iter;
 }
 
-void IndexedCorpusReaderPrivate::open(QString const &dataPath,
-                               QString const &indexPath)
+void IndexedCorpusReaderPrivate::open(std::string const &dataPath,
+    std::string const &indexPath)
 {
-    QFile indexFile(indexPath);
+    QFile indexFile(QString::fromUtf8(indexPath.c_str()));
     if (!indexFile.open(QFile::ReadOnly))
         throw OpenError(indexPath);
 
-    d_dataFile = QDictZipFilePtr(new QDictZipFile(dataPath));
+    d_dataFile = QDictZipFilePtr(new QDictZipFile(QString::fromUtf8(dataPath.c_str())));
     if (!d_dataFile->open(QDictZipFile::ReadOnly))
         throw OpenError(indexPath);
 

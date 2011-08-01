@@ -19,9 +19,9 @@ public:
      * Construct from a single file (data or index); the other file is sought
      * for in the same directory.
      */
-    IndexedCorpusReader(QString const &path);
+    IndexedCorpusReader(std::string const &path);
     /** Construct from data and index file. */
-    IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
+    IndexedCorpusReader(std::string const &dataFilename, std::string const &indexFilename);
     virtual ~IndexedCorpusReader();
 
 private:

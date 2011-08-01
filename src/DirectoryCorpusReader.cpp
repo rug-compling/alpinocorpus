@@ -9,7 +9,7 @@
 
 namespace alpinocorpus {
 
-DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
+DirectoryCorpusReader::DirectoryCorpusReader(std::string const &directory,
     bool wantCache)
     : d_private(new DirectoryCorpusReaderPrivate(directory, wantCache))
 {
