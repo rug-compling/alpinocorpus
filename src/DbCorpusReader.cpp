@@ -31,13 +31,6 @@ namespace db = DbXml;
 
 namespace xerces = XERCES_CPP_NAMESPACE;
 
-namespace {
-    QString toQString(std::string const &s)
-    {
-        return QString::fromUtf8(s.c_str());
-    }
-}
-
 namespace alpinocorpus {
 
 class DbCorpusReaderPrivate : public CorpusReader
