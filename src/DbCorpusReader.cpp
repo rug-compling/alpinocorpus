@@ -68,7 +68,7 @@ class DbCorpusReaderPrivate : public CorpusReader
     struct QueryIter : public DbIter
     {
         QueryIter(DbXml::XmlResults const &);
-        QString contents(CorpusReader const &) const;
+        std::string contents(CorpusReader const &) const;
     };
     
 public:
@@ -81,8 +81,8 @@ public:
         return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
     }
     bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
-    QString readEntry(std::string const &) const;
-    QString readEntryMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
+    std::string readEntry(std::string const &) const;
+    std::string readEntryMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
     EntryIterator runXPath(std::string const &) const;
     EntryIterator runXQuery(std::string const &) const;
     
@@ -168,11 +168,11 @@ DbCorpusReaderPrivate::QueryIter::QueryIter(db::XmlResults const &r)
 {
 }
 
-QString DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) const
+std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) const
 {
     db::XmlValue v;
     r.peek(v);
-    return toQString(v.getNodeValue());
+    return v.getNodeValue();
 }
     
 CorpusReader::EntryIterator DbCorpusReader::getBegin() const
@@ -196,12 +196,12 @@ bool DbCorpusReader::validQuery(QueryDialect d, bool variables, std::string cons
 }
 
 
-QString DbCorpusReader::readEntry(std::string const &entry) const
+std::string DbCorpusReader::readEntry(std::string const &entry) const
 {
     return d_private->readEntry(entry);
 }
     
-QString DbCorpusReader::readEntryMarkQueries(std::string const &entry, 
+std::string DbCorpusReader::readEntryMarkQueries(std::string const &entry, 
     QList<MarkerQuery> const &queries) const
 {
     return d_private->readEntryMarkQueries(entry, queries);
@@ -259,12 +259,12 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::getEnd() const
 }
 
 
-    QString DbCorpusReaderPrivate::readEntry(std::string const &filename) const
+std::string DbCorpusReaderPrivate::readEntry(std::string const &filename) const
 {
     try {
         db::XmlDocument doc(container.getDocument(filename, db::DBXML_LAZY_DOCS));
         std::string content;
-        return toQString(doc.getContent(content));
+        return doc.getContent(content);
 
     } catch (db::XmlException const &e) {
         std::ostringstream msg;
@@ -276,7 +276,7 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::getEnd() const
     }
 }
     
-QString DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
+std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
     QList<MarkerQuery> const &queries) const
 {
     std::string content;
@@ -381,10 +381,10 @@ QString DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
     output->setByteStream(&target);
     serializer->write(document, output.get());
     
-    QByteArray outArray(reinterpret_cast<char const *>(target.getRawBuffer()),
+    std::string outData(reinterpret_cast<char const *>(target.getRawBuffer()),
         target.getLen());
         
-    return QString::fromUtf8(outArray);
+    return outData;
 }
 
 CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(std::string const &query) const

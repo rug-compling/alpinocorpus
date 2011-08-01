@@ -100,7 +100,7 @@ namespace alpinocorpus {
     {
         for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
              i != end; ++i)
-            write(*i, corpus.read(*i), ctx);
+            write(*i, QString::fromUtf8(corpus.read(*i).c_str()), ctx);
     }
 
     void DbCorpusWriterPrivate::writeFailSafe(CorpusReader const &corpus,
@@ -111,7 +111,7 @@ namespace alpinocorpus {
         for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
              i != end; ++i)
             try {
-                write(*i, corpus.read(*i), ctx);
+                write(*i, QString::fromUtf8(corpus.read(*i).c_str()), ctx);
             } catch (Error const &e) {
                 err.append(e);
             }

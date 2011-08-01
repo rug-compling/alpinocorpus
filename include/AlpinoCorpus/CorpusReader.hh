@@ -31,7 +31,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         virtual void next() = 0;
 
         // Query iterators must override this
-        virtual QString contents(CorpusReader const &rdr) const;
+        virtual std::string contents(CorpusReader const &rdr) const;
     };
 
     void setName(std::string const &n);
@@ -60,7 +60,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
          * This will be a null string for an ordinary iterator,
          * and the matching part for a query iterator.
          */
-        QString contents(CorpusReader const &rdr) const;
+        std::string contents(CorpusReader const &rdr) const;
     };
     
     struct MarkerQuery {
@@ -92,13 +92,13 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     EntryIterator query(QueryDialect d, std::string const &q) const;
 
     /** Return content of a single treebank entry. */
-    QString read(std::string const &entry) const;
+    std::string read(std::string const &entry) const;
     
     /**
      * Return content of a single treebank entry, marking matching elements using the
      * given attribute and value.
      */
-    QString readMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
+    std::string readMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -116,7 +116,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
-        QString contents(CorpusReader const &) const;
+        std::string contents(CorpusReader const &) const;
       
       private:
         void parseFile(std::string const &);
@@ -126,15 +126,15 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         EntryIterator d_end;
         std::string d_file;
         std::string d_query;
-        QQueue<QString> d_buffer;
+        QQueue<std::string> d_buffer;
     };
 
   private:
     virtual EntryIterator getBegin() const = 0;
     virtual EntryIterator getEnd() const = 0;
     virtual size_t getSize() const = 0;
-    virtual QString readEntry(std::string const &entry) const = 0;
-    virtual QString readEntryMarkQueries(std::string const &entry,
+    virtual std::string readEntry(std::string const &entry) const = 0;
+    virtual std::string readEntryMarkQueries(std::string const &entry,
         QList<MarkerQuery> const &queries) const;
     virtual EntryIterator runXPath(std::string const &) const;
     virtual EntryIterator runXQuery(std::string const &) const;

@@ -75,9 +75,9 @@ void DirectoryCorpusReaderPrivate::DirIter::next()
     ++iter;
 }
 
-QString DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) const
+std::string DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) const
 {
-    return util::readFile(d_directory.filePath(QString::fromUtf8(entry.c_str())));
+    return util::readFile(d_directory.filePath(QString::fromUtf8(entry.c_str()))).toUtf8().constData();
 }
 
 QString DirectoryCorpusReaderPrivate::cachePath() const

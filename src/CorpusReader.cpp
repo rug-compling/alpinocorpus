@@ -35,7 +35,7 @@ namespace alpinocorpus {
         return getBegin();
     }
     
-    QString CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
+    std::string CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
     {
         return impl->contents(rdr);
     }
@@ -70,23 +70,23 @@ namespace alpinocorpus {
         return new DbCorpusReader(corpusPath);
     }
 
-    QString CorpusReader::read(std::string const &entry) const
+    std::string CorpusReader::read(std::string const &entry) const
     {
         return readEntry(entry);
     }
     
-    QString CorpusReader::readMarkQueries(std::string const &entry,
+    std::string CorpusReader::readMarkQueries(std::string const &entry,
         QList<MarkerQuery> const &queries) const
     {
         return readEntryMarkQueries(entry, queries);
     }
         
-    QString CorpusReader::readEntryMarkQueries(std::string const &entry,
+    std::string CorpusReader::readEntryMarkQueries(std::string const &entry,
         QList<MarkerQuery> const &queries) const
     {
-        QByteArray xmlData = readEntry(entry).toUtf8();
+        std::string xmlData = readEntry(entry);
         
-        xmlDocPtr doc = xmlParseMemory(xmlData.constData(), xmlData.size());
+        xmlDocPtr doc = xmlParseMemory(xmlData.c_str(), xmlData.size());
         if (doc == 0)
             throw Error("Could not parse XML data.");
 
@@ -149,13 +149,13 @@ namespace alpinocorpus {
         xmlChar *newData;
         int size;
         xmlDocDumpMemory(doc, &newData, &size);
-        QByteArray newXmlData(reinterpret_cast<char const *>(newData), size);
+        std::string newXmlData(reinterpret_cast<char const *>(newData), size);
         
         // Cleanup
         xmlFree(newData);
         xmlFreeDoc(doc);
         
-        return QString(newXmlData);
+        return newXmlData;
     }
     
     void CorpusReader::setName(std::string const &n)
@@ -290,19 +290,18 @@ namespace alpinocorpus {
         }
     }
     
-    QString CorpusReader::FilterIter::contents(CorpusReader const &rdr) const
+    std::string CorpusReader::FilterIter::contents(CorpusReader const &rdr) const
     {
         return d_buffer.isEmpty()
-            ? QString()
+        ?   std::string() // XXX - should be a null string???
             : d_buffer.head();
     }
     
     void CorpusReader::FilterIter::parseFile(std::string const &file)
     {
-        QString xml(d_corpus.read(file));
-        QByteArray xmlData(xml.toUtf8());
+        std::string xml(d_corpus.read(file));
         
-        xmlDocPtr doc = xmlParseMemory(xmlData.constData(), xmlData.size());
+        xmlDocPtr doc = xmlParseMemory(xml.c_str(), xml.size());
         
         if (!doc)
         {
@@ -334,12 +333,12 @@ namespace alpinocorpus {
             {
                 xmlChar *str = xmlNodeListGetString(doc, xpathObj->nodesetval->nodeTab[i]->children, 1);
                 
-                QString value(QString::fromUtf8(reinterpret_cast<const char *>(str)));
+                std::string value(reinterpret_cast<const char *>(str));
                 
                 xmlFree(str);
                 
-                if (value.trimmed().isEmpty())
-                    d_buffer.enqueue(QString());
+                if (value.empty()) // XXX - trim!
+                    d_buffer.enqueue(std::string());
                 else
                     d_buffer.enqueue(value);
             }
@@ -350,10 +349,10 @@ namespace alpinocorpus {
         xmlFreeDoc(doc);
     }
     
-    QString CorpusReader::IterImpl::contents(CorpusReader const &rdr) const
+    std::string CorpusReader::IterImpl::contents(CorpusReader const &rdr) const
     {
         //return rdr.read(current());
-        return QString();
+        return std::string(); // XXX - should be a null string
     }
     
 }

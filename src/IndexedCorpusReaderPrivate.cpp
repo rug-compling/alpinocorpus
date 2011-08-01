@@ -162,7 +162,7 @@ void IndexedCorpusReaderPrivate::open(std::string const &dataPath,
     }
 }
 
-    QString IndexedCorpusReaderPrivate::readEntry(std::string const &filename) const
+std::string IndexedCorpusReaderPrivate::readEntry(std::string const &filename) const
 {
     IndexMap::const_iterator iter = d_namedIndices.find(filename);
     if (iter == d_namedIndices.end())
@@ -173,7 +173,7 @@ void IndexedCorpusReaderPrivate::open(std::string const &dataPath,
     if (!d_dataFile->seek(iter->second->offset))
         throw Error("Seek on compressed data failed.");
 
-    return d_dataFile->read(iter->second->size);
+    return d_dataFile->read(iter->second->size).constData();
 }
 
 }   // namespace alpinocorpus

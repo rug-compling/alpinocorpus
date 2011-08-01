@@ -55,7 +55,7 @@ public:
 
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(std::string const &filename) const;
+    virtual std::string readEntry(std::string const &filename) const;
     virtual size_t getSize() const;
 
 private:

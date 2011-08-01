@@ -34,7 +34,7 @@ size_t DirectoryCorpusReader::getSize() const
   return d_private->getSize();
 }
 
-QString DirectoryCorpusReader::readEntry(std::string const &entry) const
+std::string DirectoryCorpusReader::readEntry(std::string const &entry) const
 {
   return d_private->readEntry(entry);
 }
