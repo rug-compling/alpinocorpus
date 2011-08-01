@@ -6,7 +6,6 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
-#include <QString>
 
 #include <AlpinoCorpus/DLLDefines.hh>
 
@@ -22,14 +21,14 @@ class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
 {
   public:
     /** Open path for writing. */
-    DbCorpusWriter(QString const &path, bool overwrite);
+    DbCorpusWriter(std::string const &path, bool overwrite);
     ~DbCorpusWriter();
 
   private:
     /**
      * Will write name as a portable (Unix, UTF-8) pathname.
      */
-    void writeEntry(std::string const &name, QString const &content);
+    void writeEntry(std::string const &name, std::string const &content);
     
     /**
      * Write the contents of an entire CorpusReader.

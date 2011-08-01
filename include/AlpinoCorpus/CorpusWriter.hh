@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include <QString>
-
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
@@ -17,7 +15,7 @@ namespace alpinocorpus {
         /**
          * Will write name as a portable (Unix, UTF-8) pathname.
          */
-        void write(std::string const &name, QString const &content);
+        void write(std::string const &name, std::string const &content);
         
         /**
          * Write the contents of an entire CorpusReader.
@@ -29,7 +27,7 @@ namespace alpinocorpus {
          */
         void write(CorpusReader const &corpus, bool failsafe = false);
     private:
-        virtual void writeEntry(std::string const &name, QString const &content) = 0;
+        virtual void writeEntry(std::string const &name, std::string const &content) = 0;
         virtual void writeEntry(CorpusReader const &corpus, bool failsafe = false) = 0;
     };
 }

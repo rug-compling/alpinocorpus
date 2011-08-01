@@ -20,9 +20,9 @@ namespace alpinocorpus {
     {
     public:
         /** Open path for writing. */
-        DbCorpusWriterPrivate(QString const &path, bool overwrite);
+        DbCorpusWriterPrivate(std::string const &path, bool overwrite);
         DbXml::XmlUpdateContext &mkUpdateContext(DbXml::XmlUpdateContext &);
-        void write(std::string const &, QString const &, DbXml::XmlUpdateContext &);
+        void write(std::string const &, std::string const &, DbXml::XmlUpdateContext &);
         void writeFailFirst(CorpusReader const &, DbXml::XmlUpdateContext &);
         void writeFailSafe(CorpusReader const &, DbXml::XmlUpdateContext &);
     private:
@@ -31,14 +31,14 @@ namespace alpinocorpus {
 
     };
     
-    DbCorpusWriter::DbCorpusWriter(QString const &path, bool overwrite)
+    DbCorpusWriter::DbCorpusWriter(std::string const &path, bool overwrite)
         : d_private(new DbCorpusWriterPrivate(path, overwrite))
     {}
     
     DbCorpusWriter::~DbCorpusWriter()
     {}
     
-    void DbCorpusWriter::writeEntry(std::string const &name, QString const &content)
+    void DbCorpusWriter::writeEntry(std::string const &name, std::string const &content)
     {
         db::XmlUpdateContext ctx;
         d_private->write(name, content, d_private->mkUpdateContext(ctx));
@@ -55,11 +55,9 @@ namespace alpinocorpus {
             d_private->writeFailSafe(corpus, ctx);
     }
     
-    DbCorpusWriterPrivate::DbCorpusWriterPrivate(QString const &qpath, bool overwrite)
+    DbCorpusWriterPrivate::DbCorpusWriterPrivate(std::string const &path, bool overwrite)
         : d_mgr(), d_container()
     {
-        std::string path(qpath.toLocal8Bit().data());
-
         try {
             db::XmlContainerConfig config;
             config.setReadOnly(false);
@@ -100,7 +98,7 @@ namespace alpinocorpus {
     {
         for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
              i != end; ++i)
-            write(*i, QString::fromUtf8(corpus.read(*i).c_str()), ctx);
+            write(*i, corpus.read(*i), ctx);
     }
 
     void DbCorpusWriterPrivate::writeFailSafe(CorpusReader const &corpus,
@@ -111,7 +109,7 @@ namespace alpinocorpus {
         for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
              i != end; ++i)
             try {
-                write(*i, QString::fromUtf8(corpus.read(*i).c_str()), ctx);
+                write(*i, corpus.read(*i), ctx);
             } catch (Error const &e) {
                 err.append(e);
             }
@@ -124,14 +122,14 @@ namespace alpinocorpus {
      * Transforms content to UTF-8.
      * XXX: check for/rewrite/remove encoding in XML document?
      */
-    void DbCorpusWriterPrivate::write(std::string const &name, QString const &content,
+    void DbCorpusWriterPrivate::write(std::string const &name, std::string const &content,
                                db::XmlUpdateContext &ctx)
     {
         try {
             std::string canonical(QDir::fromNativeSeparators(QString::fromUtf8(name.c_str()))
                                   .toUtf8()
                                   .data());
-            d_container.putDocument(canonical, content.toUtf8().data(), ctx,
+            d_container.putDocument(canonical, content, ctx,
                                   db::DBXML_WELL_FORMED_ONLY);
         } catch (db::XmlException const &e) {
             if (e.getExceptionCode() == db::XmlException::UNIQUE_ERROR)

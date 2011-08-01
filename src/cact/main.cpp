@@ -64,7 +64,7 @@ void writeDactCorpus(QString const &treebank, QString const &treebankOut,
   std::tr1::unordered_set<std::string> seen;
   for (; i != end; ++i)
     if (seen.find(*i) == seen.end()) {
-        wr.write(*i, QString::fromUtf8(rd->read(*i).c_str()));
+        wr.write(*i, rd->read(*i));
       seen.insert(*i);
     }
 }
