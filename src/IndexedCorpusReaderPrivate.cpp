@@ -152,8 +152,8 @@ void IndexedCorpusReaderPrivate::open(std::string const &dataPath,
             throw OpenError(indexPath, "malformed line in index file");
 
         std::string name(lineParts[0].toUtf8().constData());
-        size_t offset = util::b64_decode(lineParts[1].toAscii());
-        size_t size   = util::b64_decode(lineParts[2].toAscii());
+        size_t offset = util::b64_decode(lineParts[1].toAscii().constData());
+        size_t size   = util::b64_decode(lineParts[2].toAscii().constData());
 
         IndexItemPtr item(new IndexItem(name, offset, size));
         d_indices.push_back(item);
