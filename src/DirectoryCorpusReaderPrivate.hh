@@ -6,8 +6,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <QString>
-
 #include <AlpinoCorpus/CorpusReader.hh>
 
 namespace alpinocorpus {

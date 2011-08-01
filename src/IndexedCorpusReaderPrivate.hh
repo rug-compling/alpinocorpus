@@ -1,11 +1,11 @@
 #ifndef ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
 #define ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
 
+#include <string>
 #include <tr1/unordered_map>
 #include <tr1/memory>
 
 #include <QMutex>
-#include <QString>
 #include <QVector>
 
 #include <AlpinoCorpus/CorpusReader.hh>

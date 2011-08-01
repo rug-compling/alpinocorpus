@@ -1,7 +1,5 @@
 #include <string>
 
-#include <QString>
-
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 

@@ -1,4 +1,4 @@
-#include <QString>
+#include <string>
 
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 #include "IndexedCorpusReaderPrivate.hh"

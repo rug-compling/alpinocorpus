@@ -1,7 +1,9 @@
 #include <AlpinoCorpus/Error.hh>
 
-#include <QtGlobal>
+#include <string>
 #include <sstream>
+
+#include <QString>
 
 namespace alpinocorpus {
     std::string DuplicateKey::construct(std::string const &key)

@@ -6,15 +6,12 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 
-#include <QString>
 #include <typeinfo>
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlerror.h>
 #include <libxml/xpath.h>
-
-#include <QDebug>
 
 namespace {
     void ignoreStructuredError(void *userdata, xmlErrorPtr err)
@@ -301,7 +298,7 @@ namespace alpinocorpus {
 
         if (!doc)
         {
-            qWarning() << "CorpusReader::FilterIter::parseFile: could not parse XML data: " << QString::fromUtf8((*d_itr).c_str());
+            //qWarning() << "CorpusReader::FilterIter::parseFile: could not parse XML data: " << QString::fromUtf8((*d_itr).c_str());
             return;
         }
         
@@ -310,7 +307,7 @@ namespace alpinocorpus {
         if (!ctx)
         {
             xmlFreeDoc(doc);
-            qWarning() << "CorpusReader::FilterIter::parseFile: could not construct XPath context from document: " << QString::fromUtf8((*d_itr).c_str());
+            //qWarning() << "CorpusReader::FilterIter::parseFile: could not construct XPath context from document: " << QString::fromUtf8((*d_itr).c_str());
             return;
         }
         

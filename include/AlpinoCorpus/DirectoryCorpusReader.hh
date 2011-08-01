@@ -1,9 +1,8 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_HH
 #define ALPINO_DIRECTORYCORPUSREADER_HH
 
+#include <string>
 #include <tr1/memory>
-
-#include <QString>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 

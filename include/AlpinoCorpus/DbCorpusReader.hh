@@ -5,7 +5,6 @@
 #include <tr1/memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <QString>
 
 namespace alpinocorpus {
 
