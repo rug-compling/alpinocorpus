@@ -20,6 +20,7 @@ include_directories(${AlpinoCorpus_SOURCE_DIR}/include)
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
 
 find_package(Boost 1.47.0 COMPONENTS system filesystem thread REQUIRED)
 if(Boost_FOUND)
