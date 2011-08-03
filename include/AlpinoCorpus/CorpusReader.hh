@@ -1,11 +1,10 @@
 #ifndef ALPINO_CORPUSREADER_HH
 #define ALPINO_CORPUSREADER_HH
 
+#include <list>
+#include <queue>
 #include <string>
 #include <tr1/memory>
-
-// for FilterIter
-#include <QQueue>
 
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
@@ -96,7 +95,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      * Return content of a single treebank entry, marking matching elements using the
      * given attribute and value.
      */
-    std::string readMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
+    std::string readMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -124,7 +123,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         EntryIterator d_end;
         std::string d_file;
         std::string d_query;
-        QQueue<std::string> d_buffer;
+        std::queue<std::string> d_buffer;
     };
 
   private:
@@ -133,7 +132,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,
-        QList<MarkerQuery> const &queries) const;
+        std::list<MarkerQuery> const &queries) const;
     virtual EntryIterator runXPath(std::string const &) const;
     virtual EntryIterator runXQuery(std::string const &) const;
     virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;

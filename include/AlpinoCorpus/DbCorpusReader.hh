@@ -1,6 +1,7 @@
 #ifndef ALPINO_DBCORPUSREADER_HH
 #define ALPINO_DBCORPUSREADER_HH
 
+#include <list>
 #include <string>
 #include <tr1/memory>
 
@@ -26,7 +27,7 @@ class DbCorpusReader : public CorpusReader
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
     std::string readEntry(std::string const &) const;
-    std::string readEntryMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
+    std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
     EntryIterator runXPath(std::string const &) const;
     EntryIterator runXQuery(std::string const &) const;
     size_t getSize() const;

@@ -73,13 +73,13 @@ namespace alpinocorpus {
     }
     
     std::string CorpusReader::readMarkQueries(std::string const &entry,
-        QList<MarkerQuery> const &queries) const
+        std::list<MarkerQuery> const &queries) const
     {
         return readEntryMarkQueries(entry, queries);
     }
         
     std::string CorpusReader::readEntryMarkQueries(std::string const &entry,
-        QList<MarkerQuery> const &queries) const
+        std::list<MarkerQuery> const &queries) const
     {
         std::string xmlData = readEntry(entry);
         
@@ -87,7 +87,7 @@ namespace alpinocorpus {
         if (doc == 0)
             throw Error("Could not parse XML data.");
 
-        for (QList<MarkerQuery>::const_iterator iter = queries.begin();
+        for (std::list<MarkerQuery>::const_iterator iter = queries.begin();
              iter != queries.end(); ++iter)
         {            
             xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
@@ -109,17 +109,17 @@ namespace alpinocorpus {
             
             xmlNodeSetPtr nodeSet = xpathObj->nodesetval;
             
-            QList<xmlNodePtr> nodes;
+            std::list<xmlNodePtr> nodes;
             for (int i = 0; i < nodeSet->nodeNr; ++i) {
                 xmlNodePtr node = nodeSet->nodeTab[i];
                 
                 if (node->type != XML_ELEMENT_NODE)
                     continue;
                 
-                nodes << node;
+                nodes.push_back(node);
             }
             
-            for (QList<xmlNodePtr>::iterator nodeIter = nodes.begin();
+            for (std::list<xmlNodePtr>::iterator nodeIter = nodes.begin();
                  nodeIter != nodes.end(); ++nodeIter) {
                 xmlAttrPtr attrPtr = xmlSetProp(*nodeIter,
                     reinterpret_cast<xmlChar const *>(iter->attr.c_str()),
@@ -271,10 +271,10 @@ namespace alpinocorpus {
     
     void CorpusReader::FilterIter::next()
     {
-        if (!d_buffer.isEmpty())
-            d_buffer.dequeue();
+        if (!d_buffer.empty())
+            d_buffer.pop();
         
-        while (d_buffer.isEmpty() && d_itr != d_end)
+        while (d_buffer.empty() && d_itr != d_end)
         {
             d_file = *d_itr;
             parseFile(d_file);
@@ -285,9 +285,9 @@ namespace alpinocorpus {
     
     std::string CorpusReader::FilterIter::contents(CorpusReader const &rdr) const
     {
-        return d_buffer.isEmpty()
+        return d_buffer.empty()
         ?   std::string() // XXX - should be a null string???
-            : d_buffer.head();
+            : d_buffer.front();
     }
     
     void CorpusReader::FilterIter::parseFile(std::string const &file)
@@ -333,9 +333,9 @@ namespace alpinocorpus {
                 xmlFree(str);
                 
                 if (value.empty()) // XXX - trim!
-                    d_buffer.enqueue(std::string());
+                    d_buffer.push(std::string());
                 else
-                    d_buffer.enqueue(value);
+                    d_buffer.push(value);
             }
         }
 
