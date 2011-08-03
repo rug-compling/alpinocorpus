@@ -76,6 +76,7 @@ set (HEADERS
   include/util/base64.hh
   include/util/bufutil.hh
   include/util/textfile.hh
+  include/util/url.hh
   include/util/vs_stdint.h
   src/DirectoryCorpusReaderPrivate.hh
   src/IndexedCorpusReaderPrivate.hh
@@ -95,8 +96,9 @@ set(SOURCES
   src/IndexedCorpusReader.cpp
   src/IndexedCorpusReaderPrivate.cpp
   #src/IndexedCorpusWriter.cpp
-  src/util/textfile.cpp
   src/util/base64.cpp
+  src/util/textfile.cpp
+  src/util/url.cpp
 )
 
 set(CACT_SOURCES

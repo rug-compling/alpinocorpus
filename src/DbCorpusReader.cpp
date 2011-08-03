@@ -10,9 +10,7 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-
-#include <QString>
-#include <QUrl>
+#include <util/url.hh>
 
 #include <list>
 #include <sstream>
@@ -418,8 +416,8 @@ void DbCorpusReaderPrivate::setNameAndCollection(std::string const &path)
 
     setName(container.getName());
 
-	QString uri = QString("/%1").arg(QString::fromUtf8(name().c_str()));
-	collection = std::string(QUrl::toPercentEncoding(uri));
+    std::string uri = "/" + name();
+    collection = util::toPercentEncoding(uri);
 }
 
 }   // namespace alpinocorpus
