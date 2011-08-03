@@ -38,7 +38,7 @@ Compilation
 Requirements
 
 - A C++ compiler.
-- Qt version 4.7 or later.
+- Boost 1.47.0.
 - Berkeley DB XML 2.5.16 or later.
 - libxml2
 - libxslt
@@ -55,7 +55,7 @@ Lars Buitinck <larsmans@gmail.com>
 License
 -------
 
-Copyright 2010-2011 Daniel de Kok
+Copyright 2010-2011 Daniël de Kok
 Copyright 2010-2011 University of Groningen
 
 This library is free software; you can redistribute it and/or
