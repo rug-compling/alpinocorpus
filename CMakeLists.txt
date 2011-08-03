@@ -70,6 +70,7 @@ set (HEADERS
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
   include/AlpinoCorpus/util/NonCopyable.hh
+  include/AlpinoCorpus/capi.h
   include/util/base64.hh
   include/util/bufutil.hh
   include/util/textfile.hh
@@ -93,6 +94,7 @@ set(SOURCES
   src/IndexedCorpusReader.cpp
   src/IndexedCorpusReaderPrivate.cpp
   #src/IndexedCorpusWriter.cpp
+  src/capi.cpp
   src/util/base64.cpp
   src/util/textfile.cpp
   src/util/url.cpp
