@@ -1,17 +1,16 @@
+#include <algorithm>
+#include <iostream>
+#include <iterator>
 #include <string>
+
 #include <tr1/unordered_set>
+
+#include <boost/scoped_ptr.hpp>
+#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
-
-#include <QCoreApplication>
-#include <QFileInfo>
-#include <QRegExp>
-#include <QScopedPointer>
-#include <QString>
-#include <QStringList>
-#include <QTextStream>
 
 #include <iostream>
 #include <stdexcept>
@@ -21,9 +20,11 @@
 using alpinocorpus::CorpusReader;
 using alpinocorpus::DbCorpusWriter;
 
-void listCorpus(QString const &treebank, std::string const &query)
+namespace bf = boost::filesystem;
+
+void listCorpus(std::string const &treebank, std::string const &query)
 {
-  QScopedPointer<CorpusReader> rd(CorpusReader::open(treebank.toUtf8().constData()));
+  boost::scoped_ptr<CorpusReader> rd(CorpusReader::open(treebank));
   CorpusReader::EntryIterator i, end(rd->end());
   
   if (query.empty())
@@ -31,10 +32,7 @@ void listCorpus(QString const &treebank, std::string const &query)
   else
     i = rd->query(CorpusReader::XPATH, query);
 
-  QTextStream outStream(stdout);
-  for (; i != end; ++i)
-      outStream << QString::fromUtf8((*i).c_str()) << "\n";
-  
+  std::copy(i, end, std::ostream_iterator<std::string>(std::cout, "\n"));  
 }
 
 void usage(std::string const &programName)
@@ -45,16 +43,15 @@ void usage(std::string const &programName)
       "  -q query\tFilter the treebank using the given query" << std::endl << std::endl;  
 }
 
-void writeDactCorpus(QString const &treebank, QString const &treebankOut,
+void writeDactCorpus(std::string const &treebank, std::string const &treebankOut,
     std::string const &query)
 {
-  if (QFileInfo(treebankOut).absoluteFilePath() ==
-      QFileInfo(treebank).absoluteFilePath())
+  if (bf::equivalent(treebankOut, treebank))
     throw std::runtime_error("Attempting to write to the source treebank.");
   
-  QScopedPointer<CorpusReader> rd(CorpusReader::open(treebank.toUtf8().constData()));
+  boost::scoped_ptr<CorpusReader> rd(CorpusReader::open(treebank));
     
-  DbCorpusWriter wr(treebankOut.toUtf8().constData(), true);
+  DbCorpusWriter wr(treebankOut, true);
   CorpusReader::EntryIterator i, end(rd->end());
   if (query.empty())
     i = rd->begin();
@@ -71,8 +68,6 @@ void writeDactCorpus(QString const &treebank, QString const &treebankOut,
 
 int main(int argc, char *argv[])
 {
-  QCoreApplication app(argc, argv);
-  
   ProgramOptions opts(argc, const_cast<char const **>(argv), "c:lq:");
   
   if (opts.arguments().size() != 1)
@@ -101,8 +96,8 @@ int main(int argc, char *argv[])
   
   if (opts.option('c')) {
     try {
-        QString treebank = QString::fromUtf8(opts.arguments().at(0).c_str());
-        QString treebankOut = QString::fromUtf8(opts.optionValue('c').c_str());
+        std::string treebank = opts.arguments().at(0);
+        std::string treebankOut = opts.optionValue('c').c_str();
       writeDactCorpus(treebank, treebankOut, query);
     } catch (std::runtime_error const &e) {
         std::cerr << opts.programName() <<
@@ -113,7 +108,7 @@ int main(int argc, char *argv[])
   
   if (opts.option('l')) {
     try {
-        QString treebank = QString::fromUtf8(opts.arguments().at(0).c_str());
+        std::string treebank = opts.arguments().at(0).c_str();
         listCorpus(treebank, query);
     } catch (std::runtime_error const &e) {
         std::cerr << opts.programName() <<

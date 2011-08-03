@@ -1,11 +1,10 @@
-#include <QDir>
-#include <QString>
-
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <sstream>
 #include <string>
+
+#include <boost/filesystem.hpp>
 
 #include <dbxml/DbXml.hpp>
 
@@ -13,6 +12,7 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
+namespace bf = boost::filesystem;
 namespace db = DbXml;
 
 namespace alpinocorpus {
@@ -126,9 +126,7 @@ namespace alpinocorpus {
                                db::XmlUpdateContext &ctx)
     {
         try {
-            std::string canonical(QDir::fromNativeSeparators(QString::fromUtf8(name.c_str()))
-                                  .toUtf8()
-                                  .data());
+            std::string canonical(bf::path(name).generic_string());
             d_container.putDocument(canonical, content, ctx,
                                   db::DBXML_WELL_FORMED_ONLY);
         } catch (db::XmlException const &e) {

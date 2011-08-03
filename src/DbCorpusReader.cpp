@@ -10,9 +10,9 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <util/url.hh>
 
-#include <QString>
-#include <QUrl>
+#include <list>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -75,7 +75,7 @@ public:
     }
     bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
     std::string readEntry(std::string const &) const;
-    std::string readEntryMarkQueries(std::string const &entry, QList<MarkerQuery> const &queries) const;
+    std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
     EntryIterator runXPath(std::string const &) const;
     EntryIterator runXQuery(std::string const &) const;
     
@@ -195,7 +195,7 @@ std::string DbCorpusReader::readEntry(std::string const &entry) const
 }
     
 std::string DbCorpusReader::readEntryMarkQueries(std::string const &entry, 
-    QList<MarkerQuery> const &queries) const
+    std::list<MarkerQuery> const &queries) const
 {
     return d_private->readEntryMarkQueries(entry, queries);
 }
@@ -270,7 +270,7 @@ std::string DbCorpusReaderPrivate::readEntry(std::string const &filename) const
 }
     
 std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
-    QList<MarkerQuery> const &queries) const
+    std::list<MarkerQuery> const &queries) const
 {
     std::string content;
     
@@ -305,7 +305,7 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
         throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
     }
 
-    for (QList<MarkerQuery>::const_iterator iter = queries.begin();
+    for (std::list<MarkerQuery>::const_iterator iter = queries.begin();
          iter != queries.end(); ++iter)
     {
         AutoRelease<xerces::DOMXPathExpression> expression(0);
@@ -327,7 +327,7 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
             throw Error("Could not evaluate the expression on the given document.");
         }
         
-        QList<xerces::DOMNode *> markNodes;
+        std::list<xerces::DOMNode *> markNodes;
         
         while (result->iterateNext())
         {
@@ -337,10 +337,10 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
             if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
                 continue;
             
-            markNodes.append(node);
+            markNodes.push_back(node);
         }
         
-        for (QList<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
+        for (std::list<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
              nodeIter != markNodes.end(); ++iter)
         {
             xerces::DOMNode *node = *nodeIter;
@@ -416,8 +416,8 @@ void DbCorpusReaderPrivate::setNameAndCollection(std::string const &path)
 
     setName(container.getName());
 
-	QString uri = QString("/%1").arg(QString::fromUtf8(name().c_str()));
-	collection = std::string(QUrl::toPercentEncoding(uri));
+    std::string uri = "/" + name();
+    collection = util::toPercentEncoding(uri);
 }
 
 }   // namespace alpinocorpus
