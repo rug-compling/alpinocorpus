@@ -341,7 +341,7 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
         }
         
         for (std::list<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
-             nodeIter != markNodes.end(); ++iter)
+             nodeIter != markNodes.end(); ++nodeIter)
         {
             xerces::DOMNode *node = *nodeIter;
             
