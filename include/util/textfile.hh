@@ -1,11 +1,11 @@
 #ifndef ALPINO_TEXT_FILE_HH
 #define ALPINO_TEXT_FILE_HH
 
-#include <QString>
+#include <string>
 
 namespace alpinocorpus { namespace util {
 
-QString readFile(QString const &filename);
+std::string readFile(std::string const &filename);
 
 } } // namespace util
 

@@ -1,7 +1,7 @@
 #ifndef ALPINO_ERROR_HH
 #define ALPINO_ERROR_HH
 
-#include <QString>
+#include <string>
 #include <stdexcept>
 #include <string>
 
@@ -57,12 +57,12 @@ namespace alpinocorpus {
     class DuplicateKey : public Error
     {
       public:
-        explicit DuplicateKey(QString const &key)
+        explicit DuplicateKey(std::string const &key)
          : Error(construct(key)) {}
         ~DuplicateKey() throw() {}
 
       private:
-        static std::string construct(QString const &);
+        static std::string construct(std::string const &);
     };
 
     /**
@@ -86,16 +86,16 @@ namespace alpinocorpus {
     class OpenError : public Error
     {
       public:
-        explicit OpenError(QString const &path)
+        explicit OpenError(std::string const &path)
          : Error(construct(path)) {}
-        explicit OpenError(QString const &path, QString const &extra)
+        explicit OpenError(std::string const &path, std::string const &extra)
          : Error(construct(path, extra)) {}
         ~OpenError() throw() {}
 
       private:
-        static std::string construct(QString const &path);
-        static std::string construct(QString const &path, QString const &extra);
-        static std::string construct(QString const &path, char const *extra);
+        static std::string construct(std::string const &path);
+        static std::string construct(std::string const &path, std::string const &extra);
+        static std::string construct(std::string const &path, char const *extra);
     };
 }
 

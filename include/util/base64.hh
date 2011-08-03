@@ -1,12 +1,12 @@
 #ifndef ALPINO_CORPUSWRITER_BASE64
 #define ALPINO_CORPUSWRITER_BASE64
 
-#include <QByteArray>
+#include <string>
 
 namespace alpinocorpus { namespace util {
 
-QByteArray b64_encode(unsigned long val);
-unsigned long b64_decode(QByteArray const &val);
+std::string b64_encode(unsigned long val);
+unsigned long b64_decode(std::string const &val);
 
 } } // namespace alpinocorpus::util
 

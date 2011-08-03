@@ -1,12 +1,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/capi.h>
-
-#include <QtDebug>
-
 
 extern "C" {
 
@@ -80,33 +78,31 @@ void alpinocorpus_iter_next(alpinocorpus_reader reader, alpinocorpus_iter *iter)
     
 char *alpinocorpus_iter_value(alpinocorpus_iter iter)
 {
-    QString entry;
+    std::string entry;
     try {
         entry = *(iter->entryIter);
     } catch (std::exception const &e) {
         return NULL;
     }
     
-    QByteArray data = entry.toUtf8();
-    size_t len = strlen(data.constData()) + 1;
+    size_t len = entry.size() + 1;
     char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
-    strlcpy(cstr, data.constData(), len);
+    strlcpy(cstr, entry.c_str(), len);
     return cstr;    
 }
 
 char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
 {
-    QString str;
+    std::string str;
     try{ 
         str = reader->corpusReader->read(entry);
     } catch (std::exception const &e) {
         return NULL;
     }
     
-    QByteArray data = str.toUtf8();
-    size_t len = strlen(data.constData()) + 1;
+    size_t len = str.size() + 1;
     char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
-    strlcpy(cstr, data.constData(), len);
+    strlcpy(cstr, str.c_str(), len);
     return cstr;
 }
 

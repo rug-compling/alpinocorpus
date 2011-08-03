@@ -1,4 +1,4 @@
-#include <QString>
+#include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
@@ -7,7 +7,7 @@
 
 namespace alpinocorpus {
 
-DirectoryCorpusReader::DirectoryCorpusReader(QString const &directory,
+DirectoryCorpusReader::DirectoryCorpusReader(std::string const &directory,
     bool wantCache)
     : d_private(new DirectoryCorpusReaderPrivate(directory, wantCache))
 {
@@ -32,7 +32,7 @@ size_t DirectoryCorpusReader::getSize() const
   return d_private->getSize();
 }
 
-QString DirectoryCorpusReader::readEntry(QString const &entry) const
+std::string DirectoryCorpusReader::readEntry(std::string const &entry) const
 {
   return d_private->readEntry(entry);
 }

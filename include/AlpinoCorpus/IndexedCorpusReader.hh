@@ -1,8 +1,8 @@
 #ifndef ALPINO_INDEXED_CORPUSREADER_HH
 #define ALPINO_INDEXED_CORPUSREADER_HH
 
-#include <QSharedPointer>
-#include <QString>
+#include <string>
+#include <tr1/memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -18,18 +18,18 @@ public:
      * Construct from a single file (data or index); the other file is sought
      * for in the same directory.
      */
-    IndexedCorpusReader(QString const &path);
+    IndexedCorpusReader(std::string const &path);
     /** Construct from data and index file. */
-    IndexedCorpusReader(QString const &dataFilename, QString const &indexFilename);
+    IndexedCorpusReader(std::string const &dataFilename, std::string const &indexFilename);
     virtual ~IndexedCorpusReader();
 
 private:
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(QString const &filename) const;
+    virtual std::string readEntry(std::string const &filename) const;
     virtual size_t getSize() const;
 
-    QSharedPointer<IndexedCorpusReaderPrivate> d_private;
+    std::tr1::shared_ptr<IndexedCorpusReaderPrivate> d_private;
 };
 
 }

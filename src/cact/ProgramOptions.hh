@@ -3,11 +3,8 @@
 
 #include <map>
 #include <set>
-
-#include <QMap>
-#include <QSet>
-#include <QString>
-#include <QVector>
+#include <string>
+#include <vector>
 
 #include <unistd.h>
 
@@ -15,23 +12,23 @@ class ProgramOptions
 {
 public:
 	ProgramOptions(int argc, char const *argv[], char const *optString);
-	QVector<QString> const &arguments() const;
-	QString const &programName() const;
+	std::vector<std::string> const &arguments() const;
+	std::string const &programName() const;
 	bool option(char option) const;
-	QString const &optionValue(char option) const;
+	std::string const &optionValue(char option) const;
 private:
-	QString d_programName;
-	QMap<char, QString> d_optionValues;
-	QSet<char> d_options;
-	QVector<QString> d_arguments;
+	std::string d_programName;
+	std::map<char, std::string> d_optionValues;
+    std::set<char> d_options;
+	std::vector<std::string> d_arguments;
 };
 
-inline QVector<QString> const &ProgramOptions::arguments() const
+inline std::vector<std::string> const &ProgramOptions::arguments() const
 {
 	return d_arguments;
 }
 
-inline QString const &ProgramOptions::programName() const
+inline std::string const &ProgramOptions::programName() const
 {
 	return d_programName;
 }

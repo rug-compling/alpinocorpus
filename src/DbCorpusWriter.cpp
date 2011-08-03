@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstring>
 #include <sstream>
+#include <string>
 
 #include <dbxml/DbXml.hpp>
 
@@ -19,9 +20,9 @@ namespace alpinocorpus {
     {
     public:
         /** Open path for writing. */
-        DbCorpusWriterPrivate(QString const &path, bool overwrite);
+        DbCorpusWriterPrivate(std::string const &path, bool overwrite);
         DbXml::XmlUpdateContext &mkUpdateContext(DbXml::XmlUpdateContext &);
-        void write(QString const &, QString const &, DbXml::XmlUpdateContext &);
+        void write(std::string const &, std::string const &, DbXml::XmlUpdateContext &);
         void writeFailFirst(CorpusReader const &, DbXml::XmlUpdateContext &);
         void writeFailSafe(CorpusReader const &, DbXml::XmlUpdateContext &);
     private:
@@ -30,14 +31,14 @@ namespace alpinocorpus {
 
     };
     
-    DbCorpusWriter::DbCorpusWriter(QString const &path, bool overwrite)
+    DbCorpusWriter::DbCorpusWriter(std::string const &path, bool overwrite)
         : d_private(new DbCorpusWriterPrivate(path, overwrite))
     {}
     
     DbCorpusWriter::~DbCorpusWriter()
     {}
     
-    void DbCorpusWriter::writeEntry(QString const &name, QString const &content)
+    void DbCorpusWriter::writeEntry(std::string const &name, std::string const &content)
     {
         db::XmlUpdateContext ctx;
         d_private->write(name, content, d_private->mkUpdateContext(ctx));
@@ -54,27 +55,26 @@ namespace alpinocorpus {
             d_private->writeFailSafe(corpus, ctx);
     }
     
-    DbCorpusWriterPrivate::DbCorpusWriterPrivate(QString const &qpath, bool overwrite)
+    DbCorpusWriterPrivate::DbCorpusWriterPrivate(std::string const &path, bool overwrite)
         : d_mgr(), d_container()
     {
         try {
             db::XmlContainerConfig config;
             config.setReadOnly(false);
 
-            std::string path(qpath.toLocal8Bit().data());
 
             if (overwrite) {
                 if (std::remove(path.c_str()) != 0 && errno != ENOENT)
-                    throw OpenError(qpath,
-                                    QString("cannot remove file: %1")
-                                        .arg(std::strerror(errno)));
+                    throw OpenError(path,
+                                    std::string("cannot remove file: ") +
+                                    std::strerror(errno));
                 d_container = d_mgr.createContainer(path, config,
                                                     db::XmlContainer
                                                     ::NodeContainer);
             } else
                 d_container = d_mgr.openContainer(path, config);
         } catch (db::XmlException const &e) {
-            throw OpenError(qpath, e.what());
+            throw OpenError(path, e.what());
         }
     }
 
@@ -122,22 +122,21 @@ namespace alpinocorpus {
      * Transforms content to UTF-8.
      * XXX: check for/rewrite/remove encoding in XML document?
      */
-    void DbCorpusWriterPrivate::write(QString const &name, QString const &content,
+    void DbCorpusWriterPrivate::write(std::string const &name, std::string const &content,
                                db::XmlUpdateContext &ctx)
     {
         try {
-            std::string canonical(QDir::fromNativeSeparators(name)
+            std::string canonical(QDir::fromNativeSeparators(QString::fromUtf8(name.c_str()))
                                   .toUtf8()
                                   .data());
-            d_container.putDocument(canonical, content.toUtf8().data(), ctx,
+            d_container.putDocument(canonical, content, ctx,
                                   db::DBXML_WELL_FORMED_ONLY);
         } catch (db::XmlException const &e) {
             if (e.getExceptionCode() == db::XmlException::UNIQUE_ERROR)
                 throw DuplicateKey(name);
             else {
                 std::ostringstream msg;
-                msg << "cannot write document \"" << name.toLocal8Bit().data()
-                    << "\": " << e.what();
+                msg << "cannot write document \"" << name << "\": " << e.what();
                 throw Error(msg.str());
             }
         }

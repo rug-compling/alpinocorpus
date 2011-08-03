@@ -18,6 +18,15 @@ list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
 
 include_directories(${AlpinoCorpus_SOURCE_DIR}/include)
 
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+
+find_package(Boost 1.47.0 COMPONENTS system filesystem thread REQUIRED)
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
 find_package(Qt4 COMPONENTS QtCore QtTest REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
@@ -57,11 +66,12 @@ set (HEADERS
   include/AlpinoCorpus/DbCorpusReader.hh
   include/AlpinoCorpus/DbCorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
+  include/AlpinoCorpus/DzIstream.hh
+  include/AlpinoCorpus/DzIstreamBuf.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
-  include/AlpinoCorpus/QDictZipFile.hh
   include/AlpinoCorpus/util/NonCopyable.hh
   include/AlpinoCorpus/capi.h
   include/util/base64.hh
@@ -70,7 +80,7 @@ set (HEADERS
   include/util/vs_stdint.h
   src/DirectoryCorpusReaderPrivate.hh
   src/IndexedCorpusReaderPrivate.hh
-  src/QDictZipFilePrivate.hh
+  src/gzip.hh
 )
 
 set(SOURCES
@@ -80,12 +90,12 @@ set(SOURCES
   src/DbCorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
+  src/DzIstream.cpp
+  src/DzIstreamBuf.cpp
   src/Error.cpp
   src/IndexedCorpusReader.cpp
   src/IndexedCorpusReaderPrivate.cpp
   #src/IndexedCorpusWriter.cpp
-  src/QDictZipFile.cpp
-  src/QDictZipFilePrivate.cpp
   src/capi.cpp
   src/util/textfile.cpp
   src/util/base64.cpp
@@ -108,6 +118,7 @@ add_library(alpino_corpus SHARED
 set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
   SOVERSION 0)
 
+target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${QT_QTCORE_LIBRARY})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
 target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})

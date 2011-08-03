@@ -1,12 +1,12 @@
 #include <AlpinoCorpus/Error.hh>
 
-#include <QtGlobal>
+#include <string>
 #include <sstream>
 
 namespace alpinocorpus {
-    std::string DuplicateKey::construct(QString const &key)
+    std::string DuplicateKey::construct(std::string const &key)
     {
-        return std::string("duplicate key: ") + qPrintable(key);
+        return std::string("duplicate key: ") + key;
     }
 
     std::string NotImplemented::construct(char const *type, char const *func)
@@ -19,20 +19,20 @@ namespace alpinocorpus {
     /*
      * Construct error message from path and optional extra information
      */
-    std::string OpenError::construct(QString const &path)
+    std::string OpenError::construct(std::string const &path)
     {
         return construct(path, "");
     }
 
-    std::string OpenError::construct(QString const &path, QString const &extra)
+    std::string OpenError::construct(std::string const &path, std::string const &extra)
     {
-        return construct(path, qPrintable(extra));
+        return construct(path, extra.c_str());
     }
 
-    std::string OpenError::construct(QString const &path, char const *extra)
+    std::string OpenError::construct(std::string const &path, char const *extra)
     {
         std::ostringstream msg;
-        msg << "Cannot open \"" << qPrintable(path) << "\"";
+        msg << "Cannot open \"" << path << "\"";
         if (*extra)
             msg << ": " << extra;
         return msg.str();
