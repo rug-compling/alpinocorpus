@@ -135,6 +135,6 @@ install(DIRECTORY include/AlpinoCorpus
 
 # Unit tests
 
-#add_executable(writer_test test/writer.cpp ${writer_test_MOC_SRCS})
-#target_link_libraries(writer_test alpino_corpus)
+add_executable(writer_test test/writer.cpp ${writer_test_MOC_SRCS})
+target_link_libraries(writer_test alpino_corpus)
 #add_test(writer writer_test)
