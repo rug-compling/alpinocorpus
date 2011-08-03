@@ -1,4 +1,3 @@
-#include <QString>
 #include <QtTest/QTest>
 
 #include <cstdio>
@@ -14,7 +13,7 @@ static char const db_path[] = "test_suite.dact";
 
 void DbCorpusWriterTest::canOpenDbForWriting()
 {
-    ac::DbCorpusWriter *writer = new ac::DbCorpusWriter(QString(db_path), true);
+    ac::DbCorpusWriter *writer = new ac::DbCorpusWriter(db_path, true);
     QVERIFY(writer != 0);
     delete writer;
     std::remove(db_path);
@@ -27,13 +26,13 @@ void DbCorpusWriterTest::canWriteEntireReader()
     QVERIFY(dir_rdr != 0);
     
     // Write DBXML corpus.
-    ac::DbCorpusWriter *writer = new ac::DbCorpusWriter(QString(db_path), true);
+    ac::DbCorpusWriter *writer = new ac::DbCorpusWriter(db_path, true);
     QVERIFY(writer != 0);
     writer->write(*dir_rdr);
     delete writer;
 
     // Check corpus correctness
-    ac::CorpusReader *wrtr_rdr = ac::CorpusReader::open(QString(db_path));
+    ac::CorpusReader *wrtr_rdr = ac::CorpusReader::open(db_path);
     QCOMPARE(dir_rdr->size(), wrtr_rdr->size());
     
     // Cleanup
