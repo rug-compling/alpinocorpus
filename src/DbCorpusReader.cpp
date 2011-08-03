@@ -329,7 +329,7 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
             throw Error("Could not evaluate the expression on the given document.");
         }
         
-        QList<xerces::DOMNode *> markNodes;
+        std::list<xerces::DOMNode *> markNodes;
         
         while (result->iterateNext())
         {
@@ -339,10 +339,10 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
             if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
                 continue;
             
-            markNodes.append(node);
+            markNodes.push_back(node);
         }
         
-        for (QList<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
+        for (std::list<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
              nodeIter != markNodes.end(); ++iter)
         {
             xerces::DOMNode *node = *nodeIter;
