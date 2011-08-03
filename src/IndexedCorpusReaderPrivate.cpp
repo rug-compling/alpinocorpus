@@ -14,8 +14,6 @@
 #include <boost/thread/mutex.hpp>
 #endif
 
-#include <QString>
-
 #include <AlpinoCorpus/DzIstream.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <util/base64.hh>
