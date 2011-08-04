@@ -30,7 +30,6 @@ entries_ fPtr iter =
     loop ptr next (Continue k) = do
       case next of
         (Next _) -> do
-          liftIO $ putStrLn "debug"
           val  <- liftIO $ iterToString next
           nnext <- liftIO $ c_alpinocorpus_iter_next (unsafeForeignPtrToPtr ptr) next
           runIteratee (k (Chunks [val])) >>= loop ptr nnext
