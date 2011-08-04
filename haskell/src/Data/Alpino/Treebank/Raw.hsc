@@ -12,7 +12,7 @@ module Data.Alpino.Treebank.Raw (
 
 import Foreign.C.String (CString)
 import Foreign.C.Types (CChar)
-import Foreign.ForeignPtr (ForeignPtr, newForeignPtr, withForeignPtr)
+import Foreign.ForeignPtr (ForeignPtr, newForeignPtr)
 import Foreign.Ptr (FunPtr, Ptr, nullPtr)
 
 
