@@ -68,12 +68,15 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
     return i;    
 }
 
-void alpinocorpus_iter_next(alpinocorpus_reader reader, alpinocorpus_iter *iter)
+alpinocorpus_iter alpinocorpus_iter_next(alpinocorpus_reader reader,
+    alpinocorpus_iter iter)
 {
-    if (++(*iter)->entryIter == reader->corpusReader->end()) {
-        free(*iter);
-        *iter = NULL;
+    if (++(iter->entryIter) == reader->corpusReader->end()) {
+        free(iter);
+        return NULL;
     }
+    else
+      return iter;
 }
     
 char *alpinocorpus_iter_value(alpinocorpus_iter iter)

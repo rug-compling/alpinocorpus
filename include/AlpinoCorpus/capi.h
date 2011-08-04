@@ -32,7 +32,8 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
  * Move the iterator forward. The pointer to the iterator will become 0 when
  * there are no more entries.
  */
-void alpinocorpus_iter_next(alpinocorpus_reader corpus, alpinocorpus_iter *iter);
+alpinocorpus_iter alpinocorpus_iter_next(alpinocorpus_reader corpus,
+  alpinocorpus_iter iter);
 
 /**
  * Get the name of the current entry.
