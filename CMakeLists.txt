@@ -109,6 +109,10 @@ set(CACT_HEADERS
   src/cact/ProgramOptions.hh
 )
 
+set(MERGE_SOURCES
+  src/merge/merge.cpp
+)
+
 add_library(alpino_corpus SHARED 
 	${SOURCES}
 	${HEADERS}
@@ -126,6 +130,9 @@ target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
 add_executable(cact ${CACT_SOURCES} ${CACT_HEADERS})
 target_link_libraries(cact alpino_corpus)
+
+add_executable(alpinocorpus-merge ${MERGE_SOURCES})
+target_link_libraries(alpinocorpus-merge alpino_corpus)
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
