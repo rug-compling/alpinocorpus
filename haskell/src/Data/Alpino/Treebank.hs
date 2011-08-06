@@ -1,19 +1,29 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+
 module Data.Alpino.Treebank (
   open,
   entries,
   entriesQuery
 ) where
 
+import Control.Exception.Base (Exception)
 import Data.Alpino.Treebank.Raw
+import Data.Typeable (Typeable)
 import Foreign.C.String (newCString, peekCString)
 import Foreign.ForeignPtr (ForeignPtr, unsafeForeignPtrToPtr, withForeignPtr)
 
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.Enumerator (Enumerator, Iteratee(..), Step(..), Stream(..), tryIO)
+import Data.Enumerator (Enumerator, Iteratee(..), Step(..), Stream(..),
+  throwError, tryIO)
 
 data Treebank = Treebank (ForeignPtr ())
 
-open :: String -> IO (Maybe Treebank)
+data TreebankException = IteratorException String
+  deriving (Show, Typeable)
+
+instance Exception TreebankException
+
+open :: String -> IO (Either String Treebank)
 open fn = do
   cFn <- newCString fn
   r   <- c_alpinocorpus_open cFn
@@ -26,9 +36,11 @@ entries (Treebank fPtr) step = do
 
 entriesQuery :: MonadIO m => Treebank -> String -> Enumerator String m b
 entriesQuery (Treebank fPtr) query step = do
-  queryC <- liftIO $ newCString query
-  iter   <- tryIO $ withForeignPtr fPtr (flip c_alpinocorpus_query_iter $ queryC)
-  entries_ fPtr iter step
+  queryC     <- liftIO $ newCString query
+  iterEither <- tryIO $ withForeignPtr fPtr (flip c_alpinocorpus_query_iter $ queryC)
+  case iterEither of
+    Right iter -> entries_ fPtr iter step
+    Left  err  -> throwError $ IteratorException err
 
 
 entries_ :: MonadIO m => ForeignPtr () -> CCorpusIter -> Enumerator String m b
