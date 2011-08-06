@@ -24,14 +24,19 @@ module Data.Alpino.Treebank (
 
   -- * Entry enumerators
   enumEntries,
-  enumQueryEntries
+  enumQueryEntries,
+
+  -- * Entry reading
+  readEntry
 ) where
 
 import Control.Exception.Base (Exception)
+import Data.ByteString (ByteString, packCString)
 import Data.Alpino.Treebank.Raw
 import Data.Typeable (Typeable)
 import Foreign.C.String (newCString, peekCString)
 import Foreign.ForeignPtr (ForeignPtr, unsafeForeignPtrToPtr, withForeignPtr)
+import Foreign.Marshal.Alloc (free)
 
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Enumerator (Enumerator, Iteratee(..), Step(..), Stream(..),
@@ -53,6 +58,7 @@ open :: String -> IO (Either String Treebank)
 open fn = do
   cFn <- newCString fn
   r   <- c_alpinocorpus_open cFn
+  free cFn
   return $ fmap Treebank r
 
 -- |
@@ -70,6 +76,7 @@ enumQueryEntries :: MonadIO m => Treebank -> String -> Enumerator String m b
 enumQueryEntries (Treebank fPtr) query step = do
   queryC     <- liftIO $ newCString query
   iterEither <- tryIO $ withForeignPtr fPtr (flip c_alpinocorpus_query_iter $ queryC)
+  tryIO $ free queryC
   case iterEither of
     Right iter -> entries_ fPtr iter step
     Left  err  -> throwError $ IteratorException err
@@ -94,3 +101,17 @@ iterToString :: CCorpusIter -> IO String
 iterToString iter = do
   cStr <- c_alpinocorpus_iter_value iter
   withForeignPtr cStr peekCString
+
+-- |
+-- Read an entry from a treebank.
+readEntry :: Treebank -> String -> IO (Either String ByteString)
+readEntry (Treebank t) entry = do
+  entryC         <- newCString entry
+  contentsEither <- withForeignPtr t (flip c_alpinocorpus_read $ entryC)
+  free entryC
+  case contentsEither of
+    Left err       -> return $ Left err
+    Right contents -> do
+      bs <- withForeignPtr contents packCString
+      return $ Right bs
+

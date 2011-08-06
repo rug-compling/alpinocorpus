@@ -29,7 +29,8 @@ module Data.Alpino.Treebank.Raw (
   c_alpinocorpus_query_iter,
   c_alpinocorpus_iter_destroy,
   c_alpinocorpus_iter_value,
-  c_alpinocorpus_iter_next
+  c_alpinocorpus_iter_next,
+  c_alpinocorpus_read
 ) where
 
 import Foreign.C.String (CString)
@@ -41,7 +42,7 @@ import Foreign.Ptr (FunPtr, Ptr, nullPtr)
 -- Iterator over a corpus.
 data CCorpusIter =
     Next (Ptr ()) -- ^ Valid iterator
-  | End           -- ^ End iterator.
+  | End           -- ^ End iterator
 
 foreign import ccall "stdlib.h &free"
   p_free :: FunPtr (Ptr a -> IO ())
@@ -125,3 +126,17 @@ c_alpinocorpus_iter_next corpus (Next iter) = do
   else
     return End
 c_alpinocorpus_iter_next _      End         = return End
+
+foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_read"
+  c_alpinocorpus_read_ :: Ptr () -> CString -> IO CString
+
+-- |
+-- Read an entry from a corpus.
+c_alpinocorpus_read :: Ptr () -> CString -> IO (Either String (ForeignPtr CChar))
+c_alpinocorpus_read corpus entry = do
+  strp <- c_alpinocorpus_read_ corpus entry 
+  if strp /= nullPtr then do
+    strfp <- newForeignPtr p_free strp
+    return $ Right strfp 
+  else
+    return $ Left "Could not read entry."
