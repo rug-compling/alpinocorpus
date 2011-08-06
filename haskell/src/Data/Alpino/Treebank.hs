@@ -34,7 +34,9 @@ entries_ fPtr iter =
           nnext <- liftIO $ c_alpinocorpus_iter_next (unsafeForeignPtrToPtr ptr) next
           runIteratee (k (Chunks [val])) >>= loop ptr nnext
         End      -> return $ Continue k
-    loop _ _ step         = return step
+    loop _ next step           = do
+      liftIO $ c_alpinocorpus_iter_destroy next
+      return step
 
 iterToString :: CCorpusIter -> IO String
 iterToString iter = do

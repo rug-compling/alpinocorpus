@@ -6,6 +6,7 @@ module Data.Alpino.Treebank.Raw (
   c_alpinocorpus_open,
   CCorpusIter(..),
   c_alpinocorpus_entry_iter,
+  c_alpinocorpus_iter_destroy,
   c_alpinocorpus_iter_value,
   c_alpinocorpus_iter_next
 ) where
@@ -50,6 +51,15 @@ c_alpinocorpus_entry_iter corpus = do
     return $ Next ptr
   else
     return End
+
+foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_destroy"
+  c_alpinocorpus_iter_destroy_ :: Ptr () -> IO ()
+
+c_alpinocorpus_iter_destroy :: CCorpusIter -> IO ()
+c_alpinocorpus_iter_destroy (Next iter) = do
+  c_alpinocorpus_iter_destroy_ iter
+c_alpinocorpus_iter_destroy (End)       =
+  return ()
 
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_value"
   c_alpinocorpus_iter_value_ :: Ptr () -> IO CString
