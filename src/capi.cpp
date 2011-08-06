@@ -68,6 +68,11 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
     return i;    
 }
 
+void alpinocorpus_iter_destroy(alpinocorpus_iter iter)
+{
+  free(iter);
+}
+
 alpinocorpus_iter alpinocorpus_iter_next(alpinocorpus_reader reader,
     alpinocorpus_iter iter)
 {

@@ -28,6 +28,13 @@ alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus);
  */
 alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query);
 
+
+/**
+ * Destroy an iterator. This is only necessary if not all entries are
+ * iterated over.
+ */
+void alpinocorpus_iter_destroy(alpinocorpus_iter iter);
+
 /**
  * Move the iterator forward. The pointer to the iterator will become 0 when
  * there are no more entries.
