@@ -45,13 +45,13 @@ foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_entry_iter"
 
 -- |
 -- Create an iterator over the corpus.
-c_alpinocorpus_entry_iter :: Ptr () -> IO CCorpusIter
+c_alpinocorpus_entry_iter :: Ptr () -> IO (Either String CCorpusIter)
 c_alpinocorpus_entry_iter corpus = do
   ptr <- c_alpinocorpus_entry_iter_ corpus
   if ptr /= nullPtr then
-    return $ Next ptr
+    return $ Right $ Next ptr
   else
-    return End
+    return $ Left "Could not iterate over the corpus."
 
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_query_iter"
   c_alpinocorpus_query_iter_ :: Ptr () -> CString -> IO (Ptr ())

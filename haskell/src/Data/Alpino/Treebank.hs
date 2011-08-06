@@ -31,8 +31,10 @@ open fn = do
 
 entries :: MonadIO m => Treebank -> Enumerator String m b
 entries (Treebank fPtr) step = do
-  iter <- tryIO $ withForeignPtr fPtr c_alpinocorpus_entry_iter
-  entries_ fPtr iter step
+  iterEither <- tryIO $ withForeignPtr fPtr c_alpinocorpus_entry_iter
+  case iterEither of
+    Right iter -> entries_ fPtr iter step
+    Left  err  -> throwError $ IteratorException err
 
 entriesQuery :: MonadIO m => Treebank -> String -> Enumerator String m b
 entriesQuery (Treebank fPtr) query step = do
