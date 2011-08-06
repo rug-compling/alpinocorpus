@@ -1,5 +1,25 @@
 {-# LANGUAGE ForeignFunctionInterface, DoAndIfThenElse #-}
 
+-- |
+-- Module      : Data.Alpino.Treebank.Raw
+-- Copyright   : (c) 2011 Daniël de Kok
+-- License     : LGPL
+--
+-- Maintainer  : Daniël de Kok <me@danieldk.eu>
+-- Stability   : experimental
+--
+-- Low-level wrapper for the alpinocorpus library. This library provides
+-- access to various types of Alpino treebanks:
+--
+-- * Directory-based treebanks
+--
+-- * Compact corpora
+--
+-- * DBXML-backed treebanks
+--
+-- It is not recommended to use this module directly, please consider
+-- using the "Data.Alpino.Treebank" module instead.
+
 #include <AlpinoCorpus/capi.h>
 
 module Data.Alpino.Treebank.Raw (
@@ -17,8 +37,11 @@ import Foreign.C.Types (CChar)
 import Foreign.ForeignPtr (ForeignPtr, newForeignPtr)
 import Foreign.Ptr (FunPtr, Ptr, nullPtr)
 
-
-data CCorpusIter = Next (Ptr ()) | End
+-- |
+-- Iterator over a corpus.
+data CCorpusIter =
+    Next (Ptr ()) -- ^ Valid iterator
+  | End           -- ^ End iterator.
 
 foreign import ccall "stdlib.h &free"
   p_free :: FunPtr (Ptr a -> IO ())
@@ -56,6 +79,8 @@ c_alpinocorpus_entry_iter corpus = do
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_query_iter"
   c_alpinocorpus_query_iter_ :: Ptr () -> CString -> IO (Ptr ())
 
+-- |
+-- Get an iterator over the entries in a corpus.
 c_alpinocorpus_query_iter :: Ptr () -> CString -> IO (Either String CCorpusIter)
 c_alpinocorpus_query_iter corpus query = do
   ptr <- c_alpinocorpus_query_iter_ corpus query
@@ -67,6 +92,8 @@ c_alpinocorpus_query_iter corpus query = do
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_destroy"
   c_alpinocorpus_iter_destroy_ :: Ptr () -> IO ()
 
+-- |
+-- Destroy an iterator, freeing its resources.
 c_alpinocorpus_iter_destroy :: CCorpusIter -> IO ()
 c_alpinocorpus_iter_destroy (Next iter) = do
   c_alpinocorpus_iter_destroy_ iter
