@@ -1,6 +1,7 @@
 module Data.Alpino.Treebank (
   open,
-  entries
+  entries,
+  entriesQuery
 ) where
 
 import Data.Alpino.Treebank.Raw
@@ -22,6 +23,13 @@ entries :: MonadIO m => Treebank -> Enumerator String m b
 entries (Treebank fPtr) step = do
   iter <- tryIO $ withForeignPtr fPtr c_alpinocorpus_entry_iter
   entries_ fPtr iter step
+
+entriesQuery :: MonadIO m => Treebank -> String -> Enumerator String m b
+entriesQuery (Treebank fPtr) query step = do
+  queryC <- liftIO $ newCString query
+  iter   <- tryIO $ withForeignPtr fPtr (flip c_alpinocorpus_query_iter $ queryC)
+  entries_ fPtr iter step
+
 
 entries_ :: MonadIO m => ForeignPtr () -> CCorpusIter -> Enumerator String m b
 entries_ fPtr iter =

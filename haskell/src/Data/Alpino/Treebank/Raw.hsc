@@ -6,6 +6,7 @@ module Data.Alpino.Treebank.Raw (
   c_alpinocorpus_open,
   CCorpusIter(..),
   c_alpinocorpus_entry_iter,
+  c_alpinocorpus_query_iter,
   c_alpinocorpus_iter_destroy,
   c_alpinocorpus_iter_value,
   c_alpinocorpus_iter_next
@@ -51,6 +52,17 @@ c_alpinocorpus_entry_iter corpus = do
     return $ Next ptr
   else
     return End
+
+foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_query_iter"
+  c_alpinocorpus_query_iter_ :: Ptr () -> CString -> IO (Ptr ())
+
+c_alpinocorpus_query_iter :: Ptr () -> CString -> IO CCorpusIter
+c_alpinocorpus_query_iter corpus query = do
+  ptr <- c_alpinocorpus_query_iter_ corpus query
+  if ptr /= nullPtr then
+    return $ Next ptr
+  else
+    return End -- XXX - error
 
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_destroy"
   c_alpinocorpus_iter_destroy_ :: Ptr () -> IO ()
