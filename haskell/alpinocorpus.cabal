@@ -18,3 +18,4 @@ Library
                         transformers >= 0.2.2.0 && < 0.3
   Exposed-modules:      Data.Alpino.Treebank, Data.Alpino.Treebank.Raw
   Ghc-Options:          -Wall
+  Extra-Libraries:      alpino_corpus
