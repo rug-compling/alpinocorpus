@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <list>
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -104,6 +105,34 @@ char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
     std::string str;
     try{ 
         str = reader->corpusReader->read(entry);
+    } catch (std::exception const &e) {
+        return NULL;
+    }
+    
+    size_t len = str.size() + 1;
+    char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
+    strlcpy(cstr, str.c_str(), len);
+    return cstr;
+}
+
+char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
+    char const *entry, marker_query_t *queries, size_t n_queries)
+{
+    std::list<alpinocorpus::CorpusReader::MarkerQuery> markerQueries;
+
+    for (size_t i = 0; i < n_queries; ++i) {
+        alpinocorpus::CorpusReader::MarkerQuery query(
+          queries[i].query,
+          queries[i].attr,
+          queries[i].value
+        );
+
+        markerQueries.push_back(query);
+    }
+
+    std::string str;
+    try{ 
+        str = reader->corpusReader->readMarkQueries(entry, markerQueries);
     } catch (std::exception const &e) {
         return NULL;
     }

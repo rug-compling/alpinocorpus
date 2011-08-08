@@ -8,6 +8,13 @@ extern "C" {
 typedef struct alpinocorpus_reader_t *alpinocorpus_reader;
 typedef struct alpinocorpus_iter_t *alpinocorpus_iter;
 
+typedef struct {
+  char const *query;
+  char const *attr;
+  char const *value;
+} marker_query_t;
+
+
 /**
  * Open an Alpino treebank. Returns NULL if the corpus could not be opened.
  */
@@ -51,6 +58,12 @@ char *alpinocorpus_iter_value(alpinocorpus_iter iter);
  * Read an entry from the corpus.
  */
 char *alpinocorpus_read(alpinocorpus_reader corpus, char const *entry);
+
+/**
+ * Read an entry, marking nodes matching a given query.
+ */
+char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
+    char const *entry, marker_query_t *queries, size_t n_queries);
 
 #ifdef __cplusplus
 }
