@@ -18,8 +18,11 @@
 -- * DBXML-backed treebanks
 
 module Data.Alpino.Treebank (
-  -- * Opening treebanks
+  -- * Types
+  Treebank(..),
   TreebankException(..),
+
+  -- * Opening treebanks
   open,
 
   -- * Entry enumerators
