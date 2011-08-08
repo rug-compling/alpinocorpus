@@ -20,6 +20,7 @@
 module Data.Alpino.Treebank (
   -- * Types
   Treebank(..),
+  MarkerQuery(..),
   TreebankException(..),
 
   -- * Opening treebanks
@@ -30,22 +31,31 @@ module Data.Alpino.Treebank (
   enumQueryEntries,
 
   -- * Entry reading
-  readEntry
+  readEntry,
+  readEntryMarkQuery
 ) where
 
 import Control.Exception.Base (Exception)
 import Data.ByteString (ByteString, packCString)
 import Data.Alpino.Treebank.Raw
+import Data.List (genericLength)
 import Data.Typeable (Typeable)
 import Foreign.C.String (newCString, peekCString)
 import Foreign.ForeignPtr (ForeignPtr, unsafeForeignPtrToPtr, withForeignPtr)
 import Foreign.Marshal.Alloc (free)
+import Foreign.Marshal.Array (newArray)
 
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Enumerator (Enumerator, Iteratee(..), Step(..), Stream(..),
   throwError, tryIO)
 
 data Treebank = Treebank (ForeignPtr ())
+
+data MarkerQuery = MarkerQuery {
+  mqQuery     :: String,
+  mqAttribute :: String,
+  mqValue     :: String
+} deriving (Show, Eq)
 
 -- |
 -- Exceptions that can occur while processing a treebank.
@@ -118,3 +128,29 @@ readEntry (Treebank t) entry = do
       bs <- withForeignPtr contents packCString
       return $ Right bs
 
+readEntryMarkQuery :: Treebank -> String -> [MarkerQuery] ->
+  IO (Either String ByteString)
+readEntryMarkQuery (Treebank t) entry queries = do
+  entryC   <- newCString entry
+  cQueries <- mapM queryToCQuery queries
+  cQueriesPtr <- newArray cQueries
+  contentsEither <- withForeignPtr t (\tb ->
+    c_alpinocorpus_read_mark_queries tb entryC cQueriesPtr (genericLength cQueries))
+  mapM_ freeCQuery cQueries
+  free cQueriesPtr
+  free entryC
+  case contentsEither of
+    Left err       -> return $ Left err
+    Right contents -> do
+      bs <- withForeignPtr contents packCString
+      return $ Right bs
+  where
+    queryToCQuery (MarkerQuery q a v) = do
+      qC <- newCString q
+      qA <- newCString a
+      qV <- newCString v
+      return $ CMarkerQuery qC qA qV
+    freeCQuery (CMarkerQuery q a v) = do
+      free q
+      free a
+      free v
