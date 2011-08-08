@@ -19,7 +19,7 @@
 
 module Data.Alpino.Treebank (
   -- * Types
-  Treebank(..),
+  Treebank,
   MarkerQuery(..),
   TreebankException(..),
 
@@ -49,12 +49,18 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Enumerator (Enumerator, Iteratee(..), Step(..), Stream(..),
   throwError, tryIO)
 
+-- |
+-- A treebank, the constructor for this type is opaque to hide its internals.
 data Treebank = Treebank (ForeignPtr ())
 
+-- |
+-- A marker query is used in conjunction with 'readEntryMarkQuery'. The
+-- 'MarkerQuery' data structure is used to specify which nodes should be
+-- marked and how. A node is marked by adding an attribute-value pair.
 data MarkerQuery = MarkerQuery {
-  mqQuery     :: String,
-  mqAttribute :: String,
-  mqValue     :: String
+  mqQuery     :: String, -- ^ XPath query specifying the nodes to mark
+  mqAttribute :: String, -- ^ Attribute of the marker
+  mqValue     :: String  -- ^ Value of the marker
 } deriving (Show, Eq)
 
 -- |
@@ -128,6 +134,9 @@ readEntry (Treebank t) entry = do
       bs <- withForeignPtr contents packCString
       return $ Right bs
 
+-- |
+-- Retrieve an entry from a treebank, marking nodes that match one of the
+-- given queries.
 readEntryMarkQuery :: Treebank -> String -> [MarkerQuery] ->
   IO (Either String ByteString)
 readEntryMarkQuery (Treebank t) entry queries = do
