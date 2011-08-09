@@ -26,6 +26,11 @@ alpinocorpus_reader alpinocorpus_open(char const *path);
 void alpinocorpus_close(alpinocorpus_reader corpus);
 
 /**
+ * Check whether the given query is valid. Returns 1 if it is, 0 otherwise.
+ */
+int alpinocorpus_is_valid_query(alpinocorpus_reader corpus, char const *query);
+
+/**
  * Get an iterator over the entries in a corpus.
  */
 alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus);

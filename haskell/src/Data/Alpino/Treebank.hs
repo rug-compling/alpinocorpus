@@ -26,6 +26,9 @@ module Data.Alpino.Treebank (
   -- * Opening treebanks
   open,
 
+  -- * Query validation
+  validQuery,
+
   -- * Entry enumerators
   enumEntries,
   enumQueryEntries,
@@ -163,3 +166,11 @@ readEntryMarkQuery (Treebank t) entry queries = do
       free q
       free a
       free v
+
+validQuery :: Treebank -> String -> IO (Bool)
+validQuery (Treebank t) query = do
+  queryC <- newCString query
+  valid  <- withForeignPtr t (flip c_alpinocorpus_is_valid_query $ queryC)
+  free queryC
+  return $ if valid == 0 then False else True
+

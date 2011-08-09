@@ -30,6 +30,7 @@ module Data.Alpino.Treebank.Raw (
   CMarkerQuery(..),
   c_alpinocorpus_entry_iter,
   c_alpinocorpus_query_iter,
+  c_alpinocorpus_is_valid_query,
   c_alpinocorpus_iter_destroy,
   c_alpinocorpus_iter_value,
   c_alpinocorpus_iter_next,
@@ -38,7 +39,7 @@ module Data.Alpino.Treebank.Raw (
 ) where
 
 import Foreign.C.String (CString)
-import Foreign.C.Types (CChar, CSize)
+import Foreign.C.Types (CChar, CInt, CSize)
 import Foreign.ForeignPtr (ForeignPtr, newForeignPtr)
 import Foreign.Ptr (FunPtr, Ptr, nullPtr)
 import Foreign.Storable (Storable(..))
@@ -87,6 +88,9 @@ c_alpinocorpus_open filename = do
     return $ Right fPtr
   else
     return $ Left "Could not open treebank." 
+
+foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_is_valid_query"
+  c_alpinocorpus_is_valid_query :: Ptr () -> CString -> IO (CInt)
 
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_entry_iter"
   c_alpinocorpus_entry_iter_ :: Ptr () -> IO (Ptr ())

@@ -41,6 +41,12 @@ void alpinocorpus_close(alpinocorpus_reader reader)
     delete reader;
 }
 
+int alpinocorpus_is_valid_query(alpinocorpus_reader reader, char const *query)
+{
+  return int(reader->corpusReader->isValidQuery(
+      alpinocorpus::CorpusReader::XPATH, false, query));
+}
+
 alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
 {
     if (corpus->corpusReader->begin() == corpus->corpusReader->end())
