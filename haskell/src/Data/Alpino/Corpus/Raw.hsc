@@ -1,7 +1,7 @@
 {-# LANGUAGE ForeignFunctionInterface, DoAndIfThenElse #-}
 
 -- |
--- Module      : Data.Alpino.Treebank.Raw
+-- Module      : Data.Alpino.Corpus.Raw
 -- Copyright   : (c) 2011 Daniël de Kok
 -- License     : LGPL
 --
@@ -18,13 +18,13 @@
 -- * DBXML-backed treebanks
 --
 -- It is not recommended to use this module directly, please consider
--- using the "Data.Alpino.Treebank" module instead.
+-- using the "Data.Alpino.Corpus" module instead.
 
 #include <AlpinoCorpus/capi.h>
 
 #let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
 
-module Data.Alpino.Treebank.Raw (
+module Data.Alpino.Corpus.Raw (
   c_alpinocorpus_open,
   CCorpusIter(..),
   CMarkerQuery(..),

@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
 -- |
--- Module      : Data.Alpino.Treebank
+-- Module      : Data.Alpino.Corpus
 -- Copyright   : (c) 2011 Daniël de Kok
 -- License     : LGPL
 --
@@ -17,11 +17,11 @@
 --
 -- * DBXML-backed treebanks
 
-module Data.Alpino.Treebank (
+module Data.Alpino.Corpus (
   -- * Types
-  Treebank,
+  Corpus,
   MarkerQuery(..),
-  TreebankException(..),
+  CorpusException(..),
 
   -- * Opening treebanks
   open,
@@ -40,7 +40,7 @@ module Data.Alpino.Treebank (
 
 import Control.Exception.Base (Exception)
 import Data.ByteString (ByteString, packCString)
-import Data.Alpino.Treebank.Raw
+import Data.Alpino.Corpus.Raw
 import Data.List (genericLength)
 import Data.Typeable (Typeable)
 import Foreign.C.String (newCString, peekCString)
@@ -54,7 +54,7 @@ import Data.Enumerator (Enumerator, Iteratee(..), Step(..), Stream(..),
 
 -- |
 -- A treebank, the constructor for this type is opaque to hide its internals.
-data Treebank = Treebank (ForeignPtr ())
+data Corpus = Corpus (ForeignPtr ())
 
 -- |
 -- A marker query is used in conjunction with 'readEntryMarkQuery'. The
@@ -68,25 +68,25 @@ data MarkerQuery = MarkerQuery {
 
 -- |
 -- Exceptions that can occur while processing a treebank.
-data TreebankException =
+data CorpusException =
   IteratorException String -- ^ Iteration error
   deriving (Show, Typeable)
 
-instance Exception TreebankException
+instance Exception CorpusException
 
 -- |
 -- Open a treebank.
-open :: String -> IO (Either String Treebank)
+open :: String -> IO (Either String Corpus)
 open fn = do
   cFn <- newCString fn
   r   <- c_alpinocorpus_open cFn
   free cFn
-  return $ fmap Treebank r
+  return $ fmap Corpus r
 
 -- |
 -- Enumerate the entries in a treebank.
-enumEntries :: MonadIO m => Treebank -> Enumerator String m b
-enumEntries (Treebank fPtr) step = do
+enumEntries :: MonadIO m => Corpus -> Enumerator String m b
+enumEntries (Corpus fPtr) step = do
   iterEither <- tryIO $ withForeignPtr fPtr c_alpinocorpus_entry_iter
   case iterEither of
     Right iter -> entries_ fPtr iter step
@@ -94,8 +94,8 @@ enumEntries (Treebank fPtr) step = do
 
 -- |
 -- Enumerate the entries in a treebank matching the given query.
-enumQueryEntries :: MonadIO m => Treebank -> String -> Enumerator String m b
-enumQueryEntries (Treebank fPtr) query step = do
+enumQueryEntries :: MonadIO m => Corpus -> String -> Enumerator String m b
+enumQueryEntries (Corpus fPtr) query step = do
   queryC     <- liftIO $ newCString query
   iterEither <- tryIO $ withForeignPtr fPtr (flip c_alpinocorpus_query_iter $ queryC)
   tryIO $ free queryC
@@ -126,8 +126,8 @@ iterToString iter = do
 
 -- |
 -- Read an entry from a treebank.
-readEntry :: Treebank -> String -> IO (Either String ByteString)
-readEntry (Treebank t) entry = do
+readEntry :: Corpus -> String -> IO (Either String ByteString)
+readEntry (Corpus t) entry = do
   entryC         <- newCString entry
   contentsEither <- withForeignPtr t (flip c_alpinocorpus_read $ entryC)
   free entryC
@@ -140,9 +140,9 @@ readEntry (Treebank t) entry = do
 -- |
 -- Retrieve an entry from a treebank, marking nodes that match one of the
 -- given queries.
-readEntryMarkQuery :: Treebank -> String -> [MarkerQuery] ->
+readEntryMarkQuery :: Corpus -> String -> [MarkerQuery] ->
   IO (Either String ByteString)
-readEntryMarkQuery (Treebank t) entry queries = do
+readEntryMarkQuery (Corpus t) entry queries = do
   entryC   <- newCString entry
   cQueries <- mapM queryToCQuery queries
   cQueriesPtr <- newArray cQueries
@@ -167,8 +167,8 @@ readEntryMarkQuery (Treebank t) entry queries = do
       free a
       free v
 
-validQuery :: Treebank -> String -> IO (Bool)
-validQuery (Treebank t) query = do
+validQuery :: Corpus -> String -> IO (Bool)
+validQuery (Corpus t) query = do
   queryC <- newCString query
   valid  <- withForeignPtr t (flip c_alpinocorpus_is_valid_query $ queryC)
   free queryC
