@@ -124,7 +124,7 @@ foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_destroy"
 -- |
 -- Destroy an iterator, freeing its resources.
 c_alpinocorpus_iter_destroy :: CCorpusIter -> IO ()
-c_alpinocorpus_iter_destroy (Next iter) = do
+c_alpinocorpus_iter_destroy (Next iter) =
   c_alpinocorpus_iter_destroy_ iter
 c_alpinocorpus_iter_destroy (End)       =
   return ()

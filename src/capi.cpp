@@ -54,7 +54,7 @@ alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
     
     alpinocorpus_iter i = new alpinocorpus_iter_t(corpus->corpusReader->begin());
     
-    return i;        
+    return i;
 }
 
 alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query)
@@ -72,19 +72,19 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
     
     alpinocorpus_iter i = new alpinocorpus_iter_t(iter);
     
-    return i;    
+    return i;
 }
 
 void alpinocorpus_iter_destroy(alpinocorpus_iter iter)
 {
-  free(iter);
+  delete iter;
 }
 
 alpinocorpus_iter alpinocorpus_iter_next(alpinocorpus_reader reader,
     alpinocorpus_iter iter)
 {
     if (++(iter->entryIter) == reader->corpusReader->end()) {
-        free(iter);
+        delete iter;
         return NULL;
     }
     else
