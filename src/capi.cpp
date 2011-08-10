@@ -102,7 +102,11 @@ char *alpinocorpus_iter_value(alpinocorpus_iter iter)
     
     size_t len = entry.size() + 1;
     char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
+#ifdef HAVE_STRLCPY 
     strlcpy(cstr, entry.c_str(), len);
+#else
+    strcpy(cstr, entry.c_str());
+#endif /* HAS_STRLCPY */
     return cstr;    
 }
 
@@ -117,7 +121,11 @@ char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
     
     size_t len = str.size() + 1;
     char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
+#ifdef HAVE_STRLCPY 
     strlcpy(cstr, str.c_str(), len);
+#else
+    strcpy(cstr, str.c_str());
+#endif /* HAS_STRLCPY */
     return cstr;
 }
 
@@ -145,7 +153,11 @@ char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
     
     size_t len = str.size() + 1;
     char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
+#ifdef HAVE_STRLCPY 
     strlcpy(cstr, str.c_str(), len);
+#else
+    strcpy(cstr, str.c_str());
+#endif /* HAS_STRLCPY */
     return cstr;
 }
 

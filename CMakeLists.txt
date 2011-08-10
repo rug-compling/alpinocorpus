@@ -9,6 +9,8 @@ endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
 set(CMAKE_CXX_FLAGS "-pthread")
 
+include(CheckFunctionExists)
+
 if(APPLE)
   set (CMAKE_OSX_ARCHITECTURES "x86_64")
   set (CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
@@ -56,6 +58,8 @@ find_package(LibXml2 REQUIRED)
 if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
+
+CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
 
 set (HEADERS
   include/AlpinoCorpus/CorpusReader.hh
