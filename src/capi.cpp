@@ -80,15 +80,14 @@ void alpinocorpus_iter_destroy(alpinocorpus_iter iter)
   delete iter;
 }
 
-alpinocorpus_iter alpinocorpus_iter_next(alpinocorpus_reader reader,
+int alpinocorpus_iter_next(alpinocorpus_reader reader,
     alpinocorpus_iter iter)
 {
-    if (++(iter->entryIter) == reader->corpusReader->end()) {
-        delete iter;
-        return NULL;
-    }
+    if (iter->entryIter == reader->corpusReader->end() ||
+        ++(iter->entryIter) == reader->corpusReader->end())
+      return int(0);
     else
-      return iter;
+      return int(1);
 }
     
 char *alpinocorpus_iter_value(alpinocorpus_iter iter)

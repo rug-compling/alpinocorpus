@@ -48,10 +48,10 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
 void alpinocorpus_iter_destroy(alpinocorpus_iter iter);
 
 /**
- * Move the iterator forward. The pointer to the iterator will become 0 when
- * there are no more entries.
+ * Move the iterator forward. This function return false (0) when there are
+ * no more entries.
  */
-alpinocorpus_iter alpinocorpus_iter_next(alpinocorpus_reader corpus,
+int alpinocorpus_iter_next(alpinocorpus_reader corpus,
   alpinocorpus_iter iter);
 
 /**

@@ -31,24 +31,24 @@ module Data.Alpino.Corpus.Raw (
   c_alpinocorpus_entry_iter,
   c_alpinocorpus_query_iter,
   c_alpinocorpus_is_valid_query,
-  c_alpinocorpus_iter_destroy,
   c_alpinocorpus_iter_value,
   c_alpinocorpus_iter_next,
   c_alpinocorpus_read,
   c_alpinocorpus_read_mark_queries
 ) where
 
+import Control.Applicative ((<$>))
 import Foreign.C.String (CString)
 import Foreign.C.Types (CChar, CInt, CSize)
-import Foreign.ForeignPtr (ForeignPtr, newForeignPtr)
+import Foreign.ForeignPtr (ForeignPtr, newForeignPtr, withForeignPtr)
 import Foreign.Ptr (FunPtr, Ptr, nullPtr)
 import Foreign.Storable (Storable(..))
 
 -- |
 -- Iterator over a corpus.
 data CCorpusIter =
-    Next (Ptr ()) -- ^ Valid iterator
-  | End           -- ^ End iterator
+    Next (ForeignPtr ()) -- ^ Valid iterator
+  | End                  -- ^ End iterator
 
 data CMarkerQuery = CMarkerQuery {
   cMqQuery      :: CString,
@@ -101,7 +101,7 @@ c_alpinocorpus_entry_iter :: Ptr () -> IO (Either String CCorpusIter)
 c_alpinocorpus_entry_iter corpus = do
   ptr <- c_alpinocorpus_entry_iter_ corpus
   if ptr /= nullPtr then
-    return $ Right $ Next ptr
+    Right <$> Next <$> newForeignPtr p_alpinocorpus_iter_destroy ptr
   else
     return $ Left "Could not iterate over the corpus."
 
@@ -114,20 +114,16 @@ c_alpinocorpus_query_iter :: Ptr () -> CString -> IO (Either String CCorpusIter)
 c_alpinocorpus_query_iter corpus query = do
   ptr <- c_alpinocorpus_query_iter_ corpus query
   if ptr /= nullPtr then
-    return $ Right $ Next ptr
+    Right <$> Next <$> newForeignPtr p_alpinocorpus_iter_destroy ptr
   else
     return $ Left "Could not execute query, or invalid iterator."
 
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_destroy"
   c_alpinocorpus_iter_destroy_ :: Ptr () -> IO ()
 
--- |
--- Destroy an iterator, freeing its resources.
-c_alpinocorpus_iter_destroy :: CCorpusIter -> IO ()
-c_alpinocorpus_iter_destroy (Next iter) =
-  c_alpinocorpus_iter_destroy_ iter
-c_alpinocorpus_iter_destroy (End)       =
-  return ()
+
+foreign import ccall unsafe "AlpinoCorpus/capi.h &alpinocorpus_iter_destroy"
+  p_alpinocorpus_iter_destroy :: FunPtr (Ptr () -> IO ())
 
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_value"
   c_alpinocorpus_iter_value_ :: Ptr () -> IO CString
@@ -136,23 +132,23 @@ foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_value"
 -- Get the value of an iterator.
 c_alpinocorpus_iter_value :: CCorpusIter -> IO (ForeignPtr CChar)
 c_alpinocorpus_iter_value (Next iter) = do
-  strp <- c_alpinocorpus_iter_value_ iter
+  strp <- withForeignPtr iter c_alpinocorpus_iter_value_
   newForeignPtr p_free strp
 c_alpinocorpus_iter_value (End)       =
   error "Cannot get the value of an invalid iterator"
 
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_iter_next"
-  c_alpinocorpus_iter_next_ :: Ptr () -> Ptr () -> IO (Ptr ())
+  c_alpinocorpus_iter_next_ :: Ptr () -> Ptr () -> IO CInt
 
 -- |
 -- Increment the iterator, returns `End` when iteration is finished.
 c_alpinocorpus_iter_next :: Ptr () -> CCorpusIter -> IO CCorpusIter
 c_alpinocorpus_iter_next corpus (Next iter) = do
-  newIter <- c_alpinocorpus_iter_next_ corpus iter
-  if newIter /= nullPtr then
-    return $ Next newIter
-  else
+  status <- withForeignPtr iter $ c_alpinocorpus_iter_next_ corpus
+  if status == 0 then
     return End
+  else
+    return $ Next iter
 c_alpinocorpus_iter_next _      End         = return End
 
 foreign import ccall unsafe "AlpinoCorpus/capi.h alpinocorpus_read"
