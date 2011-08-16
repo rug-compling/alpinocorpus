@@ -40,6 +40,7 @@ void usage(std::string const &programName)
     std::cerr << "Usage: " << programName << " [OPTION] treebank" <<
       std::endl << std::endl <<
       "  -c filename\tCreate a Dact dbxml archive" << std::endl <<
+      "  -l\t\tList the entries of a treebank" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl << std::endl;  
 }
 
