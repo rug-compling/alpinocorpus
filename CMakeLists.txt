@@ -104,13 +104,13 @@ set(SOURCES
   src/util/url.cpp
 )
 
-set(CACT_SOURCES
-  src/cact/ProgramOptions.cpp
-  src/cact/main.cpp
+set(ACT_SOURCES
+  util/act/ProgramOptions.cpp
+  util/act/main.cpp
 )
 
-set(CACT_HEADERS
-  src/cact/ProgramOptions.hh
+set(ACT_HEADERS
+  util/act/ProgramOptions.hh
 )
 
 set(MERGE_SOURCES
@@ -132,8 +132,8 @@ target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
-add_executable(cact ${CACT_SOURCES} ${CACT_HEADERS})
-target_link_libraries(cact alpino_corpus)
+add_executable(alpinocorpus-act ${ACT_SOURCES} ${ACT_HEADERS})
+target_link_libraries(alpinocorpus-act alpino_corpus)
 
 add_executable(alpinocorpus-merge ${MERGE_SOURCES})
 target_link_libraries(alpinocorpus-merge alpino_corpus)
