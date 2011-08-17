@@ -47,7 +47,8 @@ void usage(std::string const &programName)
       std::endl << std::endl <<
       "  -c filename\tCreate a Dact dbxml archive" << std::endl <<
       "  -l\t\tList the entries of a treebank" << std::endl <<
-      "  -q query\tFilter the treebank using the given query" << std::endl << std::endl;  
+      "  -q query\tFilter the treebank using the given query" << std::endl <<
+      "  -r entry\tPrint a treebank entry to stdout" << std::endl << std::endl;
 }
 
 void writeDactCorpus(std::string const &treebank, std::string const &treebankOut,
