@@ -331,8 +331,13 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
         
         while (result->iterateNext())
         {
-            xerces::DOMNode *node = result->getNodeValue();
-            
+            xerces::DOMNode *node;
+            try {
+              node = result->getNodeValue();
+            } catch (xerces::DOMXPathException &e) {
+              throw Error("Matching node value invalid while marking nodes.");
+            }
+
             // Skip non-element nodes
             if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
                 continue;
