@@ -27,6 +27,11 @@ CorpusReader::EntryIterator DirectoryCorpusReader::getEnd() const
     return d_private->getEnd();
 }
 
+std::string DirectoryCorpusReader::getName() const
+{
+  return d_private->getName();
+}
+
 size_t DirectoryCorpusReader::getSize() const
 {
   return d_private->getSize();

@@ -69,6 +69,7 @@ public:
     virtual ~DbCorpusReaderPrivate();
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
+    std::string getName() const;
     size_t getSize() const
     {
         return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
@@ -178,6 +179,11 @@ CorpusReader::EntryIterator DbCorpusReader::getEnd() const
     return d_private->getEnd();
 }
 
+std::string DbCorpusReader::getName() const
+{
+  return d_private->getName();
+}
+
 size_t DbCorpusReader::getSize() const
 {
     return d_private->getSize();
@@ -239,7 +245,12 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::getEnd() const
     return EntryIterator(new DbIter(mgr));
 }
 
-    bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
+std::string DbCorpusReaderPrivate::getName() const
+{
+    return container.getName();
+}
+
+bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     try {
         db::XmlQueryContext ctx = mgr.createQueryContext();
@@ -417,10 +428,6 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &
  */
 void DbCorpusReaderPrivate::setNameAndCollection(std::string const &path)
 {
-    //collection = QFileInfo(path).absoluteFilePath().toLocal8Bit().data();
-
-    setName(container.getName());
-
     std::string uri = "/" + name();
     collection = util::toPercentEncoding(uri);
 }

@@ -65,7 +65,8 @@ void IndexedCorpusReaderPrivate::construct(std::string const &canonical,
         throw OpenError(indexPath, "not a regular file");
 
     open(dataPath, indexPath);
-    setName(canonical);
+
+    d_name = canonical;
 }
 
 CorpusReader::EntryIterator IndexedCorpusReaderPrivate::getBegin() const
@@ -78,6 +79,11 @@ CorpusReader::EntryIterator IndexedCorpusReaderPrivate::getEnd() const
 {
     ItemVector::const_iterator end(d_indices.end());
     return EntryIterator(new IndexIter(end));
+}
+
+std::string IndexedCorpusReaderPrivate::getName() const
+{
+    return d_name;
 }
 
 size_t IndexedCorpusReaderPrivate::getSize() const

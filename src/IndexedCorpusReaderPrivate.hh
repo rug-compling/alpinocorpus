@@ -58,6 +58,7 @@ public:
 
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
+    virtual std::string getName() const;
     virtual std::string readEntry(std::string const &filename) const;
     virtual size_t getSize() const;
 
@@ -70,6 +71,7 @@ private:
     DzIstreamPtr d_dataStream;
     std::vector<IndexItemPtr> d_indices;
 	IndexMap d_namedIndices;
+    std::string d_name;
 
 #if defined(BOOST_HAS_THREADS)
     mutable boost::mutex d_readMutex;

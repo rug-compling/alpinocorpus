@@ -50,8 +50,6 @@ DirectoryCorpusReaderPrivate::DirectoryCorpusReaderPrivate(
 
     if (wantCache)
         writeCache();
-
-    setName(directory);
 }
 
 DirectoryCorpusReaderPrivate::~DirectoryCorpusReaderPrivate()
@@ -65,6 +63,11 @@ CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getBegin() const
 CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEnd() const
 {
     return EntryIterator(new DirIter(d_entries.end()));
+}
+
+std::string DirectoryCorpusReaderPrivate::getName() const
+{
+  return d_directory.native();
 }
 
 std::string DirectoryCorpusReaderPrivate::DirIter::current() const

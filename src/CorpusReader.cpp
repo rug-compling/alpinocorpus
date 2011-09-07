@@ -47,9 +47,9 @@ namespace alpinocorpus {
         return validQuery(d, variables, q);
     }
     
-    std::string const &CorpusReader::name() const
+    std::string CorpusReader::name() const
     {
-        return d_name;
+        return getName();
     }
         
     CorpusReader *CorpusReader::open(std::string const &corpusPath)
@@ -149,11 +149,6 @@ namespace alpinocorpus {
         xmlFreeDoc(doc);
         
         return newXmlData;
-    }
-    
-    void CorpusReader::setName(std::string const &n)
-    {
-        d_name = n;
     }
     
     size_t CorpusReader::size() const

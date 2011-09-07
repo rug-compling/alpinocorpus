@@ -31,8 +31,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         virtual std::string contents(CorpusReader const &rdr) const;
     };
 
-    void setName(std::string const &n);
-    
   public:
     /** Forward iterator over entry names */
     class ALPINO_CORPUS_EXPORT EntryIterator
@@ -72,7 +70,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual ~CorpusReader() {}
 
     /** Return canonical name of corpus */
-    std::string const &name() const;
+    std::string name() const;
 
     /** Iterator to begin of entry names */
     EntryIterator begin() const;
@@ -129,6 +127,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
   private:
     virtual EntryIterator getBegin() const = 0;
     virtual EntryIterator getEnd() const = 0;
+    virtual std::string getName() const = 0;
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,
@@ -136,8 +135,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator runXPath(std::string const &) const;
     virtual EntryIterator runXQuery(std::string const &) const;
     virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;
-    
-    std::string d_name;
 };
 
 }

@@ -30,6 +30,11 @@ CorpusReader::EntryIterator IndexedCorpusReader::getEnd() const
     return d_private->getEnd();
 }
 
+std::string IndexedCorpusReader::getName() const
+{
+    return d_private->getName();
+}
+
 size_t IndexedCorpusReader::getSize() const
 {
     return d_private->getSize();
