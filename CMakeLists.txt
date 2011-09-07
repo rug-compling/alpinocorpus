@@ -73,6 +73,7 @@ set (HEADERS
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
   #include/AlpinoCorpus/IndexedCorpusWriter.hh
+  include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/util/NonCopyable.hh
   include/AlpinoCorpus/capi.h
   include/util/base64.hh
@@ -98,6 +99,7 @@ set(SOURCES
   src/IndexedCorpusReader.cpp
   src/IndexedCorpusReaderPrivate.cpp
   #src/IndexedCorpusWriter.cpp
+  src/MultiCorpusReader.cpp
   src/capi.cpp
   src/util/base64.cpp
   src/util/textfile.cpp
