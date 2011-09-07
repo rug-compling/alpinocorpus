@@ -1,6 +1,7 @@
 #ifndef MULTI_CORPUSREADER_HH
 #define MULTI_CORPUSREADER_HH
 
+#include <string>
 #include <tr1/memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -12,9 +13,8 @@ class MultiCorpusReaderPrivate;
 class MultiCorpusReader : public CorpusReader
 {
 public:
-  MultiCorpusReader();
+  MultiCorpusReader(std::string const &directory);
   virtual ~MultiCorpusReader();
-  void push_back(CorpusReader *reader);
 private:
   EntryIterator getBegin() const;
   EntryIterator getEnd() const;

@@ -24,8 +24,8 @@ DirectoryCorpusReaderPrivate::DirectoryCorpusReaderPrivate(
     else
         d_directory = bf::path(directory);
     
-    if (!boost::filesystem::exists(d_directory) ||
-        !boost::filesystem::is_directory(d_directory))
+    if (!bf::exists(d_directory) ||
+        !bf::is_directory(d_directory))
         throw OpenError(directory, "non-existent or not a directory");
     
     if (!wantCache || !readCache()) {

@@ -5,35 +5,58 @@
 
 #include <tr1/unordered_map>
 
+#include <boost/filesystem.hpp>
+
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
+
+#include <iostream>
+
+namespace bf = boost::filesystem;
 
 namespace alpinocorpus {
 
+struct ReaderIter
+{
+  ReaderIter(std::string newName, CorpusReader *newReader,
+      CorpusReader::EntryIterator newIter) :
+    name(newName), reader(newReader), iter(newIter) {}
+
+  std::string name;
+  CorpusReader *reader;
+  CorpusReader::EntryIterator iter;
+};
+
+bool operator==(ReaderIter const &left, ReaderIter const &right)
+{
+  return left.name == right.name && left.reader == right.reader &&
+    left.iter == right.iter;
+}
 
 class MultiCorpusReaderPrivate : public CorpusReader
 {
   class MultiIter : public CorpusReader::IterImpl
   {
   public:
-    MultiIter(std::list<CorpusReader *> const &readers);
+    MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);
     ~MultiIter();
     std::string current() const;
     bool equals(IterImpl const &other) const;
     void next();
   private:
-    typedef std::pair<CorpusReader *, CorpusReader::EntryIterator> ReaderIterPair;
-    std::list<ReaderIterPair> d_iters;
+
+    std::list<ReaderIter> d_iters;
   };
 public:
-  MultiCorpusReaderPrivate() {};
+  MultiCorpusReaderPrivate(std::string const &directory);
   virtual ~MultiCorpusReaderPrivate();
 
   EntryIterator getBegin() const;
   EntryIterator getEnd() const;
   std::string getName() const;
   size_t getSize() const;
-  void push_back(CorpusReader *reader);
+  void push_back(std::string const &name, CorpusReader *reader);
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
@@ -42,14 +65,15 @@ private:
   CorpusReader const *corpusReaderFromPath(std::string const &path) const;
   std::string entryFromPath(std::string const &path) const;
 
+  bf::path d_directory;
   std::list<CorpusReader *> d_corpusReaders;
   std::tr1::unordered_map<std::string, CorpusReader *> d_corpusReaderMap;
 };
 
 
 // Implementation of the public interface.
-MultiCorpusReader::MultiCorpusReader() :
-  d_private(new MultiCorpusReaderPrivate)
+MultiCorpusReader::MultiCorpusReader(std::string const &directory) :
+  d_private(new MultiCorpusReaderPrivate(directory))
 {
 }
 
@@ -82,11 +106,6 @@ bool MultiCorpusReader::validQuery(QueryDialect d, bool variables, std::string c
     return d_private->isValidQuery(d, variables, query);
 }
 
-void MultiCorpusReader::push_back(CorpusReader *reader)
-{
-  d_private->push_back(reader);
-}
-
 std::string MultiCorpusReader::readEntry(std::string const &entry) const
 {
     return d_private->readEntry(entry);
@@ -95,10 +114,38 @@ std::string MultiCorpusReader::readEntry(std::string const &entry) const
 std::string MultiCorpusReader::readEntryMarkQueries(std::string const &entry, 
     std::list<MarkerQuery> const &queries) const
 {
-    return d_private->readEntryMarkQueries(entry, queries);
+  return d_private->readEntryMarkQueries(entry, queries);
 }
 
 // Implementation of the private interface
+
+MultiCorpusReaderPrivate::MultiCorpusReaderPrivate(std::string const &directory)
+{
+  if (directory[directory.size() - 1] == '/')
+    d_directory = bf::path(directory).parent_path();
+  else
+    d_directory = bf::path(directory);
+  
+  if (!bf::exists(d_directory) ||
+    !bf::is_directory(d_directory))
+    throw OpenError(directory, "non-existent or not a directory");
+
+  for (bf::recursive_directory_iterator iter(d_directory, bf::symlink_option::recurse);
+       iter != bf::recursive_directory_iterator();
+       ++iter)
+  {
+    if (iter->path().extension() != ".dact" &&
+        iter->path().extension() != ".data.dz")
+      continue;
+
+    CorpusReader *reader(CorpusReader::open(iter->path().native()));
+
+    std::string name = iter->path().native();
+    name.erase(0, d_directory.native().size() + 1);
+    
+    push_back(name, reader);
+  }
+}
 
 MultiCorpusReaderPrivate::~MultiCorpusReaderPrivate()
 {
@@ -109,12 +156,13 @@ MultiCorpusReaderPrivate::~MultiCorpusReaderPrivate()
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::getBegin() const
 {
-  return EntryIterator(new MultiIter(d_corpusReaders));
+  return EntryIterator(new MultiIter(d_corpusReaderMap));
 }
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::getEnd() const
 {
-  return EntryIterator(new MultiIter(std::list<CorpusReader *>()));
+  return EntryIterator(new MultiIter(
+    std::tr1::unordered_map<std::string, CorpusReader *>()));
 }
 
 std::string MultiCorpusReaderPrivate::getName() const
@@ -133,7 +181,8 @@ size_t MultiCorpusReaderPrivate::getSize() const
   return size;
 }
 
-void MultiCorpusReaderPrivate::push_back(CorpusReader *reader)
+void MultiCorpusReaderPrivate::push_back(std::string const &name,
+    CorpusReader *reader)
 {
   // Ignore empty corpus readers, simplifies assumptions.
   if (reader->size() == 0) {
@@ -142,28 +191,29 @@ void MultiCorpusReaderPrivate::push_back(CorpusReader *reader)
   }
 
   d_corpusReaders.push_back(reader);
-  d_corpusReaderMap[reader->name()] = reader; // XXX - exists check?
+  d_corpusReaderMap[name] = reader; // XXX - exists check?
 }
 
 CorpusReader const *MultiCorpusReaderPrivate::corpusReaderFromPath(
     std::string const &path) const
 {
-  int slashPos = path.find("/", 0);
-  std::string readerName = path.substr(0, slashPos);
-
-  std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
-    d_corpusReaderMap.find(readerName);
-  if (iter == d_corpusReaderMap.end())
-    throw std::runtime_error(std::string("Unknown corpus: " + readerName));
-
-  return iter->second;
+  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
+      d_corpusReaderMap.begin(); iter != d_corpusReaderMap.end(); ++iter)
+    if (path.find(iter->first) == 0)
+      return iter->second;
+  
+  throw std::runtime_error(std::string("Could not find corpus for: " + path));
 }
 
 std::string MultiCorpusReaderPrivate::entryFromPath(
     std::string const &path) const
 {
-  int slashPos = path.find("/", 0);
-  return path.substr(slashPos + 1);
+  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
+      d_corpusReaderMap.begin(); iter != d_corpusReaderMap.end(); ++iter)
+    if (path.find(iter->first) == 0)
+      return path.substr(iter->first.size() + 1);
+
+  throw std::runtime_error(std::string("Could not find corpus for: " + path));
 }
 
 std::string MultiCorpusReaderPrivate::readEntry(std::string const &path) const
@@ -190,11 +240,13 @@ bool MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::s
 // Iteration over MultiCorpusReaders
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
-  std::list<CorpusReader *> const &readers)
+  std::tr1::unordered_map<std::string, CorpusReader *> const &readers)
 {
-  for (std::list<CorpusReader *>::const_iterator iter = readers.begin();
+  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator
+      iter = readers.begin();
       iter != readers.end(); ++iter)
-    d_iters.push_back(make_pair(*iter, (*iter)->begin()));
+    d_iters.push_back(ReaderIter(iter->first, iter->second,
+          (iter->second->begin())));
 
   // TODO: Make sure that we are positioned correctly.
 }
@@ -206,7 +258,7 @@ std::string MultiCorpusReaderPrivate::MultiIter::current() const
   if (d_iters.size() == 0)
     throw std::runtime_error("Cannot dereference an end iterator!");
 
-  return d_iters.front().first->name() + "/" + *d_iters.front().second;
+  return d_iters.front().name + "/" + *d_iters.front().iter;
 }
 
 bool MultiCorpusReaderPrivate::MultiIter::equals(IterImpl const &other) const
@@ -225,7 +277,7 @@ void MultiCorpusReaderPrivate::MultiIter::next() {
     return;
 
   // Move the iterator over the current corpus .
-  if (++d_iters.front().second != d_iters.front().first->end())
+  if (++d_iters.front().iter != d_iters.front().reader->end())
     return;
 
   // Ok, we are at the end of the current corpus, so we'll remove the
@@ -235,6 +287,3 @@ void MultiCorpusReaderPrivate::MultiIter::next() {
 
 }
 
-void bla() {
-  alpinocorpus::MultiCorpusReader reader;
-}
