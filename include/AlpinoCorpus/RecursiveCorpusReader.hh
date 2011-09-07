@@ -8,13 +8,13 @@
 
 namespace alpinocorpus {
 
-class MultiCorpusReaderPrivate;
+class RecursiveCorpusReaderPrivate;
 
-class MultiCorpusReader : public CorpusReader
+class RecursiveCorpusReader : public CorpusReader
 {
 public:
-  MultiCorpusReader(std::string const &directory);
-  virtual ~MultiCorpusReader();
+  RecursiveCorpusReader(std::string const &directory);
+  virtual ~RecursiveCorpusReader();
 private:
   EntryIterator getBegin() const;
   EntryIterator getEnd() const;
@@ -25,7 +25,7 @@ private:
   EntryIterator runXPath(std::string const &query) const;
   bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
-  std::tr1::shared_ptr<MultiCorpusReaderPrivate> d_private;
+  std::tr1::shared_ptr<RecursiveCorpusReaderPrivate> d_private;
 };
 
 }

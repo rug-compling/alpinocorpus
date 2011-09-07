@@ -9,7 +9,7 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <AlpinoCorpus/MultiCorpusReader.hh>
+#include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
 #include <iostream>
 
@@ -34,15 +34,15 @@ bool operator==(ReaderIter const &left, ReaderIter const &right)
     left.iter == right.iter;
 }
 
-class MultiCorpusReaderPrivate : public CorpusReader
+class RecursiveCorpusReaderPrivate : public CorpusReader
 {
-  class MultiIter : public CorpusReader::IterImpl
+  class RecursiveIter : public CorpusReader::IterImpl
   {
   public:
-    MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);
-    MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
+    RecursiveIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);
+    RecursiveIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
       std::string const &query);
-    ~MultiIter();
+    ~RecursiveIter();
     std::string current() const;
     bool equals(IterImpl const &other) const;
     void next();
@@ -51,8 +51,8 @@ class MultiCorpusReaderPrivate : public CorpusReader
     std::list<ReaderIter> d_iters;
   };
 public:
-  MultiCorpusReaderPrivate(std::string const &directory);
-  virtual ~MultiCorpusReaderPrivate();
+  RecursiveCorpusReaderPrivate(std::string const &directory);
+  virtual ~RecursiveCorpusReaderPrivate();
 
   EntryIterator getBegin() const;
   EntryIterator getEnd() const;
@@ -75,59 +75,59 @@ private:
 
 
 // Implementation of the public interface.
-MultiCorpusReader::MultiCorpusReader(std::string const &directory) :
-  d_private(new MultiCorpusReaderPrivate(directory))
+RecursiveCorpusReader::RecursiveCorpusReader(std::string const &directory) :
+  d_private(new RecursiveCorpusReaderPrivate(directory))
 {
 }
 
-MultiCorpusReader::~MultiCorpusReader()
+RecursiveCorpusReader::~RecursiveCorpusReader()
 {
 }
 
-CorpusReader::EntryIterator MultiCorpusReader::getBegin() const
+CorpusReader::EntryIterator RecursiveCorpusReader::getBegin() const
 {
   return d_private->getBegin();
 }
 
-CorpusReader::EntryIterator MultiCorpusReader::getEnd() const
+CorpusReader::EntryIterator RecursiveCorpusReader::getEnd() const
 {
   return d_private->getEnd();
 }
 
-std::string MultiCorpusReader::getName() const
+std::string RecursiveCorpusReader::getName() const
 {
   return d_private->getName();
 }
 
-size_t MultiCorpusReader::getSize() const
+size_t RecursiveCorpusReader::getSize() const
 {
   return d_private->getSize();
 }
     
-bool MultiCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
+bool RecursiveCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
   return d_private->isValidQuery(d, variables, query);
 }
 
-std::string MultiCorpusReader::readEntry(std::string const &entry) const
+std::string RecursiveCorpusReader::readEntry(std::string const &entry) const
 {
   return d_private->readEntry(entry);
 }
     
-std::string MultiCorpusReader::readEntryMarkQueries(std::string const &entry, 
+std::string RecursiveCorpusReader::readEntryMarkQueries(std::string const &entry, 
     std::list<MarkerQuery> const &queries) const
 {
   return d_private->readEntryMarkQueries(entry, queries);
 }
 
-CorpusReader::EntryIterator MultiCorpusReader::runXPath(std::string const &query) const
+CorpusReader::EntryIterator RecursiveCorpusReader::runXPath(std::string const &query) const
 {
   return d_private->query(XPATH, query);
 }
 
 // Implementation of the private interface
 
-MultiCorpusReaderPrivate::MultiCorpusReaderPrivate(std::string const &directory)
+RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &directory)
 {
   if (directory[directory.size() - 1] == '/')
     d_directory = bf::path(directory).parent_path();
@@ -155,30 +155,30 @@ MultiCorpusReaderPrivate::MultiCorpusReaderPrivate(std::string const &directory)
   }
 }
 
-MultiCorpusReaderPrivate::~MultiCorpusReaderPrivate()
+RecursiveCorpusReaderPrivate::~RecursiveCorpusReaderPrivate()
 {
   for (std::list<CorpusReader *>::iterator iter = d_corpusReaders.begin();
       iter != d_corpusReaders.end(); ++iter)
     delete *iter;
 }
 
-CorpusReader::EntryIterator MultiCorpusReaderPrivate::getBegin() const
+CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getBegin() const
 {
-  return EntryIterator(new MultiIter(d_corpusReaderMap));
+  return EntryIterator(new RecursiveIter(d_corpusReaderMap));
 }
 
-CorpusReader::EntryIterator MultiCorpusReaderPrivate::getEnd() const
+CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getEnd() const
 {
-  return EntryIterator(new MultiIter(
+  return EntryIterator(new RecursiveIter(
     std::tr1::unordered_map<std::string, CorpusReader *>()));
 }
 
-std::string MultiCorpusReaderPrivate::getName() const
+std::string RecursiveCorpusReaderPrivate::getName() const
 {
   return "<multi>";
 }
 
-size_t MultiCorpusReaderPrivate::getSize() const
+size_t RecursiveCorpusReaderPrivate::getSize() const
 {
   size_t size = 0;
 
@@ -189,7 +189,7 @@ size_t MultiCorpusReaderPrivate::getSize() const
   return size;
 }
 
-void MultiCorpusReaderPrivate::push_back(std::string const &name,
+void RecursiveCorpusReaderPrivate::push_back(std::string const &name,
     CorpusReader *reader)
 {
   // Ignore empty corpus readers, simplifies assumptions.
@@ -202,7 +202,7 @@ void MultiCorpusReaderPrivate::push_back(std::string const &name,
   d_corpusReaderMap[name] = reader; // XXX - exists check?
 }
 
-CorpusReader const *MultiCorpusReaderPrivate::corpusReaderFromPath(
+CorpusReader const *RecursiveCorpusReaderPrivate::corpusReaderFromPath(
     std::string const &path) const
 {
   for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
@@ -213,7 +213,7 @@ CorpusReader const *MultiCorpusReaderPrivate::corpusReaderFromPath(
   throw std::runtime_error(std::string("Could not find corpus for: " + path));
 }
 
-std::string MultiCorpusReaderPrivate::entryFromPath(
+std::string RecursiveCorpusReaderPrivate::entryFromPath(
     std::string const &path) const
 {
   for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
@@ -224,26 +224,26 @@ std::string MultiCorpusReaderPrivate::entryFromPath(
   throw std::runtime_error(std::string("Could not find corpus for: " + path));
 }
 
-std::string MultiCorpusReaderPrivate::readEntry(std::string const &path) const
+std::string RecursiveCorpusReaderPrivate::readEntry(std::string const &path) const
 {
   CorpusReader const *reader = corpusReaderFromPath(path);
   return reader->read(entryFromPath(path));
 }
 
-std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
+std::string RecursiveCorpusReaderPrivate::readEntryMarkQueries(
     std::string const &path, std::list<MarkerQuery> const &queries) const
 {
   CorpusReader const *reader = corpusReaderFromPath(path);
   return reader->readMarkQueries(entryFromPath(path), queries);
 }
 
-CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
+CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXPath(
     std::string const &query) const
 {
-  return EntryIterator(new MultiIter(d_corpusReaderMap, query));
+  return EntryIterator(new RecursiveIter(d_corpusReaderMap, query));
 }
 
-bool MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
+bool RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
   if (d_corpusReaders.size() > 0)
     return d_corpusReaders.front()->isValidQuery(d, variables, query);
@@ -251,9 +251,9 @@ bool MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::s
   return false;
 }
 
-// Iteration over MultiCorpusReaders
+// Iteration over RecursiveCorpusReaders
 
-MultiCorpusReaderPrivate::MultiIter::MultiIter(
+RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
   std::tr1::unordered_map<std::string, CorpusReader *> const &readers)
 {
   for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator
@@ -263,7 +263,7 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
           (iter->second->begin())));
 }
 
-MultiCorpusReaderPrivate::MultiIter::MultiIter(
+RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
   std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
   std::string const &query)
 {
@@ -274,9 +274,9 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
           (iter->second->query(XPATH, query))));
 }
 
-MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
+RecursiveCorpusReaderPrivate::RecursiveIter::~RecursiveIter() {}
 
-std::string MultiCorpusReaderPrivate::MultiIter::current() const
+std::string RecursiveCorpusReaderPrivate::RecursiveIter::current() const
 {
   if (d_iters.size() == 0)
     throw std::runtime_error("Cannot dereference an end iterator!");
@@ -284,17 +284,17 @@ std::string MultiCorpusReaderPrivate::MultiIter::current() const
   return d_iters.front().name + "/" + *d_iters.front().iter;
 }
 
-bool MultiCorpusReaderPrivate::MultiIter::equals(IterImpl const &other) const
+bool RecursiveCorpusReaderPrivate::RecursiveIter::equals(IterImpl const &other) const
 {
   try {
-    MultiIter &that = const_cast<MultiIter &>(dynamic_cast<MultiIter const&>(other));
+    RecursiveIter &that = const_cast<RecursiveIter &>(dynamic_cast<RecursiveIter const&>(other));
     return that.d_iters == d_iters;
   } catch (std::bad_cast const &e) {
     return false;
   }
 }
 
-void MultiCorpusReaderPrivate::MultiIter::next() {
+void RecursiveCorpusReaderPrivate::RecursiveIter::next() {
   // Iteration is done. Yay.
   if (d_iters.size() == 0)
     return;
