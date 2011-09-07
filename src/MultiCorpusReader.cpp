@@ -240,7 +240,6 @@ std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
     std::string const &query) const
 {
-  std::cerr << "runXPath: " << query << std::endl;
   return EntryIterator(new MultiIter(d_corpusReaderMap, query));
 }
 
