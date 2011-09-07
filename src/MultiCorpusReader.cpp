@@ -40,6 +40,8 @@ class MultiCorpusReaderPrivate : public CorpusReader
   {
   public:
     MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);
+    MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
+      std::string const &query);
     ~MultiIter();
     std::string current() const;
     bool equals(IterImpl const &other) const;
@@ -59,6 +61,7 @@ public:
   void push_back(std::string const &name, CorpusReader *reader);
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
+  EntryIterator runXPath(std::string const &query) const;
   bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
 private:
@@ -83,38 +86,43 @@ MultiCorpusReader::~MultiCorpusReader()
 
 CorpusReader::EntryIterator MultiCorpusReader::getBegin() const
 {
-    return d_private->getBegin();
+  return d_private->getBegin();
 }
 
 CorpusReader::EntryIterator MultiCorpusReader::getEnd() const
 {
-    return d_private->getEnd();
+  return d_private->getEnd();
 }
 
 std::string MultiCorpusReader::getName() const
 {
-    return d_private->getName();
+  return d_private->getName();
 }
 
 size_t MultiCorpusReader::getSize() const
 {
-    return d_private->getSize();
+  return d_private->getSize();
 }
     
 bool MultiCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
-    return d_private->isValidQuery(d, variables, query);
+  return d_private->isValidQuery(d, variables, query);
 }
 
 std::string MultiCorpusReader::readEntry(std::string const &entry) const
 {
-    return d_private->readEntry(entry);
+  return d_private->readEntry(entry);
 }
     
 std::string MultiCorpusReader::readEntryMarkQueries(std::string const &entry, 
     std::list<MarkerQuery> const &queries) const
 {
   return d_private->readEntryMarkQueries(entry, queries);
+}
+
+CorpusReader::EntryIterator MultiCorpusReader::runXPath(std::string const &query) const
+{
+  return d_private->query(XPATH, query);
 }
 
 // Implementation of the private interface
@@ -229,6 +237,13 @@ std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
   return reader->readMarkQueries(entryFromPath(path), queries);
 }
 
+CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
+    std::string const &query) const
+{
+  std::cerr << "runXPath: " << query << std::endl;
+  return EntryIterator(new MultiIter(d_corpusReaderMap, query));
+}
+
 bool MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
   if (d_corpusReaders.size() > 0)
@@ -247,8 +262,17 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
       iter != readers.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second,
           (iter->second->begin())));
+}
 
-  // TODO: Make sure that we are positioned correctly.
+MultiCorpusReaderPrivate::MultiIter::MultiIter(
+  std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
+  std::string const &query)
+{
+  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator
+      iter = readers.begin();
+      iter != readers.end(); ++iter)
+    d_iters.push_back(ReaderIter(iter->first, iter->second,
+          (iter->second->query(XPATH, query))));
 }
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
