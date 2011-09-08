@@ -104,6 +104,12 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      */
     static CorpusReader *open(std::string const &corpusPath);
 
+    /**
+     * Factory method: open a directory with multiple corpora recursively.
+     * The caller is responsible for deleting the object returned.
+     */
+    static CorpusReader *openRecursive(std::string const &path);
+
   protected:
     class FilterIter : public IterImpl {
       public:

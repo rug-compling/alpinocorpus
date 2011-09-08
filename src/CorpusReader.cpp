@@ -5,6 +5,7 @@
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
+#include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
 #include <typeinfo>
 
@@ -65,6 +66,11 @@ namespace alpinocorpus {
         }
 
         return new DbCorpusReader(corpusPath);
+    }
+
+    CorpusReader *CorpusReader::openRecursive(std::string const &path)
+    {
+      return new RecursiveCorpusReader(path);
     }
 
     std::string CorpusReader::read(std::string const &entry) const
