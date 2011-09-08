@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <stdexcept>
 #include <string>
 
 #include <tr1/memory>
@@ -110,10 +111,15 @@ int main(int argc, char *argv[])
  
   std::string treebankPath = opts->arguments().at(0);
   std::tr1::shared_ptr<CorpusReader> reader;
-  if (opts->option('r'))
-    reader.reset(CorpusReader::openRecursive(treebankPath));
-  else
-    reader.reset(CorpusReader::open(treebankPath));
+  try {
+    if (opts->option('r'))
+      reader.reset(CorpusReader::openRecursive(treebankPath));
+    else
+      reader.reset(CorpusReader::open(treebankPath));
+  } catch (std::runtime_error &e) {
+    std::cerr << "Could not open corpus: " << e.what() << std::endl;
+    return 1;
+  }
   
   std::string query;
   if (opts->option('q'))
