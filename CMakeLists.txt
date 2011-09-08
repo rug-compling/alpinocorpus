@@ -9,6 +9,12 @@ endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
 set(CMAKE_CXX_FLAGS "-pthread")
 
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+IF("${isSystemDir}" STREQUAL "-1")
+  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+ENDIF("${isSystemDir}" STREQUAL "-1")
+
 include(CheckFunctionExists)
 
 if(APPLE)
@@ -144,6 +150,9 @@ install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+
+install(TARGETS alpinocorpus-act alpinocorpus-merge
+  RUNTIME DESTINATION bin)
 
 install(DIRECTORY include/AlpinoCorpus
   DESTINATION include)
