@@ -138,6 +138,10 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
     !bf::is_directory(d_directory))
     throw OpenError(directory, "non-existent or not a directory");
 
+  // Pick up loose XML files.
+  CorpusReader *dirCorpusReader = CorpusReader::open(d_directory.native());
+  push_back("", dirCorpusReader);
+
   for (bf::recursive_directory_iterator iter(d_directory, bf::symlink_option::recurse);
        iter != bf::recursive_directory_iterator();
        ++iter)
@@ -280,6 +284,11 @@ std::string RecursiveCorpusReaderPrivate::RecursiveIter::current() const
 {
   if (d_iters.size() == 0)
     throw std::runtime_error("Cannot dereference an end iterator!");
+
+  // If there is no corpus name/path, we do not need a directory separator.
+  // This should only be used by DirectoryCorpusReader(s).
+  if (d_iters.front().name.size() == 0)
+    return *d_iters.front().iter;
 
   return d_iters.front().name + "/" + *d_iters.front().iter;
 }
