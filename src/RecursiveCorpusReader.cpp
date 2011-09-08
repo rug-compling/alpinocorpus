@@ -43,6 +43,7 @@ class RecursiveCorpusReaderPrivate : public CorpusReader
     RecursiveIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
       std::string const &query);
     ~RecursiveIter();
+    std::string contents(CorpusReader const &) const;
     std::string current() const;
     bool equals(IterImpl const &other) const;
     void next();
@@ -282,6 +283,15 @@ RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
 }
 
 RecursiveCorpusReaderPrivate::RecursiveIter::~RecursiveIter() {}
+
+std::string RecursiveCorpusReaderPrivate::RecursiveIter::contents(
+  CorpusReader const &reader) const
+{
+  if (d_iters.size() == 0)
+    throw std::runtime_error("Cannot dereference an end iterator!");
+
+  return d_iters.front().iter.contents(reader);
+}
 
 std::string RecursiveCorpusReaderPrivate::RecursiveIter::current() const
 {
