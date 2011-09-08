@@ -147,12 +147,15 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
        ++iter)
   {
     if (iter->path().extension() != ".dact" &&
-        iter->path().extension() != ".data.dz")
+        iter->path().extension() != ".index")
       continue;
 
     CorpusReader *reader(CorpusReader::open(iter->path().native()));
 
-    std::string name = iter->path().native();
+    bf::path namePath = iter->path();
+    namePath.replace_extension("");
+    std::string name = namePath.native();
+
     name.erase(0, d_directory.native().size() + 1);
     
     push_back(name, reader);
