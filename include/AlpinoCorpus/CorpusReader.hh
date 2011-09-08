@@ -9,6 +9,8 @@
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
+class XQQuery;
+
 namespace alpinocorpus {
 
 /**
@@ -81,7 +83,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     enum QueryDialect { XPATH, XQUERY };
 
     /** Is a query valid? */
-    bool isValidQuery(QueryDialect d, bool variables, std::string const &q) const;
+    static bool isValidQuery(QueryDialect d, bool variables, std::string const &q);
     
     /** Execute query. The end of the range is given by end(). */
     EntryIterator query(QueryDialect d, std::string const &q) const;
@@ -126,7 +128,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         EntryIterator d_itr;
         EntryIterator d_end;
         std::string d_file;
-        std::string d_query;
+        std::tr1::shared_ptr<XQQuery> d_query;
         std::queue<std::string> d_buffer;
     };
 
@@ -140,7 +142,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         std::list<MarkerQuery> const &queries) const;
     virtual EntryIterator runXPath(std::string const &) const;
     virtual EntryIterator runXQuery(std::string const &) const;
-    virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;
 };
 
 }

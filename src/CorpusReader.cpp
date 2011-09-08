@@ -1,23 +1,40 @@
 #include <string>
 
+#include <tr1/memory>
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
+#include <util/markqueries.hh>
 
 #include <typeinfo>
 
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <libxml/xmlerror.h>
-#include <libxml/xpath.h>
+#include <xercesc/framework/MemBufInputSource.hpp>
+#include <xqilla/functions/FunctionString.hpp>
+#include <xqilla/utils/XQillaPlatformUtils.hpp>
+#include <xqilla/xqilla-simple.hpp>
 
 namespace {
-    void ignoreStructuredError(void *userdata, xmlErrorPtr err)
-    {
+    struct Globals {
+        Globals();
+        virtual ~Globals();
+    };
+
+    static Globals s_globals;
+    
+    Globals::Globals() {
+        XQillaPlatformUtils::initialize();
     }
+    
+    Globals::~Globals() {
+        XQillaPlatformUtils::terminate();
+    }
+
+    static XQilla s_xqilla;
+
 }
 
 namespace alpinocorpus {    
@@ -41,11 +58,6 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator CorpusReader::end() const
     {
         return getEnd();
-    }
-    
-    bool CorpusReader::isValidQuery(QueryDialect d, bool variables, std::string const &q) const
-    {
-        return validQuery(d, variables, q);
     }
     
     std::string CorpusReader::name() const
@@ -88,73 +100,8 @@ namespace alpinocorpus {
         std::list<MarkerQuery> const &queries) const
     {
         std::string xmlData = readEntry(entry);
-        
-        xmlDocPtr doc = xmlParseMemory(xmlData.c_str(), xmlData.size());
-        if (doc == 0)
-            throw Error("Could not parse XML data.");
 
-        for (std::list<MarkerQuery>::const_iterator iter = queries.begin();
-             iter != queries.end(); ++iter)
-        {            
-            xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
-            if (xpathCtx == 0) {
-                xmlFreeDoc(doc);
-                throw Error("Unable to create new XPath context.");
-            }
-            
-            xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(
-                reinterpret_cast<xmlChar const *>(iter->query.c_str()), xpathCtx);
-            if (xpathObj == 0) {
-                xmlXPathFreeContext(xpathCtx);
-                xmlFreeDoc(doc);
-                throw Error(std::string("Could not evaluate expression:") + iter->query);
-            }
-            
-            if (xpathObj->nodesetval == 0)
-                continue;
-            
-            xmlNodeSetPtr nodeSet = xpathObj->nodesetval;
-            
-            std::list<xmlNodePtr> nodes;
-            for (int i = 0; i < nodeSet->nodeNr; ++i) {
-                xmlNodePtr node = nodeSet->nodeTab[i];
-                
-                if (node->type != XML_ELEMENT_NODE)
-                    continue;
-                
-                nodes.push_back(node);
-            }
-            
-            for (std::list<xmlNodePtr>::iterator nodeIter = nodes.begin();
-                 nodeIter != nodes.end(); ++nodeIter) {
-                xmlAttrPtr attrPtr = xmlSetProp(*nodeIter,
-                    reinterpret_cast<xmlChar const *>(iter->attr.c_str()),
-                    reinterpret_cast<xmlChar const *>(iter->value.c_str()));
-                if (attrPtr == 0) {
-                    xmlXPathFreeObject(xpathObj);
-                    xmlXPathFreeContext(xpathCtx);
-                    xmlFreeDoc(doc);
-                    throw Error(std::string("Could not set attribute '") + iter->attr +
-                        "' for the expression: " + iter->query);
-                    
-                }
-            }
-            
-            xmlXPathFreeObject(xpathObj);
-            xmlXPathFreeContext(xpathCtx);
-        }
-        
-        // Dump Data
-        xmlChar *newData;
-        int size;
-        xmlDocDumpMemory(doc, &newData, &size);
-        std::string newXmlData(reinterpret_cast<char const *>(newData), size);
-        
-        // Cleanup
-        xmlFree(newData);
-        xmlFreeDoc(doc);
-        
-        return newXmlData;
+        return markQueries(xmlData, queries);
     }
     
     size_t CorpusReader::size() const
@@ -162,33 +109,22 @@ namespace alpinocorpus {
         return getSize();
     }
     
-    bool CorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
+    bool CorpusReader::isValidQuery(QueryDialect d, bool variables, std::string const &query)
     {
-        if (d != XPATH)
-            return false;
-        
         // XXX - strip/trim
         if (query.empty())
             return true;
 
-        // Prepare context
-        xmlXPathContextPtr ctx = xmlXPathNewContext(0);
-        if (!variables)
-            ctx->flags = XML_XPATH_NOVAR;
-        xmlSetStructuredErrorFunc(ctx, &ignoreStructuredError);
-        
-        // Compile expression
-        xmlXPathCompExprPtr r = xmlXPathCtxtCompile(ctx,
-                                                    reinterpret_cast<xmlChar const *>(query.c_str()));
-        
-        if (!r) {
-            xmlXPathFreeContext(ctx);
-            return false;
+        DynamicContext *ctx = s_xqilla.createContext(XQilla::XPATH2);
+        ctx->setXPath1CompatibilityMode(true);
+
+        std::tr1::shared_ptr<XQQuery> queryPtr;
+        try {
+            queryPtr.reset(s_xqilla.parse(X(query.c_str()), ctx));
+        } catch (XQException &e) {
+          return false;
         }
-        
-        xmlXPathFreeCompExpr(r);
-        xmlXPathFreeContext(ctx);
-        
+
         return true;
     }
     
@@ -248,9 +184,17 @@ namespace alpinocorpus {
     :
         d_corpus(corpus),
         d_itr(itr),
-        d_end(end),
-        d_query(query)
+        d_end(end)
     {
+        DynamicContext *ctx = s_xqilla.createContext(XQilla::XPATH2);
+        ctx->setXPath1CompatibilityMode(true);
+
+        try {
+            d_query.reset(s_xqilla.parse(X(query.c_str()), ctx));
+        } catch (XQException &e) {
+            throw Error("CorpusReader::FilterIter::FilterIter: could not evaluate XPath expression.");
+        }
+
         next();
     }
     
@@ -295,54 +239,33 @@ namespace alpinocorpus {
     {
         std::string xml(d_corpus.read(file));
 
-        xmlDocPtr doc = xmlParseMemory(xml.c_str(), xml.size());
+        std::tr1::shared_ptr<DynamicContext> ctx(d_query->createDynamicContext());
+        XERCES_CPP_NAMESPACE::MemBufInputSource xmlInput(
+            reinterpret_cast<XMLByte const *>(xml.c_str()),
+            xml.size(), "input");
 
-        if (!doc)
-        {
-            //qWarning() << "CorpusReader::FilterIter::parseFile: could not parse XML data: " << QString::fromUtf8((*d_itr).c_str());
-            return;
-        }
+        try {
+            Sequence seq(ctx->parseDocument(xmlInput));
         
-        // Parse XPath query
-        xmlXPathContextPtr ctx = xmlXPathNewContext(doc);
-        if (!ctx)
-        {
-            xmlFreeDoc(doc);
-            //qWarning() << "CorpusReader::FilterIter::parseFile: could not construct XPath context from document: " << QString::fromUtf8((*d_itr).c_str());
-            return;
-        }
-        
-        xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(
-            reinterpret_cast<xmlChar const *>(d_query.c_str()), ctx);
-        if (!xpathObj)
-        {
-            xmlXPathFreeContext(ctx);
-            xmlFreeDoc(doc);
-            throw Error("CorpusReader::FilterIter::parseFile: could not evaluate XPath expression.");
-        }
-
-        if (xpathObj->nodesetval && xpathObj->nodesetval->nodeNr > 0)
-        {
-            for (int i = 0; i < xpathObj->nodesetval->nodeNr; ++i)
-            {
-                xmlChar *str = xmlNodeListGetString(doc, xpathObj->nodesetval->nodeTab[i]->children, 1);
-                
-                std::string value;
-                if (str != 0) // XXX - is this correct?
-                    value = reinterpret_cast<const char *>(str);
-                
-                xmlFree(str);
-                
-                if (value.empty()) // XXX - trim!
-                    d_buffer.push(std::string());
-                else
-                    d_buffer.push(value);
+            if (!seq.isEmpty() && seq.first()->isNode()) {
+                ctx->setContextItem(seq.first());
+                ctx->setContextPosition(1);
+                ctx->setContextSize(1);
             }
+        } catch (XQException &e) {
+            // XXX - warning???
+            return;
         }
 
-        xmlXPathFreeObject(xpathObj);
-        xmlXPathFreeContext(ctx);
-        xmlFreeDoc(doc);
+        Result result = d_query->execute(ctx.get());
+        
+        Item::Ptr item;
+        while ((item = result->next(ctx.get()))) {
+            std::string value(UTF8(FunctionString::string(item, ctx.get())));
+           
+            // XXX - trim value!
+            d_buffer.push(value);
+        }
     }
     
     std::string CorpusReader::IterImpl::contents(CorpusReader const &rdr) const

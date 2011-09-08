@@ -55,16 +55,6 @@ if (DBXML_FOUND)
   include_directories(${DBXML_INCLUDE_DIR})
 endif()
 
-find_package(Iconv REQUIRED)
-if(ICONV_FOUND)
-  include_directories(${ICONV_INCLUDE_DIR})
-endif()
-
-find_package(LibXml2 REQUIRED)
-if(LIBXML2_FOUND)
-  include_directories(${LIBXML2_INCLUDE_DIR})
-endif()
-
 CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
 
 set (HEADERS
@@ -84,6 +74,7 @@ set (HEADERS
   include/AlpinoCorpus/capi.h
   include/util/base64.hh
   include/util/bufutil.hh
+  include/util/markqueries.hh
   include/util/textfile.hh
   include/util/url.hh
   include/util/vs_stdint.h
@@ -108,6 +99,7 @@ set(SOURCES
   src/RecursiveCorpusReader.cpp
   src/capi.cpp
   src/util/base64.cpp
+  src/util/markqueries.cpp
   src/util/textfile.cpp
   src/util/url.cpp
 )
@@ -138,7 +130,6 @@ target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
 target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
 target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
-target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
 add_executable(alpinocorpus-act ${ACT_SOURCES} ${ACT_HEADERS})
 target_link_libraries(alpinocorpus-act alpino_corpus)
