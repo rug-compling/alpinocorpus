@@ -122,8 +122,14 @@ int main(int argc, char *argv[])
   }
   
   std::string query;
-  if (opts->option('q'))
+  if (opts->option('q')) {
     query = opts->optionValue('q');  
+
+    if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
+      std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
+      return 1;
+    }
+  }
   
   if (opts->option('c')) {
     try {
