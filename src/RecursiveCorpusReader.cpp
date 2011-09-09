@@ -249,10 +249,16 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXPath(
 
 bool RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
-  if (d_corpusReaders.size() > 0)
-    return d_corpusReaders.front()->isValidQuery(d, variables, query);
+  if (d_corpusReaders.size() == 0)
+    return false;
 
-  return false;
+  for (std::list<CorpusReader *>::const_iterator iter = d_corpusReaders.begin();
+      iter != d_corpusReaders.end(); ++iter)
+    if (!(*iter)->isValidQuery(d, variables, query))
+      return false;
+
+  // Correct according to all corpus readers.
+  return true;
 }
 
 // Iteration over RecursiveCorpusReaders
