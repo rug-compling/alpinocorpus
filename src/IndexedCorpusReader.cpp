@@ -1,18 +1,17 @@
-#include <QSharedPointer>
-#include <QString>
+#include <string>
 
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 #include "IndexedCorpusReaderPrivate.hh"
 
 namespace alpinocorpus {
 
-IndexedCorpusReader::IndexedCorpusReader(QString const &filename)
+IndexedCorpusReader::IndexedCorpusReader(std::string const &filename)
     : d_private(new IndexedCorpusReaderPrivate(filename))
 {
 }
 
-IndexedCorpusReader::IndexedCorpusReader(QString const &dataPath,
-    QString const &indexPath)
+IndexedCorpusReader::IndexedCorpusReader(std::string const &dataPath,
+    std::string const &indexPath)
     : d_private(new IndexedCorpusReaderPrivate(dataPath, indexPath))
 {
 }
@@ -31,12 +30,17 @@ CorpusReader::EntryIterator IndexedCorpusReader::getEnd() const
     return d_private->getEnd();
 }
 
+std::string IndexedCorpusReader::getName() const
+{
+    return d_private->getName();
+}
+
 size_t IndexedCorpusReader::getSize() const
 {
     return d_private->getSize();
 }
 
-QString IndexedCorpusReader::readEntry(QString const &filename) const
+std::string IndexedCorpusReader::readEntry(std::string const &filename) const
 {
   return d_private->readEntry(filename);
 }

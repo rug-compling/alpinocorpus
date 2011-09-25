@@ -10,9 +10,9 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <util/url.hh>
 
-#include <QString>
-#include <QUrl>
+#include <list>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -31,13 +31,6 @@ namespace db = DbXml;
 
 namespace xerces = XERCES_CPP_NAMESPACE;
 
-namespace {
-    QString toQString(std::string const &s)
-    {
-        return QString::fromUtf8(s.c_str());
-    }
-}
-
 namespace alpinocorpus {
 
 class DbCorpusReaderPrivate : public CorpusReader
@@ -55,7 +48,7 @@ class DbCorpusReaderPrivate : public CorpusReader
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
         
-        QString current() const;
+        std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
         
@@ -68,30 +61,31 @@ class DbCorpusReaderPrivate : public CorpusReader
     struct QueryIter : public DbIter
     {
         QueryIter(DbXml::XmlResults const &);
-        QString contents(CorpusReader const &) const;
+        std::string contents(CorpusReader const &) const;
     };
     
 public:
-    DbCorpusReaderPrivate(QString const &);
+    DbCorpusReaderPrivate(std::string const &);
     virtual ~DbCorpusReaderPrivate();
     EntryIterator getBegin() const;
     EntryIterator getEnd() const;
+    std::string getName() const;
     size_t getSize() const
     {
         return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
     }
-    bool validQuery(QueryDialect d, bool variables, QString const &query) const;
-    QString readEntry(QString const &) const;
-    QString readEntryMarkQueries(QString const &entry, QList<MarkerQuery> const &queries) const;
-    EntryIterator runXPath(QString const &) const;
-    EntryIterator runXQuery(QString const &) const;
+    bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+    std::string readEntry(std::string const &) const;
+    std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
+    EntryIterator runXPath(std::string const &) const;
+    EntryIterator runXQuery(std::string const &) const;
     
 private:
-    void setNameAndCollection(QString const &);
+    void setNameAndCollection(std::string const &);
     
 };
     
-DbCorpusReader::DbCorpusReader(QString const &name) :
+DbCorpusReader::DbCorpusReader(std::string const &name) :
     d_private(new DbCorpusReaderPrivate(name))
 {
 }
@@ -125,11 +119,11 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlManager &mgr)
 }
 
 /* operator* */
-QString DbCorpusReaderPrivate::DbIter::current() const
+std::string DbCorpusReaderPrivate::DbIter::current() const
 {
     db::XmlDocument doc;
     r.peek(doc);
-    return toQString(doc.getName());
+    return doc.getName();
 }
 
 /* operator== */
@@ -168,11 +162,11 @@ DbCorpusReaderPrivate::QueryIter::QueryIter(db::XmlResults const &r)
 {
 }
 
-QString DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) const
+std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) const
 {
     db::XmlValue v;
     r.peek(v);
-    return toQString(v.getNodeValue());
+    return v.getNodeValue();
 }
     
 CorpusReader::EntryIterator DbCorpusReader::getBegin() const
@@ -185,52 +179,55 @@ CorpusReader::EntryIterator DbCorpusReader::getEnd() const
     return d_private->getEnd();
 }
 
+std::string DbCorpusReader::getName() const
+{
+  return d_private->getName();
+}
+
 size_t DbCorpusReader::getSize() const
 {
     return d_private->getSize();
 }
     
-bool DbCorpusReader::validQuery(QueryDialect d, bool variables, QString const &query) const
+bool DbCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     return d_private->isValidQuery(d, variables, query);
 }
 
 
-QString DbCorpusReader::readEntry(const QString &entry) const
+std::string DbCorpusReader::readEntry(std::string const &entry) const
 {
     return d_private->readEntry(entry);
 }
     
-QString DbCorpusReader::readEntryMarkQueries(QString const &entry, 
-    QList<MarkerQuery> const &queries) const
+std::string DbCorpusReader::readEntryMarkQueries(std::string const &entry, 
+    std::list<MarkerQuery> const &queries) const
 {
     return d_private->readEntryMarkQueries(entry, queries);
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runXPath(QString const &query) const
+CorpusReader::EntryIterator DbCorpusReader::runXPath(std::string const &query) const
 {
     return d_private->runXPath(query);
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runXQuery(QString const &query) const
+CorpusReader::EntryIterator DbCorpusReader::runXQuery(std::string const &query) const
 {
     return d_private->runXQuery(query);
 }
     
-DbCorpusReaderPrivate::DbCorpusReaderPrivate(QString const &qpath)
+DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
  : mgr(), container()
 {
-    std::string path(qpath.toUtf8().data());
-
     try {
         db::XmlContainerConfig config;
         config.setReadOnly(true);
         container = mgr.openContainer(path, config);
         // Nasty: using a hard-coded alias to work use in the xpath queries.
         container.addAlias("corpus"); 
-        setNameAndCollection(qpath);
+        setNameAndCollection(path);
     } catch (db::XmlException const &e) {
-        throw OpenError(qpath, QString::fromUtf8(e.what()));
+        throw OpenError(path, e.what());
     }
 }
 
@@ -248,12 +245,16 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::getEnd() const
     return EntryIterator(new DbIter(mgr));
 }
 
-bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, QString const &query) const
+std::string DbCorpusReaderPrivate::getName() const
+{
+    return container.getName();
+}
+
+bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     try {
         db::XmlQueryContext ctx = mgr.createQueryContext();
-        QByteArray queryData(query.toUtf8());
-        mgr.prepare(queryData.constData(), ctx);
+        mgr.prepare(query, ctx);
     } catch (db::XmlException const &e) {
         return false;
     }
@@ -262,18 +263,16 @@ bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, QString c
 }
 
 
-QString DbCorpusReaderPrivate::readEntry(QString const &filename) const
+std::string DbCorpusReaderPrivate::readEntry(std::string const &filename) const
 {
-    std::string name(filename.toUtf8().data());
-
     try {
-        db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
+        db::XmlDocument doc(container.getDocument(filename, db::DBXML_LAZY_DOCS));
         std::string content;
-        return toQString(doc.getContent(content));
+        return doc.getContent(content);
 
     } catch (db::XmlException const &e) {
         std::ostringstream msg;
-        msg << "entry \""                  << name
+        msg << "entry \""                  << filename
             << "\" cannot be read from \"" << container.getName()
             << "\" ("                      << e.what()
             << ")";
@@ -281,18 +280,17 @@ QString DbCorpusReaderPrivate::readEntry(QString const &filename) const
     }
 }
     
-QString DbCorpusReaderPrivate::readEntryMarkQueries(QString const &entry,
-    QList<MarkerQuery> const &queries) const
+std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
+    std::list<MarkerQuery> const &queries) const
 {
-    std::string name(entry.toUtf8().data());
     std::string content;
     
     try {
-        db::XmlDocument doc(container.getDocument(name, db::DBXML_LAZY_DOCS));
+        db::XmlDocument doc(container.getDocument(entry, db::DBXML_LAZY_DOCS));
         doc.getContent(content);
     } catch (db::XmlException const &e) {
         std::ostringstream msg;
-        msg << "entry \""                  << name
+        msg << "entry \""                  << entry
         << "\" cannot be read from \"" << container.getName()
         << "\" ("                      << e.what()
         << ")";
@@ -318,16 +316,12 @@ QString DbCorpusReaderPrivate::readEntryMarkQueries(QString const &entry,
         throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
     }
 
-    for (QList<MarkerQuery>::const_iterator iter = queries.begin();
+    for (std::list<MarkerQuery>::const_iterator iter = queries.begin();
          iter != queries.end(); ++iter)
     {
-        QByteArray utf8Query(iter->query.toUtf8());
-        QByteArray attrArray(iter->attr.toUtf8());
-        QByteArray valArray(iter->value.toUtf8());
-
         AutoRelease<xerces::DOMXPathExpression> expression(0);
         try {
-            expression.set(document->createExpression(X(utf8Query.constData()), 0));
+            expression.set(document->createExpression(X(iter->query.c_str()), 0));
         } catch (xerces::DOMXPathException const &) {
             throw Error("Could not parse expression.");
         } catch (xerces::DOMException const &) {
@@ -344,23 +338,28 @@ QString DbCorpusReaderPrivate::readEntryMarkQueries(QString const &entry,
             throw Error("Could not evaluate the expression on the given document.");
         }
         
-        QList<xerces::DOMNode *> markNodes;
+        std::list<xerces::DOMNode *> markNodes;
         
         while (result->iterateNext())
         {
-            xerces::DOMNode *node = result->getNodeValue();
-            
+            xerces::DOMNode *node;
+            try {
+              node = result->getNodeValue();
+            } catch (xerces::DOMXPathException &e) {
+              throw Error("Matching node value invalid while marking nodes.");
+            }
+
             // Skip non-element nodes
             if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
                 continue;
             
-            markNodes.append(node);
+            markNodes.push_back(node);
         }
         
-        for (QList<xerces::DOMNode *>::iterator iter = markNodes.begin();
-             iter != markNodes.end(); ++iter)
+        for (std::list<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
+             nodeIter != markNodes.end(); ++nodeIter)
         {
-            xerces::DOMNode *node = *iter;
+            xerces::DOMNode *node = *nodeIter;
             
             xerces::DOMNamedNodeMap *map = node->getAttributes();
             if (map == 0)
@@ -369,11 +368,11 @@ QString DbCorpusReaderPrivate::readEntryMarkQueries(QString const &entry,
             // Create new attribute node.
             xerces::DOMAttr *attr;
             try {
-                attr = document->createAttribute(X(attrArray.constData()));
+                attr = document->createAttribute(X(iter->attr.c_str()));
             } catch (xerces::DOMException const &e) {
                 throw Error("Attribute name contains invalid character.");
             }
-            attr->setNodeValue(X(valArray.constData()));
+            attr->setNodeValue(X(iter->value.c_str()));
             
             map->setNamedItem(attr);
             
@@ -387,18 +386,18 @@ QString DbCorpusReaderPrivate::readEntryMarkQueries(QString const &entry,
     output->setByteStream(&target);
     serializer->write(document, output.get());
     
-    QByteArray outArray(reinterpret_cast<char const *>(target.getRawBuffer()),
+    std::string outData(reinterpret_cast<char const *>(target.getRawBuffer()),
         target.getLen());
         
-    return QString::fromUtf8(outArray);
+    return outData;
 }
 
-CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(QString const &query) const
+CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(std::string const &query) const
 {
-    return runXQuery(QString("collection('corpus')" + query));
+    return runXQuery(std::string("collection('corpus')" + query));
 }
 
-CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(QString const &query)
+CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &query)
     const
 {
     // XXX use DBXML_DOCUMENT_PROJECTION and return to whole-doc containers?
@@ -408,7 +407,7 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(QString const &quer
             = mgr.createQueryContext(db::XmlQueryContext::LiveValues,
                                      db::XmlQueryContext::Lazy);
         ctx.setDefaultCollection(collection);
-        db::XmlResults r(mgr.query(query.toUtf8().data(), ctx,
+        db::XmlResults r(mgr.query(query, ctx,
                                      db::DBXML_LAZY_DOCS
                                    | db::DBXML_WELL_FORMED_ONLY
                                   ));
@@ -427,14 +426,10 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(QString const &quer
  * For some reason, DB XML strips off a leading slash in the filename,
  * so we prepend an extra one.
  */
-void DbCorpusReaderPrivate::setNameAndCollection(QString const &path)
+void DbCorpusReaderPrivate::setNameAndCollection(std::string const &path)
 {
-    //collection = QFileInfo(path).absoluteFilePath().toLocal8Bit().data();
-
-    setName(toQString(container.getName()));
-
-	QString uri = QString("/%1").arg(name());
-	collection = std::string(QUrl::toPercentEncoding(uri));
+    std::string uri = "/" + name();
+    collection = util::toPercentEncoding(uri);
 }
 
 }   // namespace alpinocorpus

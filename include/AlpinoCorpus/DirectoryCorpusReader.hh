@@ -1,8 +1,8 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_HH
 #define ALPINO_DIRECTORYCORPUSREADER_HH
 
-#include <QSharedPointer>
-#include <QString>
+#include <string>
+#include <tr1/memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -23,16 +23,17 @@ public:
      * or write one if not present.
      * Failure to read or write the cache file is not signalled to the caller.
      */
-    DirectoryCorpusReader(QString const &directory, bool wantCache = true);
+    DirectoryCorpusReader(std::string const &directory, bool wantCache = true);
     ~DirectoryCorpusReader();
 
 private:
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(QString const &entry) const;
+    virtual std::string getName() const;
+    virtual std::string readEntry(std::string const &entry) const;
     virtual size_t getSize() const;
 
-    QSharedPointer<DirectoryCorpusReaderPrivate> d_private;
+    std::tr1::shared_ptr<DirectoryCorpusReaderPrivate> d_private;
 };
 
 }
