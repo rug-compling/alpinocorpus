@@ -57,7 +57,8 @@ void DzIstreamBuf::readChunk(long n)
 	unsigned char *zBuf = new unsigned char[chunkN.size];
 	
 	fseek(d_stream, d_dataOffset + chunkN.offset, SEEK_SET);
-	fread(zBuf, 1, chunkN.size, d_stream);
+	if (fread(zBuf, 1, chunkN.size, d_stream) != chunkN.size)
+		throw std::runtime_error("DzIstreamBuf::readChunk: could not read chunk!");
 
 	z_stream zStream;
 	zStream.next_in = zBuf;
@@ -104,7 +105,9 @@ void DzIstreamBuf::readExtra()
 	{
 		// Read extra field 'header'
 		char si[2];
-		fread(si, 1, 2, d_stream);
+		if (fread(si, 1, sizeof(si), d_stream) != sizeof(si))
+			throw("DzIstreamBuf::readExtra: could not read extra field header!");
+
 		int len = fgetc(d_stream) + (fgetc(d_stream) * 256);
 		
 		// Does this field part provide chunk information?
@@ -141,7 +144,8 @@ void DzIstreamBuf::readHeader()
 {
 	d_header.resize(GZ_HEADER_SIZE);
 	unsigned char *header = &d_header[0];
-	fread(header, 1, GZ_HEADER_SIZE, d_stream);
+	if (fread(header, 1, GZ_HEADER_SIZE, d_stream) != GZ_HEADER_SIZE)
+    throw std::runtime_error("DzIstreamBuf::readHeader: could not read header!");
 	
 	if (header[GZ_HEADER_ID1] != gzipId1 || header[GZ_HEADER_ID2] != gzipId2)
 		throw std::runtime_error("DzIstreamBuf::readHeader: not a gzip file!");
