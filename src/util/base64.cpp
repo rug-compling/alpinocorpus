@@ -50,7 +50,7 @@
 
 #include <cstring>
 #include <stdexcept>
-#include <QByteArray>
+#include <string>
 
 namespace alpinocorpus { namespace util {
 
@@ -81,7 +81,7 @@ static int b64_index[256] = {
 /* |b64_encode| encodes |val| in a printable base 64 format.  A MSB-first
    encoding is generated. */
 
-QByteArray b64_encode(unsigned long val)
+std::string b64_encode(unsigned long val)
 {
    char   result[7];
 
@@ -100,7 +100,7 @@ QByteArray b64_encode(unsigned long val)
    return result + 5;
 }
 
-unsigned long b64_decode(QByteArray const &val)
+unsigned long b64_decode(std::string const &val)
 {
    unsigned long v = 0;
    int           i;

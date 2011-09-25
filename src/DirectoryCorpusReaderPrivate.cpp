@@ -1,45 +1,55 @@
-#include <QDateTime>
-#include <QDirIterator>
-#include <QFile>
-#include <QFileInfo>
-#include <QString>
-#include <QtDebug>
-
+#include <algorithm>
+#include <fstream>
 #include <iterator>
 #include <stdexcept>
+#include <string>
 #include <typeinfo>
+
+#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/Error.hh>
 #include <util/textfile.hh>
 
 #include "DirectoryCorpusReaderPrivate.hh"
 
+namespace bf = boost::filesystem;
+
 namespace alpinocorpus {
 
 DirectoryCorpusReaderPrivate::DirectoryCorpusReaderPrivate(
-    QString const &directory, bool wantCache)
- : d_directory(directory)
+    std::string const &directory, bool wantCache)
 {
-    QDir dir(directory, "*.xml");
-    if (!dir.exists() || !dir.isReadable())
-        throw OpenError(directory, "non-existent or not readable");
-
+    if (directory[directory.size() - 1] == '/')
+        d_directory = bf::path(directory).parent_path();
+    else
+        d_directory = bf::path(directory);
+    
+    if (!bf::exists(d_directory) ||
+        !bf::is_directory(d_directory))
+        throw OpenError(directory, "non-existent or not a directory");
+    
     if (!wantCache || !readCache()) {
-        QDirIterator entryIter(dir, QDirIterator::Subdirectories
-                                  | QDirIterator::FollowSymlinks);
-        while (entryIter.hasNext()) {
-			QString entry = QDir::toNativeSeparators(entryIter.next());
-            entry.remove(0, directory.length());
-            if (entry[0] == QDir::separator())
-                entry.remove(0, 1);
-            d_entries.push_back(entry);
+        for (bf::recursive_directory_iterator iter(d_directory, bf::symlink_option::recurse);
+             iter != bf::recursive_directory_iterator();
+             ++iter)
+        {
+            if (iter->path().extension() != ".xml")
+                continue;
+            
+            std::string entryPathStr = iter->path().native();
+            entryPathStr.erase(0, d_directory.native().size());
+            
+            if (entryPathStr[0] == '/')
+                entryPathStr.erase(0, 1);
+            
+            bf::path entryPath(entryPathStr);
+            
+            d_entries.push_back(entryPath.native());
         }
     }
 
     if (wantCache)
         writeCache();
-
-    setName(directory);
 }
 
 DirectoryCorpusReaderPrivate::~DirectoryCorpusReaderPrivate()
@@ -55,9 +65,14 @@ CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEnd() const
     return EntryIterator(new DirIter(d_entries.end()));
 }
 
-QString DirectoryCorpusReaderPrivate::DirIter::current() const
+std::string DirectoryCorpusReaderPrivate::getName() const
 {
-    return QDir::fromNativeSeparators(*iter);
+  return d_directory.native();
+}
+
+std::string DirectoryCorpusReaderPrivate::DirIter::current() const
+{
+    return *iter; // XXX - native separators
 }
 
 bool DirectoryCorpusReaderPrivate::DirIter::equals(IterImpl const &other) const
@@ -75,44 +90,43 @@ void DirectoryCorpusReaderPrivate::DirIter::next()
     ++iter;
 }
 
-QString DirectoryCorpusReaderPrivate::readEntry(QString const &entry) const
+std::string DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) const
 {
-    return util::readFile(d_directory.filePath(entry));
+    bf::path p(d_directory);
+    p /= entry;
+    return util::readFile(p.native());
 }
 
-QString DirectoryCorpusReaderPrivate::cachePath() const
+bf::path DirectoryCorpusReaderPrivate::cachePath() const
 {
     // XXX: putting the index outside the directory
     // is a fundamental design flaw. --Lars
-    return QString("%1/../%2.dir_index")
-            .arg(d_directory.path())
-            .arg(d_directory.dirName());
-}
+    return d_directory.parent_path() / d_directory.filename().replace_extension(".dir_index");
 
+}
 
 /**
  * Read directory cache file. Returns true on success.
  */
 bool DirectoryCorpusReaderPrivate::readCache()
 {
-    QFile cache(cachePath());
-
-    if (!cache.exists()
-     || QFileInfo(d_directory.path()).lastModified()
-         > QFileInfo(cache).lastModified()
-     || !cache.open(QFile::ReadOnly))
+    bf::path cacheP(cachePath());
+    
+    if (!bf::exists(cacheP) ||
+        bf::last_write_time(d_directory) > bf::last_write_time(cacheP))
         return false;
-
-    QTextStream cacheStream(&cache);
-    while (true) {
-        QString line(cacheStream.readLine());
-        if (line.isNull())
-            break;
-
+    
+    std::ifstream cache(cacheP.native().c_str());
+    if (!cache)
+        return false;
+    
+    std::string line;
+    while (std::getline(cache, line)) {
         d_entries.push_back(line);
     }
+    
 
-    if (cacheStream.atEnd())
+    if (cache.eof())
         return true;
     else {      // I/O error occurred
         d_entries.clear();
@@ -122,14 +136,12 @@ bool DirectoryCorpusReaderPrivate::readCache()
 
 void DirectoryCorpusReaderPrivate::writeCache()
 {
-    QFile cache(cachePath());
-    if (!cache.open(QFile::WriteOnly))
+    std::ofstream cache(cachePath().native().c_str());
+
+    if (!cache)
         return;
 
-    QTextStream cacheStream(&cache);
-    for (StrVector::const_iterator i(d_entries.begin()), end(d_entries.end());
-         i != end; ++i)
-    cacheStream << *i << "\n";
+    std::copy(d_entries.begin(), d_entries.end(), std::ostream_iterator<std::string>(cache, "\n"));
 }
 
 }   // namespace alpinocorpus

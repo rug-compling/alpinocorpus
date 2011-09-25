@@ -2,33 +2,37 @@
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
+#include <string>
 
-#include <QFile>
-#include <QFileInfo>
-#include <QString>
-#include <QTextCodec>
-#include <QTextStream>
+#include <boost/filesystem.hpp>
 
 #include <util/textfile.hh>
 
 namespace alpinocorpus { namespace util {
 
-QString readFile(QString const &filename)
+std::string readFile(std::string const &filename)
 {
-    QFileInfo p(filename);
-    if (!p.isFile()) {
-        QByteArray filenameData(filename.toUtf8());
+    boost::filesystem::path p(filename);
+    
+    if (!boost::filesystem::is_regular_file(p))
         throw std::runtime_error(std::string("readFile: '")
-                                + filenameData.constData()
+                                + filename
                                 + "' is not a regular file");
-    }
+    
+    std::string data;
+    
+    std::ifstream dataStream(filename.c_str());
+    if (!dataStream)
+        throw std::runtime_error(std::string("readFile: '")
+                                 + filename
+                                 + "' could not be opened for reading");
+    
+    dataStream >> std::noskipws;
+    
+    std::copy(std::istream_iterator<char>(dataStream), std::istream_iterator<char>(),
+        std::back_inserter(data));
 
-    QFile dataFile(filename);
-    dataFile.open(QFile::ReadOnly);
-    QTextStream dataStream(&dataFile);
-    dataStream.setCodec(QTextCodec::codecForName("UTF-8"));
-
-    return dataStream.readAll();
+    return data;
 }
 
 } } // namespace alpinocorpus::util

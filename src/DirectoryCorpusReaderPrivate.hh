@@ -1,9 +1,10 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_PRIVATE_HH
 #define ALPINO_DIRECTORYCORPUSREADER_PRIVATE_HH
 
-#include <QDir>
-#include <QString>
-#include <QVector>
+#include <string>
+#include <vector>
+
+#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -14,7 +15,7 @@ namespace alpinocorpus {
  */
 class DirectoryCorpusReaderPrivate : public CorpusReader
 {
-    typedef QVector<QString> StrVector;
+    typedef std::vector<std::string> StrVector;
 
     class DirIter : public IterImpl
     {
@@ -22,7 +23,7 @@ class DirectoryCorpusReaderPrivate : public CorpusReader
 
       public:
         DirIter(StrVector::const_iterator const &i) : iter(i) { }
-        QString current() const;
+        std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
     };
@@ -35,20 +36,21 @@ public:
      * or write one if not present.
      * Failure to read or write the cache file is not signalled to the caller.
      */
-    DirectoryCorpusReaderPrivate(QString const &directory, bool cache = true);
+    DirectoryCorpusReaderPrivate(std::string const &directory, bool cache = true);
     virtual ~DirectoryCorpusReaderPrivate();
 
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
-    virtual QString readEntry(const QString &entry) const;
+    virtual std::string getName() const;
+    virtual std::string readEntry(std::string const &entry) const;
     virtual size_t getSize() const { return d_entries.size(); }
 
 private:
-    QString cachePath() const;
+    boost::filesystem::path cachePath() const;
     bool readCache();
     void writeCache();
 
-    QDir d_directory;
+    boost::filesystem::path d_directory;
     StrVector d_entries;
 };
 

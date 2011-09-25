@@ -1,13 +1,10 @@
 #ifndef ALPINO_CORPUSREADER_HH
 #define ALPINO_CORPUSREADER_HH
 
-#include <QSharedPointer>
-#include <QString>
-#include <QVector>
-
-// for FilterIter
-#include <QByteArray>
-#include <QQueue>
+#include <list>
+#include <queue>
+#include <string>
+#include <tr1/memory>
 
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
@@ -18,7 +15,7 @@ namespace alpinocorpus {
  * Abstract base class for corpus readers.
  *
  * A corpus is conceptually a mapping of names to XML documents.
- * Both are represented as QStrings.
+ * Both are represented as strings.
  */
 class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 {
@@ -26,22 +23,20 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
     struct IterImpl {
         virtual ~IterImpl() {}
-        virtual QString current() const = 0;
+        virtual std::string current() const = 0;
         virtual bool equals(IterImpl const &) const = 0;
         virtual void next() = 0;
 
         // Query iterators must override this
-        virtual QString contents(CorpusReader const &rdr) const;
+        virtual std::string contents(CorpusReader const &rdr) const;
     };
 
-    void setName(QString const &n);
-    
   public:
     /** Forward iterator over entry names */
     class ALPINO_CORPUS_EXPORT EntryIterator
-        : public std::iterator<std::input_iterator_tag, QString>
+    : public std::iterator<std::input_iterator_tag, std::string>
     {
-        QSharedPointer<IterImpl> impl;
+        std::tr1::shared_ptr<IterImpl> impl;
 
       public:
         EntryIterator() {}
@@ -60,22 +55,22 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
          * This will be a null string for an ordinary iterator,
          * and the matching part for a query iterator.
          */
-        QString contents(CorpusReader const &rdr) const;
+        std::string contents(CorpusReader const &rdr) const;
     };
     
     struct MarkerQuery {
-        MarkerQuery(QString const &newQuery, QString const &newAttr,
-            QString const &newValue) :
+        MarkerQuery(std::string const &newQuery, std::string const &newAttr,
+            std::string const &newValue) :
             query(newQuery), attr(newAttr), value(newValue) {}
-        QString query;
-        QString attr;
-        QString value;
+        std::string query;
+        std::string attr;
+        std::string value;
     };
 
     virtual ~CorpusReader() {}
 
     /** Return canonical name of corpus */
-    QString const &name() const;
+    std::string name() const;
 
     /** Iterator to begin of entry names */
     EntryIterator begin() const;
@@ -86,19 +81,19 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     enum QueryDialect { XPATH, XQUERY };
 
     /** Is a query valid? */
-    bool isValidQuery(QueryDialect d, bool variables, QString const &q) const;
+    bool isValidQuery(QueryDialect d, bool variables, std::string const &q) const;
     
     /** Execute query. The end of the range is given by end(). */
-    EntryIterator query(QueryDialect d, QString const &q) const;
+    EntryIterator query(QueryDialect d, std::string const &q) const;
 
     /** Return content of a single treebank entry. */
-    QString read(QString const &entry) const;
+    std::string read(std::string const &entry) const;
     
     /**
      * Return content of a single treebank entry, marking matching elements using the
      * given attribute and value.
      */
-    QString readMarkQueries(QString const &entry, QList<MarkerQuery> const &queries) const;
+    std::string readMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -107,40 +102,45 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      * Factory method: open a corpus, determining its type automatically.
      * The caller is responsible for deleting the object returned.
      */
-    static CorpusReader *open(QString const &corpusPath);
+    static CorpusReader *open(std::string const &corpusPath);
+
+    /**
+     * Factory method: open a directory with multiple corpora recursively.
+     * The caller is responsible for deleting the object returned.
+     */
+    static CorpusReader *openRecursive(std::string const &path);
 
   protected:
     class FilterIter : public IterImpl {
       public:
-        FilterIter(CorpusReader const &, EntryIterator, EntryIterator, QString const &);
-        QString current() const;
+        FilterIter(CorpusReader const &, EntryIterator, EntryIterator, std::string const &);
+        std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
-        QString contents(CorpusReader const &) const;
+        std::string contents(CorpusReader const &) const;
       
       private:
-        void parseFile(QString const &);
+        void parseFile(std::string const &);
         
         CorpusReader const &d_corpus;
         EntryIterator d_itr;
         EntryIterator d_end;
-        QString d_file;
-        QByteArray d_query;
-        QQueue<QString> d_buffer;
+        std::string d_file;
+        std::string d_query;
+        std::queue<std::string> d_buffer;
     };
 
   private:
     virtual EntryIterator getBegin() const = 0;
     virtual EntryIterator getEnd() const = 0;
+    virtual std::string getName() const = 0;
     virtual size_t getSize() const = 0;
-    virtual QString readEntry(QString const &entry) const = 0;
-    virtual QString readEntryMarkQueries(QString const &entry,
-        QList<MarkerQuery> const &queries) const;
-    virtual EntryIterator runXPath(QString const &) const;
-    virtual EntryIterator runXQuery(QString const &) const;
-    virtual bool validQuery(QueryDialect d, bool variables, QString const &q) const;
-    
-    QString d_name;
+    virtual std::string readEntry(std::string const &entry) const = 0;
+    virtual std::string readEntryMarkQueries(std::string const &entry,
+        std::list<MarkerQuery> const &queries) const;
+    virtual EntryIterator runXPath(std::string const &) const;
+    virtual EntryIterator runXQuery(std::string const &) const;
+    virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;
 };
 
 }

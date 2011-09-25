@@ -1,10 +1,10 @@
-#include <QString>
+#include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
 
 namespace alpinocorpus {
-    void CorpusWriter::write(QString const &name, QString const &content)
+    void CorpusWriter::write(std::string const &name, std::string const &content)
     {
         writeEntry(name, content);
     }
