@@ -13,6 +13,7 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DbCorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/MultiCorpusReader.hh>
 
 #include <iostream>
 #include <stdexcept>
@@ -21,8 +22,58 @@
 
 using alpinocorpus::CorpusReader;
 using alpinocorpus::DbCorpusWriter;
+using alpinocorpus::MultiCorpusReader;
 
 namespace bf = boost::filesystem;
+
+CorpusReader* openCorpus(std::string const &path,
+    bool recursive)
+{
+  try {
+    if (recursive)
+      return CorpusReader::openRecursive(path);
+    else
+      return CorpusReader::open(path);
+  } catch (std::runtime_error &e) {
+    std::cerr << "Could not open corpus " << path << ": " << e.what() << std::endl;
+    return 0;
+  }
+}
+
+CorpusReader *openCorpora(std::vector<std::string> const &paths,
+    bool recursive)
+{
+  MultiCorpusReader *readers = new MultiCorpusReader;
+
+  for (std::vector<std::string>::const_iterator iter = paths.begin();
+      iter != paths.end(); ++iter)
+  {
+    CorpusReader *reader = openCorpus(*iter, recursive);
+    if (reader == 0) {
+      delete readers;
+      return 0;
+    }
+
+    // If we are dealing with a directory, and the path ends with a trailing
+    // slash, we remove the slash.
+    bf::path p = bf::path(*iter);
+    if (bf::is_directory(p) && iter->rfind('/') == iter->size() - 1)
+      p = bf::path(iter->substr(0, iter->size() - 1));
+
+    // Kill the extension, if there is any.
+    p.replace_extension("");
+
+    // Use the last path component as the corpus name.
+    std::string name = p.filename().generic_string();
+
+
+    // Strip extensions
+
+    readers->push_back(name, reader);
+  }
+
+  return readers;
+}
 
 void listCorpus(std::tr1::shared_ptr<CorpusReader> reader,
   std::string const &query)
@@ -83,7 +134,7 @@ int main(int argc, char *argv[])
     return 1;
   }
   
-  if (opts->arguments().size() != 1)
+  if (opts->arguments().size() == 0)
   {
     usage(opts->programName());
     return 1;
@@ -109,17 +160,16 @@ int main(int argc, char *argv[])
     return 1;
   }
  
-  std::string treebankPath = opts->arguments().at(0);
   std::tr1::shared_ptr<CorpusReader> reader;
-  try {
-    if (opts->option('r'))
-      reader.reset(CorpusReader::openRecursive(treebankPath));
-    else
-      reader.reset(CorpusReader::open(treebankPath));
-  } catch (std::runtime_error &e) {
-    std::cerr << "Could not open corpus: " << e.what() << std::endl;
+  if (opts->arguments().size() == 1)
+    reader = std::tr1::shared_ptr<CorpusReader>(
+      openCorpus(opts->arguments().at(0), opts->option('r')));
+  else
+    reader = std::tr1::shared_ptr<CorpusReader>(
+      openCorpora(opts->arguments(), opts->option('r')));
+
+  if (reader.get() == 0)
     return 1;
-  }
   
   std::string query;
   if (opts->option('q')) {
@@ -137,8 +187,11 @@ int main(int argc, char *argv[])
 
         // XXX - needs a more sophisticated check now, the output treebank
         // could also be in the search path of a recursive reader.
-        if (bf::equivalent(treebankOut, treebankPath))
-          throw std::runtime_error("Attempting to write to the source treebank.");
+        for (std::vector<std::string>::const_iterator iter =
+            opts->arguments().begin(); iter != opts->arguments().end();
+            ++iter)
+          if (bf::equivalent(treebankOut, *iter))
+            throw std::runtime_error("Attempting to write to the source treebank.");
   
       writeDactCorpus(reader, treebankOut, query);
     } catch (std::runtime_error const &e) {
