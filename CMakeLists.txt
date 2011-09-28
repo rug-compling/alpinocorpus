@@ -88,6 +88,7 @@ set (HEADERS
   include/util/textfile.hh
   include/util/url.hh
   include/util/vs_stdint.h
+  src/DbCorpusReaderPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
   src/IndexedCorpusReaderPrivate.hh
   src/gzip.hh
@@ -97,6 +98,7 @@ set(SOURCES
   src/CorpusReader.cpp
   src/CorpusWriter.cpp
   src/DbCorpusReader.cpp
+  src/DbCorpusReaderPrivate.cpp
   src/DbCorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
