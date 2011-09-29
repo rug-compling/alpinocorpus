@@ -24,7 +24,10 @@ endif(APPLE)
 
 list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
 
-include_directories(${AlpinoCorpus_SOURCE_DIR}/include)
+include_directories(
+  ${AlpinoCorpus_SOURCE_DIR}/include
+  ${AlpinoCorpus_BINARY_DIR}/include
+)
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
@@ -74,7 +77,7 @@ CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
 
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
-  "${AlpinoCorpus_SOURCE_DIR}/include/config.hh"
+  "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
 )
 
 set (HEADERS
