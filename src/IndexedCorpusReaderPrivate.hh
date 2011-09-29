@@ -13,7 +13,8 @@
 #endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <AlpinoCorpus/DzIstream.hh>
+
+#include "DzIstream.hh"
 
 namespace alpinocorpus
 {

@@ -14,10 +14,10 @@
 #include <boost/thread/mutex.hpp>
 #endif
 
-#include <AlpinoCorpus/DzIstream.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <util/base64.hh>
 
+#include "DzIstream.hh"
 #include "IndexedCorpusReaderPrivate.hh"
 
 namespace {

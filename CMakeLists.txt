@@ -84,8 +84,6 @@ set (HEADERS
   include/AlpinoCorpus/CorpusReader.hh
   include/AlpinoCorpus/CorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
-  include/AlpinoCorpus/DzIstream.hh
-  include/AlpinoCorpus/DzIstreamBuf.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
@@ -100,6 +98,8 @@ set (HEADERS
   include/util/url.hh
   include/util/vs_stdint.h
   src/DirectoryCorpusReaderPrivate.hh
+  src/DzIstream.hh
+  src/DzIstreamBuf.hh
   src/IndexedCorpusReaderPrivate.hh
   src/gzip.hh
 )
