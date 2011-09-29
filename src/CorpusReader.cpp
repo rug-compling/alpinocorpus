@@ -1,11 +1,15 @@
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IndexedCorpusReader.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
+#include <config.hh>
+
+#if defined(USE_DBXML)
+    #include <AlpinoCorpus/DbCorpusReader.hh>
+#endif
 
 #include <typeinfo>
 
@@ -57,15 +61,19 @@ namespace alpinocorpus {
     {
         try {
             return new DirectoryCorpusReader(corpusPath);
-        } catch (OpenError const &e) {
-        }
+        } catch (OpenError const &e) {}
 
         try {
             return new IndexedCorpusReader(corpusPath);
-        } catch (OpenError const &e) {
-        }
+        } catch (OpenError const &e) {}
 
-        return new DbCorpusReader(corpusPath);
+#if defined(USE_DBXML)
+        try {
+            return new DbCorpusReader(corpusPath);
+        } catch (OpenError const &e) {}
+#endif
+        
+        throw OpenError(corpusPath);
     }
 
     CorpusReader *CorpusReader::openRecursive(std::string const &path)

@@ -11,9 +11,13 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <AlpinoCorpus/DbCorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
+#include <config.hh>
+
+#if defined(USE_DBXML)
+  #include <AlpinoCorpus/DbCorpusWriter.hh>
+#endif
 
 #include <iostream>
 #include <stdexcept>
@@ -21,8 +25,11 @@
 #include "ProgramOptions.hh"
 
 using alpinocorpus::CorpusReader;
-using alpinocorpus::DbCorpusWriter;
 using alpinocorpus::MultiCorpusReader;
+
+#if defined(USE_DBXML)
+using alpinocorpus::DbCorpusWriter;
+#endif
 
 namespace bf = boost::filesystem;
 
@@ -108,6 +115,7 @@ void writeDactCorpus(std::tr1::shared_ptr<CorpusReader> reader,
   std::string const &treebankOut,
   std::string const &query)
 {
+#if defined(USE_DBXML)
   DbCorpusWriter wr(treebankOut, true);
   CorpusReader::EntryIterator i, end(reader->end());
   if (query.empty())
@@ -121,6 +129,9 @@ void writeDactCorpus(std::tr1::shared_ptr<CorpusReader> reader,
         wr.write(*i, reader->read(*i));
       seen.insert(*i);
     }
+#else
+  throw std::runtime_error("AlpinoCorpus was compiled without DBXML support.");
+#endif // defined(USE_DBXML)
 }
 
 int main(int argc, char *argv[])
