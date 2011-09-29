@@ -137,15 +137,6 @@ if(USE_DBXML)
   )
 endif()
 
-set(ACT_SOURCES
-  util/act/ProgramOptions.cpp
-  util/act/main.cpp
-)
-
-set(ACT_HEADERS
-  util/act/ProgramOptions.hh
-)
-
 add_library(alpino_corpus SHARED 
 	${SOURCES}
 	${HEADERS}
@@ -160,9 +151,6 @@ target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
 target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
-
-add_executable(alpinocorpus-act ${ACT_SOURCES} ${ACT_HEADERS})
-target_link_libraries(alpinocorpus-act alpino_corpus)
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
@@ -179,3 +167,5 @@ if(USE_DBXML)
   target_link_libraries(writer_test alpino_corpus)
   #add_test(writer writer_test)
 endif()
+
+add_subdirectory(util)

@@ -22,7 +22,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "ProgramOptions.hh"
+#include <ProgramOptions.hh>
 
 using alpinocorpus::CorpusReader;
 using alpinocorpus::MultiCorpusReader;
