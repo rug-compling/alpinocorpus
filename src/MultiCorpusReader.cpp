@@ -47,6 +47,7 @@ class MultiCorpusReaderPrivate : public CorpusReader
     MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
       std::string const &query);
     ~MultiIter();
+    std::string contents(CorpusReader const &) const;
     std::string current() const;
     bool equals(IterImpl const &other) const;
     void next();
@@ -272,6 +273,15 @@ std::string MultiCorpusReaderPrivate::MultiIter::current() const
     throw std::runtime_error("Cannot dereference an end iterator!");
 
   return d_iters.front().name + "/" + *d_iters.front().iter;
+}
+
+std::string MultiCorpusReaderPrivate::MultiIter::contents(
+  CorpusReader const &reader) const
+{
+  if (d_iters.size() == 0)
+    throw std::runtime_error("Cannot dereference an end iterator!");
+
+  return d_iters.front().iter.contents(reader);
 }
 
 bool MultiCorpusReaderPrivate::MultiIter::equals(IterImpl const &other) const
