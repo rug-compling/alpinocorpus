@@ -125,10 +125,6 @@ set(ACT_HEADERS
   util/act/ProgramOptions.hh
 )
 
-set(MERGE_SOURCES
-  src/merge/merge.cpp
-)
-
 add_library(alpino_corpus SHARED 
 	${SOURCES}
 	${HEADERS}
@@ -147,16 +143,10 @@ target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 add_executable(alpinocorpus-act ${ACT_SOURCES} ${ACT_HEADERS})
 target_link_libraries(alpinocorpus-act alpino_corpus)
 
-add_executable(alpinocorpus-merge ${MERGE_SOURCES})
-target_link_libraries(alpinocorpus-merge alpino_corpus)
-
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
-
-install(TARGETS alpinocorpus-act alpinocorpus-merge
-  RUNTIME DESTINATION bin)
 
 install(DIRECTORY include/AlpinoCorpus
   DESTINATION include)
