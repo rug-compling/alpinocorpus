@@ -26,6 +26,8 @@ extern "C" {
 
 using alpinocorpus::CorpusReader;
 
+namespace tr1 = std::tr1;
+
 typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
     UniqueFilterIter;
 
@@ -38,8 +40,8 @@ CorpusReader* openCorpus(std::string const &path,
     return CorpusReader::open(path);
 }
 
-void transformCorpus(std::tr1::shared_ptr<CorpusReader> reader,
-  std::tr1::shared_ptr<std::string const> query, std::tr1::shared_ptr<Stylesheet> stylesheet)
+void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
+  tr1::shared_ptr<std::string const> query, tr1::shared_ptr<Stylesheet> stylesheet)
 {
   std::list<CorpusReader::MarkerQuery> markerQueries;
   if (query) {
@@ -62,8 +64,8 @@ void transformCorpus(std::tr1::shared_ptr<CorpusReader> reader,
     std::cout << stylesheet->transform(reader->readMarkQueries(*iter, markerQueries));
 }
 
-void transformEntry(std::tr1::shared_ptr<CorpusReader> reader,
-  std::tr1::shared_ptr<std::string const> query, std::tr1::shared_ptr<Stylesheet> stylesheet,
+void transformEntry(tr1::shared_ptr<CorpusReader> reader,
+  tr1::shared_ptr<std::string const> query, tr1::shared_ptr<Stylesheet> stylesheet,
   std::string const &entry)
 {
   std::list<CorpusReader::MarkerQuery> markerQueries;
@@ -110,7 +112,7 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  std::tr1::shared_ptr<Stylesheet> stylesheet;
+  tr1::shared_ptr<Stylesheet> stylesheet;
   try {
     std::string stylesheetData = alpinocorpus::util::readFile(opts->arguments().at(0));
     stylesheet.reset(new Stylesheet(stylesheetData));
@@ -119,7 +121,7 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  std::tr1::shared_ptr<CorpusReader> reader;
+  tr1::shared_ptr<CorpusReader> reader;
   try {
     reader.reset(openCorpus(opts->arguments().at(1), opts->option('r')));
   } catch (std::runtime_error &e) {
@@ -127,7 +129,7 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  std::tr1::shared_ptr<std::string> query;
+  tr1::shared_ptr<std::string> query;
   if (opts->option('q')) {
     query.reset(new std::string(opts->optionValue('q')));
 

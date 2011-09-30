@@ -34,6 +34,7 @@ using alpinocorpus::DbCorpusWriter;
 #endif
 
 namespace bf = boost::filesystem;
+namespace tr1 = std::tr1;
 
 typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
     UniqueFilterIter;
@@ -87,7 +88,7 @@ CorpusReader *openCorpora(std::vector<std::string> const &paths,
   return readers;
 }
 
-void listCorpus(std::tr1::shared_ptr<CorpusReader> reader,
+void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   std::string const &query)
 {
   CorpusReader::EntryIterator i, end(reader->end());
@@ -103,7 +104,7 @@ void listCorpus(std::tr1::shared_ptr<CorpusReader> reader,
     std::ostream_iterator<std::string>(std::cout, "\n"));
 }
 
-void readEntry(std::tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
+void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
 {
   std::cout << reader->read(entry);
 }
@@ -119,7 +120,7 @@ void usage(std::string const &programName)
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 }
 
-void writeDactCorpus(std::tr1::shared_ptr<CorpusReader> reader,
+void writeDactCorpus(tr1::shared_ptr<CorpusReader> reader,
   std::string const &treebankOut,
   std::string const &query)
 {
@@ -133,7 +134,7 @@ void writeDactCorpus(std::tr1::shared_ptr<CorpusReader> reader,
   
   // We need to be *really* sure when writing a corpus that an entry was not written
   // before. So, we'll use a set, rather than a basic filter.
-  std::tr1::unordered_set<std::string> seen;
+  tr1::unordered_set<std::string> seen;
   for (; i != end; ++i)
     if (seen.find(*i) == seen.end()) {
         wr.write(*i, reader->read(*i));
@@ -182,12 +183,12 @@ int main(int argc, char *argv[])
     return 1;
   }
  
-  std::tr1::shared_ptr<CorpusReader> reader;
+  tr1::shared_ptr<CorpusReader> reader;
   if (opts->arguments().size() == 1)
-    reader = std::tr1::shared_ptr<CorpusReader>(
+    reader = tr1::shared_ptr<CorpusReader>(
       openCorpus(opts->arguments().at(0), opts->option('r')));
   else
-    reader = std::tr1::shared_ptr<CorpusReader>(
+    reader = tr1::shared_ptr<CorpusReader>(
       openCorpora(opts->arguments(), opts->option('r')));
 
   if (reader.get() == 0)
