@@ -16,7 +16,14 @@ Stylesheet::Stylesheet(std::string const &data)
 {
   xmlDocPtr xslDoc = xmlReadMemory(data.c_str(),
     data.size(), 0, 0, 0);
-  d_stylesheet = xsltParseStylesheetDoc(xslDoc);
+
+  if (xslDoc == 0)
+    throw std::runtime_error("Stylesheet::Stylesheet: Could not parse stylesheet as XML");
+
+  if ((d_stylesheet = xsltParseStylesheetDoc(xslDoc)) == 0) {
+    xmlFreeDoc(xslDoc);
+    throw std::runtime_error("Stylesheet::Stylesheet: Could not parse stylesheet");
+  }
 }
 
 Stylesheet::~Stylesheet()
@@ -29,7 +36,7 @@ std::string Stylesheet::transform(std::string const &data)
   // Read XML data intro an xmlDoc.
   xmlDocPtr doc = xmlReadMemory(data.c_str(), data.size(), 0, 0, 0);
 
-  if (!doc)
+  if (doc == 0)
     throw std::runtime_error("Stylesheet::transform: Could not parse XML data");
 
     /*
