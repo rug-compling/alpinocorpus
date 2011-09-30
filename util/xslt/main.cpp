@@ -57,10 +57,9 @@ void transformCorpus(std::tr1::shared_ptr<CorpusReader> reader,
 
   NotEqualsPrevious<std::string> pred;
 
-  for (UniqueFilterIter iter = UniqueFilterIter(pred, i, end);
-      iter != UniqueFilterIter(pred, end, end);
+  for (UniqueFilterIter iter(pred, i, end); iter != UniqueFilterIter(pred, end, end);
       ++iter)
-    std::cout << stylesheet->transform(reader->readMarkQueries(*i, markerQueries));
+    std::cout << stylesheet->transform(reader->readMarkQueries(*iter, markerQueries));
 }
 
 void transformEntry(std::tr1::shared_ptr<CorpusReader> reader,
