@@ -56,3 +56,7 @@ target_link_libraries(alpinocorpus-xslt
 install(TARGETS alpinocorpus-act
   RUNTIME DESTINATION bin
 )
+
+install(TARGETS alpinocorpus-xslt
+  RUNTIME DESTINATION bin
+)
