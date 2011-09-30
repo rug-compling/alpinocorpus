@@ -14,6 +14,9 @@ public:
   virtual ~XSLTransformer();
   std::string transform(std::string const &data);
 private:
+  XSLTransformer(XSLTransformer const &other);
+  XSLTransformer &operator=(XSLTransformer const &other);
+
   xsltStylesheet *d_stylesheet;	
 };
 
