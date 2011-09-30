@@ -4,6 +4,7 @@
 
 #include <tr1/memory>
 
+#include <boost/iterator/filter_iterator.hpp>
 #include <boost/scoped_ptr.hpp>
 
 extern "C" {
@@ -19,10 +20,14 @@ extern "C" {
 
 #include <util/textfile.hh>
 
+#include <EqualsPrevious.hh>
 #include <ProgramOptions.hh>
 #include <Stylesheet.hh>
 
 using alpinocorpus::CorpusReader;
+
+typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
+    UniqueFilterIter;
 
 CorpusReader* openCorpus(std::string const &path,
     bool recursive)
@@ -50,7 +55,11 @@ void transformCorpus(std::tr1::shared_ptr<CorpusReader> reader,
   else
     i = reader->begin();
 
-  for (; i != end; ++i)
+  NotEqualsPrevious<std::string> pred;
+
+  for (UniqueFilterIter iter = UniqueFilterIter(pred, i, end);
+      iter != UniqueFilterIter(pred, end, end);
+      ++iter)
     std::cout << stylesheet->transform(reader->readMarkQueries(*i, markerQueries));
 }
 

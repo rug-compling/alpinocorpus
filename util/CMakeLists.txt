@@ -11,6 +11,7 @@ endif()
 include_directories(${AlpinoCorpus_SOURCE_DIR}/util/common)
 
 set(COMMON_HEADERS
+  common/EqualsPrevious.hh
   common/ProgramOptions.hh
 )
 
