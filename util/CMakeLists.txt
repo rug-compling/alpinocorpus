@@ -31,12 +31,12 @@ add_executable(alpinocorpus-act
 target_link_libraries(alpinocorpus-act alpino_corpus)
 
 set(XSLT_HEADERS
-  common/XSLTransformer.hh
+  common/Stylesheet.hh
 )
 
 set(XSLT_SOURCES
   xslt/main.cpp
-  common/XSLTransformer.cpp
+  common/Stylesheet.cpp
 )
 
 add_executable(alpinocorpus-xslt

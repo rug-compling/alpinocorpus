@@ -20,7 +20,7 @@ extern "C" {
 #include <util/textfile.hh>
 
 #include <ProgramOptions.hh>
-#include <XSLTransformer.hh>
+#include <Stylesheet.hh>
 
 using alpinocorpus::CorpusReader;
 
@@ -41,7 +41,7 @@ CorpusReader* openCorpus(std::string const &path,
 void transformCorpus(std::tr1::shared_ptr<CorpusReader> reader,
   std::tr1::shared_ptr<std::string const> query, std::string const &stylesheet)
 {
-  XSLTransformer transformer(stylesheet);
+  Stylesheet transformer(stylesheet);
 
   std::list<CorpusReader::MarkerQuery> markerQueries;
   if (query) {

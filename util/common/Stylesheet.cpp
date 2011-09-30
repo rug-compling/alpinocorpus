@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "XSLTransformer.hh"
+#include "Stylesheet.hh"
 
 extern "C" {
 #include <libxml/globals.h>
@@ -12,25 +12,25 @@ extern "C" {
 #include <libxslt/xsltutils.h>
 }
 
-XSLTransformer::XSLTransformer(std::string const &stylesheet)
+Stylesheet::Stylesheet(std::string const &data)
 {
-  xmlDocPtr xslDoc = xmlReadMemory(stylesheet.c_str(),
-	stylesheet.size(), 0, 0, 0);
+  xmlDocPtr xslDoc = xmlReadMemory(data.c_str(),
+    data.size(), 0, 0, 0);
   d_stylesheet = xsltParseStylesheetDoc(xslDoc);
 }
 
-XSLTransformer::~XSLTransformer()
+Stylesheet::~Stylesheet()
 {
     xsltFreeStylesheet(d_stylesheet);
 }
 
-std::string XSLTransformer::transform(std::string const &data)
+std::string Stylesheet::transform(std::string const &data)
 {
   // Read XML data intro an xmlDoc.
   xmlDocPtr doc = xmlReadMemory(data.c_str(), data.size(), 0, 0, 0);
 
   if (!doc)
-    throw std::runtime_error("XSLTransformer::transform: Could not parse XML data");
+    throw std::runtime_error("Stylesheet::transform: Could not parse XML data");
 
     /*
     // Hmpf, data conversions.
@@ -64,7 +64,7 @@ std::string XSLTransformer::transform(std::string const &data)
   {
     xsltFreeTransformContext(ctx);
     xmlFreeDoc(doc);
-    throw std::runtime_error("XSLTransformer::transform: Could not apply transformation!");
+    throw std::runtime_error("Stylesheet::transform: Could not apply transformation!");
   }
 
   else if (ctx->state != XSLT_STATE_OK)
@@ -72,7 +72,7 @@ std::string XSLTransformer::transform(std::string const &data)
     xsltFreeTransformContext(ctx);
     xmlFreeDoc(res);
     xmlFreeDoc(doc);
-    throw std::runtime_error("XSLTransformer::transform: Transformation error, check your query!");
+    throw std::runtime_error("Stylesheet::transform: Transformation error, check your query!");
   }
 
   xsltFreeTransformContext(ctx);

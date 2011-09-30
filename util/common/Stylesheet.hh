@@ -7,15 +7,23 @@ extern "C" {
 typedef struct _xsltStylesheet xsltStylesheet;
 }
 
-class XSLTransformer
+class Stylesheet
 {
 public:
-  XSLTransformer(std::string const &stylesheet);
-  virtual ~XSLTransformer();
+  /**
+   * Construct a Stylesheet instance from plain text.
+   */
+  Stylesheet(std::string const &data);
+
+  virtual ~Stylesheet();
+
+  /**
+   * Transform XML data using this stylesheet.
+   */
   std::string transform(std::string const &data);
 private:
-  XSLTransformer(XSLTransformer const &other);
-  XSLTransformer &operator=(XSLTransformer const &other);
+  Stylesheet(Stylesheet const &other);
+  Stylesheet &operator=(Stylesheet const &other);
 
   xsltStylesheet *d_stylesheet;	
 };
