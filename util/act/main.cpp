@@ -9,6 +9,7 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/iterator/filter_iterator.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
@@ -22,6 +23,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <EqualsPrevious.hh>
 #include <ProgramOptions.hh>
 
 using alpinocorpus::CorpusReader;
@@ -32,6 +34,9 @@ using alpinocorpus::DbCorpusWriter;
 #endif
 
 namespace bf = boost::filesystem;
+
+typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
+    UniqueFilterIter;
 
 CorpusReader* openCorpus(std::string const &path,
     bool recursive)
@@ -92,7 +97,10 @@ void listCorpus(std::tr1::shared_ptr<CorpusReader> reader,
   else
     i = reader->query(CorpusReader::XPATH, query);
 
-  std::copy(i, end, std::ostream_iterator<std::string>(std::cout, "\n"));  
+  NotEqualsPrevious<std::string> pred;
+
+  std::copy(UniqueFilterIter(pred, i, end), UniqueFilterIter(pred, end, end),
+    std::ostream_iterator<std::string>(std::cout, "\n"));
 }
 
 void readEntry(std::tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
