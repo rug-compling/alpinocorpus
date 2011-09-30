@@ -39,21 +39,23 @@ CorpusReader* openCorpus(std::string const &path,
 }
 
 void transformCorpus(std::tr1::shared_ptr<CorpusReader> reader,
-  std::string const &query, std::string const &stylesheet)
+  std::tr1::shared_ptr<std::string const> query, std::string const &stylesheet)
 {
   XSLTransformer transformer(stylesheet);
 
-  // Markers
-  CorpusReader::MarkerQuery activeMarker(query, "active", "1");
   std::list<CorpusReader::MarkerQuery> markerQueries;
-  markerQueries.push_back(activeMarker);
+  if (query) {
+     // Markers
+    CorpusReader::MarkerQuery activeMarker(*query, "active", "1");
+    markerQueries.push_back(activeMarker); 
+  }
 
   CorpusReader::EntryIterator i, end(reader->end());
   
-  if (query.empty())
-    i = reader->begin();
+  if (query)
+    i = reader->query(CorpusReader::XPATH, *query);
   else
-    i = reader->query(CorpusReader::XPATH, query);
+    i = reader->begin();
 
   for (; i != end; ++i)
     std::cout << transformer.transform(reader->readMarkQueries(*i, markerQueries));
@@ -97,12 +99,12 @@ int main (int argc, char *argv[])
   std::tr1::shared_ptr<CorpusReader> reader = std::tr1::shared_ptr<CorpusReader>(
     openCorpus(opts->arguments().at(1), opts->option('r')));
 
-  std::string query;
+  std::tr1::shared_ptr<std::string> query;
   if (opts->option('q')) {
-    query = opts->optionValue('q');  
+    query.reset(new std::string(opts->optionValue('q')));
 
-    if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
-      std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
+    if (!reader->isValidQuery(CorpusReader::XPATH, false, *query)) {
+      std::cerr << "Invalid (or unwanted) query: " << *query << std::endl;
       return 1;
     }
   }
