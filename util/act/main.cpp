@@ -131,12 +131,15 @@ void writeDactCorpus(std::tr1::shared_ptr<CorpusReader> reader,
   else
     i = reader->query(CorpusReader::XPATH, query);
   
+  // We need to be *really* sure when writing a corpus that an entry was not written
+  // before. So, we'll use a set, rather than a basic filter.
   std::tr1::unordered_set<std::string> seen;
   for (; i != end; ++i)
     if (seen.find(*i) == seen.end()) {
         wr.write(*i, reader->read(*i));
       seen.insert(*i);
-    }
+    } else
+      std::cerr << "Duplicate entry: " << *i << std::endl;
 #else
   throw std::runtime_error("AlpinoCorpus was compiled without DBXML support.");
 #endif // defined(USE_DBXML)
