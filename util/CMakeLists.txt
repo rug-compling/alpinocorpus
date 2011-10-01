@@ -53,10 +53,28 @@ target_link_libraries(alpinocorpus-xslt
   ${LIBEXSLT_LIBRARIES}
 )
 
+set(STATS_SOURCES
+  stats/main.cpp
+)
+
+add_executable(alpinocorpus-stats
+  ${STATS_SOURCES}
+  ${COMMON_HEADERS}
+  ${COMMON_SOURCES}
+)
+
+target_link_libraries(alpinocorpus-stats
+  alpino_corpus
+)
+
 install(TARGETS alpinocorpus-act
   RUNTIME DESTINATION bin
 )
 
 install(TARGETS alpinocorpus-xslt
+  RUNTIME DESTINATION bin
+)
+
+install(TARGETS alpinocorpus-stats
   RUNTIME DESTINATION bin
 )
