@@ -70,7 +70,7 @@ void transformEntry(tr1::shared_ptr<CorpusReader> reader,
 
 void usage(std::string const &programName)
 {
-    std::cerr << "Usage: " << programName << " [OPTION] stylesheet treebank" <<
+    std::cerr << "Usage: " << programName << " [OPTION] stylesheet treebanks" <<
       std::endl << std::endl <<
       "  -g entry\tApply the stylesheet to a single entry" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
@@ -97,7 +97,7 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  if (opts->arguments().size() != 2)
+  if (opts->arguments().size() < 2)
   {
     usage(opts->programName());
     return 1;
@@ -114,7 +114,13 @@ int main (int argc, char *argv[])
 
   tr1::shared_ptr<CorpusReader> reader;
   try {
-    reader.reset(openCorpus(opts->arguments().at(1), opts->option('r')));
+    if (opts->arguments().size() == 1)
+      reader = tr1::shared_ptr<CorpusReader>(
+        openCorpus(opts->arguments().at(0), opts->option('r')));
+    else
+      reader = tr1::shared_ptr<CorpusReader>(
+        openCorpora(opts->arguments().begin() + 1, 
+            opts->arguments().end(), opts->option('r')));
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;

@@ -62,7 +62,7 @@ void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
 
 void usage(std::string const &programName)
 {
-    std::cerr << "Usage: " << programName << " [OPTION] treebank" <<
+    std::cerr << "Usage: " << programName << " [OPTION] treebanks" <<
       std::endl << std::endl <<
       "  -c filename\tCreate a Dact dbxml archive" << std::endl <<
       "  -g entry\tPrint a treebank entry to stdout" << std::endl <<
@@ -141,7 +141,8 @@ int main(int argc, char *argv[])
         openCorpus(opts->arguments().at(0), opts->option('r')));
     else
       reader = tr1::shared_ptr<CorpusReader>(
-        openCorpora(opts->arguments(), opts->option('r')));
+        openCorpora(opts->arguments().begin(),
+          opts->arguments().end(), opts->option('r')));
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;

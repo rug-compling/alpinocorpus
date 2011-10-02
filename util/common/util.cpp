@@ -21,13 +21,15 @@ CorpusReader* openCorpus(std::string const &path,
       return CorpusReader::open(path);
 }
 
-CorpusReader *openCorpora(std::vector<std::string> const &paths,
+CorpusReader *openCorpora(
+    std::vector<std::string>::const_iterator const &pathBegin,    
+    std::vector<std::string>::const_iterator const &pathEnd,
     bool recursive)
 {
   MultiCorpusReader *readers = new MultiCorpusReader;
 
-  for (std::vector<std::string>::const_iterator iter = paths.begin();
-      iter != paths.end(); ++iter)
+  for (std::vector<std::string>::const_iterator iter = pathBegin;
+      iter != pathEnd; ++iter)
   {
     CorpusReader *reader = openCorpus(*iter, recursive);
     if (reader == 0) {

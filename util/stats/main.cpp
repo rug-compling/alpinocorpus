@@ -58,7 +58,7 @@ void printFrequencies(tr1::shared_ptr<CorpusReader> reader,
 
 void usage(std::string const &programName)
 {
-    std::cerr << "Usage: " << programName << " [OPTION] query treebank" <<
+    std::cerr << "Usage: " << programName << " [OPTION] query treebanks" <<
         std::endl << std::endl <<
         "  -p\tRelative item frequencies" << std::endl <<
         "  -r\tProcess a directory of corpora recursively" << std::endl << std::endl;
@@ -76,20 +76,25 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if (opts->arguments().size() != 2)
+    if (opts->arguments().size() < 2)
     {
         usage(opts->programName());
         return 1;
     }
 
-    tr1::shared_ptr<CorpusReader> reader;
-    try {
-        reader.reset(openCorpus(opts->arguments().at(1), opts->option('r')));
-    } catch (std::runtime_error &e) {
-        std::cerr << "Could not open corpus: " << e.what() << std::endl;
-        return 1;
-    }
-
+  tr1::shared_ptr<CorpusReader> reader;
+  try {
+    if (opts->arguments().size() == 1)
+      reader = tr1::shared_ptr<CorpusReader>(
+        openCorpus(opts->arguments().at(0), opts->option('r')));
+    else
+      reader = tr1::shared_ptr<CorpusReader>(
+        openCorpora(opts->arguments().begin() + 1, 
+            opts->arguments().end(), opts->option('r')));
+  } catch (std::runtime_error &e) {
+    std::cerr << "Could not open corpus: " << e.what() << std::endl;
+    return 1;
+  }
     std::string query;
     query = opts->arguments().at(0);
     if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
