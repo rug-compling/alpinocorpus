@@ -13,10 +13,12 @@ include_directories(${AlpinoCorpus_SOURCE_DIR}/util/common)
 set(COMMON_HEADERS
   common/EqualsPrevious.hh
   common/ProgramOptions.hh
+  common/util.hh
 )
 
 set(COMMON_SOURCES
   common/ProgramOptions.cpp
+  common/util.cpp
 )
 
 set(ACT_SOURCES

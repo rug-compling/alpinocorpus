@@ -12,21 +12,13 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 
 #include <ProgramOptions.hh>
+#include <util.hh>
 
 using alpinocorpus::CorpusReader;
 
 namespace tr1 = std::tr1;
 
 typedef tr1::unordered_map<std::string, size_t> ValueCounts;
-
-CorpusReader* openCorpus(std::string const &path,
-    bool recursive)
-{
-    if (recursive)
-        return CorpusReader::openRecursive(path);
-    else
-        return CorpusReader::open(path);
-}
 
 ValueCounts countQuery(tr1::shared_ptr<CorpusReader> reader,
     std::string const &query)

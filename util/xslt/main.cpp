@@ -14,7 +14,6 @@ extern "C" {
 #include <libexslt/exslt.h>
 }
 
-
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 
@@ -23,6 +22,7 @@ extern "C" {
 #include <EqualsPrevious.hh>
 #include <ProgramOptions.hh>
 #include <Stylesheet.hh>
+#include <util.hh>
 
 using alpinocorpus::CorpusReader;
 
@@ -30,15 +30,6 @@ namespace tr1 = std::tr1;
 
 typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
     UniqueFilterIter;
-
-CorpusReader* openCorpus(std::string const &path,
-    bool recursive)
-{
-  if (recursive)
-    return CorpusReader::openRecursive(path);
-  else
-    return CorpusReader::open(path);
-}
 
 void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
   tr1::shared_ptr<std::string const> query, tr1::shared_ptr<Stylesheet> stylesheet)
