@@ -169,3 +169,4 @@ if(USE_DBXML)
 endif()
 
 add_subdirectory(util)
+add_subdirectory(resources)
