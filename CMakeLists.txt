@@ -97,6 +97,7 @@ set (HEADERS
   include/util/textfile.hh
   include/util/url.hh
   include/util/vs_stdint.h
+  src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
   src/DzIstream.hh
   src/DzIstreamBuf.hh
@@ -108,6 +109,7 @@ set (HEADERS
 
 set(SOURCES
   src/CompactCorpusWriter.cpp
+  src/CompactCorpusWriterPrivate.cpp
   src/CorpusReader.cpp
   src/CorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
