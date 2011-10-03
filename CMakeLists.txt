@@ -81,13 +81,13 @@ configure_file (
 )
 
 set (HEADERS
+  include/AlpinoCorpus/CompactCorpusWriter.hh
   include/AlpinoCorpus/CorpusReader.hh
   include/AlpinoCorpus/CorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IndexedCorpusReader.hh
-  #include/AlpinoCorpus/IndexedCorpusWriter.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/util/NonCopyable.hh
@@ -100,21 +100,25 @@ set (HEADERS
   src/DirectoryCorpusReaderPrivate.hh
   src/DzIstream.hh
   src/DzIstreamBuf.hh
+  src/DzOstream.hh
+  src/DzOstreamBuf.hh
   src/IndexedCorpusReaderPrivate.hh
   src/gzip.hh
 )
 
 set(SOURCES
+  src/CompactCorpusWriter.cpp
   src/CorpusReader.cpp
   src/CorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
   src/DzIstream.cpp
   src/DzIstreamBuf.cpp
+  src/DzOstream.cpp
+  src/DzOstreamBuf.cpp
   src/Error.cpp
   src/IndexedCorpusReader.cpp
   src/IndexedCorpusReaderPrivate.cpp
-  #src/IndexedCorpusWriter.cpp
   src/MultiCorpusReader.cpp
   src/RecursiveCorpusReader.cpp
   src/capi.cpp

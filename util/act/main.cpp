@@ -12,6 +12,7 @@
 #include <boost/iterator/filter_iterator.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 #include <config.hh>
@@ -19,6 +20,8 @@
 #if defined(USE_DBXML)
   #include <AlpinoCorpus/DbCorpusWriter.hh>
 #endif
+
+#include <AlpinoCorpus/CompactCorpusWriter.hh>
 
 #include <iostream>
 #include <stdexcept>
@@ -28,6 +31,8 @@
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
+using alpinocorpus::CorpusWriter;
+using alpinocorpus::CompactCorpusWriter;
 
 #if defined(USE_DBXML)
 using alpinocorpus::DbCorpusWriter;
@@ -65,18 +70,17 @@ void usage(std::string const &programName)
     std::cerr << "Usage: " << programName << " [OPTION] treebanks" <<
       std::endl << std::endl <<
       "  -c filename\tCreate a Dact dbxml archive" << std::endl <<
+      "  -d filename\tCreate a compact corpus archive" << std::endl <<
       "  -g entry\tPrint a treebank entry to stdout" << std::endl <<
       "  -l\t\tList the entries of a treebank" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 }
 
-void writeDactCorpus(tr1::shared_ptr<CorpusReader> reader,
-  std::string const &treebankOut,
+void writeCorpus(tr1::shared_ptr<CorpusReader> reader,
+  tr1::shared_ptr<CorpusWriter> writer,
   std::string const &query)
 {
-#if defined(USE_DBXML)
-  DbCorpusWriter wr(treebankOut, true);
   CorpusReader::EntryIterator i, end(reader->end());
   if (query.empty())
     i = reader->begin();
@@ -88,13 +92,10 @@ void writeDactCorpus(tr1::shared_ptr<CorpusReader> reader,
   tr1::unordered_set<std::string> seen;
   for (; i != end; ++i)
     if (seen.find(*i) == seen.end()) {
-        wr.write(*i, reader->read(*i));
+        writer->write(*i, reader->read(*i));
       seen.insert(*i);
     } else
       std::cerr << "Duplicate entry: " << *i << std::endl;
-#else
-  throw std::runtime_error("AlpinoCorpus was compiled without DBXML support.");
-#endif // defined(USE_DBXML)
 }
 
 int main(int argc, char *argv[])
@@ -102,7 +103,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "c:g:lq:r"));
+      "c:d:g:lq:r"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -115,21 +116,21 @@ int main(int argc, char *argv[])
   }
 
   size_t cmdCount = 0;
-  char const commands[] = "cgl";
-  for (size_t i = 0; i < 3; ++i)
+  char const commands[] = "cdgl";
+  for (size_t i = 0; i < sizeof(commands); ++i)
     if (opts->option(commands[i]))
       ++cmdCount;
   
   if (cmdCount > 1) {
     std::cerr << opts->programName() <<
-      ": the '-c', '-g', and '-l' options cannot be used simultaneously." <<
+      ": the '-c', 'd', '-g', and '-l' options cannot be used simultaneously." <<
       std::endl;
     return 1;
   }
   
   if (cmdCount == 0) {
     std::cerr << opts->programName() <<
-    ": one of the '-c', '-g' or '-l' option should be used." <<
+    ": one of the '-c', 'd', -g' or '-l' option should be used." <<
     std::endl;
     return 1;
   }
@@ -170,15 +171,41 @@ int main(int argc, char *argv[])
           if (bf::equivalent(treebankOut, *iter))
             throw std::runtime_error("Attempting to write to the source treebank.");
   
-      writeDactCorpus(reader, treebankOut, query);
+#if defined(USE_DBXML)
+        tr1::shared_ptr<CorpusWriter> wr(new DbCorpusWriter(treebankOut, true));
+        writeCorpus(reader, wr, query);
+#else
+        throw std::runtime_error("AlpinoCorpus was compiled without DBXML support.");
+#endif // defined(USE_DBXML)
+
     } catch (std::runtime_error const &e) {
         std::cerr << opts->programName() <<
         ": error creating Dact treebank: " << e.what() << std::endl;
         return 1;
     }
   }
+  else if (opts->option('d')) {
+    try {
+        std::string treebankOut = opts->optionValue('d').c_str();
 
-  if (opts->option('g')) {
+        // XXX - needs a more sophisticated check now, the output treebank
+        // could also be in the search path of a recursive reader.
+        for (std::vector<std::string>::const_iterator iter =
+            opts->arguments().begin(); iter != opts->arguments().end();
+            ++iter)
+          if (bf::equivalent(treebankOut, *iter))
+            throw std::runtime_error("Attempting to write to the source treebank.");
+  
+        tr1::shared_ptr<CorpusWriter> wr(new CompactCorpusWriter(treebankOut));
+        writeCorpus(reader, wr, query);
+
+    } catch (std::runtime_error const &e) {
+        std::cerr << opts->programName() <<
+        ": error creating compact corpus: " << e.what() << std::endl;
+        return 1;
+    }    
+  }
+  else if (opts->option('g')) {
     try {
       readEntry(reader, opts->optionValue('g'));
     } catch (std::runtime_error const &e) {
@@ -187,8 +214,7 @@ int main(int argc, char *argv[])
         return 1;
     }    
   }
-  
-  if (opts->option('l')) {
+  else if (opts->option('l')) {
     try {
         listCorpus(reader, query);
     } catch (std::runtime_error const &e) {
