@@ -69,8 +69,10 @@ void usage(std::string const &programName)
 {
     std::cerr << "Usage: " << programName << " [OPTION] treebanks" <<
       std::endl << std::endl <<
-      "  -c filename\tCreate a Dact dbxml archive" << std::endl <<
-      "  -d filename\tCreate a compact corpus archive" << std::endl <<
+      "  -c filename\tCreate a compact corpus archive" << std::endl <<
+#if defined(USE_DBXML)
+      "  -d filename\tCreate a Dact dbxml archive" << std::endl <<
+#endif
       "  -g entry\tPrint a treebank entry to stdout" << std::endl <<
       "  -l\t\tList the entries of a treebank" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
@@ -159,9 +161,9 @@ int main(int argc, char *argv[])
     }
   }
   
-  if (opts->option('c')) {
+  if (opts->option('d')) {
     try {
-        std::string treebankOut = opts->optionValue('c').c_str();
+        std::string treebankOut = opts->optionValue('d').c_str();
 
         // XXX - needs a more sophisticated check now, the output treebank
         // could also be in the search path of a recursive reader.
@@ -184,9 +186,9 @@ int main(int argc, char *argv[])
         return 1;
     }
   }
-  else if (opts->option('d')) {
+  else if (opts->option('c')) {
     try {
-        std::string treebankOut = opts->optionValue('d').c_str();
+        std::string treebankOut = opts->optionValue('c').c_str();
 
         // XXX - needs a more sophisticated check now, the output treebank
         // could also be in the search path of a recursive reader.
