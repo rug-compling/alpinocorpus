@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iterator>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
@@ -17,7 +18,8 @@ namespace bf = boost::filesystem;
 namespace alpinocorpus {
 
 DirectoryCorpusReaderPrivate::DirectoryCorpusReaderPrivate(
-    std::string const &directory, bool wantCache)
+    std::string const &directory) :
+    d_nEntries(std::numeric_limits<size_t>::max())
 {
     if (directory[directory.size() - 1] == '/')
         d_directory = bf::path(directory).parent_path();
@@ -27,29 +29,6 @@ DirectoryCorpusReaderPrivate::DirectoryCorpusReaderPrivate(
     if (!bf::exists(d_directory) ||
         !bf::is_directory(d_directory))
         throw OpenError(directory, "non-existent or not a directory");
-    
-    if (!wantCache || !readCache()) {
-        for (bf::recursive_directory_iterator iter(d_directory, bf::symlink_option::recurse);
-             iter != bf::recursive_directory_iterator();
-             ++iter)
-        {
-            if (iter->path().extension() != ".xml")
-                continue;
-            
-            std::string entryPathStr = iter->path().native();
-            entryPathStr.erase(0, d_directory.native().size());
-            
-            if (entryPathStr[0] == '/')
-                entryPathStr.erase(0, 1);
-            
-            bf::path entryPath(entryPathStr);
-            
-            d_entries.push_back(entryPath.native());
-        }
-    }
-
-    if (wantCache)
-        writeCache();
 }
 
 DirectoryCorpusReaderPrivate::~DirectoryCorpusReaderPrivate()
@@ -57,12 +36,14 @@ DirectoryCorpusReaderPrivate::~DirectoryCorpusReaderPrivate()
 
 CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getBegin() const
 {
-    return EntryIterator(new DirIter(d_entries.begin()));
+    return EntryIterator(new DirIter(d_directory,
+        bf::recursive_directory_iterator(d_directory, bf::symlink_option::recurse)));
 }
 
 CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEnd() const
 {
-    return EntryIterator(new DirIter(d_entries.end()));
+    return EntryIterator(new DirIter(d_directory,
+        bf::recursive_directory_iterator()));
 }
 
 std::string DirectoryCorpusReaderPrivate::getName() const
@@ -70,9 +51,35 @@ std::string DirectoryCorpusReaderPrivate::getName() const
   return d_directory.native();
 }
 
+size_t DirectoryCorpusReaderPrivate::getSize() const
+{
+    if (d_nEntries == std::numeric_limits<size_t>::max())
+        d_nEntries = std::distance(getBegin(), getEnd());
+    
+    return d_nEntries;
+}
+
+
+DirectoryCorpusReaderPrivate::DirIter::DirIter(
+    bf::path const &path, bf::recursive_directory_iterator i) :
+    d_directory(path), iter(i)
+{
+    if (!isValid())
+        next();
+}
+
+
 std::string DirectoryCorpusReaderPrivate::DirIter::current() const
 {
-    return *iter; // XXX - native separators
+    std::string entryPathStr = iter->path().native();
+    entryPathStr.erase(0, d_directory.native().size());
+
+    if (entryPathStr[0] == '/')
+        entryPathStr.erase(0, 1);
+
+    bf::path entryPath(entryPathStr);
+
+    return entryPath.native();
 }
 
 bool DirectoryCorpusReaderPrivate::DirIter::equals(IterImpl const &other) const
@@ -85,9 +92,24 @@ bool DirectoryCorpusReaderPrivate::DirIter::equals(IterImpl const &other) const
     }
 }
 
+bool DirectoryCorpusReaderPrivate::DirIter::isValid()
+{
+    // End is a correct iterator state.
+    if (iter == bf::recursive_directory_iterator())
+        return true;
+
+    return iter->path().extension() == ".xml";
+}
+
 void DirectoryCorpusReaderPrivate::DirIter::next()
 {
-    ++iter;
+    // Don't recurse past end.
+    //if (iter == bf::recursive_directory_iterator())
+    //    return;
+
+    do {
+        ++iter;
+    } while (!isValid());
 }
 
 std::string DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) const
@@ -99,49 +121,7 @@ std::string DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) co
 
 bf::path DirectoryCorpusReaderPrivate::cachePath() const
 {
-    // XXX: putting the index outside the directory
-    // is a fundamental design flaw. --Lars
     return d_directory.parent_path() / d_directory.filename().replace_extension(".dir_index");
-
-}
-
-/**
- * Read directory cache file. Returns true on success.
- */
-bool DirectoryCorpusReaderPrivate::readCache()
-{
-    bf::path cacheP(cachePath());
-    
-    if (!bf::exists(cacheP) ||
-        bf::last_write_time(d_directory) > bf::last_write_time(cacheP))
-        return false;
-    
-    std::ifstream cache(cacheP.native().c_str());
-    if (!cache)
-        return false;
-    
-    std::string line;
-    while (std::getline(cache, line)) {
-        d_entries.push_back(line);
-    }
-    
-
-    if (cache.eof())
-        return true;
-    else {      // I/O error occurred
-        d_entries.clear();
-        return false;
-    }
-}
-
-void DirectoryCorpusReaderPrivate::writeCache()
-{
-    std::ofstream cache(cachePath().native().c_str());
-
-    if (!cache)
-        return;
-
-    std::copy(d_entries.begin(), d_entries.end(), std::ostream_iterator<std::string>(cache, "\n"));
 }
 
 }   // namespace alpinocorpus
