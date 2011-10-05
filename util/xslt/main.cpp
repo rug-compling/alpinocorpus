@@ -52,7 +52,11 @@ void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
 
   for (UniqueFilterIter iter(pred, i, end); iter != UniqueFilterIter(pred, end, end);
       ++iter)
-    std::cout << stylesheet->transform(reader->readMarkQueries(*iter, markerQueries));
+    try {
+      std::cout << stylesheet->transform(reader->readMarkQueries(*iter, markerQueries));
+    } catch (std::runtime_error &e) {
+      std::cerr << "Could not apply stylesheet to: " << *iter << std::endl;
+    }
 }
 
 void transformEntry(tr1::shared_ptr<CorpusReader> reader,
