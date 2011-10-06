@@ -3,7 +3,7 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <AlpinoCorpus/IndexedCorpusReader.hh>
+#include <AlpinoCorpus/CompactCorpusReader.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 #include <config.hh>
 
@@ -64,7 +64,7 @@ namespace alpinocorpus {
         } catch (OpenError const &e) {}
 
         try {
-            return new IndexedCorpusReader(corpusPath);
+            return new CompactCorpusReader(corpusPath);
         } catch (OpenError const &e) {}
 
 #if defined(USE_DBXML)
