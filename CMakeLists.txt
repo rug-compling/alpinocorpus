@@ -80,7 +80,7 @@ configure_file (
   "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
 )
 
-set (HEADERS
+set(HEADERS
   include/AlpinoCorpus/CompactCorpusWriter.hh
   include/AlpinoCorpus/CorpusReader.hh
   include/AlpinoCorpus/CorpusWriter.hh
@@ -104,6 +104,7 @@ set (HEADERS
   src/DzOstream.hh
   src/DzOstreamBuf.hh
   src/IndexedCorpusReaderPrivate.hh
+  src/MultiCorpusReaderPrivate.hh
   src/gzip.hh
 )
 
@@ -122,6 +123,7 @@ set(SOURCES
   src/IndexedCorpusReader.cpp
   src/IndexedCorpusReaderPrivate.cpp
   src/MultiCorpusReader.cpp
+  src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
   src/capi.cpp
   src/util/base64.cpp
