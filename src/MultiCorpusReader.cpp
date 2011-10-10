@@ -1,6 +1,6 @@
 #include <string>
 
-#include <Alpinocorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 
 #include "MultiCorpusReaderPrivate.hh"
