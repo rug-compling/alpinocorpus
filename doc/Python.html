@@ -41,6 +41,8 @@ code.sourceCode span.er { color: red; font-weight: bold; }
 <pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; reader.read(<span class="st">&quot;178.xml&quot;</span>)[:<span class="dv">25</span>]<br /><span class="st">'&lt;?xml version=&quot;1.0&quot; encod'</span></code></pre>
 <h2 id="executing-queries">Executing queries</h2>
 <p>Using a query, we can retrieve the entries that have a non-empty set of nodes matching that query. Queries are in <a href="http://en.wikipedia.org/wiki/XPath">XPath</a> 1.0 format. If the corpus that was opened is a Dact (Berkeley DB XML) corpus, XPath 2.0 expressions can also be used.</p>
+<p>A query can be verified with the <code>validQuery</code> method of <code>CorpusReader</code>:</p>
+<pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; reader.validQuery(<span class="st">&quot;//node[@root='zie]&quot;</span>)<br /><span class="ot">False</span><br />&gt;&gt;&gt; reader.validQuery(<span class="st">&quot;//node[@root='zie']&quot;</span>)<br /><span class="ot">True</span></code></pre>
 <p>The <code>query</code> method of <code>CorpusReader</code> executes a query and returns an iterator over the results. The following fragment executes the query <code>//node[@root='loop']</code>, and gives the returns five results as a list:</p>
 <pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; <span class="dt">list</span>(reader.query(<span class="st">&quot;//node[@root='loop']&quot;</span>))[:<span class="dv">5</span>]<br />[<span class="st">'1012.xml'</span>, <span class="st">'103.xml'</span>, <span class="st">'1126.xml'</span>, <span class="st">'1133.xml'</span>, <span class="st">'1189.xml'</span>]</code></pre>
 <h2 id="examples">Examples</h2>

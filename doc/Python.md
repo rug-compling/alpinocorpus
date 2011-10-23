@@ -46,6 +46,15 @@ nodes matching that query. Queries are in
 that was opened is a Dact (Berkeley DB XML) corpus, XPath 2.0 expressions
 can also be used.
 
+A query can be verified with the `validQuery` method of `CorpusReader`:
+
+~~~ {.python}
+>>> reader.validQuery("//node[@root='zie]")
+False
+>>> reader.validQuery("//node[@root='zie']")
+True
+~~~
+
 The `query` method of `CorpusReader` executes a query and returns an
 iterator over the results. The following fragment executes the query
 `//node[@root='loop']`, and gives the returns five results as a list:
