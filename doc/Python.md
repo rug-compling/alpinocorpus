@@ -64,6 +64,27 @@ iterator over the results. The following fragment executes the query
 ['1012.xml', '103.xml', '1126.xml', '1133.xml', '1189.xml']
 ~~~
 
+## Node marking
+
+In some applications, it is useful to mark the nodes of that match a query
+while reading an entry. The `readMarkQueries` method provides this
+functionality. Its arguments are the entry that should be read and
+a list of `MarkerQuery`. A `MarkerQuery` instance specifies a query
+and the attribute/value pair that matching nodes should get. For instance,
+in the following example we construct a list with one such `MarkerQuery`,
+marking nodes with the `@pt` attribute having the value `ww` with the
+attribute `active` and the value `1`:
+
+~~~ {.python}
+>>> markers = [alpinocorpus.MarkerQuery("//node[@pt='ww']", "active", "1")]
+~~~
+
+We can then mark the matching nodes while reading an entry:
+
+~~~ {.python}
+>>> reader.readMarkQueries("508.xml", markers)
+~~~
+
 ## Examples
 
 Some more extensive examples using the Python module can be found in
