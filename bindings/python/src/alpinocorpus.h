@@ -34,6 +34,7 @@ static PyObject *CorpusReader_entries(CorpusReader *self);
 static PyObject *CorpusReader_query(CorpusReader *self, PyObject *args);
 static PyObject *CorpusReader_read(CorpusReader *self, PyObject *args);
 static PyObject *CorpusReader_readMarkQueries(CorpusReader *self, PyObject *args);
+static PyObject *CorpusReader_validQuery(CorpusReader *self, PyObject *args);
 
 static void EntryIterator_dealloc(EntryIterator *self);
 static PyObject *EntryIterator_iter(PyObject *self);

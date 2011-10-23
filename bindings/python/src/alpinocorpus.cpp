@@ -26,6 +26,7 @@ static PyMethodDef CorpusReader_methods[] = {
   {"query", (PyCFunction) CorpusReader_query, METH_VARARGS, "Execute a query" },
   {"read", (PyCFunction) CorpusReader_read, METH_VARARGS, "Read entry" },
   {"readMarkQueries", (PyCFunction) CorpusReader_readMarkQueries, METH_VARARGS, "Read entry, marking queries" },
+  {"validQuery", (PyCFunction) CorpusReader_validQuery, METH_VARARGS, "Validate a query" },
   {NULL} // Sentinel
 };
 
@@ -287,6 +288,24 @@ static PyObject *CorpusReader_query(CorpusReader *self, PyObject *args)
   }
 
   return (PyObject *) iter;
+}
+
+static PyObject *CorpusReader_validQuery(CorpusReader *self, PyObject *args)
+{
+  char *query;
+  if (!PyArg_ParseTuple(args, "s", &query))
+    return NULL;
+   
+  try {
+    if (self->reader->isValidQuery(alpinocorpus::CorpusReader::XPATH, false,
+        query))
+      return Py_True;
+    else
+      return Py_False;
+  } catch (std::runtime_error &e) {
+      raise_exception(e.what());
+      return NULL;
+  }
 }
 
 static void EntryIterator_dealloc(EntryIterator *self)
