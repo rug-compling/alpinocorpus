@@ -2,6 +2,7 @@
 
 #include <AlpinoCorpus/capi.h>
 
+static void CorpusReader_free(alpinocorpus_reader reader);
 static VALUE CorpusReader_valid_query(VALUE self, VALUE query);
 
 typedef struct {

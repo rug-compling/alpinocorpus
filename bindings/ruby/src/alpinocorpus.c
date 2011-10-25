@@ -6,12 +6,9 @@
 
 #include "alpinocorpus.h"
 
-/* Classes*/
 VALUE cCorpusReader;
 VALUE cQuery;
 VALUE cMarkerQuery;
-
-/* Utility functions */
 
 #define Data_Get_Struct_Ptr(obj,type,sval) do {\
     Check_Type(obj, T_DATA); \
@@ -19,7 +16,7 @@ VALUE cMarkerQuery;
 } while (0)
 
 
-VALUE static entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter)
+void static entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter)
 {
     do {
         char *val;
@@ -40,8 +37,6 @@ VALUE static entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter
     } while (alpinocorpus_iter_next(reader, iter));
 
     alpinocorpus_iter_destroy(iter);
-
-    return Qnil;
 }
 
 marker_query_t *markers_to_c_markers(VALUE markers, long *len)
@@ -105,7 +100,30 @@ char *read_markers(alpinocorpus_reader reader, char *entry, VALUE markers)
     return data;
 }
 
-/* CorpusReader */
+/*
+ * call-seq: CorpusReader.new(path)
+ *
+ * Constructs a corpus reader, opening the corpus at _path_. The
+ * corpus can be one of the following types:
+ *
+ * * Dact (DBXML)
+ * * Compact corpus
+ * * Directory with XML files
+ *
+ */
+static VALUE CorpusReader_new(VALUE self, VALUE path)
+{
+    VALUE argv[1];
+    
+    alpinocorpus_reader reader = alpinocorpus_open(StringValueCStr(path));
+    if (reader == NULL)
+        rb_raise(rb_eRuntimeError, "can't open corpus");
+    
+    VALUE tdata = Data_Wrap_Struct(self, 0, CorpusReader_free, reader);
+    argv[0] = path;
+    rb_obj_call_init(tdata, 1, argv);
+    return tdata;
+}
 
 static void CorpusReader_free(alpinocorpus_reader reader) {
     alpinocorpus_close(reader);
@@ -117,6 +135,12 @@ static VALUE CorpusReader_init(VALUE self, VALUE path)
   return self;
 }
 
+/*
+ * call-seq:
+ *   reader.each {|entry| block} -> reader
+ *
+ * Execute a code block for each corpus entry name. 
+ */
 static VALUE CorpusReader_each(VALUE self)
 {
     if (!rb_block_given_p())
@@ -129,14 +153,29 @@ static VALUE CorpusReader_each(VALUE self)
     if ((iter = alpinocorpus_entry_iter(reader)) == NULL)
         rb_raise(rb_eRuntimeError, "could not iterate over corpus");
     
-    return entries_iterator(reader, iter);
+    entries_iterator(reader, iter);
+
+    return self;
 }
 
+/*
+ * call-seq:
+ *   reader.query(q) -> query
+ *
+ * Returns a Query instance for the given query _q_.
+ */
 static VALUE CorpusReader_query(VALUE self, VALUE query)
 {
     return Query_new(cQuery, self, query);
 }
 
+/*
+ * call-seq:
+ *   reader.read(entry[, markers]) -> data
+ *
+ * Reads an entry from the corpus. Nodes matching a query can be marked
+ * by providing a list of MarkerQuery.
+ */
 static VALUE CorpusReader_read(int argc, VALUE *argv, VALUE self)
 {
     VALUE entry, markers;
@@ -162,6 +201,12 @@ static VALUE CorpusReader_read(int argc, VALUE *argv, VALUE self)
     return rData;
 }
 
+/*
+ * call-seq:
+ *   reader.validQuery?(query) -> bool
+ *
+ * Validate an XPath query using _reader.
+ */
 static VALUE CorpusReader_valid_query(VALUE self, VALUE query)
 {
     alpinocorpus_reader reader;
@@ -172,22 +217,6 @@ static VALUE CorpusReader_valid_query(VALUE self, VALUE query)
     else
         return Qfalse;
 }
-
-static VALUE CorpusReader_new(VALUE self, VALUE path)
-{
-    VALUE argv[1];
-    
-    alpinocorpus_reader reader = alpinocorpus_open(StringValueCStr(path));
-    if (reader == NULL)
-        rb_raise(rb_eRuntimeError, "can't open corpus");
-    
-    VALUE tdata = Data_Wrap_Struct(self, 0, CorpusReader_free, reader);
-    argv[0] = path;
-    rb_obj_call_init(tdata, 1, argv);
-    return tdata;
-}
-
-/* Query */
 
 static VALUE Query_new(VALUE self, VALUE reader, VALUE query) {
     /* The query should at the very least be convertable to String. */
@@ -228,6 +257,12 @@ static VALUE Query_init(VALUE self, VALUE reader, VALUE path)
   return self;
 }
 
+/*
+ * call-seq:
+ *   query.each {|entry| block} -> query
+ *
+ * Execute a code block for each corpus entry name (matching the query). 
+ */
 static VALUE Query_each(VALUE self) {
     if (!rb_block_given_p())
         rb_raise(rb_eArgError, "a block is required");
@@ -244,11 +279,18 @@ static VALUE Query_each(VALUE self) {
     if ((iter = alpinocorpus_query_iter(reader, cQuery)) == NULL)
         rb_raise(rb_eRuntimeError, "could not execute query");
 
-    return entries_iterator(reader, iter);
+    entries_iterator(reader, iter);
+
+    return self;
 }
 
-/* Marker queries */
-
+/*
+ * call-seq: MarkerQuery.new(query, attr, value)
+ *
+ * Creates a new marker query, using _query_ as its XPath expression,
+ * and _attr_ and _value_ as the attribute-value pair to mark nodes
+ * matching the query.
+ */
 static VALUE MarkerQuery_new(VALUE self, VALUE query, VALUE attr,
     VALUE value)
 {
@@ -269,16 +311,6 @@ static VALUE MarkerQuery_new(VALUE self, VALUE query, VALUE attr,
     return tdata;
 }
 
-static VALUE MarkerQuery_init(VALUE self, VALUE query, VALUE attr,
-    VALUE value)
-{
-    rb_iv_set(self, "@query", query);
-    rb_iv_set(self, "@attr", attr);
-    rb_iv_set(self, "@value", value);
-
-    return self;
-}
-
 static void MarkerQuery_mark(MarkerQuery *markerQuery)
 {
     rb_gc_mark(markerQuery->query);
@@ -291,7 +323,15 @@ static void MarkerQuery_free(MarkerQuery *markerQuery)
     free(markerQuery);
 }
 
-/* Module initialization */
+static VALUE MarkerQuery_init(VALUE self, VALUE query, VALUE attr,
+    VALUE value)
+{
+    rb_iv_set(self, "@query", query);
+    rb_iv_set(self, "@attr", attr);
+    rb_iv_set(self, "@value", value);
+
+    return self;
+}
 
 void initializeCorpusReader()
 {
