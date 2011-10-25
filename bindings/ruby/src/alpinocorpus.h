@@ -17,5 +17,6 @@ void initializeCorpusReader();
 void initializeMarkerQuery();
 void initializeQuery();
 
+extern VALUE mAlpinoCorpus;
 extern VALUE cMarkerQuery;
 extern VALUE cQuery;

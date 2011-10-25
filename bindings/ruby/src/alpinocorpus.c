@@ -5,6 +5,8 @@
 
 #include "alpinocorpus.h"
 
+VALUE mAlpinoCorpus;
+
 void entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter)
 {
     do {
@@ -30,6 +32,8 @@ void entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter)
 
 void Init_alpinocorpus()
 {
+    mAlpinoCorpus = rb_define_module("AlpinoCorpus");
+
     initializeCorpusReader();
     initializeQuery();
     initializeMarkerQuery();

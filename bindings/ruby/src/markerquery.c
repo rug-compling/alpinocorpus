@@ -102,7 +102,8 @@ static VALUE MarkerQuery_init(VALUE self, VALUE query, VALUE attr,
 
 void initializeMarkerQuery()
 {
-    cMarkerQuery = rb_define_class("MarkerQuery", rb_cObject);
+    cMarkerQuery = rb_define_class_under(mAlpinoCorpus, "MarkerQuery",
+        rb_cObject);
     rb_define_singleton_method(cMarkerQuery, "new",
         MarkerQuery_new, 3);
     rb_define_method(cMarkerQuery, "initialize",

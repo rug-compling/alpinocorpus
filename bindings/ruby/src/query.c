@@ -86,7 +86,8 @@ static VALUE Query_each(VALUE self) {
 
 void initializeQuery()
 {
-    cQuery = rb_define_class("Query", rb_cObject);
+    cQuery = rb_define_class_under(mAlpinoCorpus, "Query",
+        rb_cObject);
     rb_define_method(cQuery, "initialize",
         Query_init, 2);
     rb_define_method(cQuery, "each",

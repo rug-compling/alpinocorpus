@@ -19,9 +19,9 @@ stylesheet = "#{styledir}/bracketed-sentence.xsl"
 xslt = XML::XSLT.new()
 xslt.xsl = REXML::Document.new(File.new(stylesheet))
 
-reader = CorpusReader.new(corpus)
+reader = AlpinoCorpus::CorpusReader.new(corpus)
 
-markers = [MarkerQuery.new(query, "active", "1")]
+markers = [AlpinoCorpus::MarkerQuery.new(query, "active", "1")]
 
 reader.query(query).each { |e|
   xslt.xml = REXML::Document.new(reader.read(e, markers))

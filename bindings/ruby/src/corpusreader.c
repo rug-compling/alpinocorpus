@@ -161,7 +161,8 @@ VALUE CorpusReader_valid_query(VALUE self, VALUE query)
 
 void initializeCorpusReader()
 {
-    cCorpusReader = rb_define_class("CorpusReader", rb_cObject);
+    cCorpusReader = rb_define_class_under(mAlpinoCorpus,
+        "CorpusReader", rb_cObject);
 
     rb_define_singleton_method(cCorpusReader, "new",
         CorpusReader_new, 1);
