@@ -11,7 +11,7 @@ VALUE cCorpusReader;
 VALUE cQuery;
 VALUE cMarkerQuery;
 
-/* CorpusReader */
+/* Utility functions */
 
 #define Data_Get_Struct_Ptr(obj,type,sval) do {\
     Check_Type(obj, T_DATA); \
@@ -44,6 +44,68 @@ VALUE static entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter
     return Qnil;
 }
 
+marker_query_t *markers_to_c_markers(VALUE markers, long *len)
+{
+    if (TYPE(markers) != T_ARRAY)
+        rb_raise(rb_eRuntimeError, "need an array");
+    
+    *len = RARRAY_LEN(markers);
+
+    marker_query_t *cQueries = malloc(sizeof(marker_query_t) * (*len));
+
+    long i;
+    for (i = 0; i < *len; ++i) {
+        VALUE q = rb_ary_entry(markers, i);
+
+        /* Check element class */
+        if (CLASS_OF(rb_ary_entry(markers, i)) != cMarkerQuery) {
+            free(cQueries);
+            rb_raise(rb_eRuntimeError, "expecting elements of class MarkerQuery");
+        }
+
+        MarkerQuery *mq;
+        Data_Get_Struct(q, MarkerQuery, mq);
+
+        /* No strdup is needed, since markers will still be around when
+           reading the entry. */
+        cQueries[i].query = StringValueCStr(mq->query);
+        cQueries[i].attr = StringValueCStr(mq->attr);
+        cQueries[i].value = StringValueCStr(mq->value);
+    }
+
+    return cQueries;
+}
+
+int validate_c_markers(alpinocorpus_reader reader, marker_query_t *markers,
+    long len)
+{
+    long i;
+    for (i = 0; i < len; ++i)
+        if (!alpinocorpus_is_valid_query(reader, markers[i].query))
+            return 0;
+    
+    return 1;
+}
+
+char *read_markers(alpinocorpus_reader reader, char *entry, VALUE markers)
+{
+    long len;
+    marker_query_t *cQueries = markers_to_c_markers(markers, &len);
+
+    if (!validate_c_markers(reader, cQueries, len)) {
+        free(cQueries);
+        rb_raise(rb_eRuntimeError, "invalid query");
+    }
+
+    char *data = alpinocorpus_read_mark_queries(reader, entry, cQueries,
+        len);
+    
+    free(cQueries);
+
+    return data;
+}
+
+/* CorpusReader */
 
 static void CorpusReader_free(alpinocorpus_reader reader) {
     alpinocorpus_close(reader);
@@ -75,14 +137,22 @@ static VALUE CorpusReader_query(VALUE self, VALUE query)
     return Query_new(cQuery, self, query);
 }
 
-static VALUE CorpusReader_read(VALUE self, VALUE entry)
+static VALUE CorpusReader_read(int argc, VALUE *argv, VALUE self)
 {
+    VALUE entry, markers;
+    rb_scan_args(argc, argv, "11", &entry, &markers);
+
     char *cEntry = StringValueCStr(entry);
 
     alpinocorpus_reader reader;
     Data_Get_Struct_Ptr(self, alpinocorpus_reader, reader);
 
-    char *data = alpinocorpus_read(reader, cEntry);
+    char *data;
+    if (markers == Qnil)
+        data = alpinocorpus_read(reader, cEntry);
+    else
+        data = read_markers(reader, cEntry, markers);
+
     if (data == NULL)
         rb_raise(rb_eRuntimeError, "can't read entry");
 
@@ -90,70 +160,6 @@ static VALUE CorpusReader_read(VALUE self, VALUE entry)
     free(data);
 
     return rData;
-}
-
-static VALUE CorpusReader_readMarkQuery(VALUE self, VALUE entry, VALUE queries)
-{
-    char *cEntry = StringValueCStr(entry);
-
-    if (TYPE(queries) != T_ARRAY)
-        rb_raise(rb_eRuntimeError, "need an array");
-    
-    long len = RARRAY_LEN(queries);
-
-    /* Verify that all elements are MarkerQueries before doing
-       any allocations, since the list will be short anyway. */
-    long i;
-    for (i = 0; i < len; ++i) {
-
-            VALUE q = rb_ary_entry(queries, i);
-            MarkerQuery *mq;
-            Data_Get_Struct(q, MarkerQuery, mq);
-
-        }
-
-    marker_query_t *cQueries = malloc(sizeof(marker_query_t) * len);
-
-    for (i = 0; i < len; ++i) {
-        VALUE q = rb_ary_entry(queries, i);
-
-        /* Check element class */
-        if (CLASS_OF(rb_ary_entry(queries, i)) != cMarkerQuery) {
-            free(cQueries);
-            rb_raise(rb_eRuntimeError, "expecting elements of class MarkerQuery");
-        }
-
-        MarkerQuery *mq;
-        Data_Get_Struct(q, MarkerQuery, mq);
-
-        /* Validate query */
-        if (CorpusReader_valid_query(self, mq->query) == Qfalse) {
-            free(cQueries);
-            rb_raise(rb_eRuntimeError, "invalid query");
-        }
-
-        /* No strdup is needed, since queries will still be around when
-           reading the entry. */
-        cQueries[i].query = StringValueCStr(mq->query);
-        cQueries[i].attr = StringValueCStr(mq->attr);
-        cQueries[i].value = StringValueCStr(mq->value);
-    }
-
-    alpinocorpus_reader reader;
-    Data_Get_Struct_Ptr(self, alpinocorpus_reader, reader);
-
-    char *data = alpinocorpus_read_mark_queries(reader, cEntry, cQueries,
-        len);
-    
-    free(cQueries);
-
-    if (data == NULL)
-        rb_raise(rb_eRuntimeError, "can't read entry");
-    else {
-        VALUE rData = rb_str_new2(data);
-        free(data);
-        return rData;
-    }
 }
 
 static VALUE CorpusReader_valid_query(VALUE self, VALUE query)
@@ -300,9 +306,7 @@ void initializeCorpusReader()
     rb_define_method(cCorpusReader, "query",
         CorpusReader_query, 1);
     rb_define_method(cCorpusReader, "read",
-        CorpusReader_read, 1);
-    rb_define_method(cCorpusReader, "readMarkQuery",
-        CorpusReader_readMarkQuery, 2);
+        CorpusReader_read, -1);
     rb_define_method(cCorpusReader, "validQuery?",
         CorpusReader_valid_query, 1);
 
