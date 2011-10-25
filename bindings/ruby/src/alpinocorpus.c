@@ -34,7 +34,7 @@ void Init_alpinocorpus()
 {
     mAlpinoCorpus = rb_define_module("AlpinoCorpus");
 
-    initializeCorpusReader();
+    initializeReader();
     initializeQuery();
     initializeMarkerQuery();
 }

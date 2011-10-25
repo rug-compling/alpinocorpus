@@ -21,7 +21,7 @@ VALUE Query_new(VALUE self, VALUE reader, VALUE query) {
     query = StringValue(query);
 
     /* Let's bail out early if the query is not valid. */
-    if (CorpusReader_valid_query(reader, query) == Qfalse)
+    if (Reader_valid_query(reader, query) == Qfalse)
         rb_raise(rb_eRuntimeError, "invalid query");
 
 
@@ -82,7 +82,7 @@ static VALUE Query_each(VALUE self) {
     return self;
 }
 
-/* Queries over CorpusReader instances. */
+/* Queries over Reader instances. */
 
 void initializeQuery()
 {

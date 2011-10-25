@@ -6,9 +6,9 @@
 
 #include "alpinocorpus.h"
 
-static void CorpusReader_free(alpinocorpus_reader reader);
+static void Reader_free(alpinocorpus_reader reader);
 
-VALUE cCorpusReader;
+VALUE cReader;
 
 int validate_c_markers(alpinocorpus_reader reader, marker_query_t *markers,
     long len)
@@ -40,7 +40,7 @@ char *read_markers(alpinocorpus_reader reader, char *entry, VALUE markers)
 }
 
 /*
- * call-seq: CorpusReader.new(path)
+ * call-seq: Reader.new(path)
  *
  * Constructs a corpus reader, opening the corpus at _path_. The
  * corpus can be one of the following types:
@@ -50,7 +50,7 @@ char *read_markers(alpinocorpus_reader reader, char *entry, VALUE markers)
  * * Directory with XML files
  *
  */
-static VALUE CorpusReader_new(VALUE self, VALUE path)
+static VALUE Reader_new(VALUE self, VALUE path)
 {
     VALUE argv[1];
     
@@ -58,17 +58,17 @@ static VALUE CorpusReader_new(VALUE self, VALUE path)
     if (reader == NULL)
         rb_raise(rb_eRuntimeError, "can't open corpus");
     
-    VALUE tdata = Data_Wrap_Struct(self, 0, CorpusReader_free, reader);
+    VALUE tdata = Data_Wrap_Struct(self, 0, Reader_free, reader);
     argv[0] = path;
     rb_obj_call_init(tdata, 1, argv);
     return tdata;
 }
 
-static void CorpusReader_free(alpinocorpus_reader reader) {
+static void Reader_free(alpinocorpus_reader reader) {
     alpinocorpus_close(reader);
 }
 
-static VALUE CorpusReader_init(VALUE self, VALUE path)
+static VALUE Reader_init(VALUE self, VALUE path)
 {
   rb_iv_set(self, "@path", path);
   return self;
@@ -80,7 +80,7 @@ static VALUE CorpusReader_init(VALUE self, VALUE path)
  *
  * Execute a code block for each corpus entry name. 
  */
-static VALUE CorpusReader_each(VALUE self)
+static VALUE Reader_each(VALUE self)
 {
     if (!rb_block_given_p())
         rb_raise(rb_eArgError, "a block is required");
@@ -103,7 +103,7 @@ static VALUE CorpusReader_each(VALUE self)
  *
  * Returns a Query instance for the given query _q_.
  */
-static VALUE CorpusReader_query(VALUE self, VALUE query)
+static VALUE Reader_query(VALUE self, VALUE query)
 {
     return Query_new(cQuery, self, query);
 }
@@ -115,7 +115,7 @@ static VALUE CorpusReader_query(VALUE self, VALUE query)
  * Reads an entry from the corpus. Nodes matching a query can be marked
  * by providing a list of MarkerQuery.
  */
-static VALUE CorpusReader_read(int argc, VALUE *argv, VALUE self)
+static VALUE Reader_read(int argc, VALUE *argv, VALUE self)
 {
     VALUE entry, markers;
     rb_scan_args(argc, argv, "11", &entry, &markers);
@@ -146,7 +146,7 @@ static VALUE CorpusReader_read(int argc, VALUE *argv, VALUE self)
  *
  * Validate an XPath query using _reader_.
  */
-VALUE CorpusReader_valid_query(VALUE self, VALUE query)
+VALUE Reader_valid_query(VALUE self, VALUE query)
 {
     alpinocorpus_reader reader;
     Data_Get_Struct_Ptr(self, alpinocorpus_reader, reader);
@@ -159,24 +159,24 @@ VALUE CorpusReader_valid_query(VALUE self, VALUE query)
 
 /* Reader for Alpino treebanks. */
 
-void initializeCorpusReader()
+void initializeReader()
 {
-    cCorpusReader = rb_define_class_under(mAlpinoCorpus,
-        "CorpusReader", rb_cObject);
+    cReader = rb_define_class_under(mAlpinoCorpus,
+        "Reader", rb_cObject);
 
-    rb_define_singleton_method(cCorpusReader, "new",
-        CorpusReader_new, 1);
-    rb_define_method(cCorpusReader, "initialize",
-        CorpusReader_init, 1); 
-    rb_define_method(cCorpusReader, "each",
-        CorpusReader_each, 0);
-    rb_define_method(cCorpusReader, "query",
-        CorpusReader_query, 1);
-    rb_define_method(cCorpusReader, "read",
-        CorpusReader_read, -1);
-    rb_define_method(cCorpusReader, "validQuery?",
-        CorpusReader_valid_query, 1);
+    rb_define_singleton_method(cReader, "new",
+        Reader_new, 1);
+    rb_define_method(cReader, "initialize",
+        Reader_init, 1); 
+    rb_define_method(cReader, "each",
+        Reader_each, 0);
+    rb_define_method(cReader, "query",
+        Reader_query, 1);
+    rb_define_method(cReader, "read",
+        Reader_read, -1);
+    rb_define_method(cReader, "validQuery?",
+        Reader_valid_query, 1);
 
-    rb_include_module(cCorpusReader, rb_mEnumerable);    
+    rb_include_module(cReader, rb_mEnumerable);    
 }
 
