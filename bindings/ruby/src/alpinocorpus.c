@@ -105,16 +105,11 @@ static VALUE CorpusReader_readMarkQuery(VALUE self, VALUE entry, VALUE queries)
        any allocations, since the list will be short anyway. */
     long i;
     for (i = 0; i < len; ++i) {
-        if (CLASS_OF(rb_ary_entry(queries, i)) != cMarkerQuery)
-            /* XXX - validate queries? */
-            rb_raise(rb_eRuntimeError, "expecting elements of class MarkerQuery");
 
             VALUE q = rb_ary_entry(queries, i);
             MarkerQuery *mq;
             Data_Get_Struct(q, MarkerQuery, mq);
 
-            if (CorpusReader_valid_query(self, mq->query) == Qfalse)
-                rb_raise(rb_eRuntimeError, "invalid query");
         }
 
     marker_query_t *cQueries = malloc(sizeof(marker_query_t) * len);
@@ -122,10 +117,22 @@ static VALUE CorpusReader_readMarkQuery(VALUE self, VALUE entry, VALUE queries)
     for (i = 0; i < len; ++i) {
         VALUE q = rb_ary_entry(queries, i);
 
+        /* Check element class */
+        if (CLASS_OF(rb_ary_entry(queries, i)) != cMarkerQuery) {
+            free(cQueries);
+            rb_raise(rb_eRuntimeError, "expecting elements of class MarkerQuery");
+        }
+
         MarkerQuery *mq;
         Data_Get_Struct(q, MarkerQuery, mq);
 
-        /* No dup needed, since queries will still be around when
+        /* Validate query */
+        if (CorpusReader_valid_query(self, mq->query) == Qfalse) {
+            free(cQueries);
+            rb_raise(rb_eRuntimeError, "invalid query");
+        }
+
+        /* No strdup is needed, since queries will still be around when
            reading the entry. */
         cQueries[i].query = StringValueCStr(mq->query);
         cQueries[i].attr = StringValueCStr(mq->attr);
