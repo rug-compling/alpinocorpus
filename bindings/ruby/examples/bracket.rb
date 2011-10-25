@@ -2,8 +2,7 @@
 
 require 'rubygems'
 require 'alpinocorpus'
-require 'rexml/document'
-require 'xml/xslt'
+require 'nokogiri'
 
 if ARGV.length != 2 then
   puts "#{$0} query corpus"
@@ -16,14 +15,13 @@ corpus = ARGV[1]
 styledir = File.dirname($0)
 stylesheet = "#{styledir}/bracketed-sentence.xsl"
 
-xslt = XML::XSLT.new()
-xslt.xsl = REXML::Document.new(File.new(stylesheet))
+xslt = Nokogiri::XSLT(File.read(stylesheet))
 
 reader = AlpinoCorpus::Reader.new(corpus)
 
 markers = [AlpinoCorpus::MarkerQuery.new(query, "active", "1")]
 
 reader.query(query).each { |e|
-  xslt.xml = REXML::Document.new(reader.read(e, markers))
-  puts xslt.serve()
+  xml = Nokogiri.XML(reader.read(e, markers))
+  puts xslt.apply_to(xml)
 }
