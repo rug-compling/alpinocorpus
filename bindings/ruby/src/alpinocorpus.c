@@ -9,6 +9,7 @@
 /* Classes*/
 VALUE cCorpusReader;
 VALUE cQuery;
+VALUE cMarkerQuery;
 
 /* CorpusReader */
 
@@ -89,6 +90,63 @@ static VALUE CorpusReader_read(VALUE self, VALUE entry)
     free(data);
 
     return rData;
+}
+
+static VALUE CorpusReader_readMarkQuery(VALUE self, VALUE entry, VALUE queries)
+{
+    char *cEntry = StringValueCStr(entry);
+
+    if (TYPE(queries) != T_ARRAY)
+        rb_raise(rb_eRuntimeError, "need an array");
+    
+    long len = RARRAY_LEN(queries);
+
+    /* Verify that all elements are MarkerQueries before doing
+       any allocations, since the list will be short anyway. */
+    long i;
+    for (i = 0; i < len; ++i) {
+        if (CLASS_OF(rb_ary_entry(queries, i)) != cMarkerQuery)
+            /* XXX - validate queries? */
+            rb_raise(rb_eRuntimeError, "expecting elements of class MarkerQuery");
+
+            VALUE q = rb_ary_entry(queries, i);
+            MarkerQuery *mq;
+            Data_Get_Struct(q, MarkerQuery, mq);
+
+            if (CorpusReader_valid_query(self, mq->query) == Qfalse)
+                rb_raise(rb_eRuntimeError, "invalid query");
+        }
+
+    marker_query_t *cQueries = malloc(sizeof(marker_query_t) * len);
+
+    for (i = 0; i < len; ++i) {
+        VALUE q = rb_ary_entry(queries, i);
+
+        MarkerQuery *mq;
+        Data_Get_Struct(q, MarkerQuery, mq);
+
+        /* No dup needed, since queries will still be around when
+           reading the entry. */
+        cQueries[i].query = StringValueCStr(mq->query);
+        cQueries[i].attr = StringValueCStr(mq->attr);
+        cQueries[i].value = StringValueCStr(mq->value);
+    }
+
+    alpinocorpus_reader reader;
+    Data_Get_Struct_Ptr(self, alpinocorpus_reader, reader);
+
+    char *data = alpinocorpus_read_mark_queries(reader, cEntry, cQueries,
+        len);
+    
+    free(cQueries);
+
+    if (data == NULL)
+        rb_raise(rb_eRuntimeError, "can't read entry");
+    else {
+        VALUE rData = rb_str_new2(data);
+        free(data);
+        return rData;
+    }
 }
 
 static VALUE CorpusReader_valid_query(VALUE self, VALUE query)
@@ -176,6 +234,50 @@ static VALUE Query_each(VALUE self) {
     return entries_iterator(reader, iter);
 }
 
+/* Marker queries */
+
+static VALUE MarkerQuery_new(VALUE self, VALUE query, VALUE attr,
+    VALUE value)
+{
+    query = StringValue(query);
+    attr = StringValue(attr);
+    value = StringValue(value);
+
+    MarkerQuery *mq = (MarkerQuery *) malloc(sizeof(MarkerQuery));
+    mq->query = query;
+    mq->attr = attr;
+    mq->value = value;
+
+    VALUE tdata = Data_Wrap_Struct(self, MarkerQuery_mark, MarkerQuery_free,
+        mq);
+    
+    VALUE argv[3] = {query, attr, value};
+    rb_obj_call_init(tdata, 3, argv);
+    return tdata;
+}
+
+static VALUE MarkerQuery_init(VALUE self, VALUE query, VALUE attr,
+    VALUE value)
+{
+    rb_iv_set(self, "@query", query);
+    rb_iv_set(self, "@attr", attr);
+    rb_iv_set(self, "@value", value);
+
+    return self;
+}
+
+static void MarkerQuery_mark(MarkerQuery *markerQuery)
+{
+    rb_gc_mark(markerQuery->query);
+    rb_gc_mark(markerQuery->attr);
+    rb_gc_mark(markerQuery->value);
+}
+
+static void MarkerQuery_free(MarkerQuery *markerQuery)
+{
+    free(markerQuery);
+}
+
 /* Module initialization */
 
 void initializeCorpusReader()
@@ -192,6 +294,8 @@ void initializeCorpusReader()
         CorpusReader_query, 1);
     rb_define_method(cCorpusReader, "read",
         CorpusReader_read, 1);
+    rb_define_method(cCorpusReader, "readMarkQuery",
+        CorpusReader_readMarkQuery, 2);
     rb_define_method(cCorpusReader, "validQuery?",
         CorpusReader_valid_query, 1);
 
@@ -209,8 +313,18 @@ void initializeQuery()
     rb_include_module(cQuery, rb_mEnumerable);
 }
 
+void initializeMarkerQuery()
+{
+    cMarkerQuery = rb_define_class("MarkerQuery", rb_cObject);
+    rb_define_singleton_method(cMarkerQuery, "new",
+        MarkerQuery_new, 3);
+    rb_define_method(cMarkerQuery, "initialize",
+        MarkerQuery_init, 3);
+}
+
 void Init_alpinocorpus()
 {
     initializeCorpusReader();
     initializeQuery();
+    initializeMarkerQuery();
 }
