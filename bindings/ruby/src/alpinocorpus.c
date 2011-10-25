@@ -119,6 +119,14 @@ static VALUE CorpusReader_new(VALUE self, VALUE path)
 /* Query */
 
 static VALUE Query_new(VALUE self, VALUE reader, VALUE query) {
+    /* The query should at the very least be convertable to String. */
+    query = StringValue(query);
+
+    /* Let's bail out early if the query is not valid. */
+    if (CorpusReader_valid_query(reader, query) == Qfalse)
+        rb_raise(rb_eRuntimeError, "invalid query");
+
+
     Query *q = (Query *) malloc(sizeof(Query));
     q->reader = reader;
     q->query = query;
@@ -167,6 +175,8 @@ static VALUE Query_each(VALUE self) {
 
     return entries_iterator(reader, iter);
 }
+
+/* Module initialization */
 
 void initializeCorpusReader()
 {
