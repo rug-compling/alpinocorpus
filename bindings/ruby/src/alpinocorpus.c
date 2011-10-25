@@ -24,7 +24,7 @@ VALUE static entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter
     do {
         char *val;
         if ((val = alpinocorpus_iter_value(iter)) == NULL)
-            rb_raise(rb_eRuntimeError, "coul not retrieve iterator value");
+            rb_raise(rb_eRuntimeError, "couldn't retrieve iterator value");
         
         VALUE rString = rb_str_new2(val);
         free(val);
