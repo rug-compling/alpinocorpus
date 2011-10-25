@@ -178,4 +178,5 @@ endif()
 
 add_subdirectory(util)
 add_subdirectory(bindings/python)
+add_subdirectory(bindings/ruby)
 add_subdirectory(resources)
