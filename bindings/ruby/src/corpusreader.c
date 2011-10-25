@@ -144,7 +144,7 @@ static VALUE CorpusReader_read(int argc, VALUE *argv, VALUE self)
  * call-seq:
  *   reader.validQuery?(query) -> bool
  *
- * Validate an XPath query using _reader.
+ * Validate an XPath query using _reader_.
  */
 VALUE CorpusReader_valid_query(VALUE self, VALUE query)
 {
