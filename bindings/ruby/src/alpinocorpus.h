@@ -2,23 +2,20 @@
 
 #include <AlpinoCorpus/capi.h>
 
-static void CorpusReader_free(alpinocorpus_reader reader);
-static VALUE CorpusReader_valid_query(VALUE self, VALUE query);
+#define Data_Get_Struct_Ptr(obj,type,sval) do {\
+    Check_Type(obj, T_DATA); \
+    sval = (type)DATA_PTR(obj);\
+} while (0)
 
-typedef struct {
-    VALUE reader;
-    VALUE query;
-} Query;
+void entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter);
+marker_query_t *markers_to_c_markers(VALUE markers, long *len);
 
-static VALUE Query_new(VALUE self, VALUE reader, VALUE query);
-static void Query_mark(Query *query);
-static void Query_free(Query *query);
+VALUE CorpusReader_valid_query(VALUE self, VALUE query);
+VALUE Query_new(VALUE self, VALUE reader, VALUE query);
 
-typedef struct {
-    VALUE query;
-    VALUE attr;
-    VALUE value;
-} MarkerQuery;
+void initializeCorpusReader();
+void initializeMarkerQuery();
+void initializeQuery();
 
-static void MarkerQuery_mark(MarkerQuery *markerQuery);
-static void MarkerQuery_free(MarkerQuery *markerQuery);
+extern VALUE cMarkerQuery;
+extern VALUE cQuery;

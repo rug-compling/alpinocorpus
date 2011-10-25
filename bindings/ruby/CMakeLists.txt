@@ -9,6 +9,9 @@ set(RUBY_HEADERS
 
 set(RUBY_SOURCES
   src/alpinocorpus.c
+  src/corpusreader.c
+  src/markerquery.c
+  src/query.c
 )
 
 add_library(alpinocorpus-rb MODULE
