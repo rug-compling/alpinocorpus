@@ -5,6 +5,7 @@
 #include <AlpinoCorpus/capi.h>
 
 #include "alpinocorpus.h"
+#include "corpusreader.h"
 
 typedef struct {
     VALUE reader;
@@ -68,16 +69,16 @@ static VALUE Query_each(VALUE self) {
     Query *query;
     Data_Get_Struct(self, Query, query);
 
-    alpinocorpus_reader reader;
-    Data_Get_Struct_Ptr(query->reader, alpinocorpus_reader, reader);
+    Reader *reader;
+    Data_Get_Struct(query->reader, Reader, reader);
 
     char *cQuery = StringValueCStr(query->query);
 
     alpinocorpus_iter iter;
-    if ((iter = alpinocorpus_query_iter(reader, cQuery)) == NULL)
+    if ((iter = alpinocorpus_query_iter(reader->reader, cQuery)) == NULL)
         rb_raise(rb_eRuntimeError, "could not execute query");
 
-    entries_iterator(reader, iter);
+    entries_iterator(reader->reader, iter);
 
     return self;
 }

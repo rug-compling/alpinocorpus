@@ -5,10 +5,18 @@
 #include <AlpinoCorpus/capi.h>
 
 #include "alpinocorpus.h"
-
-static void Reader_free(alpinocorpus_reader reader);
+#include "corpusreader.h"
 
 VALUE cReader;
+
+static void Reader_free(Reader *reader);
+
+void check_reader_open(Reader *reader)
+{
+    /* Raise an exception if the reader was closed. */
+    if (reader->reader == NULL)
+        rb_raise(rb_eIOError, "closed reader");
+}
 
 int validate_c_markers(alpinocorpus_reader reader, marker_query_t *markers,
     long len)
@@ -57,21 +65,40 @@ static VALUE Reader_new(VALUE self, VALUE path)
     alpinocorpus_reader reader = alpinocorpus_open(StringValueCStr(path));
     if (reader == NULL)
         rb_raise(rb_eRuntimeError, "can't open corpus");
+
+    Reader *r = (Reader *) malloc(sizeof(Reader));
+    r->reader = reader;
     
-    VALUE tdata = Data_Wrap_Struct(self, 0, Reader_free, reader);
+    VALUE tdata = Data_Wrap_Struct(self, 0, Reader_free, r);
     argv[0] = path;
     rb_obj_call_init(tdata, 1, argv);
     return tdata;
 }
 
-static void Reader_free(alpinocorpus_reader reader) {
-    alpinocorpus_close(reader);
+static void Reader_free(Reader *reader) {
+    if (reader->reader != NULL)
+        alpinocorpus_close(reader->reader);
+
+    free(reader);
+}
+
+static VALUE Reader_close(VALUE self)
+{
+    Reader *reader;
+    Data_Get_Struct(self, Reader, reader);
+
+    if (reader->reader != NULL) {
+        alpinocorpus_close(reader->reader);
+        reader->reader = NULL;
+    }
+
+    return Qnil;
 }
 
 static VALUE Reader_init(VALUE self, VALUE path)
 {
-  rb_iv_set(self, "@path", path);
-  return self;
+    rb_iv_set(self, "@path", path);
+    return self;
 }
 
 /*
@@ -85,14 +112,16 @@ static VALUE Reader_each(VALUE self)
     if (!rb_block_given_p())
         rb_raise(rb_eArgError, "a block is required");
 
-    alpinocorpus_reader reader;
-    Data_Get_Struct_Ptr(self, alpinocorpus_reader, reader);
+    Reader *reader;
+    Data_Get_Struct(self, Reader, reader);
+
+    check_reader_open(reader);
 
     alpinocorpus_iter iter;
-    if ((iter = alpinocorpus_entry_iter(reader)) == NULL)
+    if ((iter = alpinocorpus_entry_iter(reader->reader)) == NULL)
         rb_raise(rb_eRuntimeError, "could not iterate over corpus");
     
-    entries_iterator(reader, iter);
+    entries_iterator(reader->reader, iter);
 
     return self;
 }
@@ -108,6 +137,7 @@ static VALUE Reader_query(VALUE self, VALUE query)
     return Query_new(cQuery, self, query);
 }
 
+
 /*
  * call-seq:
  *   reader.read(entry[, markers]) -> data
@@ -122,14 +152,16 @@ static VALUE Reader_read(int argc, VALUE *argv, VALUE self)
 
     char *cEntry = StringValueCStr(entry);
 
-    alpinocorpus_reader reader;
-    Data_Get_Struct_Ptr(self, alpinocorpus_reader, reader);
+    Reader *reader;
+    Data_Get_Struct(self, Reader, reader);
+
+    check_reader_open(reader);
 
     char *data;
     if (markers == Qnil)
-        data = alpinocorpus_read(reader, cEntry);
+        data = alpinocorpus_read(reader->reader, cEntry);
     else
-        data = read_markers(reader, cEntry, markers);
+        data = read_markers(reader->reader, cEntry, markers);
 
     if (data == NULL)
         rb_raise(rb_eRuntimeError, "can't read entry");
@@ -148,10 +180,12 @@ static VALUE Reader_read(int argc, VALUE *argv, VALUE self)
  */
 VALUE Reader_valid_query(VALUE self, VALUE query)
 {
-    alpinocorpus_reader reader;
-    Data_Get_Struct_Ptr(self, alpinocorpus_reader, reader);
+    Reader *reader;
+    Data_Get_Struct(self, Reader, reader);
+
+    check_reader_open(reader);
     
-    if (alpinocorpus_is_valid_query(reader, StringValueCStr(query)))
+    if (alpinocorpus_is_valid_query(reader->reader, StringValueCStr(query)))
         return Qtrue;
     else
         return Qfalse;
@@ -168,13 +202,15 @@ void initializeReader()
         Reader_new, 1);
     rb_define_method(cReader, "initialize",
         Reader_init, 1); 
+    rb_define_method(cReader, "close",
+        Reader_close, 0);
     rb_define_method(cReader, "each",
         Reader_each, 0);
     rb_define_method(cReader, "query",
         Reader_query, 1);
     rb_define_method(cReader, "read",
         Reader_read, -1);
-    rb_define_method(cReader, "validQuery?",
+    rb_define_method(cReader, "valid_query?",
         Reader_valid_query, 1);
 
     rb_include_module(cReader, rb_mEnumerable);    

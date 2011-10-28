@@ -10,6 +10,7 @@
 void entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter);
 marker_query_t *markers_to_c_markers(VALUE markers, long *len);
 
+alpinocorpus_iter Reader_query_iter(VALUE self, char *cQuery);
 VALUE Reader_valid_query(VALUE self, VALUE query);
 VALUE Query_new(VALUE self, VALUE reader, VALUE query);
 
