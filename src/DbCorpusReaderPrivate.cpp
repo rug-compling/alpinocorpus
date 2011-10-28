@@ -83,8 +83,13 @@ bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
 void DbCorpusReaderPrivate::DbIter::next()
 {
     try {
-        db::XmlDocument doc;
-        r.next(doc);
+        try {
+            db::XmlDocument doc;
+            r.next(doc);
+        } catch (...) {
+            db::XmlValue value;
+            r.next(value);
+        }
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }
@@ -99,7 +104,12 @@ std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) con
 {
     db::XmlValue v;
     r.peek(v);
-    return v.getNodeValue();
+    if (v.isNode())
+        return v.getNodeValue();
+    else if (v.isString())
+        return v.asString();
+    else
+        return std::string();
 }
 
 DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
