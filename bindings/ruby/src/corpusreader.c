@@ -47,32 +47,9 @@ char *read_markers(alpinocorpus_reader reader, char *entry, VALUE markers)
     return data;
 }
 
-/*
- * call-seq: Reader.new(path)
- *
- * Constructs a corpus reader, opening the corpus at _path_. The
- * corpus can be one of the following types:
- *
- * * Dact (DBXML)
- * * Compact corpus
- * * Directory with XML files
- *
- */
-static VALUE Reader_new(VALUE self, VALUE path)
+static VALUE Reader_s_alloc(VALUE self)
 {
-    VALUE argv[1];
-    
-    alpinocorpus_reader reader = alpinocorpus_open(StringValueCStr(path));
-    if (reader == NULL)
-        rb_raise(rb_eRuntimeError, "can't open corpus");
-
-    Reader *r = (Reader *) malloc(sizeof(Reader));
-    r->reader = reader;
-    
-    VALUE tdata = Data_Wrap_Struct(self, 0, Reader_free, r);
-    argv[0] = path;
-    rb_obj_call_init(tdata, 1, argv);
-    return tdata;
+  return Data_Wrap_Struct(self, 0, Reader_free, 0);
 }
 
 static void Reader_free(Reader *reader) {
@@ -95,9 +72,29 @@ static VALUE Reader_close(VALUE self)
     return Qnil;
 }
 
-static VALUE Reader_init(VALUE self, VALUE path)
+/*
+ * call-seq: Reader.new(path)
+ *
+ * Constructs a corpus reader, opening the corpus at _path_. The
+ * corpus can be one of the following types:
+ *
+ * * Dact (DBXML)
+ * * Compact corpus
+ * * Directory with XML files
+ *
+ */
+static VALUE Reader_initialize(VALUE self, VALUE path)
 {
+    alpinocorpus_reader reader = alpinocorpus_open(StringValueCStr(path));
+    if (reader == NULL)
+        rb_raise(rb_eRuntimeError, "can't open corpus");
+
+    Reader *r = ALLOC(Reader);
+    r->reader = reader;
+    DATA_PTR(self) = r;
+
     rb_iv_set(self, "@path", path);
+
     return self;
 }
 
@@ -126,6 +123,18 @@ static VALUE Reader_each(VALUE self)
     return self;
 }
 
+static VALUE Reader_s_open(VALUE self, VALUE path)
+{
+    VALUE argv[1];
+    argv[0] = path;
+    VALUE reader = rb_class_new_instance(1, argv, self);
+
+    if (rb_block_given_p())
+        return rb_ensure(rb_yield, reader, Reader_close, reader);
+
+    return reader;
+}
+
 /*
  * call-seq:
  *   reader.query(q) -> query
@@ -136,7 +145,6 @@ static VALUE Reader_query(VALUE self, VALUE query)
 {
     return Query_new(cQuery, self, query);
 }
-
 
 /*
  * call-seq:
@@ -198,10 +206,12 @@ void initializeReader()
     cReader = rb_define_class_under(mAlpinoCorpus,
         "Reader", rb_cObject);
 
-    rb_define_singleton_method(cReader, "new",
-        Reader_new, 1);
+    rb_define_alloc_func(cReader, Reader_s_alloc); 
+
+    rb_define_singleton_method(cReader, "open", Reader_s_open, 1);
+
     rb_define_method(cReader, "initialize",
-        Reader_init, 1); 
+        Reader_initialize, 1); 
     rb_define_method(cReader, "close",
         Reader_close, 0);
     rb_define_method(cReader, "each",
