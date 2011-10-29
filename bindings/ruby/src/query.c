@@ -70,7 +70,7 @@ static VALUE Query_each(VALUE self) {
     Data_Get_Struct(self, Query, query);
 
     Reader *reader;
-    Data_Get_Struct(query->reader, Reader, reader);
+    get_reader(query->reader, &reader);
 
     char *cQuery = StringValueCStr(query->query);
 

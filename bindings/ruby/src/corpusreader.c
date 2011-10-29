@@ -18,6 +18,12 @@ void check_reader_open(Reader *reader)
         rb_raise(rb_eIOError, "closed reader");
 }
 
+void get_reader(VALUE obj, Reader **reader)
+{
+    Data_Get_Struct(obj, Reader, *reader);
+    check_reader_open(*reader);
+}
+
 int validate_c_markers(alpinocorpus_reader reader, marker_query_t *markers,
     long len)
 {
@@ -47,16 +53,19 @@ char *read_markers(alpinocorpus_reader reader, char *entry, VALUE markers)
     return data;
 }
 
-static VALUE Reader_s_alloc(VALUE self)
+static VALUE Reader_s_alloc(VALUE klass)
 {
-  return Data_Wrap_Struct(self, 0, Reader_free, 0);
+  return Data_Wrap_Struct(klass, 0, Reader_free, 0);
 }
 
 static void Reader_free(Reader *reader) {
-    if (reader->reader != NULL)
-        alpinocorpus_close(reader->reader);
+    if (reader) {
+        /* Reader could be deallocated per Reader_close(). */
+        if (reader->reader)
+            alpinocorpus_close(reader->reader);
 
-    free(reader);
+        free(reader);
+    }
 }
 
 static VALUE Reader_close(VALUE self)
@@ -110,9 +119,7 @@ static VALUE Reader_each(VALUE self)
         rb_raise(rb_eArgError, "a block is required");
 
     Reader *reader;
-    Data_Get_Struct(self, Reader, reader);
-
-    check_reader_open(reader);
+    get_reader(self, &reader);
 
     alpinocorpus_iter iter;
     if ((iter = alpinocorpus_entry_iter(reader->reader)) == NULL)
@@ -161,9 +168,7 @@ static VALUE Reader_read(int argc, VALUE *argv, VALUE self)
     char *cEntry = StringValueCStr(entry);
 
     Reader *reader;
-    Data_Get_Struct(self, Reader, reader);
-
-    check_reader_open(reader);
+    get_reader(self, &reader);
 
     char *data;
     if (markers == Qnil)
@@ -189,9 +194,7 @@ static VALUE Reader_read(int argc, VALUE *argv, VALUE self)
 VALUE Reader_valid_query(VALUE self, VALUE query)
 {
     Reader *reader;
-    Data_Get_Struct(self, Reader, reader);
-
-    check_reader_open(reader);
+    get_reader(self, &reader);
     
     if (alpinocorpus_is_valid_query(reader->reader, StringValueCStr(query)))
         return Qtrue;
