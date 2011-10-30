@@ -19,39 +19,38 @@ class DirectoryCorpusReaderPrivate : public CorpusReader
 
     class DirIter : public IterImpl
     {
-        StrVector::const_iterator iter;
+        boost::filesystem::recursive_directory_iterator iter;
+        boost::filesystem::path d_directory;
 
       public:
-        DirIter(StrVector::const_iterator const &i) : iter(i) { }
+        DirIter(boost::filesystem::path const &path,
+            boost::filesystem::recursive_directory_iterator i);
         std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
+      private:
+        bool isValid();
     };
 
 public:
     /**
      * Open directory dir for reading.
-     *
-     * If cache is true, attempt to read the directory's cache file if present
-     * or write one if not present.
-     * Failure to read or write the cache file is not signalled to the caller.
      */
-    DirectoryCorpusReaderPrivate(std::string const &directory, bool cache = true);
+    DirectoryCorpusReaderPrivate(std::string const &directory);
     virtual ~DirectoryCorpusReaderPrivate();
 
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
     virtual std::string getName() const;
     virtual std::string readEntry(std::string const &entry) const;
-    virtual size_t getSize() const { return d_entries.size(); }
+    virtual size_t getSize() const;
 
 private:
     boost::filesystem::path cachePath() const;
-    bool readCache();
-    void writeCache();
 
     boost::filesystem::path d_directory;
-    StrVector d_entries;
+    mutable size_t d_nEntries;
+    bool d_entriesRead;
 };
 
 }

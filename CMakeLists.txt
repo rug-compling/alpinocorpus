@@ -24,11 +24,20 @@ endif(APPLE)
 
 list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
 
-include_directories(${AlpinoCorpus_SOURCE_DIR}/include)
+include_directories(
+  ${AlpinoCorpus_SOURCE_DIR}/include
+  ${AlpinoCorpus_BINARY_DIR}/include
+)
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
+
+option(WITH_PYTHON
+  "Compile Python bindings" OFF)
+
+option(WITH_RUBY
+  "Compile Ruby bindings" OFF)
 
 find_package(Boost 1.46.1 COMPONENTS system filesystem thread REQUIRED)
 if(Boost_FOUND)
@@ -40,19 +49,24 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
-find_package(XercesC REQUIRED)
-if (XERCESC_FOUND)
-  include_directories(${XERCESC_INCLUDE_DIR})
-endif()
+option(USE_DBXML
+  "Enable the Berkeley DB XML backend" ON)
 
-find_package(XQilla REQUIRED)
-if (XQILLA_FOUND)
-  include_directories(${XQILLA_INCLUDE_DIR})
-endif()
+if(USE_DBXML)
+  find_package(XercesC REQUIRED)
+  if (XERCESC_FOUND)
+    include_directories(${XERCESC_INCLUDE_DIR})
+  endif()
 
-find_package(DBXML REQUIRED)
-if (DBXML_FOUND)
-  include_directories(${DBXML_INCLUDE_DIR})
+  find_package(XQilla REQUIRED)
+  if (XQILLA_FOUND)
+    include_directories(${XQILLA_INCLUDE_DIR})
+  endif()
+
+  find_package(DBXML REQUIRED)
+  if (DBXML_FOUND)
+    include_directories(${DBXML_INCLUDE_DIR})
+  endif()
 endif()
 
 find_package(Iconv REQUIRED)
@@ -67,18 +81,20 @@ endif()
 
 CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
 
-set (HEADERS
+configure_file (
+  "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
+  "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
+)
+
+set(HEADERS
+  include/AlpinoCorpus/CompactCorpusWriter.hh
   include/AlpinoCorpus/CorpusReader.hh
   include/AlpinoCorpus/CorpusWriter.hh
-  include/AlpinoCorpus/DbCorpusReader.hh
-  include/AlpinoCorpus/DbCorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
-  include/AlpinoCorpus/DzIstream.hh
-  include/AlpinoCorpus/DzIstreamBuf.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
-  include/AlpinoCorpus/IndexedCorpusReader.hh
-  #include/AlpinoCorpus/IndexedCorpusWriter.hh
+  include/AlpinoCorpus/CompactCorpusReader.hh
+  include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/util/NonCopyable.hh
   include/AlpinoCorpus/capi.h
@@ -87,24 +103,33 @@ set (HEADERS
   include/util/textfile.hh
   include/util/url.hh
   include/util/vs_stdint.h
+  src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
-  src/IndexedCorpusReaderPrivate.hh
+  src/DzIstream.hh
+  src/DzIstreamBuf.hh
+  src/DzOstream.hh
+  src/DzOstreamBuf.hh
+  src/CompactCorpusReaderPrivate.hh
+  src/MultiCorpusReaderPrivate.hh
   src/gzip.hh
 )
 
 set(SOURCES
+  src/CompactCorpusWriter.cpp
+  src/CompactCorpusWriterPrivate.cpp
   src/CorpusReader.cpp
   src/CorpusWriter.cpp
-  src/DbCorpusReader.cpp
-  src/DbCorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
   src/DzIstream.cpp
   src/DzIstreamBuf.cpp
+  src/DzOstream.cpp
+  src/DzOstreamBuf.cpp
   src/Error.cpp
-  src/IndexedCorpusReader.cpp
-  src/IndexedCorpusReaderPrivate.cpp
-  #src/IndexedCorpusWriter.cpp
+  src/CompactCorpusReader.cpp
+  src/CompactCorpusReaderPrivate.cpp
+  src/MultiCorpusReader.cpp
+  src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
   src/capi.cpp
   src/util/base64.cpp
@@ -112,18 +137,19 @@ set(SOURCES
   src/util/url.cpp
 )
 
-set(ACT_SOURCES
-  util/act/ProgramOptions.cpp
-  util/act/main.cpp
-)
+if(USE_DBXML)
+  list(APPEND HEADERS
+    include/AlpinoCorpus/DbCorpusReader.hh
+    include/AlpinoCorpus/DbCorpusWriter.hh
+    src/DbCorpusReaderPrivate.hh
+  )
 
-set(ACT_HEADERS
-  util/act/ProgramOptions.hh
-)
-
-set(MERGE_SOURCES
-  src/merge/merge.cpp
-)
+  list(APPEND SOURCES
+    src/DbCorpusReader.cpp
+    src/DbCorpusReaderPrivate.cpp
+    src/DbCorpusWriter.cpp
+  )
+endif()
 
 add_library(alpino_corpus SHARED 
 	${SOURCES}
@@ -140,25 +166,30 @@ target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
 target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
-add_executable(alpinocorpus-act ${ACT_SOURCES} ${ACT_HEADERS})
-target_link_libraries(alpinocorpus-act alpino_corpus)
-
-add_executable(alpinocorpus-merge ${MERGE_SOURCES})
-target_link_libraries(alpinocorpus-merge alpino_corpus)
-
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
-
-install(TARGETS alpinocorpus-act alpinocorpus-merge
-  RUNTIME DESTINATION bin)
 
 install(DIRECTORY include/AlpinoCorpus
   DESTINATION include)
 
 # Unit tests
 
-add_executable(writer_test test/writer.cpp ${writer_test_MOC_SRCS})
-target_link_libraries(writer_test alpino_corpus)
-#add_test(writer writer_test)
+if(USE_DBXML)
+  add_executable(writer_test test/writer.cpp)
+  target_link_libraries(writer_test alpino_corpus)
+  #add_test(writer writer_test)
+endif()
+
+add_subdirectory(util)
+
+if(WITH_PYTHON)
+  add_subdirectory(bindings/python)
+endif()
+
+if(WITH_RUBY)
+  add_subdirectory(bindings/ruby)
+endif()
+
+add_subdirectory(resources)

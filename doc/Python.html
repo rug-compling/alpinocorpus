@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">
+/*<![CDATA[*/
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode, table.sourceCode pre 
+   { margin: 0; padding: 0; border: 0; vertical-align: baseline; border: none; }
+td.lineNumbers { border-right: 1px solid #AAAAAA; text-align: right; color: #AAAAAA; padding-right: 5px; padding-left: 5px; }
+td.sourceCode { padding-left: 5px; }
+code.sourceCode span.kw { color: #007020; font-weight: bold; } 
+code.sourceCode span.dt { color: #902000; }
+code.sourceCode span.dv { color: #40a070; }
+code.sourceCode span.bn { color: #40a070; }
+code.sourceCode span.fl { color: #40a070; }
+code.sourceCode span.ch { color: #4070a0; }
+code.sourceCode span.st { color: #4070a0; }
+code.sourceCode span.co { color: #60a0b0; font-style: italic; }
+code.sourceCode span.ot { color: #007020; }
+code.sourceCode span.al { color: red; font-weight: bold; }
+code.sourceCode span.fu { color: #06287e; }
+code.sourceCode span.re { }
+code.sourceCode span.er { color: red; font-weight: bold; }
+/*]]>*/
+  </style>
+</head>
+<body>
+<h1 id="alpinocorpus-python-bindings">Alpinocorpus Python bindings</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The <em>alpinocorpus</em> Python binding that is included in the <em>alpinocorpus</em> distribution can be used to query and read XML treebanks in Python.</p>
+<h2 id="opening-a-corpus">Opening a corpus</h2>
+<p>A corpus is opened by loading the <code>alpinocorpus</code> Python module and constructing a <code>CorpusReader</code> instance. The <code>CorpusReader</code> constructor takes the corpus file or directory as its first argument.</p>
+<p>The following fragment constucts a <code>CorpusReader</code> using the <code>cdb.dact</code> file:</p>
+<pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; <span class="ch">import</span> alpinocorpus<br />&gt;&gt;&gt; reader = alpinocorpus.CorpusReader(<span class="st">&quot;cdb.dact&quot;</span>)</code></pre>
+<h2 id="listing-and-reading-entries">Listing and reading entries</h2>
+<p>The <code>entries</code> method of a <code>CorpusReader</code> object returns an iterator over the entries in the corpus:</p>
+<pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; <span class="dt">len</span>(<span class="dt">list</span>(reader.entries()))<br /><span class="dv">7136</span></code></pre>
+<p>The XML data of an entry can be read using the <code>read</code> method. For example, in the following fragment, we read the entry named <code>175.xml</code> and return its first 25 characters:</p>
+<pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; reader.read(<span class="st">&quot;178.xml&quot;</span>)[:<span class="dv">25</span>]<br /><span class="st">'&lt;?xml version=&quot;1.0&quot; encod'</span></code></pre>
+<h2 id="executing-queries">Executing queries</h2>
+<p>Using a query, we can retrieve the entries that have a non-empty set of nodes matching that query. Queries are in <a href="http://en.wikipedia.org/wiki/XPath">XPath</a> 1.0 format. If the corpus that was opened is a Dact (Berkeley DB XML) corpus, XPath 2.0 expressions can also be used.</p>
+<p>A query can be verified with the <code>validQuery</code> method of <code>CorpusReader</code>:</p>
+<pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; reader.validQuery(<span class="st">&quot;//node[@root='zie]&quot;</span>)<br /><span class="ot">False</span><br />&gt;&gt;&gt; reader.validQuery(<span class="st">&quot;//node[@root='zie']&quot;</span>)<br /><span class="ot">True</span></code></pre>
+<p>The <code>query</code> method of <code>CorpusReader</code> executes a query and returns an iterator over the results. The following fragment executes the query <code>//node[@root='loop']</code>, and gives the returns five results as a list:</p>
+<pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; <span class="dt">list</span>(reader.query(<span class="st">&quot;//node[@root='loop']&quot;</span>))[:<span class="dv">5</span>]<br />[<span class="st">'1012.xml'</span>, <span class="st">'103.xml'</span>, <span class="st">'1126.xml'</span>, <span class="st">'1133.xml'</span>, <span class="st">'1189.xml'</span>]</code></pre>
+<h2 id="node-marking">Node marking</h2>
+<p>In some applications, it is useful to mark the nodes of that match a query while reading an entry. The <code>readMarkQueries</code> method provides this functionality. Its arguments are the entry that should be read and a list of <code>MarkerQuery</code>. A <code>MarkerQuery</code> instance specifies a query and the attribute/value pair that matching nodes should get. For instance, in the following example we construct a list with one such <code>MarkerQuery</code>, marking nodes with the <code>@pt</code> attribute having the value <code>ww</code> with the attribute <code>active</code> and the value <code>1</code>:</p>
+<pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; markers = [alpinocorpus.MarkerQuery(<span class="st">&quot;//node[@pt='ww']&quot;</span>, <span class="st">&quot;active&quot;</span>, <span class="st">&quot;1&quot;</span>)]</code></pre>
+<p>We can then mark the matching nodes while reading an entry:</p>
+<pre class="sourceCode"><code class="sourceCode python">&gt;&gt;&gt; reader.readMarkQueries(<span class="st">&quot;508.xml&quot;</span>, markers)</code></pre>
+<h2 id="examples">Examples</h2>
+<p>Some more extensive examples using the Python module can be found in the <code>bindings/python/examples</code> directory of the <em>alpinocorpus</em> distribution.</p>
+</body>
+</html>
