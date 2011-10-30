@@ -33,6 +33,12 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
+option(WITH_PYTHON
+  "Compile Python bindings" OFF)
+
+option(WITH_RUBY
+  "Compile Ruby bindings" OFF)
+
 find_package(Boost 1.46.1 COMPONENTS system filesystem thread REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -177,6 +183,13 @@ if(USE_DBXML)
 endif()
 
 add_subdirectory(util)
-add_subdirectory(bindings/python)
-add_subdirectory(bindings/ruby)
+
+if(WITH_PYTHON)
+  add_subdirectory(bindings/python)
+endif()
+
+if(WITH_RUBY)
+  add_subdirectory(bindings/ruby)
+endif()
+
 add_subdirectory(resources)
