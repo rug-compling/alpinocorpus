@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <zlib.h>
 
-#include <AlpinoCorpus/DzIstreamBuf.hh>
+#include "DzIstreamBuf.hh"
 
 #include "gzip.hh"
 

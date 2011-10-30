@@ -1,5 +1,5 @@
-#ifndef ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
-#define ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
+#ifndef ALPINO_COMPACT_CORPUSREADER_PRIVATE_HH
+#define ALPINO_COMPACT_CORPUSREADER_PRIVATE_HH
 
 #include <string>
 #include <tr1/unordered_map>
@@ -13,7 +13,8 @@
 #endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <AlpinoCorpus/DzIstream.hh>
+
+#include "DzIstream.hh"
 
 namespace alpinocorpus
 {
@@ -28,7 +29,7 @@ namespace alpinocorpus
     size_t size;
 };
 
-class IndexedCorpusReaderPrivate : public CorpusReader
+class CompactCorpusReaderPrivate : public CorpusReader
 {
     typedef std::tr1::shared_ptr<IndexItem> IndexItemPtr;
     typedef std::tr1::unordered_map<std::string, IndexItemPtr> IndexMap;
@@ -51,10 +52,10 @@ public:
      * Construct from a single file (data or index); the other file is sought
      * for in the same directory.
      */
-    IndexedCorpusReaderPrivate(std::string const &path);
+    CompactCorpusReaderPrivate(std::string const &path);
     /** Construct from data and index file. */
-    IndexedCorpusReaderPrivate(std::string const &dataFilename, std::string const &indexFilename);
-    virtual ~IndexedCorpusReaderPrivate() {}
+    CompactCorpusReaderPrivate(std::string const &dataFilename, std::string const &indexFilename);
+    virtual ~CompactCorpusReaderPrivate() {}
 
     virtual EntryIterator getBegin() const;
     virtual EntryIterator getEnd() const;
@@ -80,4 +81,4 @@ private:
 
 }
 
-#endif  // ALPINO_INDEXED_CORPUSREADER_PRIVATE_HH
+#endif  // ALPINO_COMPACT_CORPUSREADER_PRIVATE_HH

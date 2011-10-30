@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include <AlpinoCorpus/DzIstream.hh>
-#include <AlpinoCorpus/DzIstreamBuf.hh>
+#include "DzIstream.hh"
+#include "DzIstreamBuf.hh"
 
 namespace alpinocorpus {
 

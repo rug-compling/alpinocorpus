@@ -14,11 +14,11 @@
 #include <boost/thread/mutex.hpp>
 #endif
 
-#include <AlpinoCorpus/DzIstream.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <util/base64.hh>
 
-#include "IndexedCorpusReaderPrivate.hh"
+#include "DzIstream.hh"
+#include "CompactCorpusReaderPrivate.hh"
 
 namespace {
     char const * const DATA_EXT = ".data.dz";
@@ -29,14 +29,14 @@ namespace bf = boost::filesystem;
 
 namespace alpinocorpus {
 
-IndexedCorpusReaderPrivate::IndexedCorpusReaderPrivate(std::string const &filename)
+CompactCorpusReaderPrivate::CompactCorpusReaderPrivate(std::string const &filename)
 {
     std::string canonical(filename);
     canonicalize(canonical);
     construct(canonical);
 }
 
-    IndexedCorpusReaderPrivate::IndexedCorpusReaderPrivate(std::string const &dataPath,
+    CompactCorpusReaderPrivate::CompactCorpusReaderPrivate(std::string const &dataPath,
     std::string const &indexPath)
 {
     std::string canonical(dataPath);
@@ -44,14 +44,14 @@ IndexedCorpusReaderPrivate::IndexedCorpusReaderPrivate(std::string const &filena
     construct(canonical, dataPath, indexPath);
 }
 
-void IndexedCorpusReaderPrivate::construct(std::string const &canonical)
+void CompactCorpusReaderPrivate::construct(std::string const &canonical)
 {
     std::string dataPath  = canonical + DATA_EXT;
     std::string indexPath = canonical + INDEX_EXT;
     construct(canonical, dataPath, indexPath);
 }
 
-void IndexedCorpusReaderPrivate::construct(std::string const &canonical,
+void CompactCorpusReaderPrivate::construct(std::string const &canonical,
     std::string const &dataPath,
     std::string const &indexPath)
 {
@@ -69,24 +69,24 @@ void IndexedCorpusReaderPrivate::construct(std::string const &canonical,
     d_name = canonical;
 }
 
-CorpusReader::EntryIterator IndexedCorpusReaderPrivate::getBegin() const
+CorpusReader::EntryIterator CompactCorpusReaderPrivate::getBegin() const
 {
     ItemVector::const_iterator begin(d_indices.begin());
     return EntryIterator(new IndexIter(begin));
 }
 
-CorpusReader::EntryIterator IndexedCorpusReaderPrivate::getEnd() const
+CorpusReader::EntryIterator CompactCorpusReaderPrivate::getEnd() const
 {
     ItemVector::const_iterator end(d_indices.end());
     return EntryIterator(new IndexIter(end));
 }
 
-std::string IndexedCorpusReaderPrivate::getName() const
+std::string CompactCorpusReaderPrivate::getName() const
 {
     return d_name;
 }
 
-size_t IndexedCorpusReaderPrivate::getSize() const
+size_t CompactCorpusReaderPrivate::getSize() const
 {
   return d_indices.size();
 }
@@ -104,7 +104,7 @@ bool endsWith(std::string const &str, std::string const &end)
 /*
  * Canonicalize file name. To be called from constructor.
  */
-void IndexedCorpusReaderPrivate::canonicalize(std::string &filename)
+void CompactCorpusReaderPrivate::canonicalize(std::string &filename)
 {
     if (endsWith(filename, DATA_EXT))
         filename = filename.substr(0, filename.size() - 8);
@@ -114,12 +114,12 @@ void IndexedCorpusReaderPrivate::canonicalize(std::string &filename)
         throw OpenError(filename, "not an indexed (.dz) corpus file");
 }
 
-std::string IndexedCorpusReaderPrivate::IndexIter::current() const
+std::string CompactCorpusReaderPrivate::IndexIter::current() const
 {
     return (*iter)->name;
 }
 
-bool IndexedCorpusReaderPrivate::IndexIter::equals(IterImpl const &other) const
+bool CompactCorpusReaderPrivate::IndexIter::equals(IterImpl const &other) const
 {
     try {
         IndexIter const &that = dynamic_cast<IndexIter const &>(other);
@@ -129,12 +129,12 @@ bool IndexedCorpusReaderPrivate::IndexIter::equals(IterImpl const &other) const
     }
 }
 
-void IndexedCorpusReaderPrivate::IndexIter::next()
+void CompactCorpusReaderPrivate::IndexIter::next()
 {
     ++iter;
 }
 
-void IndexedCorpusReaderPrivate::open(std::string const &dataPath,
+void CompactCorpusReaderPrivate::open(std::string const &dataPath,
     std::string const &indexPath)
 {
     std::ifstream indexStream(indexPath.c_str());
@@ -167,11 +167,11 @@ void IndexedCorpusReaderPrivate::open(std::string const &dataPath,
         d_namedIndices[name] = item;
     }}
 
-std::string IndexedCorpusReaderPrivate::readEntry(std::string const &filename) const
+std::string CompactCorpusReaderPrivate::readEntry(std::string const &filename) const
 {
     IndexMap::const_iterator iter = d_namedIndices.find(filename);
     if (iter == d_namedIndices.end())
-        throw Error("IndexedCorpusReaderPrivate::read: requesting unknown data!");
+        throw Error("CompactCorpusReaderPrivate::read: requesting unknown data!");
 
 #if defined(BOOST_HAS_THREADS)
     boost::mutex::scoped_lock lock(d_readMutex);
