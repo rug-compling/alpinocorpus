@@ -1,6 +1,7 @@
 #ifndef ALPINO_CORPUSREADER_HH
 #define ALPINO_CORPUSREADER_HH
 
+#include <cstddef>
 #include <list>
 #include <queue>
 #include <string>
