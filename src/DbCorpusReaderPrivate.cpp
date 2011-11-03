@@ -90,9 +90,14 @@ void DbCorpusReaderPrivate::DbIter::next()
     }
 }
 
-DbCorpusReaderPrivate::QueryIter::QueryIter(db::XmlResults const &r)
- : DbIter(r)
+DbCorpusReaderPrivate::QueryIter::QueryIter(db::XmlResults const &r, db::XmlQueryContext const &ctx)
+ : DbIter(r), context(ctx)
 {
+}
+
+void DbCorpusReaderPrivate::QueryIter::interrupt()
+{
+    context.interruptQuery();
 }
 
 std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) const
@@ -297,7 +302,7 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &
                                      db::DBXML_LAZY_DOCS
                                    | db::DBXML_WELL_FORMED_ONLY
                                   ));
-        return EntryIterator(new QueryIter(r));
+        return EntryIterator(new QueryIter(r, ctx));
     } catch (db::XmlException const &e) {
         throw alpinocorpus::Error(e.what());
     }

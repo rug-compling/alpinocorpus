@@ -41,6 +41,13 @@ namespace alpinocorpus {
     {
         return impl->contents(rdr);
     }
+
+    void CorpusReader::EntryIterator::interrupt()
+    {
+        // XXX this shound't be necessary, we don't do this in other places
+        if (impl.get() != 0)
+            impl->interrupt();
+    }
     
     CorpusReader::EntryIterator CorpusReader::end() const
     {
@@ -357,6 +364,11 @@ namespace alpinocorpus {
     {
         //return rdr.read(current());
         return std::string(); // XXX - should be a null string
+    }
+
+    void CorpusReader::IterImpl::interrupt()
+    {
+        // XXX no default behavior implemented
     }
     
 }

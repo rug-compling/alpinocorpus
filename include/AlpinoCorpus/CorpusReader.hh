@@ -30,6 +30,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 
         // Query iterators must override this
         virtual std::string contents(CorpusReader const &rdr) const;
+        virtual void interrupt();
     };
 
   public:
@@ -57,6 +58,11 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
          * and the matching part for a query iterator.
          */
         std::string contents(CorpusReader const &rdr) const;
+
+        /**
+         * Interrupt an iterator that is blocking.
+         */
+        void interrupt();
     };
     
     struct MarkerQuery {
