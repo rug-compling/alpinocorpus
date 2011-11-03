@@ -68,10 +68,15 @@ bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
         DbIter &other= const_cast<DbIter&>(dynamic_cast<DbIter const &>(that));
         DbIter &self = const_cast<DbIter&>(*this);
         try {
+            // XXX - Why do we check whether we are at the end first, rather than
+            // comparing the XmlResult objects immediately?
             if (!self.r.hasNext() && !other.r.hasNext())
                 return true;        // both at end()
         } catch (db::XmlException const &e) {
-            throw alpinocorpus::Error(e.what());
+        if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
+                throw alpinocorpus::IterationInterrupted();
+            else
+                throw alpinocorpus::Error(e.what());
         }
         return self.r == other.r;
     } catch (std::bad_cast const &e) {
