@@ -32,7 +32,7 @@ void entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter)
     alpinocorpus_iter_destroy(iter);
 }
 
-void Init_alpinocorpus()
+void Init_alpinocorpus_ext()
 {
     mAlpinoCorpus = rb_define_module("AlpinoCorpus");
 

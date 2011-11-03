@@ -93,6 +93,7 @@ void initializeQuery()
 {
     cQuery = rb_define_class_under(mAlpinoCorpus, "Query",
         rb_cObject);
+    rb_undef_alloc_func(cQuery);
     rb_define_method(cQuery, "initialize",
         Query_init, 2);
     rb_define_method(cQuery, "each",

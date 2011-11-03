@@ -86,7 +86,10 @@ void DbCorpusReaderPrivate::DbIter::next()
         db::XmlDocument doc;
         r.next(doc);
     } catch (db::XmlException const &e) {
-        throw alpinocorpus::Error(e.what());
+        if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
+          throw alpinocorpus::IterationInterrupted();
+        else
+          throw alpinocorpus::Error(e.what());
     }
 }
 
