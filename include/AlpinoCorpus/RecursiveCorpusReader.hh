@@ -1,5 +1,5 @@
-#ifndef MULTI_CORPUSREADER_HH
-#define MULTI_CORPUSREADER_HH
+#ifndef RECURSIVE_CORPUSREADER_HH
+#define RECURSIVE_CORPUSREADER_HH
 
 #include <string>
 #include <tr1/memory>
@@ -30,4 +30,4 @@ private:
 
 }
 
-#endif // MULTI_CORPUSREADER_HH
+#endif // RECURSIVE_CORPUSREADER_HH
