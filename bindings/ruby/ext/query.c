@@ -18,6 +18,9 @@ static void Query_free(Query *query);
 VALUE cQuery;
 
 VALUE Query_new(VALUE self, VALUE reader, VALUE query) {
+    Query *q;
+    VALUE tdata, argv[2];
+
     /* The query should at the very least be convertable to String. */
     query = StringValue(query);
 
@@ -26,13 +29,12 @@ VALUE Query_new(VALUE self, VALUE reader, VALUE query) {
         rb_raise(rb_eRuntimeError, "invalid query");
 
 
-    Query *q = (Query *) malloc(sizeof(Query));
+    q = (Query *) malloc(sizeof(Query));
     q->reader = reader;
     q->query = query;
 
-    VALUE tdata = Data_Wrap_Struct(self, Query_mark, Query_free, q);
+    tdata = Data_Wrap_Struct(self, Query_mark, Query_free, q);
 
-    VALUE argv[2];
     argv[0] = reader;
     argv[0] = query;
     rb_obj_call_init(tdata, 2, argv);
@@ -63,18 +65,20 @@ static VALUE Query_init(VALUE self, VALUE reader, VALUE path)
  * Execute a code block for each corpus entry name (matching the query). 
  */
 static VALUE Query_each(VALUE self) {
+    Query *query;
+    Reader *reader;
+    char *cQuery;
+    alpinocorpus_iter iter;
+
     if (!rb_block_given_p())
         rb_raise(rb_eArgError, "a block is required");
 
-    Query *query;
     Data_Get_Struct(self, Query, query);
 
-    Reader *reader;
     get_reader(query->reader, &reader);
 
-    char *cQuery = StringValueCStr(query->query);
+    cQuery = StringValueCStr(query->query);
 
-    alpinocorpus_iter iter;
     if ((iter = alpinocorpus_query_iter(reader->reader, cQuery)) == NULL)
         rb_raise(rb_eRuntimeError, "could not execute query");
 
