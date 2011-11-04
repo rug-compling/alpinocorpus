@@ -12,7 +12,9 @@ void entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter)
     VALUE rString;
     int status;
 
-    do {
+    for (; !alpinocorpus_iter_end(reader, iter);
+        alpinocorpus_iter_next(reader, iter))
+    {
         char *val;
         if ((val = alpinocorpus_iter_value(iter)) == NULL)
             rb_raise(rb_eRuntimeError, "couldn't retrieve iterator value");
@@ -27,7 +29,7 @@ void entries_iterator(alpinocorpus_reader reader, alpinocorpus_iter iter)
             rb_jump_tag(status);
         }
 
-    } while (alpinocorpus_iter_next(reader, iter));
+    }
 
     alpinocorpus_iter_destroy(iter);
 }

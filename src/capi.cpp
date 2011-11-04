@@ -49,9 +49,6 @@ int alpinocorpus_is_valid_query(alpinocorpus_reader reader, char const *query)
 
 alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
 {
-    if (corpus->corpusReader->begin() == corpus->corpusReader->end())
-        return NULL;
-    
     alpinocorpus_iter i = new alpinocorpus_iter_t(corpus->corpusReader->begin());
     
     return i;
@@ -67,9 +64,6 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
         return NULL;
     }
         
-    if (iter == reader->corpusReader->end())
-        return NULL;
-    
     alpinocorpus_iter i = new alpinocorpus_iter_t(iter);
     
     return i;
@@ -80,14 +74,15 @@ void alpinocorpus_iter_destroy(alpinocorpus_iter iter)
   delete iter;
 }
 
-int alpinocorpus_iter_next(alpinocorpus_reader reader,
+int alpinocorpus_iter_end(alpinocorpus_reader reader, alpinocorpus_iter iter)
+{
+  return iter->entryIter == reader->corpusReader->end();
+}
+
+void alpinocorpus_iter_next(alpinocorpus_reader reader,
     alpinocorpus_iter iter)
 {
-    if (iter->entryIter == reader->corpusReader->end() ||
-        ++(iter->entryIter) == reader->corpusReader->end())
-      return int(0);
-    else
-      return int(1);
+  ++(iter->entryIter);
 }
     
 char *alpinocorpus_iter_value(alpinocorpus_iter iter)
