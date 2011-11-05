@@ -1,3 +1,9 @@
+alpino-corpus (1.0.0-1) oneiric; urgency=low
+
+  * New upstream release.
+
+ -- Daniël de Kok <me@danieldk.eu>  Sat, 5 Nov 2011 12:31:21 +0200
+
 alpino-corpus (0.9.9-1) oneiric; urgency=low
 
   * New upstream release.

@@ -2,7 +2,7 @@ Source: alpino-corpus
 Priority: extra
 Maintainer: Daniël de Kok <me@danieldk.eu>
 Build-Depends: debhelper (>= 7.0.50~), libboost-dev (>= 1.46.1.1), libboost-filesystem-dev (>= 1.46.1.1), libboost-system-dev (>= 1.46.1.1), libboost-thread-dev (>= 1.46.1.1), cmake (>= 2.8.0), cdbs (>= 0.4.62), libxqilla-dev, libxerces-c-dev, libdbxml-dev (>= 2.5.16), libxml2-dev (>= 2.7.8), libxslt1-dev (>= 1.1.26-7), zlib1g-dev (>= 1.2.3)
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 Section: libs
 Homepage: http://github.com/rug-compling/dact
 Vcs-Git: git://github.com/rug-compling/alpinocorpus.git
