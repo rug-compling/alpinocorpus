@@ -48,10 +48,16 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
 void alpinocorpus_iter_destroy(alpinocorpus_iter iter);
 
 /**
+ * Check whether the iterator is at its end.
+ */
+int alpinocorpus_iter_end(alpinocorpus_reader corpus,
+  alpinocorpus_iter iter);
+
+/**
  * Move the iterator forward. This function return false (0) when there are
  * no more entries.
  */
-int alpinocorpus_iter_next(alpinocorpus_reader corpus,
+void alpinocorpus_iter_next(alpinocorpus_reader corpus,
   alpinocorpus_iter iter);
 
 /**

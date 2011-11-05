@@ -38,6 +38,7 @@ int validate_c_markers(alpinocorpus_reader reader, marker_query_t *markers,
 char *read_markers(alpinocorpus_reader reader, char *entry, VALUE markers)
 {
     long len;
+    char *data;
     marker_query_t *cQueries = markers_to_c_markers(markers, &len);
 
     if (!validate_c_markers(reader, cQueries, len)) {
@@ -45,7 +46,7 @@ char *read_markers(alpinocorpus_reader reader, char *entry, VALUE markers)
         rb_raise(rb_eRuntimeError, "invalid query");
     }
 
-    char *data = alpinocorpus_read_mark_queries(reader, entry, cQueries,
+    data = alpinocorpus_read_mark_queries(reader, entry, cQueries,
         len);
     
     free(cQueries);
@@ -94,11 +95,14 @@ static VALUE Reader_close(VALUE self)
  */
 static VALUE Reader_initialize(VALUE self, VALUE path)
 {
-    alpinocorpus_reader reader = alpinocorpus_open(StringValueCStr(path));
+    Reader *r = ALLOC(Reader);
+    alpinocorpus_reader reader;
+
+    reader = alpinocorpus_open(StringValueCStr(path));
     if (reader == NULL)
         rb_raise(rb_eRuntimeError, "can't open corpus");
 
-    Reader *r = ALLOC(Reader);
+    r = ALLOC(Reader);
     r->reader = reader;
     DATA_PTR(self) = r;
 
@@ -115,13 +119,14 @@ static VALUE Reader_initialize(VALUE self, VALUE path)
  */
 static VALUE Reader_each(VALUE self)
 {
+    Reader *reader;
+    alpinocorpus_iter iter;
+
     if (!rb_block_given_p())
         rb_raise(rb_eArgError, "a block is required");
 
-    Reader *reader;
     get_reader(self, &reader);
 
-    alpinocorpus_iter iter;
     if ((iter = alpinocorpus_entry_iter(reader->reader)) == NULL)
         rb_raise(rb_eRuntimeError, "could not iterate over corpus");
     
@@ -132,9 +137,10 @@ static VALUE Reader_each(VALUE self)
 
 static VALUE Reader_s_open(VALUE self, VALUE path)
 {
-    VALUE argv[1];
+    VALUE reader, argv[1];
+
     argv[0] = path;
-    VALUE reader = rb_class_new_instance(1, argv, self);
+    reader = rb_class_new_instance(1, argv, self);
 
     if (rb_block_given_p())
         return rb_ensure(rb_yield, reader, Reader_close, reader);
@@ -162,15 +168,17 @@ static VALUE Reader_query(VALUE self, VALUE query)
  */
 static VALUE Reader_read(int argc, VALUE *argv, VALUE self)
 {
-    VALUE entry, markers;
+    VALUE entry, markers, rData;
+    char *cEntry;
+    Reader *reader;
+    char *data;
+
     rb_scan_args(argc, argv, "11", &entry, &markers);
 
-    char *cEntry = StringValueCStr(entry);
+    cEntry = StringValueCStr(entry);
 
-    Reader *reader;
     get_reader(self, &reader);
 
-    char *data;
     if (markers == Qnil)
         data = alpinocorpus_read(reader->reader, cEntry);
     else
@@ -179,7 +187,7 @@ static VALUE Reader_read(int argc, VALUE *argv, VALUE self)
     if (data == NULL)
         rb_raise(rb_eRuntimeError, "can't read entry");
 
-    VALUE rData = rb_str_new2(data);
+    rData = rb_str_new2(data);
     free(data);
 
     return rData;

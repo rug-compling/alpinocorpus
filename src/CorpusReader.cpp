@@ -41,6 +41,13 @@ namespace alpinocorpus {
     {
         return impl->contents(rdr);
     }
+
+    void CorpusReader::EntryIterator::interrupt()
+    {
+        // XXX this shouldn't be necessary, we don't do this in other places
+        if (impl.get() != 0)
+            impl->interrupt();
+    }
     
     CorpusReader::EntryIterator CorpusReader::end() const
     {
@@ -257,9 +264,10 @@ namespace alpinocorpus {
         d_corpus(corpus),
         d_itr(itr),
         d_end(end),
-        d_query(query)
+        d_query(query),
+        d_initialState(true)
     {
-        next();
+        //next();
     }
     
     std::string CorpusReader::FilterIter::current() const
@@ -269,6 +277,12 @@ namespace alpinocorpus {
     
     bool CorpusReader::FilterIter::equals(IterImpl const &itr) const
     {
+        if (d_initialState) {
+          d_initialState = false;
+          FilterIter *self = const_cast<FilterIter *>(this);
+          self->next();
+        }
+
         try {
             // TODO fix me to be more like isEqual instead of hasNext.
             return d_itr == d_end
@@ -277,14 +291,24 @@ namespace alpinocorpus {
             return false;
         }
     }
+
+    void CorpusReader::FilterIter::interrupt()
+    {
+      d_interrupted = true;
+    }
     
     void CorpusReader::FilterIter::next()
     {
         if (!d_buffer.empty())
             d_buffer.pop();
-        
+       
+        d_interrupted = false;
+
         while (d_buffer.empty() && d_itr != d_end)
         {
+            if (d_interrupted)
+              throw IterationInterrupted();
+
             d_file = *d_itr;
             parseFile(d_file);
             
@@ -358,5 +382,9 @@ namespace alpinocorpus {
         //return rdr.read(current());
         return std::string(); // XXX - should be a null string
     }
-    
+
+    void CorpusReader::IterImpl::interrupt()
+    {
+        // XXX no default behavior implemented
+    }
 }

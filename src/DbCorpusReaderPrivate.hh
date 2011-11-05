@@ -32,10 +32,15 @@ class DbCorpusReaderPrivate : public CorpusReader
         DbIter(DbXml::XmlResults const &);
     };
     
-    struct QueryIter : public DbIter
+    class QueryIter : public DbIter
     {
-        QueryIter(DbXml::XmlResults const &);
+    public:
+        QueryIter(DbXml::XmlResults const &, DbXml::XmlQueryContext const &);
         std::string contents(CorpusReader const &) const;
+        void interrupt();
+    
+    protected:
+        DbXml::XmlQueryContext context;
     };
     
 public:
