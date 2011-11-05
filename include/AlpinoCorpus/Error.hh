@@ -97,6 +97,15 @@ namespace alpinocorpus {
         static std::string construct(std::string const &path, std::string const &extra);
         static std::string construct(std::string const &path, char const *extra);
     };
+
+    /**
+     * Iteration is interrupted.
+     */
+    class IterationInterrupted : public Error
+    {
+      public:
+        explicit IterationInterrupted() : Error("Iteration was interrupted.") {}
+    };
 }
 
 #endif // ALPINO_ERROR_HH

@@ -4,14 +4,14 @@ if(RUBY_FOUND)
 endif()
 
 set(RUBY_HEADERS
-  src/alpinocorpus.h
+  ext/alpinocorpus.h
 )
 
 set(RUBY_SOURCES
-  src/alpinocorpus.c
-  src/corpusreader.c
-  src/markerquery.c
-  src/query.c
+  ext/alpinocorpus.c
+  ext/corpusreader.c
+  ext/markerquery.c
+  ext/query.c
 )
 
 add_library(alpinocorpus-rb MODULE

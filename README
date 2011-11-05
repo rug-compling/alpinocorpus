@@ -23,6 +23,12 @@ This library evolved from the libcorpus library of the Alpino parser,
 adding query-based iteration, support for Berkeley DB XML treebanks,
 and a Qt-ish API.
 
+ABI/API
+-------
+
+We aim for ABI/API stability accross y versions in x.y.z. The C API
+(capi.h), Python, and Ruby bindings are not API/ABI stable yet.
+
 Design
 ------
 

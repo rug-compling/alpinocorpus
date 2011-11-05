@@ -19,16 +19,20 @@ VALUE cMarkerQuery;
 
 marker_query_t *markers_to_c_markers(VALUE markers, long *len)
 {
+    marker_query_t *cQueries;
+    long i;
+    VALUE q;
+    MarkerQuery *mq;
+
     if (TYPE(markers) != T_ARRAY)
         rb_raise(rb_eRuntimeError, "need an array");
     
     *len = RARRAY_LEN(markers);
 
-    marker_query_t *cQueries = malloc(sizeof(marker_query_t) * (*len));
+    cQueries = malloc(sizeof(marker_query_t) * (*len));
 
-    long i;
     for (i = 0; i < *len; ++i) {
-        VALUE q = rb_ary_entry(markers, i);
+        q = rb_ary_entry(markers, i);
 
         /* Check element class */
         if (CLASS_OF(rb_ary_entry(markers, i)) != cMarkerQuery) {
@@ -36,7 +40,6 @@ marker_query_t *markers_to_c_markers(VALUE markers, long *len)
             rb_raise(rb_eRuntimeError, "expecting elements of class MarkerQuery");
         }
 
-        MarkerQuery *mq;
         Data_Get_Struct(q, MarkerQuery, mq);
 
         /* No strdup is needed, since markers will still be around when
@@ -59,19 +62,24 @@ marker_query_t *markers_to_c_markers(VALUE markers, long *len)
 static VALUE MarkerQuery_new(VALUE self, VALUE query, VALUE attr,
     VALUE value)
 {
+    MarkerQuery *mq;
+    VALUE tdata, argv[3];
+
     query = StringValue(query);
     attr = StringValue(attr);
     value = StringValue(value);
 
-    MarkerQuery *mq = (MarkerQuery *) malloc(sizeof(MarkerQuery));
+    mq = (MarkerQuery *) malloc(sizeof(MarkerQuery));
     mq->query = query;
     mq->attr = attr;
     mq->value = value;
 
-    VALUE tdata = Data_Wrap_Struct(self, MarkerQuery_mark, MarkerQuery_free,
+    tdata = Data_Wrap_Struct(self, MarkerQuery_mark, MarkerQuery_free,
         mq);
     
-    VALUE argv[3] = {query, attr, value};
+    argv[0] = query;
+    argv[1] = attr;
+    argv[2] = value;
     rb_obj_call_init(tdata, 3, argv);
     return tdata;
 }
