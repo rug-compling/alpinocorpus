@@ -157,7 +157,7 @@ add_library(alpino_corpus SHARED
 )
 
 set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
-  SOVERSION 1)
+  SOVERSION 1.0)
 
 target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
