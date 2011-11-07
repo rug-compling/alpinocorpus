@@ -19,6 +19,11 @@ namespace alpinocorpus {
          */
         static CorpusWriter *open(std::string const &filename,
             bool overwrite, WriterType writerType);
+
+        /**
+         * Check whether a particular writer type is available.
+         */
+        static bool writerAvailable(WriterType writerType);
         
         /**
          * Will write name as a portable (Unix, UTF-8) pathname.

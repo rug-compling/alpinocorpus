@@ -23,6 +23,15 @@ namespace alpinocorpus {
       }
     }
 
+    bool CorpusWriter::writerAvailable(WriterType writerType)
+    {
+#ifndef USE_DBXML
+      if (writerType == DBXML_CORPUS_WRITER)
+        return false;
+#endif
+      return true;
+    }
+
     void CorpusWriter::write(std::string const &name, std::string const &content)
     {
         writeEntry(name, content);
