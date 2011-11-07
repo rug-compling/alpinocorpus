@@ -10,7 +10,15 @@ namespace alpinocorpus {
     class CorpusWriter : public util::NonCopyable
     {
     public:
+        enum WriterType { DBXML_CORPUS_WRITER } ;
+
         virtual ~CorpusWriter() {}
+
+        /**
+         * Open a corpus writer of the given type.
+         */
+        static CorpusWriter *open(std::string const &filename,
+            bool overwrite, WriterType writerType);
         
         /**
          * Will write name as a portable (Unix, UTF-8) pathname.
