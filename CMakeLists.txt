@@ -172,7 +172,8 @@ install(TARGETS alpino_corpus
 )
 
 install(DIRECTORY include/AlpinoCorpus
-  DESTINATION include)
+  DESTINATION include
+  FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
 
 # Unit tests
 
