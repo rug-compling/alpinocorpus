@@ -13,7 +13,6 @@ class Transformer:
 
   def close(self):
     self.style.freeStylesheet()
-    self.doc.freeDoc()
 
   def transform(self, data):
     doc = libxml2.parseMemory(data, len(data))
