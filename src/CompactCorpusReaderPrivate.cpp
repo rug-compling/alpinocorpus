@@ -5,7 +5,7 @@
 #include <typeinfo>
 #include <vector>
 
-#include <tr1/unordered_map>
+#include <boost/tr1/unordered_map.hpp>
 
 #include <boost/config.hpp>
 #include <boost/filesystem.hpp>

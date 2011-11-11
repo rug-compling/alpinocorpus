@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <tr1/memory>
+#include <boost/tr1/memory.hpp>
 
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/scoped_ptr.hpp>

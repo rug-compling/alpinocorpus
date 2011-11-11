@@ -3,7 +3,7 @@
 #include <string>
 #include <utility>
 
-#include <tr1/unordered_map>
+#include <boost/tr1/unordered_map.hpp>
 
 #include <boost/filesystem.hpp>
 
