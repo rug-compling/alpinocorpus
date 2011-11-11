@@ -168,7 +168,7 @@ bool MultiCorpusReaderPrivate::MultiIter::equals(IterImpl const &other) const
   try {
     MultiIter &that = const_cast<MultiIter &>(dynamic_cast<MultiIter const&>(other));
     return that.d_iters == d_iters;
-  } catch (std::bad_cast const &e) {
+  } catch (std::bad_cast const &) {
     return false;
   }
 }

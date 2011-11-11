@@ -68,16 +68,16 @@ namespace alpinocorpus {
     {
         try {
             return new DirectoryCorpusReader(corpusPath);
-        } catch (OpenError const &e) {}
+        } catch (OpenError const &) {}
 
         try {
             return new CompactCorpusReader(corpusPath);
-        } catch (OpenError const &e) {}
+        } catch (OpenError const &) {}
 
 #if defined(USE_DBXML)
         try {
             return new DbCorpusReader(corpusPath);
-        } catch (OpenError const &e) {}
+        } catch (OpenError const &) {}
 #endif
         
         throw OpenError(corpusPath);

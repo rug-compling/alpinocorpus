@@ -28,7 +28,7 @@ alpinocorpus_reader alpinocorpus_open(char const *path)
     
     try {
         reader = alpinocorpus::CorpusReader::open(path);
-    } catch (std::exception const &e) {
+    } catch (std::exception const &) {
         return NULL;
     }
     
@@ -60,7 +60,7 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
     
     try {
         iter = reader->corpusReader->query(alpinocorpus::CorpusReader::XPATH, query);
-    } catch (std::exception const &e) {
+    } catch (std::exception const &) {
         return NULL;
     }
         
@@ -90,7 +90,7 @@ char *alpinocorpus_iter_value(alpinocorpus_iter iter)
     std::string entry;
     try {
         entry = *(iter->entryIter);
-    } catch (std::exception const &e) {
+    } catch (std::exception const &) {
         return NULL;
     }
     
@@ -109,7 +109,7 @@ char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
     std::string str;
     try{ 
         str = reader->corpusReader->read(entry);
-    } catch (std::exception const &e) {
+    } catch (std::exception const &) {
         return NULL;
     }
     
@@ -141,7 +141,7 @@ char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
     std::string str;
     try{ 
         str = reader->corpusReader->readMarkQueries(entry, markerQueries);
-    } catch (std::exception const &e) {
+    } catch (std::exception const &) {
         return NULL;
     }
     

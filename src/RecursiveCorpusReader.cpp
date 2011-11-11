@@ -308,7 +308,7 @@ bool RecursiveCorpusReaderPrivate::RecursiveIter::equals(IterImpl const &other) 
   try {
     RecursiveIter &that = const_cast<RecursiveIter &>(dynamic_cast<RecursiveIter const&>(other));
     return that.d_iters == d_iters;
-  } catch (std::bad_cast const &e) {
+  } catch (std::bad_cast const &) {
     return false;
   }
 }
