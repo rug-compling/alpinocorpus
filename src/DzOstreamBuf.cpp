@@ -12,12 +12,14 @@
 #include <boost/cstdint.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/filesystem.hpp>
 
 #include <util/bufutil.hh>
 
 #include "DzOstreamBuf.hh"
 #include "gzip.hh"
 
+namespace bf = boost::filesystem;
 namespace pt = boost::posix_time;
 namespace bg = boost::gregorian;
 
@@ -45,13 +47,13 @@ DzOstreamBuf::DzOstreamBuf(char const *filename) : d_size(0), d_crc32(crc32(0L, 
 		return;
 	}
 
-	std::string tmpTemplate = std::string(filename) + "-XXXXXX";	
-	char *tmpFilename = strdup(tmpTemplate.c_str());
-	int fd = mkstemp(tmpFilename);
-
-	d_tmpFilename = tmpFilename;
-	d_zDataStream = fdopen(fd, "w");
-	free(tmpFilename);
+  // XXX - There is a race condition here, but Boost does not seem to
+  // provide a variant that returns a file descriptor. We used mkstemp
+  // previously, but it is not portable.
+  std::string tmpFilename =
+    bf::unique_path(std::string(filename) + "-%%%%-%%%%-%%%%-%%%%").string();
+  d_tmpFilename = tmpFilename;
+  d_zDataStream = fopen(tmpFilename.c_str(), "w");
 	
 	if (d_zDataStream == NULL)
 		throw std::runtime_error(std::string("DzOstreamBuf::DzOstreamBuf: Could not open ") +
@@ -115,7 +117,7 @@ DzOstreamBuf::~DzOstreamBuf()
 	
 	fclose(d_dzStream);
 
-	unlink(d_tmpFilename.c_str());
+  bf::remove(d_tmpFilename);
 }
 
 void DzOstreamBuf::flushBuffer()
