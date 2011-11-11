@@ -39,7 +39,8 @@ option(WITH_PYTHON
 option(WITH_RUBY
   "Compile Ruby bindings" OFF)
 
-find_package(Boost 1.46.1 COMPONENTS system filesystem thread REQUIRED)
+find_package(Boost 1.46.1 COMPONENTS system date_time
+  filesystem thread REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
