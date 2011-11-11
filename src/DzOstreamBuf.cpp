@@ -9,14 +9,18 @@
 
 #include <unistd.h>
 #include <zlib.h>
-#include <sys/time.h>
 
 #include <boost/cstdint.hpp>
+#include "boost/date_time/gregorian/gregorian.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <util/bufutil.hh>
 
 #include "DzOstreamBuf.hh"
 #include "gzip.hh"
+
+namespace pt = boost::posix_time;
+namespace bg = boost::gregorian;
 
 namespace {
 
@@ -193,16 +197,20 @@ void DzOstreamBuf::writeHeader()
 	std::vector<unsigned char> header(GZ_HEADER_SIZE);
 
 	// Get the current time. gzip only allows for 32-bit timestamps.
-	struct timeval tv;
-	if (gettimeofday(&tv, NULL) == -1 ||
-			tv.tv_sec > std::numeric_limits<int32_t>::max())
-		tv.tv_sec = 0;
+  pt::ptime epoch(bg::date(1970, 1, 1));
+  pt::time_duration diff = pt::second_clock::universal_time() - epoch;
+ 
+  long secsSinceEpoch;
+  if (diff.total_seconds() > std::numeric_limits<int32_t>::max())
+      secsSinceEpoch = 0;
+  else
+      secsSinceEpoch = diff.total_seconds();
 
 	header[GZ_HEADER_ID1] = gzipId1;
 	header[GZ_HEADER_ID2] = gzipId2;
 	header[GZ_HEADER_CM] = GZ_CM_DEFLATE;
 	header[GZ_HEADER_FLG] = GZ_FLG_EXTRA;
-	util::writeToBuf<uint32_t>(&header[0] + GZ_HEADER_MTIME, tv.tv_sec);
+	util::writeToBuf<uint32_t>(&header[0] + GZ_HEADER_MTIME, secsSinceEpoch);
 	header[GZ_HEADER_XFL] = GZ_XFL_MAX;
 	header[GZ_HEADER_OS] = GZ_OS_UNIX;
 	
