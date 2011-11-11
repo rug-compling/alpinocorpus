@@ -3,7 +3,6 @@
 #include <iostream>
 #include <stdexcept>
 
-#include <stdint.h>
 #include <zlib.h>
 
 #include "DzIstreamBuf.hh"

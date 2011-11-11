@@ -6,8 +6,6 @@
 #include <streambuf>
 #include <vector>
 
-#include <stdint.h>
-
 namespace alpinocorpus {
     
 struct DzChunk
