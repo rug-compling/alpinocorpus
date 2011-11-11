@@ -10,7 +10,7 @@ namespace alpinocorpus {
 
 class MultiCorpusReaderPrivate;
 
-class MultiCorpusReader : public CorpusReader
+class ALPINO_CORPUS_EXPORT MultiCorpusReader : public CorpusReader
 {
 public:
   MultiCorpusReader();

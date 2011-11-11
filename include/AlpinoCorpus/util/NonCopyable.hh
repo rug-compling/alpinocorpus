@@ -6,7 +6,7 @@ namespace alpinocorpus { namespace util {
 /**
  * Base class for objects without copy constructor and assignment.
  */
-class NonCopyable {
+class ALPINO_CORPUS_EXPORT NonCopyable {
   protected:
     NonCopyable() {}
     ~NonCopyable() {}
