@@ -147,13 +147,13 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
         iter->path().extension() != ".index")
       continue;
 
-    CorpusReader *reader(CorpusReader::open(iter->path().native()));
+    CorpusReader *reader(CorpusReader::open(iter->path().string()));
 
     bf::path namePath = iter->path();
     namePath.replace_extension("");
-    std::string name = namePath.native();
+    std::string name = namePath.string();
 
-    name.erase(0, d_directory.native().size() + 1);
+    name.erase(0, d_directory.string().size() + 1);
     
     push_back(name, reader);
   }
