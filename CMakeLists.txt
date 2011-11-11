@@ -157,13 +157,15 @@ add_library(alpino_corpus SHARED
 )
 
 set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
-  SOVERSION 1)
+  SOVERSION 1.0)
 
 target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
-target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
-target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
-target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
+if(USE_DBXML)
+  target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
+  target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
+  target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
+endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
 install(TARGETS alpino_corpus
@@ -172,7 +174,8 @@ install(TARGETS alpino_corpus
 )
 
 install(DIRECTORY include/AlpinoCorpus
-  DESTINATION include)
+  DESTINATION include
+  FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
 
 # Unit tests
 
