@@ -202,7 +202,7 @@ void DzOstreamBuf::writeHeader()
   pt::time_duration diff = pt::second_clock::universal_time() - epoch;
  
   long secsSinceEpoch;
-  if (diff.total_seconds() > std::numeric_limits<int32_t>::max())
+  if (diff.total_seconds() > std::numeric_limits<boost::int32_t>::max())
       secsSinceEpoch = 0;
   else
       secsSinceEpoch = diff.total_seconds();
@@ -211,7 +211,7 @@ void DzOstreamBuf::writeHeader()
 	header[GZ_HEADER_ID2] = gzipId2;
 	header[GZ_HEADER_CM] = GZ_CM_DEFLATE;
 	header[GZ_HEADER_FLG] = GZ_FLG_EXTRA;
-	util::writeToBuf<uint32_t>(&header[0] + GZ_HEADER_MTIME, secsSinceEpoch);
+	util::writeToBuf<boost::uint32_t>(&header[0] + GZ_HEADER_MTIME, secsSinceEpoch);
 	header[GZ_HEADER_XFL] = GZ_XFL_MAX;
 	header[GZ_HEADER_OS] = GZ_OS_UNIX;
 	
@@ -222,8 +222,8 @@ void DzOstreamBuf::writeTrailer()
 {
 	std::vector<unsigned char> trailer(GZ_TRAILER_SIZE);
 	
-	util::writeToBuf<uint32_t>(&trailer[0] + GZ_TRAILER_CRC32, d_crc32);
-	util::writeToBuf<uint32_t>(&trailer[0] + GZ_TRAILER_ISIZE, d_size);
+	util::writeToBuf<boost::uint32_t>(&trailer[0] + GZ_TRAILER_CRC32, d_crc32);
+	util::writeToBuf<boost::uint32_t>(&trailer[0] + GZ_TRAILER_ISIZE, d_size);
 
 	fwrite(&trailer[0], 1, GZ_TRAILER_SIZE, d_dzStream);
 }
