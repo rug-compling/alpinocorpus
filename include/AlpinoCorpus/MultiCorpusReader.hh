@@ -2,7 +2,7 @@
 #define MULTI_CORPUSREADER_HH
 
 #include <string>
-#include <tr1/memory>
+#include <boost/tr1/memory.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -10,7 +10,7 @@ namespace alpinocorpus {
 
 class MultiCorpusReaderPrivate;
 
-class MultiCorpusReader : public CorpusReader
+class ALPINO_CORPUS_EXPORT MultiCorpusReader : public CorpusReader
 {
 public:
   MultiCorpusReader();

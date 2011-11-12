@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include <tr1/memory>
+#include <boost/tr1/memory.hpp>
 
 #include "DzIstreamBuf.hh"
 

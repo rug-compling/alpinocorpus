@@ -3,31 +3,26 @@
 
 #include <boost/filesystem.hpp>
 
-#include <tr1/unordered_map>
+#include <boost/tr1/unordered_map.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
 namespace alpinocorpus {
 
-struct ReaderIter
-{
-  ReaderIter(std::string newName, alpinocorpus::CorpusReader *newReader,
-      alpinocorpus::CorpusReader::EntryIterator newIter) :
-    name(newName), reader(newReader), iter(newIter) {}
-
-  std::string name;
-  alpinocorpus::CorpusReader *reader;
-  alpinocorpus::CorpusReader::EntryIterator iter;
-};
-
-inline bool operator==(ReaderIter const &left, ReaderIter const &right)
-{
-  return left.name == right.name && left.reader == right.reader &&
-    left.iter == right.iter;
-}
-
 class MultiCorpusReaderPrivate : public CorpusReader
 {
+public:
+  struct ReaderIter
+  {
+    ReaderIter(std::string newName, alpinocorpus::CorpusReader *newReader,
+        alpinocorpus::CorpusReader::EntryIterator newIter) :
+      name(newName), reader(newReader), iter(newIter) {}
+
+    std::string name;
+    alpinocorpus::CorpusReader *reader;
+    alpinocorpus::CorpusReader::EntryIterator iter;
+  };
+private:
   class MultiIter : public CorpusReader::IterImpl
   {
   public:
@@ -64,5 +59,12 @@ private:
   std::list<CorpusReader *> d_corpusReaders;
   std::tr1::unordered_map<std::string, CorpusReader *> d_corpusReaderMap;
 };
+
+inline bool operator==(MultiCorpusReaderPrivate::ReaderIter const &left,
+  MultiCorpusReaderPrivate::ReaderIter const &right)
+{
+  return left.name == right.name && left.reader == right.reader &&
+    left.iter == right.iter;
+}
 
 }

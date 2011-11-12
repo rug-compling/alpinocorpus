@@ -7,7 +7,9 @@ if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
 endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
-set(CMAKE_CXX_FLAGS "-pthread")
+if (NOT WIN32)
+  set(CMAKE_CXX_FLAGS "-pthread -pedantic")
+endif(NOT WIN32)
 
 LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
@@ -29,7 +31,12 @@ include_directories(
   ${AlpinoCorpus_BINARY_DIR}/include
 )
 
-set(Boost_USE_STATIC_LIBS ON)
+if (APPLE OR WIN32)
+  set(Boost_USE_STATIC_LIBS ON)
+else(APPLE OR WIN32)
+  set(Boost_USE_STATIC_LIBS OFF)
+endif(APPLE OR WIN32)
+
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
@@ -39,7 +46,8 @@ option(WITH_PYTHON
 option(WITH_RUBY
   "Compile Ruby bindings" OFF)
 
-find_package(Boost 1.46.1 COMPONENTS system filesystem thread REQUIRED)
+find_package(Boost 1.46.1 COMPONENTS system date_time
+  filesystem thread REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()

@@ -7,7 +7,7 @@
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
 namespace alpinocorpus {
-    class CorpusWriter : public util::NonCopyable
+    class ALPINO_CORPUS_EXPORT CorpusWriter : public util::NonCopyable
     {
     public:
         enum WriterType { DBXML_CORPUS_WRITER } ;
