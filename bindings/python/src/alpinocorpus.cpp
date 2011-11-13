@@ -319,7 +319,7 @@ static void EntryIterator_dealloc(EntryIterator *self)
   delete self->iter;
   self->ob_type->tp_free(self);
 
-  Py_DECREF(self->reader);
+  Py_DECREF(reader);
 }
 
 static PyObject *EntryIterator_iter(PyObject *self)
