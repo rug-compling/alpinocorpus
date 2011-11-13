@@ -205,12 +205,15 @@ static PyObject *CorpusReader_read(CorpusReader *self, PyObject *args)
     return NULL;
 
   std::string data;
+  Py_BEGIN_ALLOW_THREADS
   try {
     data = self->reader->read(entry);
   } catch (std::runtime_error &e) {
+    Py_BLOCK_THREADS
     raise_exception(e.what());
     return NULL;
   }
+  Py_END_ALLOW_THREADS
 
   return Py_BuildValue("s#", data.c_str(), data.size());
 }
@@ -236,12 +239,15 @@ static PyObject *CorpusReader_readMarkQueries(CorpusReader *self, PyObject *args
   }
 
   std::string data;
+  Py_BEGIN_ALLOW_THREADS
   try {
     data = self->reader->readMarkQueries(entry, markerQueries);
   } catch (std::runtime_error &e) {
+    Py_BLOCK_THREADS
     raise_exception(e.what());
     return NULL;
   }
+  Py_END_ALLOW_THREADS
 
   return Py_BuildValue("s#", data.c_str(), data.size());
 }
@@ -331,9 +337,19 @@ static PyObject *EntryIterator_iternext(PyObject *self)
 {
   EntryIterator *entryIterator = reinterpret_cast<EntryIterator *>(self);
 
-  if (*entryIterator->iter != entryIterator->reader->reader->end()) {
+  bool atEnd;
+
+  Py_BEGIN_ALLOW_THREADS
+  atEnd = *entryIterator->iter == entryIterator->reader->reader->end();
+  Py_END_ALLOW_THREADS
+
+  if (!atEnd) {
     std::string entry = **entryIterator->iter;
+
+    Py_BEGIN_ALLOW_THREADS
     ++(*entryIterator->iter);
+    Py_END_ALLOW_THREADS
+
     return Py_BuildValue("s#", entry.c_str(), entry.size());
   } else {
     PyErr_SetNone(PyExc_StopIteration);
