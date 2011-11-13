@@ -283,6 +283,7 @@ static PyObject *CorpusReader_query(CorpusReader *self, PyObject *args)
       Py_INCREF(iter->reader);
     }
   } catch (std::runtime_error &e) {
+    EntryIteratorType.tp_free(iter);
     raise_exception(e.what());
     return NULL;
   }
