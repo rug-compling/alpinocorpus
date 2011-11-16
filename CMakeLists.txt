@@ -87,6 +87,13 @@ if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
 
+find_package(OpenSSL)
+if (OPENSSL_FOUND)
+  set(WITH_SSL ON)
+  option(WITH_SSL_STRICT
+	"With SSL, enable domain verification" OFF)
+endif()
+
 CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
 
 configure_file (
@@ -104,8 +111,9 @@ set(HEADERS
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
-  include/AlpinoCorpus/util/NonCopyable.hh
   include/AlpinoCorpus/capi.h
+  include/AlpinoCorpus/util/GetUrl.hh
+  include/AlpinoCorpus/util/NonCopyable.hh
   include/util/base64.hh
   include/util/bufutil.hh
   include/util/textfile.hh
@@ -136,6 +144,7 @@ set(SOURCES
   src/Error.cpp
   src/CompactCorpusReader.cpp
   src/CompactCorpusReaderPrivate.cpp
+  src/util/GetUrl.cpp
   src/MultiCorpusReader.cpp
   src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
@@ -175,6 +184,10 @@ if(USE_DBXML)
   target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
+if(WITH_SSL)
+  target_link_libraries(alpino_corpus ${OPENSSL_LIBRARIES})
+endif(WITH_SSL)
+
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
@@ -192,6 +205,9 @@ if(USE_DBXML)
   target_link_libraries(writer_test alpino_corpus)
   #add_test(writer writer_test)
 endif()
+
+add_executable(geturl_test test/geturl.cpp)
+target_link_libraries(geturl_test alpino_corpus)
 
 add_subdirectory(util)
 

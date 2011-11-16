@@ -2,5 +2,7 @@
 #define ALPINOCORPUS_CONFIG_HH
 
 #cmakedefine USE_DBXML
+#cmakedefine WITH_SSL
+#cmakedefine WITH_SSL_STRICT
 
 #endif // ALPINOCORPUS_CONFIG_HH
