@@ -149,51 +149,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
     else
 	throw std::runtime_error("geturl " + url +" : " + line);
 
-    // header lines
-    std::string previous ("");
-    while (std::getline(response_stream, line)) {
-
-	boost::algorithm::trim_right(line);
-
-	if (line.size() == 0) { // end of header lines
-
-	    if (d_headers["location"].size() > 0)
-		break;
-
-	    char delim = '\0';
-	    std::getline(response_stream, d_result, delim);
-	    while (!response_stream.eof()) {
-		d_result += delim;
-		std::string s;
-		std::getline(response_stream, s, delim);
-		d_result += s;
-	    }
-	    return;
-	}
-
-	if (line[0] == ' ' || line[0] == '\t') { // continuation line
-	    boost::algorithm::trim_left(line);
-	    if (d_headers[previous].size() > 0)
-		d_headers[previous] += " ";
-	    d_headers[previous] += line;
-	} else { // normal header line
-	    std::string s1, s2;
-	    size_t ii;
-	    ii = line.find(":");
-	    if (ii == std::string::npos) {
-		throw std::runtime_error("GetUrl: invalid header line: " + line);
-	    } else {
-		s1 = line.substr(0, ii);
-		boost::algorithm::to_lower(s1);
-		boost::algorithm::trim_right(s1);
-		s2 = line.substr(ii + 1);
-		boost::algorithm::trim_left(s2);
-	    }
-	    d_headers[s1] = s2;
-	    previous = s1;
-	}
-
-    }
+    extractHeaders(&response_stream);
 
     if (redirect && d_headers["location"].size() == 0)
 	throw "GetUrl: redirect without location";
@@ -210,6 +166,56 @@ void GetUrl::download(std::string const& url, int maxhop) {
 	} else
 	    u = d_headers["location"];
 	download(u, maxhop - 1);
+    }
+}
+
+void GetUrl::extractHeaders(std::istream *response_stream)
+{
+    // header lines
+    std::string line;
+    std::string previous ("");
+    while (std::getline(*response_stream, line)) {
+
+        boost::algorithm::trim_right(line);
+
+        if (line.size() == 0) { // end of header lines
+
+            if (d_headers["location"].size() > 0)
+            break;
+
+            char delim = '\0';
+            std::getline(*response_stream, d_result, delim);
+            while (!response_stream->eof()) {
+                d_result += delim;
+                std::string s;
+                std::getline(*response_stream, s, delim);
+                d_result += s;
+            }
+            return;
+        }
+
+        if (line[0] == ' ' || line[0] == '\t') { // continuation line
+            boost::algorithm::trim_left(line);
+            if (d_headers[previous].size() > 0)
+            d_headers[previous] += " ";
+            d_headers[previous] += line;
+        } else { // normal header line
+            std::string s1, s2;
+            size_t ii;
+            ii = line.find(":");
+            if (ii == std::string::npos) {
+                throw std::runtime_error("GetUrl: invalid header line: " + line);
+            } else {
+                s1 = line.substr(0, ii);
+                boost::algorithm::to_lower(s1);
+                boost::algorithm::trim_right(s1);
+                s2 = line.substr(ii + 1);
+                boost::algorithm::trim_left(s2);
+            }
+            d_headers[s1] = s2;
+            previous = s1;
+        }
+
     }
 }
 

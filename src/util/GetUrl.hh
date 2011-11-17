@@ -57,6 +57,7 @@ private:
     };
 
     void download(std::string const& url, int maxhop);
+    void extractHeaders(std::istream *response_stream);
     URLComponents parseUrl(std::string const &url);
 
     std::string d_result;
