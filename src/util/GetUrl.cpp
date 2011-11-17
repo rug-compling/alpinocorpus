@@ -21,7 +21,7 @@ namespace ssl = boost::asio::ssl;
 
 namespace alpinocorpus { namespace util {
 
-GetUrl::GetUrl(std::string const& url)
+GetUrl::GetUrl(std::string const& url) : d_redirect(false)
 {
     download(url, 6);
 }
@@ -121,55 +121,33 @@ void GetUrl::download(std::string const& url, int maxhop) {
 	    i = boost::asio::read(socket, response, boost::asio::transfer_all(), error);
 	}
     io_service.stop();
-    if (! i)
+    if (!i)
 	throw boost::system::system_error(error);
 
-    // Process the response.
-    std::istream response_stream(&response);
-    std::string line;
-    std::string status;
-    bool redirect = false;
+    parseResponse(&response, url);
 
-    std::getline(response_stream, line);
-    if (line.substr(0, 4) != "HTTP")
-	throw std::runtime_error("GetUrl: invalid response: " + line);
-
-    // find reponse code
-    typedef std::vector< std::string > split_vector_type;
-    split_vector_type sv;
-    boost::algorithm::split(sv, line, boost::algorithm::is_any_of(" \t"), boost::algorithm::token_compress_on);
-    status = sv[1];
-
-    // std::cout << "Status: " << status << std::endl;
-
-    if (status[0] == '2')
-	;
-    else if (status[0] == '3')
-	redirect = true;
-    else
-	throw std::runtime_error("geturl " + url +" : " + line);
-
-    extractHeaders(&response_stream);
-
-    if (redirect && d_headers["location"].size() == 0)
-	throw "GetUrl: redirect without location";
+    if (d_redirect && d_headers["location"].size() == 0)
+	   throw "GetUrl: redirect without location";
 
     if (d_headers["location"].size() > 0) {
-	std::string u;
-	if (d_headers["location"][0] == '/') {
-	    u = urlc.scheme + "://" + urlc.domain;
-	    if (urlc.port.size() > 0) {
-		u += ":";
-		u += urlc.port;
-	    }
-	    u += d_headers["location"];
-	} else
-	    u = d_headers["location"];
-	download(u, maxhop - 1);
+        std::string u;
+        if (d_headers["location"][0] == '/') {
+            u = urlc.scheme + "://" + urlc.domain;
+
+            if (urlc.port.size() > 0) {
+                u += ":";
+                u += urlc.port;
+            }
+            
+            u += d_headers["location"];
+        } else
+            u = d_headers["location"];
+        
+        download(u, maxhop - 1);
     }
 }
 
-void GetUrl::extractHeaders(std::istream *response_stream)
+void GetUrl::parseHeaders(std::istream *response_stream)
 {
     // header lines
     std::string line;
@@ -217,6 +195,37 @@ void GetUrl::extractHeaders(std::istream *response_stream)
         }
 
     }
+}
+
+void GetUrl::parseResponse(boost::asio::streambuf *response,
+    std::string const &url)
+{
+    // Process the response.
+    std::istream response_stream(response);
+    std::string line;
+    std::string status;
+    d_redirect = false;
+
+    std::getline(response_stream, line);
+    if (line.substr(0, 4) != "HTTP")
+    throw std::runtime_error("GetUrl: invalid response: " + line);
+
+    // find reponse code
+    typedef std::vector< std::string > split_vector_type;
+    split_vector_type sv;
+    boost::algorithm::split(sv, line, boost::algorithm::is_any_of(" \t"), boost::algorithm::token_compress_on);
+    status = sv[1];
+
+    // std::cout << "Status: " << status << std::endl;
+
+    if (status[0] == '2')
+        ;
+    else if (status[0] == '3')
+        d_redirect = true;
+    else
+        throw std::runtime_error("geturl " + url +" : " + line);
+
+    parseHeaders(&response_stream);
 }
 
 GetUrl::URLComponents GetUrl::parseUrl(std::string const &url)

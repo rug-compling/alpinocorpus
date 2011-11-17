@@ -4,6 +4,8 @@
 #include <string>
 #include <map>
 
+#include <boost/asio/streambuf.hpp>
+
 namespace alpinocorpus { namespace util {
 
 /*! \class GetUrl GetUrl.hh "AlpinoCorpus/util/GetUrl.hh"
@@ -57,11 +59,14 @@ private:
     };
 
     void download(std::string const& url, int maxhop);
-    void extractHeaders(std::istream *response_stream);
+    void parseHeaders(std::istream *response_stream);
+    void parseResponse(boost::asio::streambuf *response,
+        std::string const &url);
     URLComponents parseUrl(std::string const &url);
 
     std::string d_result;
     Headers d_headers;
+    bool d_redirect;
 
 };
 
