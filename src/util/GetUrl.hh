@@ -26,6 +26,7 @@ namespace alpinocorpus { namespace util {
 class GetUrl {
 
 public:
+    typedef std::map<std::string, std::string> Headers;
 
     //! Constructor with a url. The webpage is retrieved immediately.
     GetUrl(std::string const& url);
@@ -36,14 +37,14 @@ public:
     std::string const& body();
 
     //! Get a header for the retrieved webpage. Field names are case-insensitive.
-    std::string const& header(std::string const& field);
+    Headers const &headers();
 
 private:
 
     void download(std::string const& url, int maxhop);
 
     std::string d_result;
-    std::map<std::string, std::string> d_headers;
+    Headers d_headers;
 
 };
 

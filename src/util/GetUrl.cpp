@@ -35,11 +35,9 @@ std::string const& GetUrl::body()
     return d_result;
 }
 
-std::string const& GetUrl::header(std::string const& field)
+GetUrl::Headers const &GetUrl::headers()
 {
-    std::string s(field);
-    boost::algorithm::to_lower(s);
-    return d_headers[s];
+    return d_headers;
 }
 
 void GetUrl::download(std::string const& url, int maxhop) {
