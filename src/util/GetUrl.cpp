@@ -107,8 +107,6 @@ void GetUrl::download(std::string const& url, int maxhop) {
 
 	// Get response.
 	i = boost::asio::read(socket, response, boost::asio::transfer_all(), error);
-	socket.lowest_layer().close();
-
     } else
 #endif // defined(WITH_SSL)
 	{ // scheme == "http"
@@ -121,7 +119,6 @@ void GetUrl::download(std::string const& url, int maxhop) {
 
 	    // Get response.
 	    i = boost::asio::read(socket, response, boost::asio::transfer_all(), error);
-	    socket.close();
 	}
     io_service.stop();
     if (! i)
