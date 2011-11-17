@@ -48,43 +48,16 @@ void GetUrl::download(std::string const& url, int maxhop) {
     if (maxhop == 0)
 	throw std::runtime_error("GetUrl: too many redirects");
 
-    // split the url into components
-    std::string u, scheme, domain, port, path;
-    size_t i;
-    i = url.find("://");
-    if (i == std::string::npos) {
-	scheme = "http";
-	u = url;
-    } else {
-	scheme = url.substr(0, i);
-	u = url.substr(i + 3);
-    }
+    URLComponents urlc = parseUrl(url);
 
-    i = u.find("/");
-    if (i == std::string::npos) {
-	path = "/";
-    } else {
-	path = u.substr(i);
-	u = u.substr(0, i);
-    }
-
-    i = u.find(":");
-    if (i == std::string::npos) {
-	domain = u;
-	port = "";
-    } else {
-	domain = u.substr(0, i);
-	port = u.substr(i + 1);
-    }
-
-    if (scheme != "http"
+    if (urlc.scheme != "http"
 #ifdef WITH_SSL
-	 && scheme != "https"
+	 && urlc.scheme != "https"
 #endif // defined(WITH_SSL)
 	)
-	throw std::invalid_argument("GetUrl: unsupported scheme '" + scheme + "' in url " + url);
+	throw std::invalid_argument("GetUrl: unsupported scheme '" + urlc.scheme + "' in url " + url);
 
-    if (domain == "")
+    if (urlc.domain == "")
 	throw std::invalid_argument("GetUrl: missing domain in url " + url);
 
 
@@ -93,8 +66,8 @@ void GetUrl::download(std::string const& url, int maxhop) {
     // allow us to treat all data up until the EOF as the content.
     boost::asio::streambuf request;
     std::ostream request_stream(&request);
-    request_stream << "GET " << path << " HTTP/1.0\r\n";
-    request_stream << "Host: " << domain << "\r\n";
+    request_stream << "GET " << urlc.path << " HTTP/1.0\r\n";
+    request_stream << "Host: " << urlc.domain << "\r\n";
     request_stream << "Accept: */*\r\n";
     request_stream << "User-Agent: Alpino Corpus\r\n";
     request_stream << "Connection: close\r\n\r\n";
@@ -103,10 +76,12 @@ void GetUrl::download(std::string const& url, int maxhop) {
     boost::asio::streambuf response;
     boost::system::error_code error;
     tcp::resolver resolver(io_service);
-    tcp::resolver::query query(domain,  port.size() ? port : scheme);
+    tcp::resolver::query query(urlc.domain, urlc.port.size() ? urlc.port : urlc.scheme);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+
+    size_t i;
 #ifdef WITH_SSL
-    if (scheme == "https") {
+    if (urlc.scheme == "https") {
 
 	typedef ssl::stream<tcp::socket> ssl_socket;
 
@@ -121,7 +96,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
 	// Perform SSL handshake and verify the remote host's certificate.
 #ifdef WITH_SSL_STRICT
 	socket.set_verify_mode(ssl::verify_peer);
-	socket.set_verify_callback(ssl::rfc2818_verification(domain));
+	socket.set_verify_callback(ssl::rfc2818_verification(urlc.domain));
 #else
 	socket.set_verify_mode(ssl::verify_none);
 #endif // defined(WITH_SSL_STRICT)
@@ -229,17 +204,50 @@ void GetUrl::download(std::string const& url, int maxhop) {
     if (d_headers["location"].size() > 0) {
 	std::string u;
 	if (d_headers["location"][0] == '/') {
-	    u = scheme + "://" + domain;
-	    if (port.size() > 0) {
+	    u = urlc.scheme + "://" + urlc.domain;
+	    if (urlc.port.size() > 0) {
 		u += ":";
-		u += port;
+		u += urlc.port;
 	    }
 	    u += d_headers["location"];
 	} else
 	    u = d_headers["location"];
 	download(u, maxhop - 1);
     }
+}
 
+GetUrl::URLComponents GetUrl::parseUrl(std::string const &url)
+{
+    // split the url into components
+    std::string u, scheme, domain, port, path;
+    size_t i;
+    i = url.find("://");
+    if (i == std::string::npos) {
+    scheme = "http";
+    u = url;
+    } else {
+    scheme = url.substr(0, i);
+    u = url.substr(i + 3);
+    }
+
+    i = u.find("/");
+    if (i == std::string::npos) {
+    path = "/";
+    } else {
+    path = u.substr(i);
+    u = u.substr(0, i);
+    }
+
+    i = u.find(":");
+    if (i == std::string::npos) {
+    domain = u;
+    port = "";
+    } else {
+    domain = u.substr(0, i);
+    port = u.substr(i + 1);
+    }
+
+    return URLComponents(scheme, domain, port, path);
 }
 
 } } // namespace alpinocorpus::util

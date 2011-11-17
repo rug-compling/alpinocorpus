@@ -40,8 +40,24 @@ public:
     Headers const &headers() const;
 
 private:
+    struct URLComponents {
+        URLComponents(std::string const &newScheme,
+                std::string const &newDomain,
+                std::string const &newPort,
+                std::string const &newPath) :
+            scheme(newScheme),
+            domain(newDomain),
+            port(newPort),
+            path(newPath) {}
+
+        std::string scheme;
+        std::string domain;
+        std::string port;
+        std::string path;
+    };
 
     void download(std::string const& url, int maxhop);
+    URLComponents parseUrl(std::string const &url);
 
     std::string d_result;
     Headers d_headers;
