@@ -34,10 +34,10 @@ public:
     ~GetUrl();
 
     //! Get the body of the retrieved webpage.
-    std::string const& body();
+    std::string const& body() const;
 
     //! Get a header for the retrieved webpage. Field names are case-insensitive.
-    Headers const &headers();
+    Headers const &headers() const;
 
 private:
 

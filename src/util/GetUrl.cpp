@@ -30,12 +30,12 @@ GetUrl::~GetUrl()
 {
 }
 
-std::string const& GetUrl::body()
+std::string const& GetUrl::body() const
 {
     return d_result;
 }
 
-GetUrl::Headers const &GetUrl::headers()
+GetUrl::Headers const &GetUrl::headers() const
 {
     return d_headers;
 }
