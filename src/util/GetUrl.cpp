@@ -32,20 +32,20 @@ GetUrl::~GetUrl()
 
 std::string const& GetUrl::body()
 {
-    return result;
+    return d_result;
 }
 
 std::string const& GetUrl::header(std::string const& field)
 {
     std::string s(field);
     boost::algorithm::to_lower(s);
-    return headers[s];
+    return d_headers[s];
 }
 
 void GetUrl::download(std::string const& url, int maxhop) {
 
-    result.clear();
-    headers.clear();
+    d_result.clear();
+    d_headers.clear();
 
     if (maxhop == 0)
 	throw std::runtime_error("GetUrl: too many redirects");
@@ -187,25 +187,25 @@ void GetUrl::download(std::string const& url, int maxhop) {
 
 	if (line.size() == 0) { // end of header lines
 
-	    if (headers["location"].size() > 0)
+	    if (d_headers["location"].size() > 0)
 		break;
 
 	    char delim = '\0';
-	    std::getline(response_stream, result, delim);
+	    std::getline(response_stream, d_result, delim);
 	    while (!response_stream.eof()) {
-		result += delim;
+		d_result += delim;
 		std::string s;
 		std::getline(response_stream, s, delim);
-		result += s;
+		d_result += s;
 	    }
 	    return;
 	}
 
 	if (line[0] == ' ' || line[0] == '\t') { // continuation line
 	    boost::algorithm::trim_left(line);
-	    if (headers[previous].size() > 0)
-		headers[previous] += " ";
-	    headers[previous] += line;
+	    if (d_headers[previous].size() > 0)
+		d_headers[previous] += " ";
+	    d_headers[previous] += line;
 	} else { // normal header line
 	    std::string s1, s2;
 	    size_t ii;
@@ -219,26 +219,26 @@ void GetUrl::download(std::string const& url, int maxhop) {
 		s2 = line.substr(ii + 1);
 		boost::algorithm::trim_left(s2);
 	    }
-	    headers[s1] = s2;
+	    d_headers[s1] = s2;
 	    previous = s1;
 	}
 
     }
 
-    if (redirect && headers["location"].size() == 0)
+    if (redirect && d_headers["location"].size() == 0)
 	throw "GetUrl: redirect without location";
 
-    if (headers["location"].size() > 0) {
+    if (d_headers["location"].size() > 0) {
 	std::string u;
-	if (headers["location"][0] == '/') {
+	if (d_headers["location"][0] == '/') {
 	    u = scheme + "://" + domain;
 	    if (port.size() > 0) {
 		u += ":";
 		u += port;
 	    }
-	    u += headers["location"];
+	    u += d_headers["location"];
 	} else
-	    u = headers["location"];
+	    u = d_headers["location"];
 	download(u, maxhop - 1);
     }
 

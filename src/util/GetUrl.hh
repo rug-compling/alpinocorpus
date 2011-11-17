@@ -42,8 +42,8 @@ private:
 
     void download(std::string const& url, int maxhop);
 
-    std::string result;
-    std::map<std::string, std::string> headers;
+    std::string d_result;
+    std::map<std::string, std::string> d_headers;
 
 };
 
