@@ -11,7 +11,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-#include <AlpinoCorpus/util/GetUrl.hh>
+#include "GetUrl.hh"
 
 using boost::asio::ip::tcp;
 

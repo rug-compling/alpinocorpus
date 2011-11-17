@@ -1,5 +1,4 @@
-
-#include <AlpinoCorpus/util/GetUrl.hh>
+#include <util/GetUrl.hh>
 #include <iostream>
 #include <string>
 

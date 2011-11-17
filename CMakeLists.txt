@@ -112,7 +112,6 @@ set(HEADERS
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/capi.h
-  include/AlpinoCorpus/util/GetUrl.hh
   include/AlpinoCorpus/util/NonCopyable.hh
   include/util/base64.hh
   include/util/bufutil.hh
@@ -128,6 +127,7 @@ set(HEADERS
   src/CompactCorpusReaderPrivate.hh
   src/MultiCorpusReaderPrivate.hh
   src/gzip.hh
+  src/util/GetUrl.hh
 )
 
 set(SOURCES
@@ -198,17 +198,7 @@ install(DIRECTORY include/AlpinoCorpus
   DESTINATION include
   FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
 
-# Unit tests
-
-if(USE_DBXML)
-  add_executable(writer_test test/writer.cpp)
-  target_link_libraries(writer_test alpino_corpus)
-  #add_test(writer writer_test)
-endif()
-
-add_executable(geturl_test test/geturl.cpp)
-target_link_libraries(geturl_test alpino_corpus)
-
+add_subdirectory(test)
 add_subdirectory(util)
 
 if(WITH_PYTHON)
