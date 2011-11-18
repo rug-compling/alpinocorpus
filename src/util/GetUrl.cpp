@@ -30,7 +30,6 @@ GetUrl::GetUrl(std::string const& url) :
     d_charset("")
 {
     download(url, 6);
-    parseContentType();
 }
 
 GetUrl::~GetUrl()
@@ -72,23 +71,25 @@ GetUrl::Headers const &GetUrl::headers() const
 
 void GetUrl::download(std::string const& url, int maxhop) {
 
+    d_url = url;
     d_result.clear();
     d_headers.clear();
+    d_redirect = false;
 
     if (maxhop == 0)
         throw std::runtime_error("GetUrl: too many redirects");
 
-    URLComponents urlc = parseUrl(url);
+    URLComponents urlc = parseUrl();
 
     if (urlc.scheme != "http"
 #ifdef WITH_SSL
          && urlc.scheme != "https"
 #endif // defined(WITH_SSL)
         )
-        throw std::invalid_argument("GetUrl: unsupported scheme '" + urlc.scheme + "' in url " + url);
+        throw std::invalid_argument("GetUrl: unsupported scheme '" + urlc.scheme + "' in url " + d_url);
 
     if (urlc.domain == "")
-        throw std::invalid_argument("GetUrl: missing domain in url " + url);
+        throw std::invalid_argument("GetUrl: missing domain in url " + d_url);
 
 
     // Form the request. We specify the "Connection: close" header so that the
@@ -99,9 +100,10 @@ void GetUrl::download(std::string const& url, int maxhop) {
     request_stream << "GET " << urlc.path << " HTTP/1.0\r\n";
     request_stream << "Host: " << urlc.domain << "\r\n";
     request_stream << "Accept: */*\r\n";
-    request_stream <<" Accept-Encoding: gzip\r\r";
+    request_stream <<" Accept-Encoding: gzip\r\n";
     request_stream << "User-Agent: Alpino Corpus\r\n";
-    request_stream << "Connection: close\r\n\r\n";
+    request_stream << "Connection: close\r\n";
+    request_stream << "\r\n";
 
     boost::asio::io_service io_service;
     boost::asio::streambuf response;
@@ -154,62 +156,66 @@ void GetUrl::download(std::string const& url, int maxhop) {
     if (!i)
         throw boost::system::system_error(error);
 
-    parseResponse(&response, url);
 
+    std::istream response_stream(&response);
+
+    parseResponse(&response_stream);
+
+    parseHeaders(&response_stream);
     if (d_redirect && d_headers["location"].size() == 0)
            throw "GetUrl: redirect without location";
 
-    if (d_headers["location"].size() > 0) {
-        std::string u;
-        if (d_headers["location"][0] == '/') {
-            u = urlc.scheme + "://" + urlc.domain;
+    if (d_headers["location"].size() == 0) {
+        parseContentType();
+        getBody(&response_stream);
+        return;
+    }
 
-            if (urlc.port.size() > 0) {
-                u += ":";
-                u += urlc.port;
-            }
+    // redirect
+    std::string u;
+    if (d_headers["location"][0] == '/') {
+        u = urlc.scheme + "://" + urlc.domain;
+        if (urlc.port.size() > 0) {
+            u += ":";
+            u += urlc.port;
+        }
+        u += d_headers["location"];
+    } else
+        u = d_headers["location"];
+    download(u, maxhop - 1);
 
-            u += d_headers["location"];
-        } else
-            u = d_headers["location"];
+}
 
-        download(u, maxhop - 1);
+void GetUrl::getBody(std::istream *response_stream)
+{
+    std::string enc(d_headers["content-encoding"]);
+    boost::algorithm::to_lower(enc);
+    boost::iostreams::filtering_stream<boost::iostreams::input> in;
+    if (enc == "gzip") {
+        in.push(boost::iostreams::gzip_decompressor());
+    }
+    in.push(*response_stream);
+
+    char delim = '\0';
+    std::getline(in, d_result, delim);
+    while (!in.eof()) {
+        d_result += delim;
+        std::string s;
+        std::getline(in, s, delim);
+        d_result += s;
     }
 }
 
 void GetUrl::parseHeaders(std::istream *response_stream)
 {
-    // header lines
     std::string line;
     std::string previous ("");
     while (std::getline(*response_stream, line)) {
 
         boost::algorithm::trim_right(line);
 
-        if (line.size() == 0) { // end of header lines
-
-            if (d_headers["location"].size() > 0)
-                break;
-
-            std::string enc(d_headers["content-encoding"]);
-            boost::algorithm::to_lower(enc);
-            boost::iostreams::filtering_stream<boost::iostreams::input> in;
-            if (enc == "gzip") {
-                in.push(boost::iostreams::gzip_decompressor());
-            }
-            in.push(*response_stream);
-
-            char delim = '\0';
-            std::getline(in, d_result, delim);
-            while (!in.eof()) {
-                d_result += delim;
-                std::string s;
-                std::getline(in, s, delim);
-                d_result += s;
-            }
-
+        if (line.size() == 0)
             return;
-        }
 
         if (line[0] == ' ' || line[0] == '\t') { // continuation line
             boost::algorithm::trim_left(line);
@@ -218,15 +224,15 @@ void GetUrl::parseHeaders(std::istream *response_stream)
             d_headers[previous] += line;
         } else { // normal header line
             std::string s1, s2;
-            size_t ii;
-            ii = line.find(":");
-            if (ii == std::string::npos) {
+            size_t i;
+            i = line.find(":");
+            if (i == std::string::npos) {
                 throw std::runtime_error("GetUrl: invalid header line: " + line);
             } else {
-                s1 = line.substr(0, ii);
+                s1 = line.substr(0, i);
                 boost::algorithm::to_lower(s1);
                 boost::algorithm::trim_right(s1);
-                s2 = line.substr(ii + 1);
+                s2 = line.substr(i + 1);
                 boost::algorithm::trim_left(s2);
             }
             d_headers[s1] = s2;
@@ -236,16 +242,13 @@ void GetUrl::parseHeaders(std::istream *response_stream)
     }
 }
 
-void GetUrl::parseResponse(boost::asio::streambuf *response,
-    std::string const &url)
+void GetUrl::parseResponse(std::istream *response_stream)
 {
-    // Process the response.
-    std::istream response_stream(response);
+
     std::string line;
     std::string status;
-    d_redirect = false;
 
-    std::getline(response_stream, line);
+    std::getline(*response_stream, line);
     if (line.substr(0, 4) != "HTTP")
         throw std::runtime_error("GetUrl: invalid response: " + line);
 
@@ -255,30 +258,27 @@ void GetUrl::parseResponse(boost::asio::streambuf *response,
     boost::algorithm::split(sv, line, boost::algorithm::is_any_of(" \t"), boost::algorithm::token_compress_on);
     status = sv[1];
 
-    // std::cout << "Status: " << status << std::endl;
-
     if (status[0] == '2')
         ;
     else if (status[0] == '3')
         d_redirect = true;
     else
-        throw std::runtime_error("geturl " + url +" : " + line);
+        throw std::runtime_error("geturl " + d_url +" : " + line);
 
-    parseHeaders(&response_stream);
 }
 
-GetUrl::URLComponents GetUrl::parseUrl(std::string const &url)
+GetUrl::URLComponents GetUrl::parseUrl()
 {
-    // split the url into components
+
     std::string u, scheme, domain, port, path;
     size_t i;
-    i = url.find("://");
+    i = d_url.find("://");
     if (i == std::string::npos) {
         scheme = "http";
-        u = url;
+        u = d_url;
     } else {
-        scheme = url.substr(0, i);
-        u = url.substr(i + 3);
+        scheme = d_url.substr(0, i);
+        u = d_url.substr(i + 3);
     }
 
     i = u.find("/");

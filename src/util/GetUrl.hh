@@ -69,15 +69,16 @@ private:
     };
 
     void download(std::string const& url, int maxhop);
-    void parseContentType();
+    void parseResponse(std::istream *response_stream);
     void parseHeaders(std::istream *response_stream);
-    void parseResponse(boost::asio::streambuf *response,
-        std::string const &url);
-    URLComponents parseUrl(std::string const &url);
+    void getBody(std::istream *response_stream);
+    void parseContentType();
+    URLComponents parseUrl();
 
     std::string d_charset;
     std::string d_content_type;
     std::string d_result;
+    std::string d_url; // url of last redirect
     Headers d_headers;
     bool d_redirect;
 
