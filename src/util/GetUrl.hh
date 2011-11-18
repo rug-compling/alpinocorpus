@@ -44,7 +44,7 @@ public:
     //! All headers for the retrieved webpage. Field names are coonverted to lowercase.
     Headers const &headers() const;
 
-    //! Get the bare Content-Type for the retrieved webpage, converted to lower case, (without charset, etc.)
+    //! Get the bare Content-Type for the retrieved webpage, converted to lower case, without charset etc.
     std::string const & content_type() const;
 
     //! Get charset for the retrieved webpage, converted to lower case

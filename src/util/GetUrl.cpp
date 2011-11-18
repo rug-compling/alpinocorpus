@@ -8,6 +8,7 @@
 #include <boost/asio/ssl.hpp>
 #endif // defined(WITH_SSL)
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
@@ -294,6 +295,8 @@ void GetUrl::parseContentType()
 
     std::string ct(header("Content-Type"));
     boost::algorithm::to_lower(ct);
+    boost::algorithm::erase_all(ct, "\"");
+    boost::algorithm::erase_all(ct, "'");
 
     split_vector_type sv;
     boost::algorithm::split(sv, ct, boost::algorithm::is_any_of(";"), boost::algorithm::token_compress_on);
@@ -311,12 +314,6 @@ void GetUrl::parseContentType()
             if (sv2[0] == "charset") {
                 d_charset = sv2[1];
                 boost::algorithm::trim(d_charset);
-                size_t j = d_charset.size();
-                if (j > 1)
-                    if (d_charset[0] == '"' && d_charset[j - 1] == '"' || d_charset[0] == '\'' && d_charset[j - 1] == '\'') {
-                        d_charset = d_charset.substr(1, j - 2);
-                        boost::algorithm::trim(d_charset);
-                    }
             }
         }
     }
