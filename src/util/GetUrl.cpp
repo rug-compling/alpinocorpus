@@ -138,11 +138,11 @@ void GetUrl::download(std::string const& url, int maxhop) {
                 u += ":";
                 u += urlc.port;
             }
-            
+
             u += d_headers["location"];
         } else
             u = d_headers["location"];
-        
+
         download(u, maxhop - 1);
     }
 }
@@ -159,7 +159,7 @@ void GetUrl::parseHeaders(std::istream *response_stream)
         if (line.size() == 0) { // end of header lines
 
             if (d_headers["location"].size() > 0)
-            break;
+		break;
 
             char delim = '\0';
             std::getline(*response_stream, d_result, delim);
@@ -175,7 +175,7 @@ void GetUrl::parseHeaders(std::istream *response_stream)
         if (line[0] == ' ' || line[0] == '\t') { // continuation line
             boost::algorithm::trim_left(line);
             if (d_headers[previous].size() > 0)
-            d_headers[previous] += " ";
+		d_headers[previous] += " ";
             d_headers[previous] += line;
         } else { // normal header line
             std::string s1, s2;
@@ -208,7 +208,7 @@ void GetUrl::parseResponse(boost::asio::streambuf *response,
 
     std::getline(response_stream, line);
     if (line.substr(0, 4) != "HTTP")
-    throw std::runtime_error("GetUrl: invalid response: " + line);
+	throw std::runtime_error("GetUrl: invalid response: " + line);
 
     // find reponse code
     typedef std::vector< std::string > split_vector_type;
@@ -235,28 +235,28 @@ GetUrl::URLComponents GetUrl::parseUrl(std::string const &url)
     size_t i;
     i = url.find("://");
     if (i == std::string::npos) {
-    scheme = "http";
-    u = url;
+	scheme = "http";
+	u = url;
     } else {
-    scheme = url.substr(0, i);
-    u = url.substr(i + 3);
+	scheme = url.substr(0, i);
+	u = url.substr(i + 3);
     }
 
     i = u.find("/");
     if (i == std::string::npos) {
-    path = "/";
+	path = "/";
     } else {
-    path = u.substr(i);
-    u = u.substr(0, i);
+	path = u.substr(i);
+	u = u.substr(0, i);
     }
 
     i = u.find(":");
     if (i == std::string::npos) {
-    domain = u;
-    port = "";
+	domain = u;
+	port = "";
     } else {
-    domain = u.substr(0, i);
-    port = u.substr(i + 1);
+	domain = u.substr(0, i);
+	port = u.substr(i + 1);
     }
 
     return URLComponents(scheme, domain, port, path);
