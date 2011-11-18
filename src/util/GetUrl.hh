@@ -68,7 +68,6 @@ private:
     URLComponents parseUrl(std::string const &url);
 
     std::string d_result;
-    std::string d_null;
     Headers d_headers;
     bool d_redirect;
 

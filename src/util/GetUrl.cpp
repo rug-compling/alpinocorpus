@@ -21,7 +21,7 @@ namespace ssl = boost::asio::ssl;
 
 namespace alpinocorpus { namespace util {
 
-GetUrl::GetUrl(std::string const& url) : d_redirect(false), d_null("")
+GetUrl::GetUrl(std::string const& url) : d_redirect(false)
 {
     download(url, 6);
 }
@@ -37,11 +37,13 @@ std::string const& GetUrl::body() const
 
 std::string const& GetUrl::header(std::string const& field) const
 {
+    static const std::string null("");
+
     std::string s(field);
     boost::algorithm::to_lower(s);
     Headers::const_iterator it = d_headers.find(s);
     if (it == d_headers.end()) {
-	return d_null;
+	return null;
     }
     return it->second;
 }
