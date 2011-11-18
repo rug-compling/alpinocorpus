@@ -21,6 +21,7 @@ namespace alpinocorpus { namespace util {
  *  Url with username/password is \b not supported
  *
  *  \todo
+ *  - uncompressing compressed body
  *  - decoding of body based on charset
  *
  */
@@ -41,7 +42,7 @@ public:
     //! Get a header for the retrieved webpage. Field names are case-insensitive.
     std::string const& header(std::string const& field) const;
 
-    //! All headers for the retrieved webpage. Field names are coonverted to lowercase.
+    //! All headers for the retrieved webpage. Field names are converted to lowercase.
     Headers const &headers() const;
 
     //! Get the bare Content-Type for the retrieved webpage, converted to lower case, without charset etc.
