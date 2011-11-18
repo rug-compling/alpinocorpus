@@ -133,7 +133,6 @@ void GetUrl::download(std::string const& url, int maxhop) {
             // Get response.
             i = boost::asio::read(socket, response, boost::asio::transfer_all(), error);
         }
-    io_service.stop();
     if (!i)
         throw boost::system::system_error(error);
 
