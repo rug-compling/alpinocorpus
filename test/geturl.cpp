@@ -7,13 +7,13 @@ namespace ac = alpinocorpus;
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
-	std::cerr << "Usage: " << argv[0] << " url" << std::endl;
-	return 1;
+        std::cerr << "Usage: " << argv[0] << " url" << std::endl;
+        return 1;
     }
 
     try {
-	ac::util::GetUrl p(argv [1]);
-	std::cout << "I got: " << p.header("Content-Type") << std::endl << p.body() << "END" << std::endl;
+        ac::util::GetUrl p(argv [1]);
+        std::cout << "I got: " << p.header("Content-Type") << std::endl << p.body() << "END" << std::endl;
     }  catch (std::exception& e) {
         std::cout << "Exception: " << e.what() << std::endl;
     }
