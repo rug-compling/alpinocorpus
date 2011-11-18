@@ -16,12 +16,12 @@ namespace alpinocorpus { namespace util {
  *  - https, if compiled with \c WITH_SSL
  *  - redirection
  *  - url with port number
+ *  - content-encoding: gzip
  *
  *  \note
  *  Url with username/password is \b not supported
  *
  *  \todo
- *  - uncompressing compressed body
  *  - decoding of body based on charset
  *
  */

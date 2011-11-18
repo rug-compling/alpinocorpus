@@ -11,6 +11,8 @@
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 
 #include "GetUrl.hh"
 
@@ -97,6 +99,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
     request_stream << "GET " << urlc.path << " HTTP/1.0\r\n";
     request_stream << "Host: " << urlc.domain << "\r\n";
     request_stream << "Accept: */*\r\n";
+    request_stream <<" Accept-Encoding: gzip\r\r";
     request_stream << "User-Agent: Alpino Corpus\r\n";
     request_stream << "Connection: close\r\n\r\n";
 
@@ -188,14 +191,23 @@ void GetUrl::parseHeaders(std::istream *response_stream)
             if (d_headers["location"].size() > 0)
                 break;
 
+            std::string enc(d_headers["content-encoding"]);
+            boost::algorithm::to_lower(enc);
+            boost::iostreams::filtering_stream<boost::iostreams::input> in;
+            if (enc == "gzip") {
+                in.push(boost::iostreams::gzip_decompressor());
+            }
+            in.push(*response_stream);
+
             char delim = '\0';
-            std::getline(*response_stream, d_result, delim);
-            while (!response_stream->eof()) {
+            std::getline(in, d_result, delim);
+            while (!in.eof()) {
                 d_result += delim;
                 std::string s;
-                std::getline(*response_stream, s, delim);
+                std::getline(in, s, delim);
                 d_result += s;
             }
+
             return;
         }
 
