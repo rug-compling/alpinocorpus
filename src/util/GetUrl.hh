@@ -39,6 +39,9 @@ public:
     std::string const& body() const;
 
     //! Get a header for the retrieved webpage. Field names are case-insensitive.
+    std::string const& header(std::string const& field) const;
+
+    //! All headers for the retrieved webpage. Field names are coonverted to lowercase.
     Headers const &headers() const;
 
 private:
@@ -65,6 +68,7 @@ private:
     URLComponents parseUrl(std::string const &url);
 
     std::string d_result;
+    std::string d_null;
     Headers d_headers;
     bool d_redirect;
 
