@@ -13,7 +13,9 @@ int main(int argc, char* argv[])
 
     try {
         ac::util::GetUrl p(argv [1]);
-        std::cout << "I got: " << p.header("Content-Type") << std::endl << p.body() << "END" << std::endl;
+        std::cout << "Content-type: \"" << p.content_type() << "\"" << std::endl
+                  << "Charset:      \"" << p.charset() << "\"" << std::endl
+                  << p.body() << "END" << std::endl;
     }  catch (std::exception& e) {
         std::cout << "Exception: " << e.what() << std::endl;
     }

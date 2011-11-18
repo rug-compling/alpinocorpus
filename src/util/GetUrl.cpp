@@ -21,9 +21,13 @@ namespace ssl = boost::asio::ssl;
 
 namespace alpinocorpus { namespace util {
 
-GetUrl::GetUrl(std::string const& url) : d_redirect(false)
+GetUrl::GetUrl(std::string const& url) :
+    d_redirect(false),
+    d_content_type(""),
+    d_charset("")
 {
     download(url, 6);
+    parseContentType();
 }
 
 GetUrl::~GetUrl()
@@ -46,6 +50,16 @@ std::string const& GetUrl::header(std::string const& field) const
         return null;
     }
     return it->second;
+}
+
+std::string const & GetUrl::content_type() const
+{
+    return d_content_type;
+}
+
+std::string const & GetUrl::charset() const
+{
+    return d_charset;
 }
 
 GetUrl::Headers const &GetUrl::headers() const
@@ -274,4 +288,39 @@ GetUrl::URLComponents GetUrl::parseUrl(std::string const &url)
     return URLComponents(scheme, domain, port, path);
 }
 
+void GetUrl::parseContentType()
+{
+    typedef std::vector< std::string > split_vector_type;
+
+    std::string ct(header("Content-Type"));
+    boost::algorithm::to_lower(ct);
+
+    split_vector_type sv;
+    boost::algorithm::split(sv, ct, boost::algorithm::is_any_of(";"), boost::algorithm::token_compress_on);
+
+    if (sv.size() > 0) {
+        d_content_type = sv[0];
+        boost::algorithm::trim(d_content_type);
+    }
+
+    for (size_t i = 1; i < sv.size(); i++) {
+        split_vector_type sv2;
+        boost::algorithm::split(sv2, sv[i], boost::algorithm::is_any_of("="), boost::algorithm::token_compress_on);
+        if (sv2.size() == 2) {
+            boost::algorithm::trim(sv2[0]);
+            if (sv2[0] == "charset") {
+                d_charset = sv2[1];
+                boost::algorithm::trim(d_charset);
+                size_t j = d_charset.size();
+                if (j > 1)
+                    if (d_charset[0] == '"' && d_charset[j - 1] == '"' || d_charset[0] == '\'' && d_charset[j - 1] == '\'') {
+                        d_charset = d_charset.substr(1, j - 2);
+                        boost::algorithm::trim(d_charset);
+                    }
+            }
+        }
+    }
+}
+
 } } // namespace alpinocorpus::util
+
