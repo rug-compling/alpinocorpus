@@ -126,6 +126,12 @@ std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) con
     return v.getNodeValue();
 }
 
+CorpusReader::IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
+{
+    // XXX - See DbIter::copy()
+
+    return new QueryIter(*this);
+}
 DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
  : mgr(), container()
 {

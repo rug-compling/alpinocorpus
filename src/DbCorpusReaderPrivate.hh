@@ -22,7 +22,7 @@ class DbCorpusReaderPrivate : public CorpusReader
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
 
-        IterImpl *copy() const;        
+        virtual IterImpl *copy() const;        
         std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
@@ -37,6 +37,7 @@ class DbCorpusReaderPrivate : public CorpusReader
     {
     public:
         QueryIter(DbXml::XmlResults const &, DbXml::XmlQueryContext const &);
+        IterImpl *copy() const;
         std::string contents(CorpusReader const &) const;
         void interrupt();
     
