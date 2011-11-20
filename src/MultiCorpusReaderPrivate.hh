@@ -31,6 +31,7 @@ private:
       std::string const &query);
     ~MultiIter();
     std::string contents(CorpusReader const &) const;
+    IterImpl *copy() const;
     std::string current() const;
     bool equals(IterImpl const &other) const;
     void next();

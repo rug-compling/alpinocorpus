@@ -51,6 +51,17 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlManager &mgr)
 {
 }
 
+CorpusReader::IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
+{
+    // XXX - Copy constructor of XmlResults copies handle but not body.
+    //       The copyResults() method retuls an XmlResults instance that
+    //       is eagerly evaluated. Is there a way to copy XmlResults,
+    //       retain the iterator position, and have it lazy?
+
+    // No pointer members
+    return new DbIter(*this);
+}
+
 /* operator* */
 std::string DbCorpusReaderPrivate::DbIter::current() const
 {

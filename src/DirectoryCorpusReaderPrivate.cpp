@@ -68,6 +68,11 @@ DirectoryCorpusReaderPrivate::DirIter::DirIter(
         next();
 }
 
+CorpusReader::IterImpl *DirectoryCorpusReaderPrivate::DirIter::copy() const
+{
+    // No pointer members
+    return new DirIter(*this);
+}
 
 std::string DirectoryCorpusReaderPrivate::DirIter::current() const
 {

@@ -40,8 +40,9 @@ class CompactCorpusReaderPrivate : public CorpusReader
     {
         ItemVector::const_iterator iter;
 
-      public:
+    public:
         IndexIter(ItemVector::const_iterator const &i) : iter(i) { }
+        IterImpl *copy() const;
         std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
