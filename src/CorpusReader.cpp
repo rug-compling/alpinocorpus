@@ -24,7 +24,16 @@ namespace {
     }
 }
 
-namespace alpinocorpus {    
+namespace alpinocorpus {
+    CorpusReader::EntryIterator::EntryIterator() : d_impl(0)
+    { 
+    }
+
+    CorpusReader::EntryIterator::EntryIterator(IterImpl *p) :
+        d_impl(p)
+    { 
+    }
+
     CorpusReader::EntryIterator::EntryIterator(EntryIterator const &other)
     {
         copy(other);
