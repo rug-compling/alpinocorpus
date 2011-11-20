@@ -24,6 +24,7 @@ DbCorpusReader::DbCorpusReader(std::string const &name) :
 
 DbCorpusReader::~DbCorpusReader()
 {
+    delete d_private;
 }
     
 CorpusReader::EntryIterator DbCorpusReader::getBegin() const

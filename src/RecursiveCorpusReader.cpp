@@ -83,6 +83,7 @@ RecursiveCorpusReader::RecursiveCorpusReader(std::string const &directory) :
 
 RecursiveCorpusReader::~RecursiveCorpusReader()
 {
+  delete d_private;
 }
 
 CorpusReader::EntryIterator RecursiveCorpusReader::getBegin() const

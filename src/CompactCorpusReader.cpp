@@ -18,6 +18,7 @@ CompactCorpusReader::CompactCorpusReader(std::string const &dataPath,
 
 CompactCorpusReader::~CompactCorpusReader()
 {
+    delete d_private;
 }
 
 CorpusReader::EntryIterator CompactCorpusReader::getBegin() const

@@ -14,6 +14,7 @@ DirectoryCorpusReader::DirectoryCorpusReader(std::string const &directory)
 
 DirectoryCorpusReader::~DirectoryCorpusReader()
 {
+    delete d_private;
 }
 
 CorpusReader::EntryIterator DirectoryCorpusReader::getBegin() const

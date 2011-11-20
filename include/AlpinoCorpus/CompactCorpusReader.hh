@@ -2,7 +2,6 @@
 #define ALPINO_COMPACT_CORPUSREADER_HH
 
 #include <string>
-#include <boost/tr1/memory.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -30,7 +29,7 @@ private:
     virtual std::string readEntry(std::string const &filename) const;
     virtual size_t getSize() const;
 
-    std::tr1::shared_ptr<CompactCorpusReaderPrivate> d_private;
+    CompactCorpusReaderPrivate *d_private;
 };
 
 }
