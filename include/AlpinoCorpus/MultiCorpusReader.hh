@@ -2,7 +2,6 @@
 #define MULTI_CORPUSREADER_HH
 
 #include <string>
-#include <boost/tr1/memory.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -26,7 +25,7 @@ private:
   EntryIterator runXPath(std::string const &query) const;
   bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
-  std::tr1::shared_ptr<MultiCorpusReaderPrivate> d_private;
+  MultiCorpusReaderPrivate *d_private;
 };
 
 }

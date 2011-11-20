@@ -21,7 +21,8 @@ class DbCorpusReaderPrivate : public CorpusReader
     public:
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
-        
+
+        IterImpl *copy() const;        
         std::string current() const;
         bool equals(IterImpl const &) const;
         void next();

@@ -36,7 +36,9 @@ namespace alpinocorpus {
     {}
     
     DbCorpusWriter::~DbCorpusWriter()
-    {}
+    {
+        delete d_private;
+    }
     
     void DbCorpusWriter::writeEntry(std::string const &name, std::string const &content)
     {

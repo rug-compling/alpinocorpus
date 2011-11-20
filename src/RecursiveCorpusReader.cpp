@@ -44,6 +44,7 @@ class RecursiveCorpusReaderPrivate : public CorpusReader
       std::string const &query);
     ~RecursiveIter();
     std::string contents(CorpusReader const &) const;
+    IterImpl *copy() const;
     std::string current() const;
     bool equals(IterImpl const &other) const;
     void next();
@@ -83,6 +84,7 @@ RecursiveCorpusReader::RecursiveCorpusReader(std::string const &directory) :
 
 RecursiveCorpusReader::~RecursiveCorpusReader()
 {
+  delete d_private;
 }
 
 CorpusReader::EntryIterator RecursiveCorpusReader::getBegin() const
@@ -293,6 +295,13 @@ std::string RecursiveCorpusReaderPrivate::RecursiveIter::contents(
     throw std::runtime_error("Cannot dereference an end iterator!");
 
   return d_iters.front().iter.contents(reader);
+}
+
+CorpusReader::IterImpl *RecursiveCorpusReaderPrivate::RecursiveIter::copy() const
+{
+  // No pointer members, pointer member of ReaderIter is not managed by
+  // ReaderIter.
+  return new RecursiveIter(*this);
 }
 
 std::string RecursiveCorpusReaderPrivate::RecursiveIter::current() const

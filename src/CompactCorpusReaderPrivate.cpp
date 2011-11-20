@@ -114,6 +114,12 @@ void CompactCorpusReaderPrivate::canonicalize(std::string &filename)
         throw OpenError(filename, "not an indexed (.dz) corpus file");
 }
 
+CorpusReader::IterImpl *CompactCorpusReaderPrivate::IndexIter::copy() const
+{
+    // No pointer members.
+    return new IndexIter(*this);
+}
+
 std::string CompactCorpusReaderPrivate::IndexIter::current() const
 {
     return (*iter)->name;

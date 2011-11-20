@@ -146,6 +146,13 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
 
+CorpusReader::IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
+{
+  // No pointer members, and pointer member in ReaderIter is not managed
+  // by ReaderIter.
+  return new MultiIter(*this);
+}
+
 std::string MultiCorpusReaderPrivate::MultiIter::current() const
 {
   if (d_iters.size() == 0)

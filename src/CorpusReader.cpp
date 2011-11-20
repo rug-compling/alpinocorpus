@@ -25,10 +25,40 @@ namespace {
 }
 
 namespace alpinocorpus {    
+    CorpusReader::EntryIterator::EntryIterator(EntryIterator const &other)
+    {
+        copy(other);
+    }
+
+    CorpusReader::EntryIterator::~EntryIterator()
+    {
+        delete d_impl;
+    }
+
+    CorpusReader::EntryIterator &CorpusReader::EntryIterator::operator=(
+        EntryIterator const &other)
+    {
+        if (this != &other) {
+            if (d_impl != 0) {
+                delete d_impl;
+                d_impl = 0;
+            }
+
+            copy(other);
+        }
+
+        return *this;
+    }
 
     bool CorpusReader::EntryIterator::operator!=(EntryIterator const &other) const
     {
         return !operator==(other);
+    }
+
+    void CorpusReader::EntryIterator::copy(EntryIterator const &other)
+    {        
+        if (other.d_impl != 0)
+            d_impl = other.d_impl->copy();
     }
     
     
@@ -39,14 +69,14 @@ namespace alpinocorpus {
     
     std::string CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
     {
-        return impl->contents(rdr);
+        return d_impl->contents(rdr);
     }
 
     void CorpusReader::EntryIterator::interrupt()
     {
         // XXX this shouldn't be necessary, we don't do this in other places
-        if (impl.get() != 0)
-            impl->interrupt();
+        if (d_impl != 0)
+            d_impl->interrupt();
     }
     
     CorpusReader::EntryIterator CorpusReader::end() const
@@ -209,22 +239,22 @@ namespace alpinocorpus {
     
     CorpusReader::EntryIterator::value_type CorpusReader::EntryIterator::operator*() const
     {
-        return impl->current();
+        return d_impl->current();
     }
     
     bool CorpusReader::EntryIterator::operator==(EntryIterator const &other) const
     {
-        if (!impl)
-            return !other.impl;
-        else if (!other.impl)
-            return !impl;
+        if (d_impl == 0)
+            return other.d_impl == 0;
+        else if (other.d_impl == 0)
+            return d_impl == 0;
         else
-            return impl->equals(*other.impl.get());
+            return d_impl->equals(*other.d_impl);
     }
     
     CorpusReader::EntryIterator &CorpusReader::EntryIterator::operator++()
     {
-        impl->next();
+        d_impl->next();
         return *this;
     }
 
@@ -270,6 +300,12 @@ namespace alpinocorpus {
         //next();
     }
     
+    CorpusReader::IterImpl *CorpusReader::FilterIter::copy() const
+    {
+        // FilterIter is no pointer members.
+        return new FilterIter(*this);
+    }
+
     std::string CorpusReader::FilterIter::current() const
     {
         return d_file;

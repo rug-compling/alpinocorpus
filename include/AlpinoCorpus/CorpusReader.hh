@@ -24,6 +24,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
     struct IterImpl {
         virtual ~IterImpl() {}
+        virtual IterImpl *copy() const = 0;
         virtual std::string current() const = 0;
         virtual bool equals(IterImpl const &) const = 0;
         virtual void next() = 0;
@@ -38,13 +39,12 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     class ALPINO_CORPUS_EXPORT EntryIterator
     : public std::iterator<std::input_iterator_tag, std::string, ptrdiff_t, std::string *, std::string>
     {
-        std::tr1::shared_ptr<IterImpl> impl;
-
       public:
-        EntryIterator() {}
-        EntryIterator(IterImpl *p) : impl(p) { }
-        EntryIterator(EntryIterator const &other) : impl(other.impl) { }
-        virtual ~EntryIterator() {}
+        EntryIterator() : d_impl(0) {}
+        EntryIterator(IterImpl *p) : d_impl(p) { }
+        EntryIterator(EntryIterator const &other);
+        virtual ~EntryIterator();
+        EntryIterator &operator=(EntryIterator const &other);
         EntryIterator &operator++();
         EntryIterator operator++(int);
         bool operator==(EntryIterator const &other) const;
@@ -63,6 +63,11 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
          * Interrupt an iterator that is blocking.
          */
         void interrupt();
+
+      private:
+        void copy(EntryIterator const &other);
+
+        IterImpl *d_impl;
     };
     
     struct MarkerQuery {
@@ -121,6 +126,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     class FilterIter : public IterImpl {
       public:
         FilterIter(CorpusReader const &, EntryIterator, EntryIterator, std::string const &);
+        IterImpl *copy() const;
         std::string current() const;
         bool equals(IterImpl const &) const;
         void next();
