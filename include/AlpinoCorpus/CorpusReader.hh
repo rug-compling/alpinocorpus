@@ -5,7 +5,6 @@
 #include <list>
 #include <queue>
 #include <string>
-#include <boost/tr1/memory.hpp>
 
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
