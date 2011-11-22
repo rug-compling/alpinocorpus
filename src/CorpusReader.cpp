@@ -131,6 +131,16 @@ namespace alpinocorpus {
     {
         return readEntry(entry);
     }
+
+    bool CorpusReader::readerAvailable(ReaderType readerType)
+    {
+#ifndef USE_DBXML
+        if (readerType == DBXML_CORPUS_READER)
+            return false;
+#endif USE_DBXML
+
+        return true;
+    }
     
     std::string CorpusReader::readMarkQueries(std::string const &entry,
         std::list<MarkerQuery> const &queries) const
