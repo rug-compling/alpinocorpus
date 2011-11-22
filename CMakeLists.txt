@@ -193,6 +193,9 @@ if(USE_DBXML)
   #add_test(writer writer_test)
 endif()
 
+add_executable(readers_available test/readers_available.cpp)
+target_link_libraries(readers_available alpino_corpus)
+
 add_subdirectory(util)
 
 if(WITH_PYTHON)
