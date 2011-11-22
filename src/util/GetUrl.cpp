@@ -4,9 +4,9 @@
 #include <ostream>
 #include <string>
 #include <boost/asio.hpp>
-#ifdef WITH_SSL
+#ifdef ALPINOCORPUS_WITH_SSL
 #include <boost/asio/ssl.hpp>
-#endif // defined(WITH_SSL)
+#endif // defined(ALPINOCORPUS_WITH_SSL)
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -18,9 +18,9 @@
 
 using boost::asio::ip::tcp;
 
-#ifdef WITH_SSL
+#ifdef ALPINOCORPUS_WITH_SSL
 namespace ssl = boost::asio::ssl;
-#endif // defined(WITH_SSL)
+#endif // defined(ALPINOCORPUS_WITH_SSL)
 
 namespace alpinocorpus { namespace util {
 
@@ -82,9 +82,9 @@ void GetUrl::download(std::string const& url, int maxhop) {
     URLComponents urlc = parseUrl();
 
     if (urlc.scheme != "http"
-#ifdef WITH_SSL
+#ifdef ALPINOCORPUS_WITH_SSL
          && urlc.scheme != "https"
-#endif // defined(WITH_SSL)
+#endif // defined(ALPINOCORPUS_WITH_SSL)
         )
         throw std::invalid_argument("GetUrl: unsupported scheme '" + urlc.scheme + "' in url " + d_url);
 
@@ -113,7 +113,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
 
     size_t i;
-#ifdef WITH_SSL
+#ifdef ALPINOCORPUS_WITH_SSL
     if (urlc.scheme == "https") {
 
         typedef ssl::stream<tcp::socket> ssl_socket;
@@ -127,12 +127,12 @@ void GetUrl::download(std::string const& url, int maxhop) {
         socket.lowest_layer().set_option(tcp::no_delay(true));
 
         // Perform SSL handshake and verify the remote host's certificate.
-#ifdef WITH_SSL_STRICT
+#ifdef ALPINOCORPUS_WITH_SSL_STRICT
         socket.set_verify_mode(ssl::verify_peer);
         socket.set_verify_callback(ssl::rfc2818_verification(urlc.domain));
 #else
         socket.set_verify_mode(ssl::verify_none);
-#endif // defined(WITH_SSL_STRICT)
+#endif // defined(ALPINOCORPUS_WITH_SSL_STRICT)
         socket.handshake(ssl_socket::client);
 
         // Send the request.
@@ -141,7 +141,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
         // Get response.
         i = boost::asio::read(socket, response, boost::asio::transfer_all(), error);
     } else
-#endif // defined(WITH_SSL)
+#endif // defined(ALPINOCORPUS_WITH_SSL)
         { // scheme == "http"
             // Try each endpoint until we successfully establish a connection.
             tcp::socket socket(io_service);

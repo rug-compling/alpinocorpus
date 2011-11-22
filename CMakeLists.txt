@@ -89,8 +89,8 @@ endif()
 
 find_package(OpenSSL)
 if (OPENSSL_FOUND)
-  set(WITH_SSL ON)
-  option(WITH_SSL_STRICT
+  set(ALPINOCORPUS_WITH_SSL ON)
+  option(ALPINOCORPUS_WITH_SSL_STRICT
 	"With SSL, enable domain verification" OFF)
 endif()
 
@@ -184,9 +184,9 @@ if(USE_DBXML)
   target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
-if(WITH_SSL)
+if(ALPINOCORPUS_WITH_SSL)
   target_link_libraries(alpino_corpus ${OPENSSL_LIBRARIES})
-endif(WITH_SSL)
+endif(ALPINOCORPUS_WITH_SSL)
 
 
 install(TARGETS alpino_corpus
