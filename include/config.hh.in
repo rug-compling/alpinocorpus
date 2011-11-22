@@ -1,6 +1,14 @@
+/*! \file config.hh
+ *  \brief Build settings for Alpino Corpus
+ */
+
 #ifndef ALPINOCORPUS_CONFIG_HH
 #define ALPINOCORPUS_CONFIG_HH
 
-#cmakedefine USE_DBXML
+/*! Alpino Corpus version */
+#define ALPINOCORPUS_VERSION "@ALPINOCORPUS_VERSION@"
+
+/*! with Berkeley DB XML */
+#cmakedefine ALPINOCORPUS_WITH_DBXML
 
 #endif // ALPINOCORPUS_CONFIG_HH

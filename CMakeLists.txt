@@ -75,6 +75,9 @@ if(USE_DBXML)
   if (DBXML_FOUND)
     include_directories(${DBXML_INCLUDE_DIR})
   endif()
+  set(ALPINOCORPUS_WITH_DBXML ON)
+else()
+  set(ALPINOCORPUS_WITH_DBXML OFF)
 endif()
 
 find_package(Iconv REQUIRED)
@@ -184,6 +187,8 @@ install(TARGETS alpino_corpus
 install(DIRECTORY include/AlpinoCorpus
   DESTINATION include
   FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
+
+install(FILES include/config.hh DESTINATION include/AlpinoCorpus)
 
 # Unit tests
 

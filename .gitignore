@@ -19,8 +19,10 @@ install_manifest.txt
 libalpino_corpus.so.0.9.9
 libalpino_corpus.so.1.0
 resources/CMakeFiles/
+test/CMakeFiles/
 util/CMakeFiles/
 util/alpinocorpus-act
+util/alpinocorpus-config
 util/alpinocorpus-stats
 util/alpinocorpus-xslt
 writer_test

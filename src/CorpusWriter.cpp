@@ -12,7 +12,7 @@ namespace alpinocorpus {
     {
       switch (writerType) {
         case DBXML_CORPUS_WRITER:
-#ifdef USE_DBXML
+#ifdef ALPINOCORPUS_WITH_DBXML
           return new DbCorpusWriter(filename, overwrite);
 #else
           throw Error("AlpinoCorpus library without DBXML support");
@@ -25,7 +25,7 @@ namespace alpinocorpus {
 
     bool CorpusWriter::writerAvailable(WriterType writerType)
     {
-#ifndef USE_DBXML
+#ifndef ALPINOCORPUS_WITH_DBXML
       if (writerType == DBXML_CORPUS_WRITER)
         return false;
 #endif

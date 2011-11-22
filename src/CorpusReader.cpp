@@ -7,7 +7,7 @@
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 #include <config.hh>
 
-#if defined(USE_DBXML)
+#if defined(ALPINOCORPUS_WITH_DBXML)
     #include <AlpinoCorpus/DbCorpusReader.hh>
 #endif
 
@@ -113,7 +113,7 @@ namespace alpinocorpus {
             return new CompactCorpusReader(corpusPath);
         } catch (OpenError const &) {}
 
-#if defined(USE_DBXML)
+#if defined(ALPINOCORPUS_WITH_DBXML)
         try {
             return new DbCorpusReader(corpusPath);
         } catch (OpenError const &) {}

@@ -17,7 +17,7 @@
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 #include <config.hh>
 
-#if defined(USE_DBXML)
+#if defined(ALPINOCORPUS_WITH_DBXML)
   #include <AlpinoCorpus/DbCorpusWriter.hh>
 #endif
 
@@ -34,7 +34,7 @@ using alpinocorpus::CorpusReader;
 using alpinocorpus::CorpusWriter;
 using alpinocorpus::CompactCorpusWriter;
 
-#if defined(USE_DBXML)
+#if defined(ALPINOCORPUS_WITH_DBXML)
 using alpinocorpus::DbCorpusWriter;
 #endif
 
@@ -70,7 +70,7 @@ void usage(std::string const &programName)
     std::cerr << "Usage: " << programName << " [OPTION] treebanks" <<
       std::endl << std::endl <<
       "  -c filename\tCreate a compact corpus archive" << std::endl <<
-#if defined(USE_DBXML)
+#if defined(ALPINOCORPUS_WITH_DBXML)
       "  -d filename\tCreate a Dact dbxml archive" << std::endl <<
 #endif
       "  -g entry\tPrint a treebank entry to stdout" << std::endl <<
@@ -173,12 +173,12 @@ int main(int argc, char *argv[])
           if (bf::equivalent(treebankOut, *iter))
             throw std::runtime_error("Attempting to write to the source treebank.");
   
-#if defined(USE_DBXML)
+#if defined(ALPINOCORPUS_WITH_DBXML)
         tr1::shared_ptr<CorpusWriter> wr(new DbCorpusWriter(treebankOut, true));
         writeCorpus(reader, wr, query);
 #else
         throw std::runtime_error("AlpinoCorpus was compiled without DBXML support.");
-#endif // defined(USE_DBXML)
+#endif // defined(ALPINOCORPUS_WITH_DBXML)
 
     } catch (std::runtime_error const &e) {
         std::cerr << opts->programName() <<

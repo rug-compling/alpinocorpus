@@ -33,6 +33,19 @@ add_executable(alpinocorpus-act
 
 target_link_libraries(alpinocorpus-act alpino_corpus)
 
+set(CONFIG_SOURCES
+  config/main.cpp
+)
+
+set(CONFIG_HEADERS
+  ../include/config.hh
+)
+
+add_executable(alpinocorpus-config
+  ${CONFIG_SOURCES}
+  ${CONFIG_HEADERS}
+)
+
 set(XSLT_HEADERS
   common/Stylesheet.hh
 )
@@ -70,6 +83,10 @@ target_link_libraries(alpinocorpus-stats
 )
 
 install(TARGETS alpinocorpus-act
+  RUNTIME DESTINATION bin
+)
+
+install(TARGETS alpinocorpus-config
   RUNTIME DESTINATION bin
 )
 
