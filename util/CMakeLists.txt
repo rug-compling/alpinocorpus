@@ -37,14 +37,11 @@ set(CONFIG_SOURCES
   config/main.cpp
 )
 
-set(CONFIG_HEADERS
-  ../include/config.hh
-)
-
 add_executable(alpinocorpus-config
   ${CONFIG_SOURCES}
-  ${CONFIG_HEADERS}
 )
+
+target_link_libraries(alpinocorpus-config alpino_corpus)
 
 set(XSLT_HEADERS
   common/Stylesheet.hh

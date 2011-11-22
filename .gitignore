@@ -20,6 +20,7 @@ libalpino_corpus.so.0.9.9
 libalpino_corpus.so.1.0
 resources/CMakeFiles/
 test/CMakeFiles/
+test/geturl_test
 util/CMakeFiles/
 util/alpinocorpus-act
 util/alpinocorpus-config

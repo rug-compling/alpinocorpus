@@ -6,7 +6,7 @@
  * etc.
  */
 
-#include <config.hh>
+#include <AlpinoCorpus/Config.hh>
 #include <iostream>
 
 using std::cout;
@@ -14,18 +14,15 @@ using std::endl;
 
 int main()
 {
+    alpinocorpus::Config cfg;
+
     cout << endl
 
-         <<"Alpino Corpus version " ALPINOCORPUS_VERSION << endl
+         << "Alpino Corpus version " << cfg.Version() << endl
+         << "version major number :  " << cfg.VersionMajor() << endl
+         << "version minor number :  " << cfg.VersionMinor() << endl
          << endl
 
-         << "with Berkeley DB XML :  "
-#ifdef ALPINOCORPUS_WITH_DBXML
-        "yes"
-#else
-        "no"
-#endif
-         << endl
-
+         << "with Berkeley DB XML :  " << (cfg.WithDBXML() ? "yes" : "no") << endl
          << endl;
 }
