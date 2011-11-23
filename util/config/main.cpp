@@ -26,23 +26,8 @@ int main(int argc, char *argv[])
         cout << cfg.VersionMajor() << endl;
     else if (! strcmp (argv [1], "--versionminor"))
         cout << cfg.VersionMinor() << endl;
-    else if (! strcmp (argv [1], "--options")) {
-        char *p = "";
-        if (cfg.WithDBXML()) {
-            cout << p << "with-dbxml";
-            p = " ";
-        }
-        /*
-        if (cfg.WithSSL()) {
-            cout << p << "with-ssl";
-            p = " ";
-        }
-        if (cfg.WithSSLStrict()) {
-            cout << p << "with-ssl-strict";
-            p = " ";
-        }
-        */
-        cout << endl;
-    } else
-        cout << "Invalid arggument: " << argv[1];
+    else if (! strcmp (argv [1], "--options"))
+        cout << cfg.Options() << endl;
+    else
+        cout << "Invalid argument: " << argv[1] << endl;
 }

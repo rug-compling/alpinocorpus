@@ -41,6 +41,21 @@ namespace alpinocorpus {
 #endif
     }
 
+    char const * Config::Options() const
+    {
+        return ""
+#ifdef ALPINOCORPUS_WITH_DBXML
+            "with-dbxml "
+#endif
+#ifdef ALPINOCORPUS_WITH_SSL
+            "with-ssl "
+#endif
+#ifdef ALPINOCORPUS_WITH_SSL_STRICT
+            "with-ssl-strict "
+#endif
+            ;
+    }
+
 
 } // namespace alpinocorpus
 

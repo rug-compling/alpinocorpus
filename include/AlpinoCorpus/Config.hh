@@ -26,6 +26,8 @@ namespace alpinocorpus {
         //! Was the library built with Berkeley DB XML?
         bool WithDBXML() const;
 
+        //! Get list op enabled options
+        char const * Options() const;
 
     private:
 
