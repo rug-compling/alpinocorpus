@@ -87,8 +87,6 @@ if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
 
-CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
-
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
   "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
