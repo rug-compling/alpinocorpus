@@ -11,10 +11,11 @@ int main(int argc, char *argv[])
         cout << "Usage: " << argv[0] << " OPTION" << endl
              << "Known values for OPTION are:" << endl
              << endl
-             << "  --version         output version information" << endl
-             << "  --versionmajor    output major version number" << endl
-             << "  --versionminor    output minor version number" << endl
-             << "  --options         output list of enabled options" << endl;
+             << "  --version             output version information" << endl
+             << "  --versionmajor        output major version number" << endl
+             << "  --versionminor        output minor version number" << endl
+             << "  --versionrevision     output revision version number" << endl
+             << "  --options             output list of enabled options" << endl;
         return 0;
     }
 
@@ -26,6 +27,8 @@ int main(int argc, char *argv[])
         cout << cfg.VersionMajor() << endl;
     else if (! strcmp (argv [1], "--versionminor"))
         cout << cfg.VersionMinor() << endl;
+    else if (! strcmp (argv [1], "--versionrevision"))
+        cout << cfg.VersionRevision() << endl;
     else if (! strcmp (argv [1], "--options"))
         cout << cfg.Options() << endl;
     else

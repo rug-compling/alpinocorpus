@@ -6,11 +6,6 @@ namespace alpinocorpus {
 
     Config::Config()
     {
-        int i = sscanf(ALPINOCORPUS_VERSION, "%i.%i", &d_major, &d_minor);
-        if (i < 2)
-            d_minor = -1;
-        if (i < 1)
-            d_major = -1;
     }
 
     Config::~Config()
@@ -24,21 +19,17 @@ namespace alpinocorpus {
 
     int Config::VersionMajor() const
     {
-        return d_major;
+        return ALPINOCORPUS_MAJOR;
     }
 
     int Config::VersionMinor() const
     {
-        return d_minor;
+        return ALPINOCORPUS_MINOR;
     }
 
-    bool Config::WithDBXML() const
+    int Config::VersionRevision() const
     {
-#ifdef ALPINOCORPUS_WITH_DBXML
-        return true;
-#else
-        return false;
-#endif
+        return ALPINOCORPUS_REVISION;
     }
 
     char const * Config::Options() const
@@ -54,6 +45,15 @@ namespace alpinocorpus {
             "with-ssl-strict "
 #endif
             ;
+    }
+
+    bool Config::WithDBXML() const
+    {
+#ifdef ALPINOCORPUS_WITH_DBXML
+        return true;
+#else
+        return false;
+#endif
     }
 
 

@@ -22,17 +22,14 @@ namespace alpinocorpus {
         int VersionMajor() const;
         //! Get the minor version number.
         int VersionMinor() const;
-
-        //! Was the library built with Berkeley DB XML?
-        bool WithDBXML() const;
+        //! Get the revision version number.
+        int VersionRevision() const;
 
         //! Get list op enabled options
         char const * Options() const;
 
-    private:
-
-        int d_major;
-        int d_minor;
+        //! Was the library built with Berkeley DB XML?
+        bool WithDBXML() const;
 
     };
 

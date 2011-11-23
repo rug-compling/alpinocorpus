@@ -8,6 +8,15 @@
 /*! Alpino Corpus version */
 #define ALPINOCORPUS_VERSION "@ALPINOCORPUS_VERSION@"
 
+/*! Alpino Corpus major version number */
+#define ALPINOCORPUS_MAJOR @ALPINOCORPUS_MAJOR@
+
+/*! Alpino Corpus minor version number */
+#define ALPINOCORPUS_MINOR @ALPINOCORPUS_MINOR@
+
+/*! Alpino Corpus revision version number */
+#define ALPINOCORPUS_REVISION @ALPINOCORPUS_REVISION@
+
 /*! with Berkeley DB XML */
 #cmakedefine ALPINOCORPUS_WITH_DBXML
 
