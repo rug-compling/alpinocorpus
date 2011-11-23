@@ -100,7 +100,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
     request_stream << "GET " << urlc.path << " HTTP/1.0\r\n";
     request_stream << "Host: " << urlc.domain << "\r\n";
     request_stream << "Accept: */*\r\n";
-    request_stream <<" Accept-Encoding: gzip\r\n";
+    request_stream << "Accept-Encoding: gzip\r\n";
     request_stream << "User-Agent: Alpino Corpus\r\n";
     request_stream << "Connection: close\r\n";
     request_stream << "\r\n";
