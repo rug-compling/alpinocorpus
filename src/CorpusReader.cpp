@@ -5,6 +5,7 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/CompactCorpusReader.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
+#include <AlpinoCorpus/RemoteCorpusReader.hh>
 #include <config.hh>
 
 #if defined(USE_DBXML)
@@ -105,6 +106,10 @@ namespace alpinocorpus {
         
     CorpusReader *CorpusReader::open(std::string const &corpusPath)
     {
+        try {
+            return new RemoteCorpusReader(corpusPath);
+        } catch (OpenError const &) {}
+
         try {
             return new DirectoryCorpusReader(corpusPath);
         } catch (OpenError const &) {}

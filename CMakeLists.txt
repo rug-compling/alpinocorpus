@@ -111,6 +111,7 @@ set(HEADERS
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
+  include/AlpinoCorpus/RemoteCorpusReader.hh
   include/AlpinoCorpus/capi.h
   include/AlpinoCorpus/util/NonCopyable.hh
   include/util/base64.hh
@@ -126,6 +127,7 @@ set(HEADERS
   src/DzOstreamBuf.hh
   src/CompactCorpusReaderPrivate.hh
   src/MultiCorpusReaderPrivate.hh
+  src/RemoteCorpusReaderPrivate.hh
   src/gzip.hh
   src/util/GetUrl.hh
 )
@@ -148,6 +150,8 @@ set(SOURCES
   src/MultiCorpusReader.cpp
   src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
+  src/RemoteCorpusReader.cpp
+  src/RemoteCorpusReaderPrivate.cpp
   src/capi.cpp
   src/util/base64.cpp
   src/util/textfile.cpp
