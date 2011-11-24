@@ -10,8 +10,8 @@
 
 namespace alpinocorpus {
     
-    RemoteCorpusReader::RemoteCorpusReader(std::string const &name) :
-        d_private(new RemoteCorpusReaderPrivate(name))
+    RemoteCorpusReader::RemoteCorpusReader(std::string const &url) :
+        d_private(new RemoteCorpusReaderPrivate(url))
     {
     }
 

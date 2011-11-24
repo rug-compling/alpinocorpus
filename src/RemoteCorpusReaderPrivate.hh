@@ -3,6 +3,7 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <string>
+#include <vector>
 
 namespace alpinocorpus {
 
@@ -11,7 +12,7 @@ namespace alpinocorpus {
 
     public:
 
-        RemoteCorpusReaderPrivate(std::string const &path);
+        RemoteCorpusReaderPrivate(std::string const &url);
 
         virtual ~RemoteCorpusReaderPrivate() {}
 
@@ -21,13 +22,15 @@ namespace alpinocorpus {
         virtual size_t getSize() const;
         virtual std::string readEntry(std::string const &filename) const;
         virtual std::string readEntryMarkQueries(std::string const &entry,
-            std::list<MarkerQuery> const &queries) const;
+                                                 std::list<MarkerQuery> const &queries) const;
         virtual EntryIterator runXPath(std::string const &) const;
         virtual EntryIterator runXQuery(std::string const &) const;
         virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;
 
     private:
-
+        std::string d_name;
+        std::string d_url;
+        std::vector<std::string> d_entries;
     };
 
 }
