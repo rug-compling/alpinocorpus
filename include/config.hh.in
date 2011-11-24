@@ -17,6 +17,9 @@
 /*! Alpino Corpus revision version number */
 #define ALPINOCORPUS_REVISION @ALPINOCORPUS_REVISION@
 
+/*! Alpino Corpus release info */
+#define ALPINOCORPUS_RELEASE "@ALPINOCORPUS_RELEASE@ @CMAKE_SYSTEM@"
+
 /*! with Berkeley DB XML */
 #cmakedefine ALPINOCORPUS_WITH_DBXML
 

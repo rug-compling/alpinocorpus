@@ -32,6 +32,11 @@ namespace alpinocorpus {
         return ALPINOCORPUS_REVISION;
     }
 
+    char const * Config::Release() const
+    {
+        return ALPINOCORPUS_RELEASE;
+    }
+
     char const * Config::Options() const
     {
         return ""

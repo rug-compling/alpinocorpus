@@ -24,6 +24,8 @@ namespace alpinocorpus {
         int VersionMinor() const;
         //! Get the revision version number.
         int VersionRevision() const;
+        //! Get release info.
+        char const * Release() const;
 
         //! Get list op enabled options
         char const * Options() const;
