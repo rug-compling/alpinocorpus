@@ -7,9 +7,6 @@
 namespace alpinocorpus {
 
     // done
-
-    //! url is actual url#name
-    //  example: http://localhost:8123/cdb#cdb
     RemoteCorpusReaderPrivate::RemoteCorpusReaderPrivate(std::string const &url)
     {
         if (url.substr(0, 7) != "http://" && url.substr(0, 8) != "https://")
@@ -20,6 +17,19 @@ namespace alpinocorpus {
             throw std::invalid_argument("Invalid argument, must be http://host/name");
         d_name = url.substr(i + 1);
         d_url = url;
+
+        bool OK = false;
+        util::GetUrl p1(url.substr(0, i + 1));
+        std::vector<std::string> lines;
+        std::vector<std::string> words;
+        boost::algorithm::split(lines, p1.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
+        for (i = 0; i < lines.size(); i++) {
+            boost::algorithm::split(words, lines[i], boost::algorithm::is_any_of("\t"));
+            if (words.size() == 4 && words[0] == d_name)
+                OK = true;
+        }
+        if (! OK)
+            throw std::invalid_argument("URL is not a valid corpus: " + d_url);
 
         util::GetUrl p(d_url + "/entries");
         d_entries.clear();
