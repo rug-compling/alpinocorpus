@@ -19,7 +19,7 @@ namespace alpinocorpus {
         d_url = url;
 
         bool OK = false;
-        util::GetUrl p1(url.substr(0, i + 1));
+        util::GetUrl p1(url.substr(0, i + 1)); // TODO: met of zonder '/' aan het eind?
         std::vector<std::string> lines;
         std::vector<std::string> words;
         boost::algorithm::split(lines, p1.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
