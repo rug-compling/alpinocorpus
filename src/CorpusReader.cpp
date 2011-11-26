@@ -1,3 +1,4 @@
+#include <list>
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -130,6 +131,36 @@ namespace alpinocorpus {
     std::string CorpusReader::read(std::string const &entry) const
     {
         return readEntry(entry);
+    }
+
+    bool CorpusReader::readerAvailable(ReaderType readerType)
+    {
+#ifndef USE_DBXML
+        if (readerType == DBXML_CORPUS_READER)
+            return false;
+#endif USE_DBXML
+
+        return true;
+    }
+
+    std::list<CorpusReader::ReaderInfo> CorpusReader::readersAvailable()
+    {
+        std::list<ReaderInfo> readers;
+
+        // XXX - How to present directory corpus readers?
+
+        readers.push_back(ReaderInfo(DIRECTORY_CORPUS_READER,
+            "Directory reader", std::list<std::string>()));
+
+        #ifdef USE_DBXML
+        readers.push_back(ReaderInfo(DBXML_CORPUS_READER,
+            "Dact (DBXML) corpus reader", std::list<std::string>(1, "dact")));
+        #endif
+
+        readers.push_back(ReaderInfo(COMPACT_CORPUS_READER,
+            "Compact corpus reader", std::list<std::string>(1, "data.dz")));
+        
+        return readers;
     }
     
     std::string CorpusReader::readMarkQueries(std::string const &entry,
