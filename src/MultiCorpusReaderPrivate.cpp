@@ -34,8 +34,10 @@ CorpusReader::EntryIterator MultiCorpusReaderPrivate::getBegin() const
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::getEnd() const
 {
-  return EntryIterator(new MultiIter(
-    std::tr1::unordered_map<std::string, CorpusReader *>()));
+  // XXX - Constructing an empty map in the argument of the constructor
+  // breaks with Boost 1.48.0. See ticket 6167.
+  std::tr1::unordered_map<std::string, CorpusReader *> emptyMap;
+  return EntryIterator(new MultiIter(emptyMap));
 }
 
 std::string MultiCorpusReaderPrivate::getName() const
