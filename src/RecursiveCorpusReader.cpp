@@ -175,8 +175,10 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getBegin() const
 
 CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getEnd() const
 {
-  return EntryIterator(new RecursiveIter(
-    std::tr1::unordered_map<std::string, CorpusReader *>()));
+  // XXX - Constructing an empty map in the argument of the constructor
+  // breaks with Boost 1.48.0. See ticket 6167.
+  std::tr1::unordered_map<std::string, CorpusReader *> emptyMap;
+  return EntryIterator(new RecursiveIter(emptyMap));
 }
 
 std::string RecursiveCorpusReaderPrivate::getName() const
