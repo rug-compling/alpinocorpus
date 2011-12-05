@@ -35,7 +35,7 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlContainer &container)
                                      | db::DBXML_WELL_FORMED_ONLY
                                      );
     } catch (db::XmlException const &e) {
-        throw alpinocorpus::Error(e.what());
+        throw Error(e.what());
     }
 }
 
@@ -66,7 +66,12 @@ CorpusReader::IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
 std::string DbCorpusReaderPrivate::DbIter::current() const
 {
     db::XmlDocument doc;
-    r.peek(doc);
+    try {
+        r.peek(doc);
+    } catch (db::XmlException const &e) {
+        throw Error(e.what());
+    }
+
     return doc.getName();
 }
 
@@ -85,9 +90,9 @@ bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
                 return true;        // both at end()
         } catch (db::XmlException const &e) {
         if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
-                throw alpinocorpus::IterationInterrupted();
+                throw IterationInterrupted();
             else
-                throw alpinocorpus::Error(e.what());
+                throw Error(e.what());
         }
         return self.r == other.r;
     } catch (std::bad_cast const &e) {
@@ -103,9 +108,9 @@ void DbCorpusReaderPrivate::DbIter::next()
         r.next(doc);
     } catch (db::XmlException const &e) {
         if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
-          throw alpinocorpus::IterationInterrupted();
+          throw IterationInterrupted();
         else
-          throw alpinocorpus::Error(e.what());
+          throw Error(e.what());
     }
 }
 
@@ -329,7 +334,7 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &
                                   ));
         return EntryIterator(new QueryIter(r, ctx));
     } catch (db::XmlException const &e) {
-        throw alpinocorpus::Error(e.what());
+        throw Error(e.what());
     }
 }
 
