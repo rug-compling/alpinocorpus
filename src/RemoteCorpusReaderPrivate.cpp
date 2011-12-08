@@ -43,12 +43,14 @@ namespace alpinocorpus {
 
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getBegin() const
     {
-        return 0;
+        // hoe wordt dat RemoteIter weer opgeruimd?
+        return EntryIterator(new RemoteIter(&d_entries, (size_t) 0));
     }
 
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getEnd() const
     {
-        return 0;
+        // hoe wordt dat RemoteIter weer opgeruimd?
+        return EntryIterator(new RemoteIter(&d_entries, d_entries.size()));
     }
 
     // done
@@ -90,5 +92,30 @@ namespace alpinocorpus {
         return CorpusReader::EntryIterator(0);
     }
 
+    RemoteCorpusReaderPrivate::RemoteIter::~RemoteIter()
+    {
+    }
+
+    std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
+    {
+        return (*items)[idx];
+    }
+
+    void RemoteCorpusReaderPrivate::RemoteIter::next()
+    {
+        idx++;
+    }
+
+    bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
+    {
+        RemoteIter const &that = (RemoteIter const &)other;
+        return idx == that.idx;
+    }
+
+    CorpusReader::IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
+    {
+        // hoe wordt dat RemoteIter weer opgeruimd?
+        return new RemoteIter(this->items, this->idx);
+    }
 
 }   // namespace alpinocorpus
