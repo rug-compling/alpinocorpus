@@ -41,15 +41,15 @@ namespace alpinocorpus {
             throw std::runtime_error("No entries found at " + d_url + "/entries");
     }
 
+    // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getBegin() const
     {
-        // hoe wordt dat RemoteIter weer opgeruimd?
         return EntryIterator(new RemoteIter(&d_entries, (size_t) 0));
     }
 
+    // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getEnd() const
     {
-        // hoe wordt dat RemoteIter weer opgeruimd?
         return EntryIterator(new RemoteIter(&d_entries, d_entries.size()));
     }
 
@@ -92,29 +92,33 @@ namespace alpinocorpus {
         return CorpusReader::EntryIterator(0);
     }
 
+    // done
     RemoteCorpusReaderPrivate::RemoteIter::~RemoteIter()
     {
     }
 
+    // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
         return (*items)[idx];
     }
 
+    // done
     void RemoteCorpusReaderPrivate::RemoteIter::next()
     {
         idx++;
     }
 
+    // done
     bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
     {
         RemoteIter const &that = (RemoteIter const &)other;
         return idx == that.idx;
     }
 
+    // done
     CorpusReader::IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        // hoe wordt dat RemoteIter weer opgeruimd?
         return new RemoteIter(this->items, this->idx);
     }
 
