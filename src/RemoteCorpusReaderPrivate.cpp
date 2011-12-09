@@ -65,9 +65,11 @@ namespace alpinocorpus {
         return d_entries.size();
     }
 
+    // done
     std::string RemoteCorpusReaderPrivate::readEntry(std::string const &filename) const
     {
-        return std::string("");
+        util::GetUrl p(d_url + "/entry/" + filename);
+        return p.body();
     }
 
     bool RemoteCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
