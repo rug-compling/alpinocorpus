@@ -97,7 +97,10 @@ namespace alpinocorpus {
     // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
-        return (*items)[idx];
+        if (idx >= 0 && idx < size)
+            return (*items)[idx];
+        else
+            return "";
     }
 
     // done
@@ -110,6 +113,10 @@ namespace alpinocorpus {
     bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
     {
         RemoteIter const &that = (RemoteIter const &)other;
+        if (idx >= size and that.idx >= that.size)
+            return true;
+        if (idx < 0 and that.idx < 0)
+            return true;
         return idx == that.idx;
     }
 

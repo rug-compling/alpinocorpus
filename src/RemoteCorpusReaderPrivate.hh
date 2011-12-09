@@ -12,7 +12,7 @@ namespace alpinocorpus {
 
         class RemoteIter : public CorpusReader::IterImpl {
         public:
-            RemoteIter(std::vector<std::string> const * i, size_t n) : items(i),  idx(n) { }
+            RemoteIter(std::vector<std::string> const * i, size_t n) : items(i), idx(n), size(i->size()) { }
             ~RemoteIter(); // if missing I get: undefined reference to `vtable for...
             IterImpl *copy() const;
             std::string current() const;
@@ -21,6 +21,7 @@ namespace alpinocorpus {
         private:
             std::vector<std::string> const *items;
             size_t idx;
+            size_t const size;
         };
 
     public:
