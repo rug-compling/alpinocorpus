@@ -38,7 +38,6 @@ namespace alpinocorpus {
                                                  std::list<MarkerQuery> const &queries) const;
         virtual EntryIterator runXPath(std::string const &) const;
         virtual EntryIterator runXQuery(std::string const &) const;
-        virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;
 
     private:
         std::string d_name;

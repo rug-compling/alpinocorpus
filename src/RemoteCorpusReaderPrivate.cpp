@@ -72,11 +72,6 @@ namespace alpinocorpus {
         return p.body();
     }
 
-    bool RemoteCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
-    {
-        return true;
-    }
-
     std::string RemoteCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
                                                                 std::list<MarkerQuery> const &queries) const
     {

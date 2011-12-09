@@ -40,12 +40,6 @@ namespace alpinocorpus {
         return d_private->getSize();
     }
     
-    bool RemoteCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
-    {
-        return d_private->isValidQuery(d, variables, query);
-    }
-
-
     std::string RemoteCorpusReader::readEntry(std::string const &entry) const
     {
         return d_private->readEntry(entry);

@@ -20,7 +20,6 @@ namespace alpinocorpus {
         virtual ~RemoteCorpusReader();
 
     private:
-        bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
         EntryIterator getBegin() const;
         EntryIterator getEnd() const;
         std::string getName() const;
