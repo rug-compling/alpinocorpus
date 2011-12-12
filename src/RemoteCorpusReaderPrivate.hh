@@ -23,7 +23,7 @@ namespace alpinocorpus {
             size_t *d_refcount;
             size_t d_idx;
             size_t const d_size;
-            bool d_ownsdata;
+            bool const d_ownsdata;
         };
 
     public:
@@ -43,6 +43,9 @@ namespace alpinocorpus {
         virtual EntryIterator runXQuery(std::string const &) const;
 
     private:
+
+        std::string escape(std::string const &) const;
+
         std::string d_name;
         std::string d_url;
         std::vector<std::string> d_entries;

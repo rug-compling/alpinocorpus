@@ -5,8 +5,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <cctype>
 
-#include <iostream>  // voor debug, TO DO: weghalen
-
 namespace alpinocorpus {
 
     // done
@@ -56,7 +54,7 @@ namespace alpinocorpus {
         return EntryIterator(new RemoteIter(&d_entries, d_entries.size()));
     }
 
-    // done
+    // done? TODO: alleen naam van corpus of complete url? (nu: alleen naam)
     std::string RemoteCorpusReaderPrivate::getName() const
     {
         return d_name;
@@ -75,28 +73,17 @@ namespace alpinocorpus {
         return p.body();
     }
 
+    // TODO
     std::string RemoteCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
                                                                 std::list<MarkerQuery> const &queries) const
     {
         return std::string("");
     }
 
-    // working...
+    // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
-        char buf[4];
-        std::string qu = "";
-        for (std::string::const_iterator it = query.begin(); it < query.end(); it++) {
-            if (isalnum(*it) || *it == '-' || *it == '_' || *it == '[' || *it == ']')
-                qu += *it;
-            else {
-                sprintf(buf, "%02x", (int) *it);
-                qu += "%";
-                qu += buf;
-            }
-        }
-        std::cerr << qu << std::endl;
-        util::GetUrl p(d_url + "/entries?query=" + qu);
+        util::GetUrl p(d_url + "/entries?query=" + escape(query));
         std::vector<std::string> *data;
         data = new std::vector<std::string>;
         data->clear();
@@ -107,11 +94,13 @@ namespace alpinocorpus {
         return EntryIterator(new RemoteIter(data, 0, true));
     }
 
+    // done? TODO: klopt dit?
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXQuery(std::string const &query) const
     {
-        return CorpusReader::EntryIterator(0);
+        return runXPath(query);
     }
 
+    // done
     RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::vector<std::string> const * i,
                                                       size_t n,
                                                       bool const ownsdata,
@@ -173,5 +162,23 @@ namespace alpinocorpus {
         else
             return new RemoteIter(this->d_items, this->d_idx);
     }
+
+    // done
+    std::string RemoteCorpusReaderPrivate::escape(std::string const &s) const
+    {
+        char buf[4];
+        std::string s2 = "";
+        for (std::string::const_iterator it = s.begin(); it < s.end(); it++) {
+            if (isalnum(*it) || *it == '.' || *it == '-' || *it == '_' || *it == '[' || *it == ']')
+                s2 += *it;
+            else {
+                sprintf(buf, "%02x", (int) *it);
+                s2 += "%";
+                s2 += buf;
+            }
+        }
+        return s2;
+    }
+
 
 }   // namespace alpinocorpus
