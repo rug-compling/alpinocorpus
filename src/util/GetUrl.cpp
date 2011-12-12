@@ -154,7 +154,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
             i = boost::asio::read(socket, response, boost::asio::transfer_all(), error);
         }
     if (!i)
-        throw boost::system::system_error(error);
+        throw std::runtime_error("GetUrl: unable to connect to " + urlc.domain);
 
 
     std::istream response_stream(&response);
@@ -163,7 +163,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
 
     parseHeaders(&response_stream);
     if (d_redirect && d_headers["location"].size() == 0)
-           throw "GetUrl: redirect without location";
+           throw std::runtime_error("GetUrl: redirect without location");
 
     if (d_headers["location"].size() == 0) {
         parseContentType();
