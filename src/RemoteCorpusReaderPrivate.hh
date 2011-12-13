@@ -12,18 +12,22 @@ namespace alpinocorpus {
 
         class RemoteIter : public CorpusReader::IterImpl {
         public:
-            RemoteIter(std::vector<std::string> const * i, size_t n, bool ownsdata = false, size_t * refcount = 0);
+            RemoteIter(std::vector<std::string> const * i, size_t n,
+                       bool ownsdata = false, std::string const &query = "", size_t * refcount = 0);
             ~RemoteIter();
             IterImpl *copy() const;
             std::string current() const;
             bool equals(IterImpl const &) const;
             void next();
+            void interrupt();
+            std::string contents(CorpusReader const &) const;
         private:
             std::vector<std::string> const *d_items;
             size_t *d_refcount;
             size_t d_idx;
             size_t const d_size;
             bool const d_ownsdata;
+            std::string const d_query;
         };
 
     public:

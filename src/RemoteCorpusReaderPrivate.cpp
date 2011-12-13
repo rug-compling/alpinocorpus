@@ -5,6 +5,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <cctype>
 
+// TODO: remove next line and all lines with std::cerr
 #include <iostream>
 
 namespace alpinocorpus {
@@ -56,7 +57,7 @@ namespace alpinocorpus {
         return EntryIterator(new RemoteIter(&d_entries, d_entries.size()));
     }
 
-    // done? TODO: alleen naam van corpus of complete url? (nu: alleen naam)
+    // done? TODO: alleen naam van corpus of complete url? (nu: complete url)
     std::string RemoteCorpusReaderPrivate::getName() const
     {
         // return d_name;
@@ -85,6 +86,8 @@ namespace alpinocorpus {
         if (iter == queries.end())
             return readEntry(entry);
 
+        std::cerr << "RemoteCorpusReaderPrivate::readEntryMarkQueries(" << entry << ", (" << iter->query << ", " << iter->attr << ", " << iter->value << "))" << std::endl;
+
         util::GetUrl p(d_url + "/entry/" + escape(entry) +
                        "?markerQuery=" + escape(iter->query) +
                        "&markerAttr=" + escape(iter->attr) +
@@ -92,7 +95,7 @@ namespace alpinocorpus {
 
         ++iter;
         if (iter != queries.end())
-            throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");            
+            throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
 
         return p.body();
     }
@@ -100,7 +103,7 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
-        util::GetUrl p(d_url + "/entries?query=" + escape(query));
+        util::GetUrl p(d_url + "/entries?query=" + escape(query) + "&unique=1");
         std::vector<std::string> *data;
         data = new std::vector<std::string>;
         data->clear();
@@ -108,10 +111,10 @@ namespace alpinocorpus {
         size_t i = data->size() - 1;
         if (i >= 0 && (*data)[i] == "")
             data->resize(i);
-        return EntryIterator(new RemoteIter(data, 0, true));
+        return EntryIterator(new RemoteIter(data, 0, true, query));
     }
 
-    // done? TODO: klopt dit?
+    // done? TODO: klopt dit? (blijkbaar wel)
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXQuery(std::string const &query) const
     {
         return runXPath(query);
@@ -121,13 +124,15 @@ namespace alpinocorpus {
     RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::vector<std::string> const * i,
                                                       size_t n,
                                                       bool const ownsdata,
+                                                      std::string const & query,
                                                       size_t * refcount) :
-        d_items(i), d_idx(n), d_size(i->size()), d_ownsdata(ownsdata), d_refcount(refcount)
+        d_items(i), d_idx(n), d_size(i->size()), d_ownsdata(ownsdata), d_query(query), d_refcount(refcount)
     {
         if (d_ownsdata) {
             if (d_refcount == 0) {
                 d_refcount = new size_t;
                 *d_refcount = 1;
+                std::cerr << "RemoteCorpusReaderPrivate::RemoteIter::RemoteIter query=" << query << std::endl;
             } else
                 (*d_refcount)++;
         }
@@ -175,9 +180,51 @@ namespace alpinocorpus {
     CorpusReader::IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
         if (this->d_ownsdata)
-            return new RemoteIter(this->d_items, this->d_idx, true, this->d_refcount);
+            return new RemoteIter(this->d_items, this->d_idx, true, this->d_query, this->d_refcount);
         else
             return new RemoteIter(this->d_items, this->d_idx);
+    }
+
+    // done
+    void RemoteCorpusReaderPrivate::RemoteIter::interrupt()
+    {
+        d_idx = d_size;
+    }
+
+    // BUSY
+    std::string RemoteCorpusReaderPrivate::RemoteIter::contents(CorpusReader const &rdr) const
+    {
+        if (d_idx < 0 || d_idx >= d_size)
+            return std::string("");
+
+        if (! d_ownsdata)
+            return std::string("");
+
+        size_t i = d_query.rfind("/@");
+        std::string q1 = d_query.substr(0, i);
+        std::string q2 = " " + d_query.substr(i + 2) + "=\"";
+
+        std::list<CorpusReader::MarkerQuery> queries;
+        queries.push_back(CorpusReader::MarkerQuery(q1, "active", "1"));
+
+        std::string p = rdr.readMarkQueries((*d_items)[d_idx], queries);
+
+        std::vector<std::string> lines;
+        boost::algorithm::split(lines, p, boost::algorithm::is_any_of("\n"));
+
+        for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
+            size_t i = it->find(" active=\"1\"");
+            if (i < it->size()) {
+                i = it->find(q2);
+                if (i < it->size()) {
+                    size_t i1 = i + q2.size();
+                    size_t i2 = it->find("\"", i1);
+                    return it->substr(i1, i2 - i1);
+                }
+            }
+        }
+
+        return std::string("");
     }
 
     // done
