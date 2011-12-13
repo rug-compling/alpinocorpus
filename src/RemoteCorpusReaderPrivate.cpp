@@ -5,6 +5,8 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <cctype>
 
+#include <iostream>
+
 namespace alpinocorpus {
 
     // done
@@ -57,7 +59,8 @@ namespace alpinocorpus {
     // done? TODO: alleen naam van corpus of complete url? (nu: alleen naam)
     std::string RemoteCorpusReaderPrivate::getName() const
     {
-        return d_name;
+        // return d_name;
+        return d_url;
     }
 
     // done
@@ -69,15 +72,29 @@ namespace alpinocorpus {
     // done
     std::string RemoteCorpusReaderPrivate::readEntry(std::string const &filename) const
     {
-        util::GetUrl p(d_url + "/entry/" + filename);
+        util::GetUrl p(d_url + "/entry/" + escape(filename));
         return p.body();
     }
 
-    // TODO
+    // TODO: multiple queries (now: only the first is used)
     std::string RemoteCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
                                                                 std::list<MarkerQuery> const &queries) const
     {
-        return std::string("");
+        std::list<MarkerQuery>::const_iterator iter = queries.begin();
+
+        if (iter == queries.end())
+            return readEntry(entry);
+
+        util::GetUrl p(d_url + "/entry/" + escape(entry) +
+                       "?markerQuery=" + escape(iter->query) +
+                       "&markerAttr=" + escape(iter->attr) +
+                       "&markerValue=" + escape(iter->value));
+
+        ++iter;
+        if (iter != queries.end())
+            throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");            
+
+        return p.body();
     }
 
     // done
