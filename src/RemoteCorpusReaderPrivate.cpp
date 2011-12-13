@@ -191,7 +191,7 @@ namespace alpinocorpus {
         d_idx = d_size;
     }
 
-    // BUSY
+    // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::contents(CorpusReader const &rdr) const
     {
         if (d_idx < 0 || d_idx >= d_size)
@@ -210,7 +210,7 @@ namespace alpinocorpus {
         std::string p = rdr.readMarkQueries((*d_items)[d_idx], queries);
 
         std::vector<std::string> lines;
-        boost::algorithm::split(lines, p, boost::algorithm::is_any_of("\n"));
+        boost::algorithm::split(lines, p, boost::algorithm::is_any_of(">"));
 
         for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
             size_t i = it->find(" active=\"1\"");
