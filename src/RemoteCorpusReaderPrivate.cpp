@@ -103,7 +103,7 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
-        util::GetUrl p(d_url + "/entries?query=" + escape(query) + "&unique=1");
+        util::GetUrl p(d_url + "/entries?query=" + escape(query)); // + "&unique=1");
         std::vector<std::string> *data;
         data = new std::vector<std::string>;
         data->clear();
@@ -200,6 +200,14 @@ namespace alpinocorpus {
         if (! d_ownsdata)
             return std::string("");
 
+        int counter = 0;
+        for (size_t i = d_idx; i > 0; i--) {
+            if ((*d_items)[i-1] == (*d_items)[d_idx])
+                counter++;
+            else
+                break;
+        }
+
         size_t i = d_query.rfind("/@");
         std::string q1 = d_query.substr(0, i);
         std::string q2 = " " + d_query.substr(i + 2) + "=\"";
@@ -211,15 +219,19 @@ namespace alpinocorpus {
 
         std::vector<std::string> lines;
         boost::algorithm::split(lines, p, boost::algorithm::is_any_of(">"));
-
+        
         for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
             size_t i = it->find(" active=\"1\"");
             if (i < it->size()) {
-                i = it->find(q2);
-                if (i < it->size()) {
-                    size_t i1 = i + q2.size();
-                    size_t i2 = it->find("\"", i1);
-                    return it->substr(i1, i2 - i1);
+                if (counter)
+                    counter--;
+                else {
+                    i = it->find(q2);
+                    if (i < it->size()) {
+                        size_t i1 = i + q2.size();
+                        size_t i2 = it->find("\"", i1);
+                        return it->substr(i1, i2 - i1);
+                    }
                 }
             }
         }
