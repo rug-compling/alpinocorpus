@@ -134,7 +134,7 @@ char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
 
     std::string str;
     try{ 
-        str = reader->corpusReader->readMarkQueries(entry, markerQueries);
+        str = reader->corpusReader->read(entry, markerQueries);
     } catch (std::exception const &) {
         return NULL;
     }

@@ -101,7 +101,7 @@ std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
     std::string const &path, std::list<MarkerQuery> const &queries) const
 {
   CorpusReader const *reader = corpusReaderFromPath(path);
-  return reader->readMarkQueries(entryFromPath(path), queries);
+  return reader->read(entryFromPath(path), queries);
 }
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(

@@ -55,8 +55,7 @@ namespace alpinocorpus {
     
     std::string CorpusReader::StylesheetIter::contents(CorpusReader const &rdr) const
     {
-        return d_transformer->transform(rdr.readMarkQueries(*d_iter,
-            d_markerQueries));
+        return d_transformer->transform(rdr.read(*d_iter, d_markerQueries));
     }
 
     void CorpusReader::StylesheetIter::interrupt()

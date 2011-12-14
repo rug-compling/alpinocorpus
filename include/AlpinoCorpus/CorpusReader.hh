@@ -141,15 +141,13 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     EntryIterator queryWithStylesheet(QueryDialect d, std::string const &q,
       std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries) const;
-
-    /** Return content of a single treebank entry. */
-    std::string read(std::string const &entry) const;
     
     /**
-     * Return content of a single treebank entry, marking matching elements using the
-     * given attribute and value.
+     * Return content of a single treebank entry. Mark elements if a marker
+     * queries were provided.
      */
-    std::string readMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
+    std::string read(std::string const &entry,
+      std::list<MarkerQuery> const &queries = std::list<MarkerQuery>()) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;

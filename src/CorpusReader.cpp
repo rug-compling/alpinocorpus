@@ -136,11 +136,6 @@ namespace alpinocorpus {
       return new RecursiveCorpusReader(path);
     }
 
-    std::string CorpusReader::read(std::string const &entry) const
-    {
-        return readEntry(entry);
-    }
-
     bool CorpusReader::readerAvailable(ReaderType readerType)
     {
 #ifndef USE_DBXML
@@ -171,10 +166,13 @@ namespace alpinocorpus {
         return readers;
     }
     
-    std::string CorpusReader::readMarkQueries(std::string const &entry,
+    std::string CorpusReader::read(std::string const &entry,
         std::list<MarkerQuery> const &queries) const
     {
-        return readEntryMarkQueries(entry, queries);
+        if (queries.size() == 0)
+            return readEntry(entry);
+        else
+            return readEntryMarkQueries(entry, queries);
     }
         
     std::string CorpusReader::readEntryMarkQueries(std::string const &entry,
