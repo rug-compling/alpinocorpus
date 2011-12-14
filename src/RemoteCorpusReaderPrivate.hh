@@ -28,6 +28,7 @@ namespace alpinocorpus {
             size_t const d_size;
             bool const d_ownsdata;
             std::string const d_query;
+            bool d_interrupted;
         };
 
     public:

@@ -126,7 +126,7 @@ namespace alpinocorpus {
                                                       bool const ownsdata,
                                                       std::string const & query,
                                                       size_t * refcount) :
-        d_items(i), d_idx(n), d_size(i->size()), d_ownsdata(ownsdata), d_query(query), d_refcount(refcount)
+        d_items(i), d_idx(n), d_size(i->size()), d_ownsdata(ownsdata), d_query(query), d_refcount(refcount), d_interrupted(false)
     {
         if (d_ownsdata) {
             if (d_refcount == 0) {
@@ -162,6 +162,8 @@ namespace alpinocorpus {
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::next()
     {
+        if (d_interrupted)
+            throw alpinocorpus::IterationInterrupted();
         d_idx++;
     }
 
@@ -179,16 +181,21 @@ namespace alpinocorpus {
     // done
     CorpusReader::IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
+        CorpusReader::IterImpl * other;
         if (this->d_ownsdata)
-            return new RemoteIter(this->d_items, this->d_idx, true, this->d_query, this->d_refcount);
+            other = new RemoteIter(this->d_items, this->d_idx, true, this->d_query, this->d_refcount);
         else
-            return new RemoteIter(this->d_items, this->d_idx);
+            other = new RemoteIter(this->d_items, this->d_idx);
+        if (this->d_interrupted)
+            other->interrupt();
+        return other;
+
     }
 
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::interrupt()
     {
-        d_idx = d_size;
+        d_interrupted = true;
     }
 
     // done
@@ -219,7 +226,7 @@ namespace alpinocorpus {
 
         std::vector<std::string> lines;
         boost::algorithm::split(lines, p, boost::algorithm::is_any_of(">"));
-        
+
         for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
             size_t i = it->find(" active=\"1\"");
             if (i < it->size()) {
