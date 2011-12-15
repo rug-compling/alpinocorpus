@@ -9,8 +9,6 @@
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
-#include <config.hh>
-
 namespace alpinocorpus {
 
 /**
