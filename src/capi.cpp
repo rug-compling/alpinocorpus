@@ -23,7 +23,6 @@ struct alpinocorpus_iter_t {
 
 alpinocorpus_reader alpinocorpus_open(char const *path)
 {
-
     alpinocorpus::CorpusReader *reader;
     
     try {
@@ -98,6 +97,27 @@ char *alpinocorpus_iter_value(alpinocorpus_iter iter)
     char *cstr = reinterpret_cast<char *>(std::malloc(len));
     if (cstr != NULL)
         std::memcpy(cstr, entry.c_str(), len);
+    return cstr;
+}
+
+char *alpinocorpus_iter_contents(alpinocorpus_reader reader,
+    alpinocorpus_iter iter)
+{
+    if (reader->corpusReader == NULL)
+        return NULL;
+
+    std::string contents;
+    try {
+        contents = iter->entryIter.contents(*reader->corpusReader);
+    } catch (std::exception const &) {
+        return NULL;
+    }
+
+    size_t len = contents.size() + 1;
+    char *cstr = reinterpret_cast<char *>(std::malloc(len));
+    if (cstr != NULL)
+        std::memcpy(cstr, contents.c_str(), len);
+    
     return cstr;
 }
 
