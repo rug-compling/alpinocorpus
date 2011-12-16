@@ -35,7 +35,8 @@ namespace alpinocorpus {
     { 
     }
 
-    CorpusReader::EntryIterator::EntryIterator(EntryIterator const &other)
+    CorpusReader::EntryIterator::EntryIterator(EntryIterator const &other) :
+        d_impl(0)
     {
         copy(other);
     }
