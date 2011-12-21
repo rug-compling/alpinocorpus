@@ -23,7 +23,7 @@ namespace alpinocorpus {
         d_url = url;
 
         bool OK = false;
-        util::GetUrl p1(url.substr(0, i + 1)); // TODO: met of zonder '/' aan het eind?
+        util::GetUrl p1(url.substr(0, i) + "/corpora?plain=1");
         std::vector<std::string> lines;
         std::vector<std::string> words;
         boost::algorithm::split(lines, p1.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
@@ -35,7 +35,7 @@ namespace alpinocorpus {
         if (! OK)
             throw std::invalid_argument("URL is not a valid corpus: " + d_url);
 
-        util::GetUrl p(d_url + "/entries");
+        util::GetUrl p(d_url + "/entries?plain=1");
         d_entries.clear();
         boost::algorithm::split(d_entries, p.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
         i = d_entries.size() - 1;
@@ -103,7 +103,7 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
-        util::GetUrl p(d_url + "/entries?query=" + escape(query)); // + "&unique=1");
+        util::GetUrl p(d_url + "/entries?query=" + escape(query) + "&plain=1");
         std::vector<std::string> *data;
         data = new std::vector<std::string>;
         data->clear();
@@ -153,9 +153,14 @@ namespace alpinocorpus {
     // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
-        if (d_idx >= 0 && d_idx < d_size)
-            return (*d_items)[d_idx];
-        else
+        if (d_idx >= 0 && d_idx < d_size) {
+            if (d_ownsdata) {
+                size_t i = (*d_items)[d_idx].find('\t');
+                return (*d_items)[d_idx].substr(0, i);
+            } else {
+                return (*d_items)[d_idx];
+            }
+        } else
             return "";
     }
 
@@ -207,43 +212,8 @@ namespace alpinocorpus {
         if (! d_ownsdata)
             return std::string("");
 
-        int counter = 0;
-        for (size_t i = d_idx; i > 0; i--) {
-            if ((*d_items)[i-1] == (*d_items)[d_idx])
-                counter++;
-            else
-                break;
-        }
-
-        size_t i = d_query.rfind("/@");
-        std::string q1 = d_query.substr(0, i);
-        std::string q2 = " " + d_query.substr(i + 2) + "=\"";
-
-        std::list<CorpusReader::MarkerQuery> queries;
-        queries.push_back(CorpusReader::MarkerQuery(q1, "active", "1"));
-
-        std::string p = rdr.readMarkQueries((*d_items)[d_idx], queries);
-
-        std::vector<std::string> lines;
-        boost::algorithm::split(lines, p, boost::algorithm::is_any_of(">"));
-
-        for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
-            size_t i = it->find(" active=\"1\"");
-            if (i < it->size()) {
-                if (counter)
-                    counter--;
-                else {
-                    i = it->find(q2);
-                    if (i < it->size()) {
-                        size_t i1 = i + q2.size();
-                        size_t i2 = it->find("\"", i1);
-                        return it->substr(i1, i2 - i1);
-                    }
-                }
-            }
-        }
-
-        return std::string("");
+        size_t i = (*d_items)[d_idx].find('\t');
+        return (*d_items)[d_idx].substr(i + 1);
     }
 
     // done
