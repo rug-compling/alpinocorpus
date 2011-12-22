@@ -17,7 +17,7 @@ extern "C" {
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 
-#include <util/textfile.hh>
+#include "../src/util/textfile.hh" // XXX - hmpf
 
 #include <EqualsPrevious.hh>
 #include <ProgramOptions.hh>

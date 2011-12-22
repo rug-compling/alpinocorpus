@@ -10,9 +10,9 @@
 
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
-#include <util/textfile.hh>
 
 #include "DirectoryCorpusReaderPrivate.hh"
+#include "util/textfile.hh"
 
 namespace bf = boost::filesystem;
 

@@ -15,10 +15,10 @@
 #endif
 
 #include <AlpinoCorpus/Error.hh>
-#include <util/base64.hh>
 
 #include "DzIstream.hh"
 #include "CompactCorpusReaderPrivate.hh"
+#include "util/base64.hh"
 
 namespace {
     char const * const DATA_EXT = ".data.dz";

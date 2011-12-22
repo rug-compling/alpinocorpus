@@ -111,11 +111,6 @@ set(HEADERS
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/util/NonCopyable.hh
   include/AlpinoCorpus/capi.h
-  include/util/base64.hh
-  include/util/bufutil.hh
-  include/util/textfile.hh
-  include/util/url.hh
-  include/util/vs_stdint.h
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
   src/DzIstream.hh
@@ -128,6 +123,12 @@ set(HEADERS
   src/StylesheetIter.hh
   src/XSLTransformer.hh
   src/gzip.hh
+  src/util/base64.hh
+  src/util/bufutil.hh
+  src/util/textfile.hh
+  src/util/url.hh
+  src/util/vs_stdint.h
+
 )
 
 set(SOURCES

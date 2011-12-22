@@ -17,10 +17,9 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
-#include <util/url.hh>
 
 #include "DbCorpusReaderPrivate.hh"
-
+#include "util/url.hh"
 
 namespace db = DbXml;
 
