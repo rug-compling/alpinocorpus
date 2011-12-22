@@ -16,6 +16,7 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 #include <util/url.hh>
 
 #include "DbCorpusReaderPrivate.hh"
@@ -51,7 +52,7 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlManager &mgr)
 {
 }
 
-CorpusReader::IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
+IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
 {
     // XXX - Copy constructor of XmlResults copies handle but not body.
     //       The copyResults() method returns an XmlResults instance that
@@ -131,7 +132,7 @@ std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) con
     return v.getNodeValue();
 }
 
-CorpusReader::IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
+IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
 {
     // XXX - See DbIter::copy()
 

@@ -3,6 +3,7 @@
 #include <typeinfo>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 #include "../XSLTransformer.hh"
 
@@ -24,7 +25,7 @@ namespace alpinocorpus {
         delete d_transformer;
     }
 
-    CorpusReader::IterImpl *CorpusReader::StylesheetIter::copy() const
+    IterImpl *CorpusReader::StylesheetIter::copy() const
     {
         // The only state are the wrapped iterators. We can safely reconstruct
         // the transformer.

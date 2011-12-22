@@ -7,6 +7,7 @@
 #include <string>
 
 #include <AlpinoCorpus/DLLDefines.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
 namespace alpinocorpus {
@@ -21,20 +22,6 @@ class XSLTransformer;
  */
 class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 {
-  protected:
-    // Iterator body. We need handle-body/proxy/pimpl for polymorphic copy.
-    struct IterImpl {
-        virtual ~IterImpl() {}
-        virtual IterImpl *copy() const = 0;
-        virtual std::string current() const = 0;
-        virtual bool equals(IterImpl const &) const = 0;
-        virtual void next() = 0;
-
-        // Query iterators must override this
-        virtual std::string contents(CorpusReader const &rdr) const;
-        virtual void interrupt();
-    };
-
   public:
     /** Forward iterator over entry names */
     class ALPINO_CORPUS_EXPORT EntryIterator
@@ -127,31 +114,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     size_t size() const;
 
   protected:
-    class FilterIter : public IterImpl {
-      public:
-        FilterIter(CorpusReader const &, EntryIterator, EntryIterator, std::string const &);
-        IterImpl *copy() const;
-        std::string current() const;
-        bool equals(IterImpl const &) const;
-        void next();
-        std::string contents(CorpusReader const &) const;
-
-      protected:
-        void interrupt();
-      
-      private:
-        void parseFile(std::string const &);
-        
-        CorpusReader const &d_corpus;
-        EntryIterator d_itr;
-        EntryIterator d_end;
-        std::string d_file;
-        std::string d_query;
-        std::queue<std::string> d_buffer;
-        mutable bool d_initialState;
-        bool d_interrupted;
-    };
-
     class StylesheetIter : public IterImpl {
     public:
       StylesheetIter(EntryIterator iter, EntryIterator end,

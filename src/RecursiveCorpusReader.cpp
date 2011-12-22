@@ -10,6 +10,7 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
 #include <iostream>
@@ -37,7 +38,7 @@ bool operator==(ReaderIter const &left, ReaderIter const &right)
 
 class RecursiveCorpusReaderPrivate : public CorpusReader
 {
-  class RecursiveIter : public CorpusReader::IterImpl
+  class RecursiveIter : public IterImpl
   {
   public:
     RecursiveIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);
@@ -300,7 +301,7 @@ std::string RecursiveCorpusReaderPrivate::RecursiveIter::contents(
   return d_iters.front().iter.contents(reader);
 }
 
-CorpusReader::IterImpl *RecursiveCorpusReaderPrivate::RecursiveIter::copy() const
+IterImpl *RecursiveCorpusReaderPrivate::RecursiveIter::copy() const
 {
   // No pointer members, pointer member of ReaderIter is not managed by
   // ReaderIter.

@@ -9,6 +9,8 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/IterImpl.hh>
+
 
 #include "MultiCorpusReaderPrivate.hh"
 
@@ -148,7 +150,7 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
 
-CorpusReader::IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
+IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
 {
   // No pointer members, and pointer member in ReaderIter is not managed
   // by ReaderIter.

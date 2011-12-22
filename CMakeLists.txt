@@ -105,6 +105,7 @@ set(HEADERS
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
+  include/AlpinoCorpus/IterImpl.hh
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
@@ -122,6 +123,7 @@ set(HEADERS
   src/DzOstream.hh
   src/DzOstreamBuf.hh
   src/CompactCorpusReaderPrivate.hh
+  src/FilterIter.hh
   src/MultiCorpusReaderPrivate.hh
   src/XSLTransformer.hh
   src/gzip.hh
@@ -141,8 +143,10 @@ set(SOURCES
   src/DzOstream.cpp
   src/DzOstreamBuf.cpp
   src/Error.cpp
+  src/FilterIter.cpp
   src/CompactCorpusReader.cpp
   src/CompactCorpusReaderPrivate.cpp
+  src/IterImpl.cpp
   src/MultiCorpusReader.cpp
   src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
