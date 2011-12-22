@@ -118,9 +118,9 @@ int main (int argc, char *argv[])
 
   tr1::shared_ptr<CorpusReader> reader;
   try {
-    if (opts->arguments().size() == 1)
+    if (opts->arguments().size() == 2)
       reader = tr1::shared_ptr<CorpusReader>(
-        openCorpus(opts->arguments().at(0), opts->option('r')));
+        openCorpus(opts->arguments().at(1), opts->option('r')));
     else
       reader = tr1::shared_ptr<CorpusReader>(
         openCorpora(opts->arguments().begin() + 1, 
