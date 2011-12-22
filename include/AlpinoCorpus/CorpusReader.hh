@@ -11,6 +11,8 @@
 
 namespace alpinocorpus {
 
+class XSLTransformer;
+
 /**
  * Abstract base class for corpus readers.
  *
@@ -100,6 +102,8 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         std::string query;
         std::string attr;
         std::string value;
+
+        bool operator==(MarkerQuery const &other) const;
     };
 
     virtual ~CorpusReader() {}
@@ -109,6 +113,13 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 
     /** Iterator to begin of entry names */
     EntryIterator begin() const;
+
+    /**
+     * Iterator to begin of entry names, contents are transformed with
+     * the given stylesheet.
+     */
+    EntryIterator beginWithStylesheet(std::string const &stylesheet,
+      std::list<MarkerQuery> const &markerQueries = std::list<MarkerQuery>()) const;
 
     /** Iterator to end of entry names */
     EntryIterator end() const;
@@ -121,14 +132,20 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     /** Execute query. The end of the range is given by end(). */
     EntryIterator query(QueryDialect d, std::string const &q) const;
 
-    /** Return content of a single treebank entry. */
-    std::string read(std::string const &entry) const;
+    /**
+     * Execute a query, applying the given stylesheet to each entry. The
+     * end of the range is given by end().
+     */ 
+    EntryIterator queryWithStylesheet(QueryDialect d, std::string const &q,
+      std::string const &stylesheet,
+      std::list<MarkerQuery> const &markerQueries) const;
     
     /**
-     * Return content of a single treebank entry, marking matching elements using the
-     * given attribute and value.
+     * Return content of a single treebank entry. Mark elements if a marker
+     * queries were provided.
      */
-    std::string readMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
+    std::string read(std::string const &entry,
+      std::list<MarkerQuery> const &queries = std::list<MarkerQuery>()) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -179,6 +196,32 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         std::queue<std::string> d_buffer;
         mutable bool d_initialState;
         bool d_interrupted;
+    };
+
+    class StylesheetIter : public IterImpl {
+    public:
+      StylesheetIter(EntryIterator iter, EntryIterator end,
+        std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries);
+      virtual ~StylesheetIter();
+      IterImpl *copy() const;
+      std::string current() const;
+      bool equals(IterImpl const &) const;
+      void next();
+      std::string contents(CorpusReader const &) const;
+    
+    protected:
+      void interrupt();
+    
+    private:
+      StylesheetIter(StylesheetIter const &other);
+      StylesheetIter &operator=(StylesheetIter const &other);
+
+      EntryIterator d_iter;
+      EntryIterator d_end;
+      std::list<MarkerQuery> d_markerQueries;
+      std::string d_stylesheet; // To simplify equals...
+      XSLTransformer *d_transformer;
     };
 
   private:

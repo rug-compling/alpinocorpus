@@ -87,6 +87,11 @@ if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
 
+find_package(LibXslt REQUIRED)
+if(LIBXSLT_FOUND)
+  include_directories(${LIBXSLT_INCLUDE_DIR})
+endif()
+
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
   "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
@@ -117,6 +122,7 @@ set(HEADERS
   src/DzOstreamBuf.hh
   src/CompactCorpusReaderPrivate.hh
   src/MultiCorpusReaderPrivate.hh
+  src/XSLTransformer.hh
   src/gzip.hh
 )
 
@@ -124,6 +130,7 @@ set(SOURCES
   src/CompactCorpusWriter.cpp
   src/CompactCorpusWriterPrivate.cpp
   src/CorpusReader.cpp
+  src/CorpusReader/StylesheetIter.cpp
   src/CorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
@@ -137,6 +144,7 @@ set(SOURCES
   src/MultiCorpusReader.cpp
   src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
+  src/XSLTransformer.cpp
   src/capi.cpp
   src/util/base64.cpp
   src/util/textfile.cpp
@@ -173,6 +181,7 @@ if(USE_DBXML)
   target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
+target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib

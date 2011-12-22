@@ -237,7 +237,7 @@ static PyObject *CorpusReader_readMarkQueries(CorpusReader *self, PyObject *args
 
   std::string data;
   try {
-    data = self->reader->readMarkQueries(entry, markerQueries);
+    data = self->reader->read(entry, markerQueries);
   } catch (std::runtime_error &e) {
     raise_exception(e.what());
     return NULL;

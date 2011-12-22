@@ -77,6 +77,14 @@ namespace alpinocorpus {
     {
         return getBegin();
     }
+
+    CorpusReader::EntryIterator CorpusReader::beginWithStylesheet(
+        std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries) const
+    {
+        return EntryIterator(new StylesheetIter(getBegin(), getEnd(),
+            stylesheet, markerQueries));
+    }
     
     std::string CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
     {
@@ -129,11 +137,6 @@ namespace alpinocorpus {
       return new RecursiveCorpusReader(path);
     }
 
-    std::string CorpusReader::read(std::string const &entry) const
-    {
-        return readEntry(entry);
-    }
-
     bool CorpusReader::readerAvailable(ReaderType readerType)
     {
 #ifndef USE_DBXML
@@ -164,10 +167,13 @@ namespace alpinocorpus {
         return readers;
     }
     
-    std::string CorpusReader::readMarkQueries(std::string const &entry,
+    std::string CorpusReader::read(std::string const &entry,
         std::list<MarkerQuery> const &queries) const
     {
-        return readEntryMarkQueries(entry, queries);
+        if (queries.size() == 0)
+            return readEntry(entry);
+        else
+            return readEntryMarkQueries(entry, queries);
     }
         
     std::string CorpusReader::readEntryMarkQueries(std::string const &entry,
@@ -318,6 +324,21 @@ namespace alpinocorpus {
         }
     }
 
+    CorpusReader::EntryIterator CorpusReader::queryWithStylesheet(
+        QueryDialect d, std::string const &query,
+      std::string const &stylesheet,
+      std::list<MarkerQuery> const &markerQueries) const
+    {
+        if (d == XQUERY)
+            throw NotImplemented(typeid(*this).name(),
+                "XQuery functionality");
+        
+        EntryIterator iter = runXPath(query);
+
+        return EntryIterator(new StylesheetIter(iter, getEnd(), stylesheet,
+            markerQueries));
+    }
+
     CorpusReader::EntryIterator CorpusReader::runXPath(std::string const &query) const
     {
         //throw NotImplemented(typeid(*this).name(), "XQuery functionality");
@@ -362,6 +383,7 @@ namespace alpinocorpus {
 
         try {
             // TODO fix me to be more like isEqual instead of hasNext.
+            // XXX - Where is the possibility of a bad cast here?
             return d_itr == d_end
                 && d_buffer.size() == 0;
         } catch (std::bad_cast const &e) {
@@ -453,7 +475,7 @@ namespace alpinocorpus {
         xmlXPathFreeContext(ctx);
         xmlFreeDoc(doc);
     }
-    
+
     std::string CorpusReader::IterImpl::contents(CorpusReader const &rdr) const
     {
         //return rdr.read(current());
@@ -463,5 +485,12 @@ namespace alpinocorpus {
     void CorpusReader::IterImpl::interrupt()
     {
         // XXX no default behavior implemented
+    }
+
+    bool CorpusReader::MarkerQuery::operator==(MarkerQuery const &other) const
+    {
+        return other.query == query &&
+            other.attr == attr &&
+            other.value == value;
     }
 }
