@@ -218,7 +218,7 @@ CorpusReader const *RecursiveCorpusReaderPrivate::corpusReaderFromPath(
     if (path.find(iter->first) == 0)
       return iter->second;
   
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Unknown corpus: " + path));
 }
 
 std::string RecursiveCorpusReaderPrivate::entryFromPath(
@@ -229,7 +229,7 @@ std::string RecursiveCorpusReaderPrivate::entryFromPath(
     if (path.find(iter->first) == 0)
       return path.substr(iter->first.size() + 1);
 
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Could not find entry: " + path));
 }
 
 std::string RecursiveCorpusReaderPrivate::readEntry(std::string const &path) const

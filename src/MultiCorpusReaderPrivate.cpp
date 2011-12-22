@@ -77,7 +77,7 @@ CorpusReader const *MultiCorpusReaderPrivate::corpusReaderFromPath(
     if (path.find(iter->first) == 0)
       return iter->second;
   
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Unknown corpus: " + path));
 }
 
 std::string MultiCorpusReaderPrivate::entryFromPath(
@@ -88,7 +88,7 @@ std::string MultiCorpusReaderPrivate::entryFromPath(
     if (path.find(iter->first) == 0)
       return path.substr(iter->first.size() + 1);
 
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Could not find entry: " + path));
 }
 
 std::string MultiCorpusReaderPrivate::readEntry(std::string const &path) const
