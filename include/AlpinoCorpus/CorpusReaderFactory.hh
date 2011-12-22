@@ -4,6 +4,8 @@
 #include <list>
 #include <string>
 
+#include "DLLDefines.hh"
+
 namespace alpinocorpus {
     class CorpusReader;
 
