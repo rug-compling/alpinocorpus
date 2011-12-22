@@ -21,6 +21,7 @@
 #include <libxml/xpath.h>
 
 #include "FilterIter.hh"
+#include "StylesheetIter.hh"
 
 namespace {
     void ignoreStructuredError(void *userdata, xmlErrorPtr err)

@@ -125,6 +125,7 @@ set(HEADERS
   src/CompactCorpusReaderPrivate.hh
   src/FilterIter.hh
   src/MultiCorpusReaderPrivate.hh
+  src/StylesheetIter.hh
   src/XSLTransformer.hh
   src/gzip.hh
 )
@@ -134,7 +135,6 @@ set(SOURCES
   src/CompactCorpusWriterPrivate.cpp
   src/CorpusReader.cpp
   src/CorpusReaderFactory.cpp
-  src/CorpusReader/StylesheetIter.cpp
   src/CorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
@@ -150,6 +150,7 @@ set(SOURCES
   src/MultiCorpusReader.cpp
   src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
+  src/StylesheetIter.cpp
   src/XSLTransformer.cpp
   src/capi.cpp
   src/util/base64.cpp

@@ -5,14 +5,15 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 
-#include "../XSLTransformer.hh"
+#include "StylesheetIter.hh"
+#include "XSLTransformer.hh"
 
 namespace alpinocorpus {
 
-    CorpusReader::StylesheetIter::StylesheetIter(EntryIterator iter,
-            EntryIterator end,
+    StylesheetIter::StylesheetIter(CorpusReader::EntryIterator iter,
+            CorpusReader::EntryIterator end,
             std::string const &stylesheet,
-            std::list<MarkerQuery> const &markerQueries) :
+            std::list<CorpusReader::MarkerQuery> const &markerQueries) :
         d_iter(iter), d_end(end),
         d_markerQueries(markerQueries),
         d_stylesheet(stylesheet),
@@ -20,24 +21,24 @@ namespace alpinocorpus {
     {
     }
 
-    CorpusReader::StylesheetIter::~StylesheetIter()
+    StylesheetIter::~StylesheetIter()
     {
         delete d_transformer;
     }
 
-    IterImpl *CorpusReader::StylesheetIter::copy() const
+    IterImpl *StylesheetIter::copy() const
     {
         // The only state are the wrapped iterators. We can safely reconstruct
         // the transformer.
         return new StylesheetIter(d_iter, d_end, d_stylesheet, d_markerQueries);
     }
 
-    std::string CorpusReader::StylesheetIter::current() const
+    std::string StylesheetIter::current() const
     {
         return *d_iter;
     }
 
-    bool CorpusReader::StylesheetIter::equals(IterImpl const &other)
+    bool StylesheetIter::equals(IterImpl const &other)
         const
     {
         try {
@@ -54,17 +55,17 @@ namespace alpinocorpus {
         } 
     }
     
-    std::string CorpusReader::StylesheetIter::contents(CorpusReader const &rdr) const
+    std::string StylesheetIter::contents(CorpusReader const &rdr) const
     {
         return d_transformer->transform(rdr.read(*d_iter, d_markerQueries));
     }
 
-    void CorpusReader::StylesheetIter::interrupt()
+    void StylesheetIter::interrupt()
     {
         d_iter.interrupt();
     }
 
-    void CorpusReader::StylesheetIter::next()
+    void StylesheetIter::next()
     {
         ++d_iter;
     }

@@ -12,8 +12,6 @@
 
 namespace alpinocorpus {
 
-class XSLTransformer;
-
 /**
  * Abstract base class for corpus readers.
  *
@@ -112,33 +110,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 
     /** The number of entries in the corpus. */
     size_t size() const;
-
-  protected:
-    class StylesheetIter : public IterImpl {
-    public:
-      StylesheetIter(EntryIterator iter, EntryIterator end,
-        std::string const &stylesheet,
-        std::list<MarkerQuery> const &markerQueries);
-      virtual ~StylesheetIter();
-      IterImpl *copy() const;
-      std::string current() const;
-      bool equals(IterImpl const &) const;
-      void next();
-      std::string contents(CorpusReader const &) const;
-    
-    protected:
-      void interrupt();
-    
-    private:
-      StylesheetIter(StylesheetIter const &other);
-      StylesheetIter &operator=(StylesheetIter const &other);
-
-      EntryIterator d_iter;
-      EntryIterator d_end;
-      std::list<MarkerQuery> d_markerQueries;
-      std::string d_stylesheet; // To simplify equals...
-      XSLTransformer *d_transformer;
-    };
 
   private:
     virtual EntryIterator getBegin() const = 0;
