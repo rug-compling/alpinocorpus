@@ -10,6 +10,8 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
+#include <config.hh>
+
 namespace alpinocorpus {
 
     CorpusReader *CorpusReaderFactory::open(std::string const &corpusPath)
