@@ -5,6 +5,7 @@
 #include <Python.h>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 
 #include "alpinocorpus.h"
 
@@ -183,7 +184,7 @@ static PyObject *CorpusReader_new(PyTypeObject *type, PyObject *args,
   self = (CorpusReader *) type->tp_alloc(type, 0);
   try {
     if (self != NULL)
-      self->reader = alpinocorpus::CorpusReader::open(path);
+      self->reader = alpinocorpus::CorpusReaderFactory::open(path);
   } catch (std::runtime_error &e) {
     raise_exception(e.what());
     return NULL;

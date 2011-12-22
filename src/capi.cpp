@@ -5,6 +5,7 @@
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/capi.h>
 
 extern "C" {
@@ -26,7 +27,7 @@ alpinocorpus_reader alpinocorpus_open(char const *path)
     alpinocorpus::CorpusReader *reader;
     
     try {
-        reader = alpinocorpus::CorpusReader::open(path);
+        reader = alpinocorpus::CorpusReaderFactory::open(path);
     } catch (std::exception const &) {
         return NULL;
     }

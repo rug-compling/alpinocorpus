@@ -100,6 +100,7 @@ configure_file (
 set(HEADERS
   include/AlpinoCorpus/CompactCorpusWriter.hh
   include/AlpinoCorpus/CorpusReader.hh
+  include/AlpinoCorpus/CorpusReaderFactory.hh
   include/AlpinoCorpus/CorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
@@ -130,6 +131,7 @@ set(SOURCES
   src/CompactCorpusWriter.cpp
   src/CompactCorpusWriterPrivate.cpp
   src/CorpusReader.cpp
+  src/CorpusReaderFactory.cpp
   src/CorpusReader/StylesheetIter.cpp
   src/CorpusWriter.cpp
   src/DirectoryCorpusReader.cpp

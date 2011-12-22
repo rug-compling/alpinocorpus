@@ -8,6 +8,7 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
@@ -149,7 +150,7 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
         iter->path().extension() != ".index")
       continue;
 
-    CorpusReader *reader(CorpusReader::open(iter->path().string()));
+    CorpusReader *reader(CorpusReaderFactory::open(iter->path().string()));
 
     bf::path namePath = iter->path();
     namePath.replace_extension("");

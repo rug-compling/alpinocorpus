@@ -5,15 +5,16 @@
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 
 namespace ac = alpinocorpus;
 
-typedef std::list<ac::CorpusReader::ReaderInfo> ReaderList;
+typedef std::list<ac::CorpusReaderFactory::ReaderInfo> ReaderList;
 typedef std::list<std::string> ExtList;
 
 int main(int argc, char *argv[])
 {
-  ReaderList readers = ac::CorpusReader::readersAvailable();
+  ReaderList readers = ac::CorpusReaderFactory::readersAvailable();
 
   for (ReaderList::const_iterator iter = readers.begin();
     iter != readers.end(); ++iter)
@@ -24,7 +25,7 @@ int main(int argc, char *argv[])
     std::cout << "): ";
 
     // Corresponds with CorpusReader::readerAvailable?
-    if (ac::CorpusReader::readerAvailable(iter->readerType))
+    if (ac::CorpusReaderFactory::readerAvailable(iter->readerType))
       std::cout << "OK";
     else
       std::cout << "Error in readerAvailable!";

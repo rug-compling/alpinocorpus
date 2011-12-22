@@ -2,6 +2,7 @@
 #include <cstdio>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/DbCorpusWriter.hh>
 
 #include "writer.hh"
@@ -21,7 +22,7 @@ void canOpenDbForWriting()
 void canWriteEntireReader()
 {
     // Open the directory-based corpus as a reference.
-    ac::CorpusReader *dir_rdr = ac::CorpusReader::open("test_suite");
+    ac::CorpusReader *dir_rdr = ac::CorpusReaderFactory::open("test_suite");
     assert(dir_rdr != 0);
     
     // Write DBXML corpus.
@@ -31,7 +32,7 @@ void canWriteEntireReader()
     delete writer;
 
     // Check corpus correctness
-    ac::CorpusReader *wrtr_rdr = ac::CorpusReader::open(db_path);
+    ac::CorpusReader *wrtr_rdr = ac::CorpusReaderFactory::open(db_path);
     assert(dir_rdr->size() == wrtr_rdr->size());
     
     // Cleanup
