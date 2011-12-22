@@ -32,7 +32,7 @@ typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::Ent
     UniqueFilterIter;
 
 void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
-  tr1::shared_ptr<std::string const> query, tr1::shared_ptr<Stylesheet> stylesheet)
+  tr1::shared_ptr<std::string const> query, std::string const &stylesheet)
 {
   std::list<CorpusReader::MarkerQuery> markerQueries;
   if (query) {
@@ -44,32 +44,35 @@ void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
   CorpusReader::EntryIterator i, end(reader->end());
   
   if (query)
-    i = reader->query(CorpusReader::XPATH, *query);
+    i = reader->queryWithStylesheet(CorpusReader::XPATH, *query,
+      stylesheet, markerQueries);
   else
-    i = reader->begin();
+    i = reader->beginWithStylesheet(stylesheet);
 
   NotEqualsPrevious<std::string> pred;
 
   for (UniqueFilterIter iter(pred, i, end); iter != UniqueFilterIter(pred, end, end);
       ++iter)
     try {
-      std::cout << stylesheet->transform(reader->readMarkQueries(*iter, markerQueries));
+      std::cout << i.contents(*reader);
     } catch (std::runtime_error &e) {
       std::cerr << "Could not apply stylesheet to: " << *iter << std::endl;
     }
 }
 
 void transformEntry(tr1::shared_ptr<CorpusReader> reader,
-  tr1::shared_ptr<std::string const> query, tr1::shared_ptr<Stylesheet> stylesheet,
+  tr1::shared_ptr<std::string const> query, std::string stylesheet,
   std::string const &entry)
 {
+  Stylesheet compiledStylesheet(stylesheet);
+
   std::list<CorpusReader::MarkerQuery> markerQueries;
   if (query) {
      // Markers
     CorpusReader::MarkerQuery activeMarker(*query, "active", "1");
-    markerQueries.push_back(activeMarker); 
+    markerQueries.push_back(activeMarker);
   }
-  std::cout << stylesheet->transform(reader->readMarkQueries(entry, markerQueries));
+  std::cout << compiledStylesheet.transform(reader->read(entry, markerQueries));
 }
 
 void usage(std::string const &programName)
@@ -107,12 +110,11 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  tr1::shared_ptr<Stylesheet> stylesheet;
+  std::string stylesheet;
   try {
-    std::string stylesheetData = alpinocorpus::util::readFile(opts->arguments().at(0));
-    stylesheet.reset(new Stylesheet(stylesheetData));
+    stylesheet = alpinocorpus::util::readFile(opts->arguments().at(0));
   } catch (std::runtime_error &e) {
-    std::cerr << "Could not parse stylesheet: " << e.what() << std::endl;
+    std::cerr << "Could not read stylesheet: " << e.what() << std::endl;
     return 1;
   }
 
