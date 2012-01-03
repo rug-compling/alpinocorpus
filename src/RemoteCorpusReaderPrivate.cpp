@@ -4,6 +4,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <cctype>
+#include <cstdio>
 
 // TODO: remove next line and all lines with std::cerr
 #include <iostream>
@@ -225,7 +226,7 @@ namespace alpinocorpus {
             if (isalnum(*it) || *it == '.' || *it == '-' || *it == '_' || *it == '[' || *it == ']')
                 s2 += *it;
             else {
-                sprintf(buf, "%02x", (int) *it);
+                std::sprintf(buf, "%02x", (int) *it);
                 s2 += "%";
                 s2 += buf;
             }
