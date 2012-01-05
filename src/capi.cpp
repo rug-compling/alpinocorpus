@@ -54,6 +54,34 @@ alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
     return i;
 }
 
+alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
+    char const *query, char const *stylesheet, marker_query_t *queries,
+    size_t n_queries)
+{
+    std::list<alpinocorpus::CorpusReader::MarkerQuery> markerQueries;
+
+    for (size_t i = 0; i < n_queries; ++i) {
+        alpinocorpus::CorpusReader::MarkerQuery query(
+          queries[i].query,
+          queries[i].attr,
+          queries[i].value
+        );
+
+        markerQueries.push_back(query);
+    }
+
+    alpinocorpus::CorpusReader::EntryIterator iter;
+    try {
+        iter = corpus->corpusReader->queryWithStylesheet(
+            alpinocorpus::CorpusReader::XPATH, query, stylesheet,
+            markerQueries);
+    } catch (std::exception const &) {
+        return NULL;
+    }
+
+    return new alpinocorpus_iter_t(iter);
+}
+
 alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query)
 {
     alpinocorpus::CorpusReader::EntryIterator iter;
