@@ -74,7 +74,8 @@ namespace alpinocorpus {
     // done
     std::string RemoteCorpusReaderPrivate::readEntry(std::string const &filename) const
     {
-        util::GetUrl p(d_url + "/entry/" + escape(filename));
+        // util::GetUrl p(d_url + "/entry/" + escape(filename));
+        util::GetUrl p(d_url + "/entry/" + filename);
         return p.body();
     }
 
@@ -89,7 +90,7 @@ namespace alpinocorpus {
 
         std::cerr << "RemoteCorpusReaderPrivate::readEntryMarkQueries(" << entry << ", (" << iter->query << ", " << iter->attr << ", " << iter->value << "))" << std::endl;
 
-        util::GetUrl p(d_url + "/entry/" + escape(entry) +
+        util::GetUrl p(d_url + "/entry/" + entry +   // escape(entry) +
                        "?markerQuery=" + escape(iter->query) +
                        "&markerAttr=" + escape(iter->attr) +
                        "&markerValue=" + escape(iter->value));
