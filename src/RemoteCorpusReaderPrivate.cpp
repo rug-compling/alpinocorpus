@@ -30,8 +30,10 @@ namespace alpinocorpus {
         boost::algorithm::split(lines, p1.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
         for (i = 0; i < lines.size(); i++) {
             boost::algorithm::split(words, lines[i], boost::algorithm::is_any_of("\t"));
-            if (words.size() == 4 && words[0] == d_name)
+            if (words.size() == 4 && words[0] == d_name) {
                 OK = true;
+                d_size = std::atoi(words[1].c_str());
+            }
         }
         if (! OK)
             throw std::invalid_argument("URL is not a valid corpus: " + d_url);

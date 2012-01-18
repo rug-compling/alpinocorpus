@@ -1,10 +1,16 @@
 #ifndef ALPINOCORPUS_UTIL_GET_URL_HH
 #define ALPINOCORPUS_UTIL_GET_URL_HH
 
+#include <config.hh>
+
 #include <string>
 #include <map>
 
+#include <boost/asio.hpp>
 #include <boost/asio/streambuf.hpp>
+#ifdef ALPINOCORPUS_WITH_SSL
+#include <boost/asio/ssl.hpp>
+#endif // defined(ALPINOCORPUS_WITH_SSL)
 
 namespace alpinocorpus { namespace util {
 
@@ -16,10 +22,12 @@ namespace alpinocorpus { namespace util {
  *  - https, if compiled with \c WITH_SSL
  *  - redirection
  *  - url with port number
- *  - content-encoding: gzip
  *
  *  \note
  *  Url with username/password is \b not supported
+ *
+ * \note
+ * Content-encoding gzip no longer supported
  *
  *  \todo
  *  - decoding of body based on charset
@@ -31,13 +39,13 @@ class GetUrl {
 public:
     typedef std::map<std::string, std::string> Headers;
 
-    //! Constructor with a url. The webpage is retrieved immediately.
+    //! Constructor with a url. The headers for the webpage are retrieved immediately.
     GetUrl(std::string const& url);
 
     ~GetUrl();
 
-    //! Get the body of the retrieved webpage.
-    std::string const& body() const;
+    //! Retrieve and return the body of the webpage.
+    std::string const& body();
 
     //! Get a header for the retrieved webpage. Field names are case-insensitive.
     std::string const& header(std::string const& field) const;
@@ -71,7 +79,6 @@ private:
     void download(std::string const& url, int maxhop);
     void parseResponse(std::istream *response_stream);
     void parseHeaders(std::istream *response_stream);
-    void getBody(std::istream *response_stream);
     void parseContentType();
     URLComponents parseUrl();
 
@@ -81,6 +88,17 @@ private:
     std::string d_url; // url of last redirect
     Headers d_headers;
     bool d_redirect;
+    bool d_ssl;
+    bool d_requested_body;
+    bool d_requested_line;
+    boost::asio::streambuf d_response;
+    std::istream *d_response_stream;
+
+    boost::asio::ip::tcp::socket *d_socket;
+#ifdef ALPINOCORPUS_WITH_SSL
+    typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
+    ssl_socket *d_ssl_socket;
+#endif // defined(ALPINOCORPUS_WITH_SSL)
 
 };
 

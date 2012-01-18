@@ -27,17 +27,65 @@ namespace alpinocorpus { namespace util {
 GetUrl::GetUrl(std::string const& url) :
     d_redirect(false),
     d_content_type(""),
-    d_charset("")
+    d_charset(""),
+    d_requested_body(false),
+    d_requested_line(false)
 {
     download(url, 6);
 }
 
 GetUrl::~GetUrl()
 {
+#ifdef ALPINOCORPUS_WITH_SSL
+
+    delete d_response_stream;
+
+    if (d_ssl) {
+        d_ssl_socket->lowest_layer().close();
+        delete d_ssl_socket;
+    } else
+#endif // defined(ALPINOCORPUS_WITH_SSL)
+        {
+            d_socket->close();
+            delete d_socket;
+        }
 }
 
-std::string const& GetUrl::body() const
+std::string const& GetUrl::body()
 {
+    if (d_requested_body)
+        return d_result;
+    if (d_requested_line)
+        throw std::runtime_error("GetUrl: requesting body after requesting line");
+
+    d_requested_body = true;
+
+    boost::system::error_code error;
+    size_t i;
+#ifdef ALPINOCORPUS_WITH_SSL
+    if (d_ssl)
+        i = boost::asio::read(*d_ssl_socket, d_response, boost::asio::transfer_all(), error);
+    else
+#endif
+        i = boost::asio::read(*d_socket, d_response, boost::asio::transfer_all(), error);
+
+    std::string enc(d_headers["content-encoding"]);
+    boost::algorithm::to_lower(enc);
+    boost::iostreams::filtering_stream<boost::iostreams::input> in;
+    if (enc == "gzip") { // not used anymore because you can't detect newlines in gzip'ed data
+        in.push(boost::iostreams::gzip_decompressor());
+    }
+    in.push(*d_response_stream);
+
+    char delim = '\0';
+    std::getline(in, d_result, delim);
+    while (!in.eof()) {
+        d_result += delim;
+        std::string s;
+        std::getline(in, s, delim);
+        d_result += s;
+    }
+
     return d_result;
 }
 
@@ -106,7 +154,6 @@ void GetUrl::download(std::string const& url, int maxhop) {
     request_stream << "\r\n";
 
     boost::asio::io_service io_service;
-    boost::asio::streambuf response;
     boost::system::error_code error;
     tcp::resolver resolver(io_service);
     tcp::resolver::query query(urlc.domain, urlc.port.size() ? urlc.port : urlc.scheme);
@@ -116,58 +163,66 @@ void GetUrl::download(std::string const& url, int maxhop) {
 #ifdef ALPINOCORPUS_WITH_SSL
     if (urlc.scheme == "https") {
 
-        typedef ssl::stream<tcp::socket> ssl_socket;
+        d_ssl = true;
 
         ssl::context ctx(ssl::context::sslv23);
         ctx.set_default_verify_paths();
 
         // Open a socket and connect it to the remote host.
-        ssl_socket socket(io_service, ctx);
-        boost::asio::connect(socket.lowest_layer(), endpoint_iterator);
-        socket.lowest_layer().set_option(tcp::no_delay(true));
+        d_ssl_socket = new ssl_socket(io_service, ctx);
+        boost::asio::connect(d_ssl_socket->lowest_layer(), endpoint_iterator);
+        d_ssl_socket->lowest_layer().set_option(tcp::no_delay(true));
 
         // Perform SSL handshake and verify the remote host's certificate.
 #ifdef ALPINOCORPUS_WITH_SSL_STRICT
-        socket.set_verify_mode(ssl::verify_peer);
-        socket.set_verify_callback(ssl::rfc2818_verification(urlc.domain));
+        d_ssl_socket->socket.set_verify_mode(ssl::verify_peer);
+        d_ssl_socket->socket.set_verify_callback(ssl::rfc2818_verification(urlc.domain));
 #else
-        socket.set_verify_mode(ssl::verify_none);
+        d_ssl_socket->set_verify_mode(ssl::verify_none);
 #endif // defined(ALPINOCORPUS_WITH_SSL_STRICT)
-        socket.handshake(ssl_socket::client);
+        d_ssl_socket->handshake(ssl_socket::client);
 
         // Send the request.
-        boost::asio::write(socket, request);
+        boost::asio::write(*d_ssl_socket, request);
 
         // Get response.
-        i = boost::asio::read(socket, response, boost::asio::transfer_all(), error);
+        i = boost::asio::read_until(*d_ssl_socket, d_response, "\r\n", error);
     } else
 #endif // defined(ALPINOCORPUS_WITH_SSL)
         { // scheme == "http"
+            d_ssl = false;
             // Try each endpoint until we successfully establish a connection.
-            tcp::socket socket(io_service);
-            boost::asio::connect(socket, endpoint_iterator);
+            d_socket = new tcp::socket(io_service);
+            boost::asio::connect(*d_socket, endpoint_iterator);
 
             // Send the request.
-            boost::asio::write(socket, request);
+            boost::asio::write(*d_socket, request);
 
             // Get response.
-            i = boost::asio::read(socket, response, boost::asio::transfer_all(), error);
-        }
+            i = boost::asio::read_until(*d_socket, d_response, "\r\n", error);
+             }
     if (!i)
         throw std::runtime_error("GetUrl: unable to connect to " + urlc.domain);
 
+    d_response_stream = new std::istream(&d_response);
 
-    std::istream response_stream(&response);
+    parseResponse(d_response_stream);
 
-    parseResponse(&response_stream);
+#ifdef ALPINOCORPUS_WITH_SSL
+    if (d_ssl)
+        i = boost::asio::read_until(*d_ssl_socket, d_response, "\r\n\r\n", error);
+    else
+#endif
+        i = boost::asio::read_until(*d_socket, d_response, "\r\n\r\n", error);
 
-    parseHeaders(&response_stream);
+    if (!i)
+        throw std::runtime_error("GetUrl: reading headers for " + urlc.domain);
+    parseHeaders(d_response_stream);
     if (d_redirect && d_headers["location"].size() == 0)
            throw std::runtime_error("GetUrl: redirect without location");
 
     if (d_headers["location"].size() == 0) {
         parseContentType();
-        getBody(&response_stream);
         return;
     }
 
@@ -184,26 +239,6 @@ void GetUrl::download(std::string const& url, int maxhop) {
         u = d_headers["location"];
     download(u, maxhop - 1);
 
-}
-
-void GetUrl::getBody(std::istream *response_stream)
-{
-    std::string enc(d_headers["content-encoding"]);
-    boost::algorithm::to_lower(enc);
-    boost::iostreams::filtering_stream<boost::iostreams::input> in;
-    if (enc == "gzip") {
-        in.push(boost::iostreams::gzip_decompressor());
-    }
-    in.push(*response_stream);
-
-    char delim = '\0';
-    std::getline(in, d_result, delim);
-    while (!in.eof()) {
-        d_result += delim;
-        std::string s;
-        std::getline(in, s, delim);
-        d_result += s;
-    }
 }
 
 void GetUrl::parseHeaders(std::istream *response_stream)
