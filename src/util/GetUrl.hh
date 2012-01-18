@@ -50,17 +50,18 @@ namespace alpinocorpus { namespace util {
             */
             std::string const& body();
 
-            /*! \brief Retrieve and return a single line of the body of the webpage.
+            /*! \brief Return a single line of the body of the webpage. Retrieve it from the server if necessary.
+
+                If lineno < 0, then next line, else line with that number.
 
                 - Use eof() after line() to check for end-of-file.
 
-                Result remains valid until next call to this function.
                 \note Don't mix calls to line() and body().
             */
-            std::string const& line();
+            std::string const& line(long signed int = -1);
 
             //! Did last call to line() result in end-of-file?
-            bool eof() const { return d_eof; }
+            bool eof() const { return d_eoflast; }
 
             //! Get a header for the retrieved webpage. Field names are case-insensitive.
             std::string const& header(std::string const& field) const;
@@ -101,7 +102,10 @@ namespace alpinocorpus { namespace util {
             std::string d_charset;
             std::string d_content_type;
             std::string d_result;
-            std::string d_line;
+            std::string d_nullstring;
+            std::vector<std::string> d_lines;
+            long unsigned int d_nlines;
+            long unsigned int d_prevline;
             std::string d_url; // url of last redirect
             Headers d_headers;
             bool d_redirect;
@@ -109,6 +113,7 @@ namespace alpinocorpus { namespace util {
             bool d_requested_body;
             bool d_requested_line;
             bool d_eof;
+            bool d_eoflast;
             boost::asio::io_service d_io_service;
             boost::asio::streambuf d_response;
             std::istream *d_response_stream;

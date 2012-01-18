@@ -30,7 +30,11 @@ namespace alpinocorpus { namespace util {
             d_charset(""),
             d_requested_body(false),
             d_requested_line(false),
-            d_eof(false)
+            d_nlines(0),
+            d_prevline(-1),
+            d_nullstring(""),
+            d_eof(false),
+            d_eoflast(false)
         {
             download(url, 6);
         }
@@ -57,47 +61,67 @@ namespace alpinocorpus { namespace util {
                 }
         }
 
-        std::string const& GetUrl::line()
+        std::string const& GetUrl::line(long signed int lineno)
         {
             if (d_requested_body)
                 throw std::runtime_error("GetUrl: requesting line after requesting body");
 
             d_requested_line = true;
 
+            d_eoflast = false;
+
+            if (lineno < 0)
+                lineno = d_prevline + 1;
+
+            d_prevline = lineno;
+
             if (d_eof)
-                return d_line;
+                if (lineno < d_nlines)
+                    return d_lines[lineno];
+                else {
+                    d_eoflast = true;
+                    return d_nullstring;
+                }
 
             boost::system::error_code error;
             size_t i;
+
+            while (d_nlines <= lineno) {
+
 #ifdef ALPINOCORPUS_WITH_SSL
-            if (d_ssl)
-                i = boost::asio::read_until(*d_ssl_socket, d_response, '\n', error);
-            else
+                if (d_ssl)
+                    i = boost::asio::read_until(*d_ssl_socket, d_response, '\n', error);
+                else
 #endif
-                i = boost::asio::read_until(*d_socket, d_response, '\n', error);
+                    i = boost::asio::read_until(*d_socket, d_response, '\n', error);
 
-            /*
+                /*
 
-            // problem: reading the last line if final newline is missing
+                // problem: reading the last line if final newline is missing
 
-            // solution seems to be: just skip this test
+                // solution seems to be: just skip this test
 
-            if (! i && error == boost::asio::error::eof) {
+                if (! i && error == boost::asio::error::eof) {
+                    std::cerr << error << std::endl;
+                    d_eof = true;
+                    d_eoflast = true;
+                    return d_nullstring;
+                }
 
-                std::cerr << error << std::endl;
-                d_eof = true;
-                d_line = "";
-                return d_line;
+                */
+
+                std::string line;
+                if (! std::getline(*d_response_stream, line)) {
+                    d_eof = true;
+                    d_eoflast = true;
+                    return d_nullstring;
+                } else {
+                    d_lines.push_back(line);
+                    d_nlines++;
+                }
             }
 
-            */
-
-            if (! std::getline(*d_response_stream, d_line)) {
-                d_eof = true;
-                d_line = "";
-            }
-
-            return d_line;
+            return d_lines[lineno];
         }
 
         std::string const& GetUrl::body()

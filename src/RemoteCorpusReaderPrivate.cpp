@@ -38,26 +38,19 @@ namespace alpinocorpus {
         if (! OK)
             throw std::invalid_argument("URL is not a valid corpus: " + d_url);
 
-        util::GetUrl p(d_url + "/entries?plain=1");
-        d_entries.clear();
-        boost::algorithm::split(d_entries, p.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
-        i = d_entries.size() - 1;
-        if (i >= 0 && d_entries[i] == "")
-            d_entries.resize(i);
-        if (i < 1)
-            throw std::runtime_error("No entries found at " + d_url + "/entries");
+        d_geturl = new util::GetUrl(d_url + "/entries?plain=1");
     }
 
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getBegin() const
     {
-        return EntryIterator(new RemoteIter(&d_entries, 0));
+        return EntryIterator(new RemoteIter(d_geturl, 0));
     }
 
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getEnd() const
     {
-        return EntryIterator(new RemoteIter(&d_entries, d_entries.size()));
+        return EntryIterator(new RemoteIter(d_geturl, -1));
     }
 
     // done? TODO: alleen naam van corpus of complete url? (nu: complete url)
@@ -70,7 +63,10 @@ namespace alpinocorpus {
     // done
     size_t RemoteCorpusReaderPrivate::getSize() const
     {
-        return d_entries.size();
+        if (d_size < 0)
+            throw std::runtime_error("RemoteCorpusReader: size is unknown");
+
+        return d_size;
     }
 
     // done
@@ -107,15 +103,8 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
-        util::GetUrl p(d_url + "/entries?query=" + escape(query) + "&plain=1");
-        std::vector<std::string> *data;
-        data = new std::vector<std::string>;
-        data->clear();
-        boost::algorithm::split(*data, p.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
-        size_t i = data->size() - 1;
-        if (i >= 0 && (*data)[i] == "")
-            data->resize(i);
-        return EntryIterator(new RemoteIter(data, 0, true, query));
+        util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" + escape(query) + "&plain=1");
+        return EntryIterator(new RemoteIter(p, 0, true));
     }
 
     // done? TODO: klopt dit? (blijkbaar wel)
@@ -125,18 +114,22 @@ namespace alpinocorpus {
     }
 
     // done
-    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::vector<std::string> const * i,
-                                                      size_t n,
+    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(util::GetUrl * geturl,
+                                                      long signed int n,
                                                       bool const ownsdata,
-                                                      std::string const & query,
                                                       size_t * refcount) :
-        d_items(i), d_idx(n), d_size(i->size()), d_ownsdata(ownsdata), d_query(query), d_refcount(refcount), d_interrupted(false)
+        d_idx(n), d_ownsdata(ownsdata), d_refcount(refcount), d_interrupted(false)
     {
+        d_geturl = geturl;
         if (d_ownsdata) {
             if (d_refcount == 0) {
+                if (n >= 0) {
+                    geturl->line(n);
+                    if (geturl->eof())
+                        d_idx = -1;
+                }
                 d_refcount = new size_t;
                 *d_refcount = 1;
-                std::cerr << "RemoteCorpusReaderPrivate::RemoteIter::RemoteIter query=" << query << std::endl;
             } else
                 (*d_refcount)++;
         }
@@ -149,7 +142,7 @@ namespace alpinocorpus {
             (*d_refcount)--;
             if (*d_refcount == 0) {
                 delete d_refcount;
-                delete d_items;
+                delete d_geturl;
             }
         }
     }
@@ -157,12 +150,13 @@ namespace alpinocorpus {
     // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
-        if (d_idx >= 0 && d_idx < d_size) {
+        if (d_idx >= 0) {
             if (d_ownsdata) {
-                size_t i = (*d_items)[d_idx].find('\t');
-                return (*d_items)[d_idx].substr(0, i);
+                std::string s = d_geturl->line(d_idx);
+                size_t i = s.find('\t');
+                return s.substr(0, i);
             } else {
-                return (*d_items)[d_idx];
+                return d_geturl->line(d_idx);
             }
         } else
             return "";
@@ -173,17 +167,18 @@ namespace alpinocorpus {
     {
         if (d_interrupted)
             throw alpinocorpus::IterationInterrupted();
-        d_idx++;
+        if (d_idx >= 0) {
+            d_idx++;
+            d_geturl->line(d_idx);
+            if (d_geturl->eof())
+                d_idx = -1;
+        }
     }
 
     // done
     bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
     {
         RemoteIter const &that = (RemoteIter const &)other;
-        if (d_idx >= d_size and that.d_idx >= that.d_size)
-            return true;
-        if (d_idx < 0 and that.d_idx < 0)
-            return true;
         return d_idx == that.d_idx;
     }
 
@@ -192,9 +187,9 @@ namespace alpinocorpus {
     {
         CorpusReader::IterImpl * other;
         if (this->d_ownsdata)
-            other = new RemoteIter(this->d_items, this->d_idx, true, this->d_query, this->d_refcount);
+            other = new RemoteIter(this->d_geturl, this->d_idx, true, this->d_refcount);
         else
-            other = new RemoteIter(this->d_items, this->d_idx);
+            other = new RemoteIter(this->d_geturl, this->d_idx);
         if (this->d_interrupted)
             other->interrupt();
         return other;
@@ -207,17 +202,18 @@ namespace alpinocorpus {
         d_interrupted = true;
     }
 
-    // done
+    // TODO ????? parameter rdr not used, what is this for?
     std::string RemoteCorpusReaderPrivate::RemoteIter::contents(CorpusReader const &rdr) const
     {
-        if (d_idx < 0 || d_idx >= d_size)
+        if (d_idx < 0)
             return std::string("");
 
         if (! d_ownsdata)
             return std::string("");
 
-        size_t i = (*d_items)[d_idx].find('\t');
-        return (*d_items)[d_idx].substr(i + 1);
+        std::string s = d_geturl->line(d_idx);
+        size_t i = s.find('\t');
+        return s.substr(i + 1);
     }
 
     // done

@@ -16,13 +16,10 @@ int main(int argc, char* argv[])
         std::cout << "Content-type: \"" << p.content_type() << "\"" << std::endl
                   << "Charset:      \"" << p.charset() << "\"" << std::endl;
         
-        for (;;) {
-            std::string line = p.line();
-            if (p.eof())
-                break;
-            std::cout << line << std::endl;
-        }
+        std::cout << "Line 10: " << p.line(9) << std::endl;
 
+        for (std::string line = p.line(0); ! p.eof(); line = p.line())
+            std::cout << line << std::endl;
         std::cout << "END" << std::endl;
     }  catch (std::exception& e) {
         std::cout << "Exception: " << e.what() << std::endl;

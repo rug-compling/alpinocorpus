@@ -2,6 +2,7 @@
 #define ALPINO_REMOTE_CORPUSREADER_PRIVATE_HH
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <../src/util/GetUrl.hh>
 #include <string>
 #include <vector>
 
@@ -12,8 +13,8 @@ namespace alpinocorpus {
 
         class RemoteIter : public CorpusReader::IterImpl {
         public:
-            RemoteIter(std::vector<std::string> const * i, size_t n,
-                       bool ownsdata = false, std::string const &query = "", size_t * refcount = 0);
+            RemoteIter(util::GetUrl * geturl, long signed int n,
+                       bool ownsdata = false, size_t * refcount = 0);
             ~RemoteIter();
             IterImpl *copy() const;
             std::string current() const;
@@ -22,12 +23,10 @@ namespace alpinocorpus {
             void interrupt();
             std::string contents(CorpusReader const &) const;
         private:
-            std::vector<std::string> const *d_items;
+            util::GetUrl *d_geturl;
             size_t *d_refcount;
             size_t d_idx;
-            size_t const d_size;
             bool const d_ownsdata;
-            std::string const d_query;
             bool d_interrupted;
         };
 
@@ -35,7 +34,7 @@ namespace alpinocorpus {
 
         RemoteCorpusReaderPrivate(std::string const &url);
 
-        virtual ~RemoteCorpusReaderPrivate() {}
+        virtual ~RemoteCorpusReaderPrivate() { delete d_geturl; }
 
         virtual EntryIterator getBegin() const;
         virtual EntryIterator getEnd() const;
@@ -56,6 +55,8 @@ namespace alpinocorpus {
         long int d_size;
         std::vector<std::string> d_entries;
         std::vector<std::string> d_results;
+
+        util::GetUrl *d_geturl;
 
     };
 
