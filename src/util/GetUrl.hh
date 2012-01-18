@@ -52,13 +52,15 @@ namespace alpinocorpus { namespace util {
 
             /*! \brief Retrieve and return a single line of the body of the webpage.
 
-                - On succes, returns line including a final newline.
-                - On EOF, returns empty line, without newline.
+                - Use eof() after line() to check for end-of-file.
 
                 Result remains valid until next call to this function.
                 \note Don't mix calls to line() and body().
             */
             std::string const& line();
+
+            //! Did last call to line() result in end-of-file?
+            bool eof() const { return d_eof; }
 
             //! Get a header for the retrieved webpage. Field names are case-insensitive.
             std::string const& header(std::string const& field) const;
@@ -89,6 +91,7 @@ namespace alpinocorpus { namespace util {
                 std::string path;
             };
 
+            void clean_up();
             void download(std::string const& url, int maxhop);
             void parseResponse(std::istream *response_stream);
             void parseHeaders(std::istream *response_stream);

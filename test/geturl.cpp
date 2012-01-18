@@ -18,10 +18,9 @@ int main(int argc, char* argv[])
         
         for (;;) {
             std::string line = p.line();
-            if (line.size())
-                std::cout << line;
-            else
+            if (p.eof())
                 break;
+            std::cout << line << std::endl;
         }
 
         std::cout << "END" << std::endl;

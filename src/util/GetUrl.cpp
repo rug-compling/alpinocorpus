@@ -37,6 +37,10 @@ namespace alpinocorpus { namespace util {
 
         GetUrl::~GetUrl()
         {
+            clean_up();
+        }
+
+        void GetUrl::clean_up() {
             d_io_service.stop();
 
             delete d_response_stream;
@@ -91,8 +95,6 @@ namespace alpinocorpus { namespace util {
             if (! std::getline(*d_response_stream, d_line)) {
                 d_eof = true;
                 d_line = "";
-            } else {
-                d_line += "\n";
             }
 
             return d_line;
@@ -283,6 +285,10 @@ namespace alpinocorpus { namespace util {
                 u += d_headers["location"];
             } else
                 u = d_headers["location"];
+
+            d_response.consume(d_response.size());
+            clean_up();
+            d_io_service.reset();
             download(u, maxhop - 1);
 
         }
