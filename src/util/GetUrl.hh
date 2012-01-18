@@ -91,6 +91,7 @@ private:
     bool d_ssl;
     bool d_requested_body;
     bool d_requested_line;
+    boost::asio::io_service d_io_service;
     boost::asio::streambuf d_response;
     std::istream *d_response_stream;
 

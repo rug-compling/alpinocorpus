@@ -36,10 +36,11 @@ GetUrl::GetUrl(std::string const& url) :
 
 GetUrl::~GetUrl()
 {
-#ifdef ALPINOCORPUS_WITH_SSL
+    d_io_service.stop();
 
     delete d_response_stream;
 
+#ifdef ALPINOCORPUS_WITH_SSL
     if (d_ssl) {
         d_ssl_socket->lowest_layer().close();
         delete d_ssl_socket;
@@ -153,9 +154,8 @@ void GetUrl::download(std::string const& url, int maxhop) {
     request_stream << "Connection: close\r\n";
     request_stream << "\r\n";
 
-    boost::asio::io_service io_service;
     boost::system::error_code error;
-    tcp::resolver resolver(io_service);
+    tcp::resolver resolver(d_io_service);
     tcp::resolver::query query(urlc.domain, urlc.port.size() ? urlc.port : urlc.scheme);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
 
@@ -169,7 +169,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
         ctx.set_default_verify_paths();
 
         // Open a socket and connect it to the remote host.
-        d_ssl_socket = new ssl_socket(io_service, ctx);
+        d_ssl_socket = new ssl_socket(d_io_service, ctx);
         boost::asio::connect(d_ssl_socket->lowest_layer(), endpoint_iterator);
         d_ssl_socket->lowest_layer().set_option(tcp::no_delay(true));
 
@@ -192,7 +192,7 @@ void GetUrl::download(std::string const& url, int maxhop) {
         { // scheme == "http"
             d_ssl = false;
             // Try each endpoint until we successfully establish a connection.
-            d_socket = new tcp::socket(io_service);
+            d_socket = new tcp::socket(d_io_service);
             boost::asio::connect(*d_socket, endpoint_iterator);
 
             // Send the request.
