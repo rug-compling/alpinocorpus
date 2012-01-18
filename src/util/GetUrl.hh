@@ -14,95 +14,112 @@
 
 namespace alpinocorpus { namespace util {
 
-/*! \class GetUrl GetUrl.hh "util/GetUrl.hh"
- *  \brief GetUrl is a simple class for retrieving a webpage.
- *
- *  Supported:
- *  - http
- *  - https, if compiled with \c WITH_SSL
- *  - redirection
- *  - url with port number
- *
- *  \note
- *  Url with username/password is \b not supported
- *
- * \note
- * Content-encoding gzip no longer supported
- *
- *  \todo
- *  - decoding of body based on charset
- *
- */
+        /*! \class GetUrl GetUrl.hh "util/GetUrl.hh"
+         *  \brief GetUrl is a simple class for retrieving a webpage.
+         *
+         *  Supported:
+         *  - http
+         *  - https, if compiled with \c WITH_SSL
+         *  - redirection
+         *  - url with port number
+         *
+         *  \note
+         *  Url with username/password is \b not supported
+         *
+         * \note
+         * Content-encoding gzip no longer supported
+         *
+         *  \todo
+         *  - decoding of body based on charset
+         *
+         */
 
-class GetUrl {
+        class GetUrl {
 
-public:
-    typedef std::map<std::string, std::string> Headers;
+        public:
+            typedef std::map<std::string, std::string> Headers;
 
-    //! Constructor with a url. The headers for the webpage are retrieved immediately.
-    GetUrl(std::string const& url);
+            //! Constructor with a url. The headers for the webpage are retrieved immediately.
+            GetUrl(std::string const& url);
 
-    ~GetUrl();
+            ~GetUrl();
 
-    //! Retrieve and return the body of the webpage.
-    std::string const& body();
+            /*! \brief Retrieve and return the body of the webpage.
 
-    //! Get a header for the retrieved webpage. Field names are case-insensitive.
-    std::string const& header(std::string const& field) const;
+                \note Don't mix calls to body() and line().
+            */
+            std::string const& body();
 
-    //! All headers for the retrieved webpage. Field names are converted to lowercase.
-    Headers const &headers() const;
+            /*! \brief Retrieve and return a single line of the body of the webpage.
 
-    //! Get the bare Content-Type for the retrieved webpage, converted to lower case, without charset etc.
-    std::string const & content_type() const;
+                - On succes, returns line including a final newline.
+                - On EOF, returns empty line, without newline.
 
-    //! Get charset for the retrieved webpage, converted to lower case
-    std::string const & charset() const;
+                Result remains valid until next call to this function.
+                \note Don't mix calls to line() and body().
+            */
+            std::string const& line();
 
-private:
-    struct URLComponents {
-        URLComponents(std::string const &newScheme,
-                std::string const &newDomain,
-                std::string const &newPort,
-                std::string const &newPath) :
-            scheme(newScheme),
-            domain(newDomain),
-            port(newPort),
-            path(newPath) {}
+            //! Get a header for the retrieved webpage. Field names are case-insensitive.
+            std::string const& header(std::string const& field) const;
 
-        std::string scheme;
-        std::string domain;
-        std::string port;
-        std::string path;
-    };
+            //! All headers for the retrieved webpage. Field names are converted to lowercase.
+            Headers const &headers() const;
 
-    void download(std::string const& url, int maxhop);
-    void parseResponse(std::istream *response_stream);
-    void parseHeaders(std::istream *response_stream);
-    void parseContentType();
-    URLComponents parseUrl();
+            //! Get the bare Content-Type for the retrieved webpage, converted to lower case, without charset etc.
+            std::string const & content_type() const;
 
-    std::string d_charset;
-    std::string d_content_type;
-    std::string d_result;
-    std::string d_url; // url of last redirect
-    Headers d_headers;
-    bool d_redirect;
-    bool d_ssl;
-    bool d_requested_body;
-    bool d_requested_line;
-    boost::asio::io_service d_io_service;
-    boost::asio::streambuf d_response;
-    std::istream *d_response_stream;
+            //! Get charset for the retrieved webpage, converted to lower case
+            std::string const & charset() const;
 
-    boost::asio::ip::tcp::socket *d_socket;
+        private:
+            struct URLComponents {
+                URLComponents(std::string const &newScheme,
+                              std::string const &newDomain,
+                              std::string const &newPort,
+                              std::string const &newPath) :
+                    scheme(newScheme),
+                    domain(newDomain),
+                    port(newPort),
+                    path(newPath) {}
+
+                std::string scheme;
+                std::string domain;
+                std::string port;
+                std::string path;
+            };
+
+            void download(std::string const& url, int maxhop);
+            void parseResponse(std::istream *response_stream);
+            void parseHeaders(std::istream *response_stream);
+            void parseContentType();
+            URLComponents parseUrl();
+
+            std::string d_charset;
+            std::string d_content_type;
+            std::string d_result;
+            std::string d_line;
+            std::string d_url; // url of last redirect
+            Headers d_headers;
+            bool d_redirect;
+            bool d_ssl;
+            bool d_requested_body;
+            bool d_requested_line;
+            bool d_eof;
+            boost::asio::io_service d_io_service;
+            boost::asio::streambuf d_response;
+            std::istream *d_response_stream;
+
+            boost::asio::ip::tcp::socket *d_socket;
 #ifdef ALPINOCORPUS_WITH_SSL
-    typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
-    ssl_socket *d_ssl_socket;
+            typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
+            ssl_socket *d_ssl_socket;
 #endif // defined(ALPINOCORPUS_WITH_SSL)
 
-};
+        };
 
-} } // namespace alpinocorpus::util
+    }
+
+} // namespace alpinocorpus::util
 
 #endif // ALPINOCORPUS_UTIL_GET_URL_HH

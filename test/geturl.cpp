@@ -14,8 +14,17 @@ int main(int argc, char* argv[])
     try {
         ac::util::GetUrl p(argv [1]);
         std::cout << "Content-type: \"" << p.content_type() << "\"" << std::endl
-                  << "Charset:      \"" << p.charset() << "\"" << std::endl
-                  << p.body() << "END" << std::endl;
+                  << "Charset:      \"" << p.charset() << "\"" << std::endl;
+        
+        for (;;) {
+            std::string line = p.line();
+            if (line.size())
+                std::cout << line;
+            else
+                break;
+        }
+
+        std::cout << "END" << std::endl;
     }  catch (std::exception& e) {
         std::cout << "Exception: " << e.what() << std::endl;
     }
