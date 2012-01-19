@@ -104,8 +104,8 @@ bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
 void DbCorpusReaderPrivate::DbIter::next()
 {
     try {
-        db::XmlDocument doc;
-        r.next(doc);
+        db::XmlValue v;
+        r.next(v);
     } catch (db::XmlException const &e) {
         if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
           throw IterationInterrupted();
@@ -128,7 +128,13 @@ std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) con
 {
     db::XmlValue v;
     r.peek(v);
-    return v.getNodeValue();
+
+    if (v.isNode())
+        return v.getNodeValue();
+    else if (v.isString())
+        return v.asString();
+
+    return std::string();
 }
 
 IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
