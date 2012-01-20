@@ -13,6 +13,7 @@
 #endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 #include "DzIstream.hh"
 

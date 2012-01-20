@@ -5,6 +5,7 @@
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/capi.h>
 
 extern "C" {
@@ -23,11 +24,10 @@ struct alpinocorpus_iter_t {
 
 alpinocorpus_reader alpinocorpus_open(char const *path)
 {
-
     alpinocorpus::CorpusReader *reader;
     
     try {
-        reader = alpinocorpus::CorpusReader::open(path);
+        reader = alpinocorpus::CorpusReaderFactory::open(path);
     } catch (std::exception const &) {
         return NULL;
     }
@@ -52,6 +52,34 @@ alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
     alpinocorpus_iter i = new alpinocorpus_iter_t(corpus->corpusReader->begin());
     
     return i;
+}
+
+alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
+    char const *query, char const *stylesheet, marker_query_t *queries,
+    size_t n_queries)
+{
+    std::list<alpinocorpus::CorpusReader::MarkerQuery> markerQueries;
+
+    for (size_t i = 0; i < n_queries; ++i) {
+        alpinocorpus::CorpusReader::MarkerQuery query(
+          queries[i].query,
+          queries[i].attr,
+          queries[i].value
+        );
+
+        markerQueries.push_back(query);
+    }
+
+    alpinocorpus::CorpusReader::EntryIterator iter;
+    try {
+        iter = corpus->corpusReader->queryWithStylesheet(
+            alpinocorpus::CorpusReader::XPATH, query, stylesheet,
+            markerQueries);
+    } catch (std::exception const &) {
+        return NULL;
+    }
+
+    return new alpinocorpus_iter_t(iter);
 }
 
 alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query)
@@ -95,13 +123,31 @@ char *alpinocorpus_iter_value(alpinocorpus_iter iter)
     }
     
     size_t len = entry.size() + 1;
-    char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
-#ifdef HAVE_STRLCPY 
-    strlcpy(cstr, entry.c_str(), len);
-#else
-    strcpy(cstr, entry.c_str());
-#endif /* HAS_STRLCPY */
-    return cstr;    
+    char *cstr = reinterpret_cast<char *>(std::malloc(len));
+    if (cstr != NULL)
+        std::memcpy(cstr, entry.c_str(), len);
+    return cstr;
+}
+
+char *alpinocorpus_iter_contents(alpinocorpus_reader reader,
+    alpinocorpus_iter iter)
+{
+    if (reader->corpusReader == NULL)
+        return NULL;
+
+    std::string contents;
+    try {
+        contents = iter->entryIter.contents(*reader->corpusReader);
+    } catch (std::exception const &) {
+        return NULL;
+    }
+
+    size_t len = contents.size() + 1;
+    char *cstr = reinterpret_cast<char *>(std::malloc(len));
+    if (cstr != NULL)
+        std::memcpy(cstr, contents.c_str(), len);
+    
+    return cstr;
 }
 
 char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
@@ -114,12 +160,9 @@ char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
     }
     
     size_t len = str.size() + 1;
-    char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
-#ifdef HAVE_STRLCPY 
-    strlcpy(cstr, str.c_str(), len);
-#else
-    strcpy(cstr, str.c_str());
-#endif /* HAS_STRLCPY */
+    char *cstr = reinterpret_cast<char *>(std::malloc(len));
+    if (cstr)
+        std::memcpy(cstr, str.c_str(), len);
     return cstr;
 }
 
@@ -140,18 +183,15 @@ char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
 
     std::string str;
     try{ 
-        str = reader->corpusReader->readMarkQueries(entry, markerQueries);
+        str = reader->corpusReader->read(entry, markerQueries);
     } catch (std::exception const &) {
         return NULL;
     }
     
     size_t len = str.size() + 1;
-    char *cstr = reinterpret_cast<char *>(malloc(sizeof(char) * len));
-#ifdef HAVE_STRLCPY 
-    strlcpy(cstr, str.c_str(), len);
-#else
-    strcpy(cstr, str.c_str());
-#endif /* HAS_STRLCPY */
+    char *cstr = reinterpret_cast<char *>(std::malloc(len));
+    if (cstr)
+        std::memcpy(cstr, str.c_str(), len);
     return cstr;
 }
 

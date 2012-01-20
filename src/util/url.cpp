@@ -1,7 +1,7 @@
 #include <sstream>
 #include <string>
 
-#include <util/url.hh>
+#include "url.hh"
 
 namespace alpinocorpus {
 namespace util {

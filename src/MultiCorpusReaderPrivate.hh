@@ -6,6 +6,7 @@
 #include <boost/tr1/unordered_map.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 namespace alpinocorpus {
 
@@ -23,7 +24,7 @@ public:
     alpinocorpus::CorpusReader::EntryIterator iter;
   };
 private:
-  class MultiIter : public CorpusReader::IterImpl
+  class MultiIter : public IterImpl
   {
   public:
     MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);

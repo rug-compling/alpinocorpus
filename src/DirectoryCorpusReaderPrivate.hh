@@ -7,6 +7,7 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 namespace alpinocorpus {
 

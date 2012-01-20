@@ -4,6 +4,7 @@
 #include <dbxml/DbXml.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 namespace alpinocorpus {
 
@@ -16,7 +17,7 @@ class DbCorpusReaderPrivate : public CorpusReader
     DbXml::XmlContainer mutable container;
     std::string collection;
     
-    class DbIter : public CorpusReader::IterImpl
+    class DbIter : public IterImpl
     {
     public:
         DbIter(DbXml::XmlContainer &);

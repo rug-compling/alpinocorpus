@@ -5,20 +5,22 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 
 namespace bf = boost::filesystem;
 
 using alpinocorpus::CorpusReader;
+using alpinocorpus::CorpusReaderFactory;
 using alpinocorpus::MultiCorpusReader;
 
 CorpusReader* openCorpus(std::string const &path,
     bool recursive)
 {
     if (recursive)
-      return CorpusReader::openRecursive(path);
+      return CorpusReaderFactory::openRecursive(path);
     else
-      return CorpusReader::open(path);
+      return CorpusReaderFactory::open(path);
 }
 
 CorpusReader *openCorpora(
