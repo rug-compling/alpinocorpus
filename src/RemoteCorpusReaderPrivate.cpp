@@ -1,4 +1,5 @@
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 #include "RemoteCorpusReaderPrivate.hh"
 #include "util/GetUrl.hh"
 #include <boost/algorithm/string/split.hpp>
@@ -183,9 +184,9 @@ namespace alpinocorpus {
     }
 
     // done
-    CorpusReader::IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
+    IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        CorpusReader::IterImpl * other;
+        IterImpl * other;
         if (this->d_ownsdata)
             other = new RemoteIter(this->d_geturl, this->d_idx, true, this->d_refcount);
         else

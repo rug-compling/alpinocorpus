@@ -155,6 +155,9 @@ set(SOURCES
   src/CompactCorpusReader.cpp
   src/CompactCorpusReaderPrivate.cpp
   src/util/GetUrl.cpp
+  src/MultiCorpusReader.cpp
+  src/MultiCorpusReaderPrivate.cpp
+  src/RecursiveCorpusReader.cpp
   src/RemoteCorpusReader.cpp
   src/RemoteCorpusReaderPrivate.cpp
   src/IterImpl.cpp
@@ -219,6 +222,9 @@ if(USE_DBXML)
   target_link_libraries(writer_test alpino_corpus)
   #add_test(writer writer_test)
 endif()
+
+add_executable(geturl_test test/geturl.cpp)
+target_link_libraries(geturl_test alpino_corpus)
 
 add_executable(readers_available test/readers_available.cpp)
 target_link_libraries(readers_available alpino_corpus)

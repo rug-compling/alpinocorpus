@@ -2,6 +2,7 @@
 #define ALPINO_REMOTE_CORPUSREADER_PRIVATE_HH
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 #include <../src/util/GetUrl.hh>
 #include <string>
 #include <vector>
@@ -11,7 +12,7 @@ namespace alpinocorpus {
     class RemoteCorpusReaderPrivate : public CorpusReader
     {
 
-        class RemoteIter : public CorpusReader::IterImpl {
+        class RemoteIter : public IterImpl {
         public:
             RemoteIter(util::GetUrl * geturl, long signed int n,
                        bool ownsdata = false, size_t * refcount = 0);
