@@ -36,4 +36,4 @@ namespace alpinocorpus {
 }
 
 
-#endif ALPINOCORPUS_FILTERITER_HH
+#endif // ALPINOCORPUS_FILTERITER_HH
