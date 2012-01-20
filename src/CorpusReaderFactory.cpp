@@ -43,7 +43,7 @@ namespace alpinocorpus {
 #ifndef USE_DBXML
         if (readerType == DBXML_CORPUS_READER)
             return false;
-#endif USE_DBXML
+#endif // USE_DBXML
 
         return true;
     }
