@@ -49,8 +49,6 @@ namespace alpinocorpus {
 
     private:
 
-        std::string escape(std::string const &) const;
-
         std::string d_name;
         std::string d_url;
         long int d_size;
