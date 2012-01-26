@@ -1,4 +1,4 @@
-#include <util/GetUrl.hh>
+#include <../src/util/GetUrl.hh>
 #include <iostream>
 #include <string>
 
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
         std::cout << "Content-type: \"" << p.content_type() << "\"" << std::endl
                   << "Charset:      \"" << p.charset() << "\"" << std::endl;
         
-        std::cout << "Line 10: " << p.line(9) << std::endl;
+        //std::cout << "Line 10: " << p.line(9) << std::endl;
 
         for (std::string line = p.line(0); ! p.eof(); line = p.line())
             std::cout << line << std::endl;

@@ -1,6 +1,8 @@
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 #include "RemoteCorpusReaderPrivate.hh"
 #include "util/GetUrl.hh"
+#include "util/url.hh"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <cctype>
@@ -89,9 +91,9 @@ namespace alpinocorpus {
         std::cerr << "RemoteCorpusReaderPrivate::readEntryMarkQueries(" << entry << ", (" << iter->query << ", " << iter->attr << ", " << iter->value << "))" << std::endl;
 
         util::GetUrl p(d_url + "/entry/" + entry +   // escape(entry) +
-                       "?markerQuery=" + escape(iter->query) +
-                       "&markerAttr=" + escape(iter->attr) +
-                       "&markerValue=" + escape(iter->value));
+                       "?markerQuery=" + util::toPercentEncoding(iter->query) +
+                       "&markerAttr=" + util::toPercentEncoding(iter->attr) +
+                       "&markerValue=" + util::toPercentEncoding(iter->value));
 
         ++iter;
         if (iter != queries.end())
@@ -103,7 +105,7 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
-        util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" + escape(query) + "&plain=1");
+        util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" + util::toPercentEncoding(query) + "&plain=1");
         return EntryIterator(new RemoteIter(p, 0, true));
     }
 
@@ -183,9 +185,9 @@ namespace alpinocorpus {
     }
 
     // done
-    CorpusReader::IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
+    IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        CorpusReader::IterImpl * other;
+        IterImpl * other;
         if (this->d_ownsdata)
             other = new RemoteIter(this->d_geturl, this->d_idx, true, this->d_refcount);
         else
@@ -215,23 +217,5 @@ namespace alpinocorpus {
         size_t i = s.find('\t');
         return s.substr(i + 1);
     }
-
-    // done
-    std::string RemoteCorpusReaderPrivate::escape(std::string const &s) const
-    {
-        char buf[4];
-        std::string s2 = "";
-        for (std::string::const_iterator it = s.begin(); it < s.end(); it++) {
-            if (isalnum(*it) || *it == '.' || *it == '-' || *it == '_' || *it == '[' || *it == ']')
-                s2 += *it;
-            else {
-                std::sprintf(buf, "%02x", (int) *it);
-                s2 += "%";
-                s2 += buf;
-            }
-        }
-        return s2;
-    }
-
 
 }   // namespace alpinocorpus

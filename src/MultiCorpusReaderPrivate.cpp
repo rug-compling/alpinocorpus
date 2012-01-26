@@ -9,6 +9,8 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/IterImpl.hh>
+
 
 #include "MultiCorpusReaderPrivate.hh"
 
@@ -77,7 +79,7 @@ CorpusReader const *MultiCorpusReaderPrivate::corpusReaderFromPath(
     if (path.find(iter->first) == 0)
       return iter->second;
   
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Unknown corpus: " + path));
 }
 
 std::string MultiCorpusReaderPrivate::entryFromPath(
@@ -88,7 +90,7 @@ std::string MultiCorpusReaderPrivate::entryFromPath(
     if (path.find(iter->first) == 0)
       return path.substr(iter->first.size() + 1);
 
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Could not find entry: " + path));
 }
 
 std::string MultiCorpusReaderPrivate::readEntry(std::string const &path) const
@@ -101,7 +103,7 @@ std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
     std::string const &path, std::list<MarkerQuery> const &queries) const
 {
   CorpusReader const *reader = corpusReaderFromPath(path);
-  return reader->readMarkQueries(entryFromPath(path), queries);
+  return reader->read(entryFromPath(path), queries);
 }
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
@@ -148,7 +150,7 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
 
-CorpusReader::IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
+IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
 {
   // No pointer members, and pointer member in ReaderIter is not managed
   // by ReaderIter.

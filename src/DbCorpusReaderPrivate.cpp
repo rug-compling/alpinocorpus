@@ -16,10 +16,10 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <util/url.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 #include "DbCorpusReaderPrivate.hh"
-
+#include "util/url.hh"
 
 namespace db = DbXml;
 
@@ -35,7 +35,7 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlContainer &container)
                                      | db::DBXML_WELL_FORMED_ONLY
                                      );
     } catch (db::XmlException const &e) {
-        throw alpinocorpus::Error(e.what());
+        throw Error(e.what());
     }
 }
 
@@ -51,10 +51,10 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlManager &mgr)
 {
 }
 
-CorpusReader::IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
+IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
 {
     // XXX - Copy constructor of XmlResults copies handle but not body.
-    //       The copyResults() method retuls an XmlResults instance that
+    //       The copyResults() method returns an XmlResults instance that
     //       is eagerly evaluated. Is there a way to copy XmlResults,
     //       retain the iterator position, and have it lazy?
 
@@ -65,9 +65,18 @@ CorpusReader::IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
 /* operator* */
 std::string DbCorpusReaderPrivate::DbIter::current() const
 {
-    db::XmlDocument doc;
-    r.peek(doc);
-    return doc.getName();
+    db::XmlValue v;
+    try {
+        r.peek(v);
+    } catch (db::XmlException const &e) {
+        throw Error(e.what());
+    }
+
+    if (v.isNode()) {
+        db::XmlDocument doc = v.asDocument();
+        return doc.getName();
+    } else
+        return std::string();
 }
 
 /* operator== */
@@ -85,9 +94,9 @@ bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
                 return true;        // both at end()
         } catch (db::XmlException const &e) {
         if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
-                throw alpinocorpus::IterationInterrupted();
+                throw IterationInterrupted();
             else
-                throw alpinocorpus::Error(e.what());
+                throw Error(e.what());
         }
         return self.r == other.r;
     } catch (std::bad_cast const &e) {
@@ -99,13 +108,13 @@ bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
 void DbCorpusReaderPrivate::DbIter::next()
 {
     try {
-        db::XmlDocument doc;
-        r.next(doc);
+        db::XmlValue v;
+        r.next(v);
     } catch (db::XmlException const &e) {
         if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
-          throw alpinocorpus::IterationInterrupted();
+          throw IterationInterrupted();
         else
-          throw alpinocorpus::Error(e.what());
+          throw Error(e.what());
     }
 }
 
@@ -123,10 +132,16 @@ std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) con
 {
     db::XmlValue v;
     r.peek(v);
-    return v.getNodeValue();
+
+    if (v.isNode())
+        return v.getNodeValue();
+    else if (v.isString())
+        return v.asString();
+
+    return std::string();
 }
 
-CorpusReader::IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
+IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
 {
     // XXX - See DbIter::copy()
 
@@ -329,7 +344,7 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &
                                   ));
         return EntryIterator(new QueryIter(r, ctx));
     } catch (db::XmlException const &e) {
-        throw alpinocorpus::Error(e.what());
+        throw Error(e.what());
     }
 }
 

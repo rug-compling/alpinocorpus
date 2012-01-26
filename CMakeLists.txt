@@ -8,7 +8,7 @@ if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
 if (NOT WIN32)
-  set(CMAKE_CXX_FLAGS "-pthread -pedantic")
+  set(CMAKE_CXX_FLAGS "-pthread -pedantic -Wno-long-long")
 endif(NOT WIN32)
 
 LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
@@ -94,7 +94,10 @@ if (OPENSSL_FOUND)
 	"With SSL, enable domain verification" OFF)
 endif()
 
-CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
+find_package(LibXslt REQUIRED)
+if(LIBXSLT_FOUND)
+  include_directories(${LIBXSLT_INCLUDE_DIR})
+endif()
 
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
@@ -104,21 +107,17 @@ configure_file (
 set(HEADERS
   include/AlpinoCorpus/CompactCorpusWriter.hh
   include/AlpinoCorpus/CorpusReader.hh
+  include/AlpinoCorpus/CorpusReaderFactory.hh
   include/AlpinoCorpus/CorpusWriter.hh
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
+  include/AlpinoCorpus/IterImpl.hh
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/RemoteCorpusReader.hh
   include/AlpinoCorpus/capi.h
-  include/AlpinoCorpus/util/NonCopyable.hh
-  include/util/base64.hh
-  include/util/bufutil.hh
-  include/util/textfile.hh
-  include/util/url.hh
-  include/util/vs_stdint.h
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
   src/DzIstream.hh
@@ -126,16 +125,24 @@ set(HEADERS
   src/DzOstream.hh
   src/DzOstreamBuf.hh
   src/CompactCorpusReaderPrivate.hh
+  src/FilterIter.hh
   src/MultiCorpusReaderPrivate.hh
   src/RemoteCorpusReaderPrivate.hh
-  src/gzip.hh
   src/util/GetUrl.hh
+  src/StylesheetIter.hh
+  src/XSLTransformer.hh
+  src/util/base64.hh
+  src/util/bufutil.hh
+  src/util/textfile.hh
+  src/util/url.hh
+  src/util/vs_stdint.h
 )
 
 set(SOURCES
   src/CompactCorpusWriter.cpp
   src/CompactCorpusWriterPrivate.cpp
   src/CorpusReader.cpp
+  src/CorpusReaderFactory.cpp
   src/CorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
@@ -144,6 +151,7 @@ set(SOURCES
   src/DzOstream.cpp
   src/DzOstreamBuf.cpp
   src/Error.cpp
+  src/FilterIter.cpp
   src/CompactCorpusReader.cpp
   src/CompactCorpusReaderPrivate.cpp
   src/util/GetUrl.cpp
@@ -152,6 +160,9 @@ set(SOURCES
   src/RecursiveCorpusReader.cpp
   src/RemoteCorpusReader.cpp
   src/RemoteCorpusReaderPrivate.cpp
+  src/IterImpl.cpp
+  src/StylesheetIter.cpp
+  src/XSLTransformer.cpp
   src/capi.cpp
   src/util/base64.cpp
   src/util/textfile.cpp
@@ -188,10 +199,12 @@ if(USE_DBXML)
   target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
+
 if(ALPINOCORPUS_WITH_SSL)
   target_link_libraries(alpino_corpus ${OPENSSL_LIBRARIES})
 endif(ALPINOCORPUS_WITH_SSL)
 
+target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib
@@ -202,7 +215,20 @@ install(DIRECTORY include/AlpinoCorpus
   DESTINATION include
   FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
 
-add_subdirectory(test)
+# Unit tests
+
+if(USE_DBXML)
+  add_executable(writer_test test/writer.cpp)
+  target_link_libraries(writer_test alpino_corpus)
+  #add_test(writer writer_test)
+endif()
+
+add_executable(geturl_test test/geturl.cpp)
+target_link_libraries(geturl_test alpino_corpus)
+
+add_executable(readers_available test/readers_available.cpp)
+target_link_libraries(readers_available alpino_corpus)
+
 add_subdirectory(util)
 
 if(WITH_PYTHON)

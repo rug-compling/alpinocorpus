@@ -35,11 +35,19 @@ int alpinocorpus_is_valid_query(alpinocorpus_reader corpus, char const *query);
  */
 alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus);
 
+
+/**
+ * Get an iterator over the entries in a corpus, where the contents
+ * are transformed using the given stylesheet.
+ */
+alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
+    char const *query, char const *stylesheet, marker_query_t *queries,
+    size_t n_queries);
+
 /**
  * Get an iterator over the entries in a corpus that match a query.
  */
 alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query);
-
 
 /**
  * Destroy an iterator. This is only necessary if not all entries are
@@ -64,6 +72,12 @@ void alpinocorpus_iter_next(alpinocorpus_reader corpus,
  * Get the name of the current entry.
  */
 char *alpinocorpus_iter_value(alpinocorpus_iter iter);
+
+/**
+ * Get the iterator contents.
+ */
+char *alpinocorpus_iter_contents(alpinocorpus_reader reader,
+    alpinocorpus_iter iter);
 
 /**
  * Read an entry from the corpus.

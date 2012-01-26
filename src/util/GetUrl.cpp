@@ -274,7 +274,7 @@ namespace alpinocorpus { namespace util {
                     i = boost::asio::read_until(*d_socket, d_response, "\r\n", error);
                 }
             if (!i)
-                throw std::runtime_error("GetUrl: unable to connect to " + urlc.domain);
+                throw std::runtime_error("GetUrl: unable to connect to " + urlc.domain + " [ " + url + " ]");
 
             d_response_stream = new std::istream(&d_response);
 

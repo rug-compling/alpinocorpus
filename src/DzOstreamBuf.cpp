@@ -14,10 +14,10 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/filesystem.hpp>
 
-#include <util/bufutil.hh>
-
 #include "DzOstreamBuf.hh"
 #include "gzip.hh"
+#include "util/bufutil.hh"
+
 
 namespace bf = boost::filesystem;
 namespace pt = boost::posix_time;
