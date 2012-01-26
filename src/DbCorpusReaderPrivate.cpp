@@ -65,14 +65,18 @@ CorpusReader::IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
 /* operator* */
 std::string DbCorpusReaderPrivate::DbIter::current() const
 {
-    db::XmlDocument doc;
+    db::XmlValue v;
     try {
-        r.peek(doc);
+        r.peek(v);
     } catch (db::XmlException const &e) {
         throw Error(e.what());
     }
 
-    return doc.getName();
+    if (v.isNode()) {
+        db::XmlDocument doc = v.asDocument();
+        return doc.getName();
+    } else
+        return std::string();
 }
 
 /* operator== */
