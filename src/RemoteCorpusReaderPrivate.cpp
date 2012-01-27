@@ -1,3 +1,7 @@
+#include <config.hh>
+#ifdef USE_DBXML
+#include <dbxml/DbXml.hpp>
+#endif // USE_DBXML
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include "RemoteCorpusReaderPrivate.hh"
@@ -73,9 +77,19 @@ namespace alpinocorpus {
 
     bool RemoteCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
     {
+#ifdef USE_DBXML
+        try {
+            DbXml::XmlQueryContext ctx = mgr.createQueryContext();
+            mgr.prepare(query, ctx);
+        } catch (DbXml::XmlException const &e) {
+            return false;
+        }
+        return true;
+#else
         util::GetUrl p(d_url + "/validQuery?query=" + util::toPercentEncoding(query));
         std::string result = p.body();
         return (result.substr(0, 4) == "true");
+#endif
     }
 
     // done

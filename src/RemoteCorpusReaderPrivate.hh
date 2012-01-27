@@ -1,6 +1,11 @@
 #ifndef ALPINO_REMOTE_CORPUSREADER_PRIVATE_HH
 #define ALPINO_REMOTE_CORPUSREADER_PRIVATE_HH
 
+#include <config.hh>
+#ifdef USE_DBXML
+#include <dbxml/DbXml.hpp>
+#endif // USE_DBXML
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <../src/util/GetUrl.hh>
@@ -11,6 +16,10 @@ namespace alpinocorpus {
 
     class RemoteCorpusReaderPrivate : public CorpusReader
     {
+
+#ifdef USE_DBXML
+        DbXml::XmlManager   mutable mgr;
+#endif
 
         class RemoteIter : public IterImpl {
         public:
