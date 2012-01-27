@@ -41,6 +41,7 @@ namespace alpinocorpus {
         virtual EntryIterator getEnd() const;
         virtual std::string getName() const;
         virtual size_t getSize() const;
+        bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
         virtual std::string readEntry(std::string const &filename) const;
         virtual std::string readEntryMarkQueries(std::string const &entry,
                                                  std::list<MarkerQuery> const &queries) const;
