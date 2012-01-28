@@ -2,8 +2,8 @@
 #define ALPINO_COMPACT_CORPUSREADER_PRIVATE_HH
 
 #include <string>
-#include <tr1/unordered_map>
-#include <tr1/memory>
+#include <boost/tr1/unordered_map.hpp>
+#include <boost/tr1/memory.hpp>
 #include <vector>
 
 #include <boost/config.hpp>
@@ -40,8 +40,9 @@ class CompactCorpusReaderPrivate : public CorpusReader
     {
         ItemVector::const_iterator iter;
 
-      public:
+    public:
         IndexIter(ItemVector::const_iterator const &i) : iter(i) { }
+        IterImpl *copy() const;
         std::string current() const;
         bool equals(IterImpl const &) const;
         void next();

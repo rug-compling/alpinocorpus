@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 2.6)
 project(AlpinoCorpus)
 
-set (ALPINOCORPUS_VERSION "1.0.0")
+set (ALPINOCORPUS_VERSION "1.0.1")
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
 endif (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 
-set(CMAKE_CXX_FLAGS "-pthread")
+if (NOT WIN32)
+  set(CMAKE_CXX_FLAGS "-pthread -pedantic")
+endif(NOT WIN32)
 
 LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
@@ -29,7 +31,12 @@ include_directories(
   ${AlpinoCorpus_BINARY_DIR}/include
 )
 
-set(Boost_USE_STATIC_LIBS OFF)
+if (APPLE OR WIN32)
+  set(Boost_USE_STATIC_LIBS ON)
+else(APPLE OR WIN32)
+  set(Boost_USE_STATIC_LIBS OFF)
+endif(APPLE OR WIN32)
+
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
@@ -39,7 +46,8 @@ option(WITH_PYTHON
 option(WITH_RUBY
   "Compile Ruby bindings" OFF)
 
-find_package(Boost 1.46.1 COMPONENTS system filesystem thread REQUIRED)
+find_package(Boost 1.46.1 COMPONENTS system date_time
+  filesystem thread REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
@@ -78,8 +86,6 @@ find_package(LibXml2 REQUIRED)
 if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
-
-CHECK_FUNCTION_EXISTS(strlcpy HAVE_STRLCPY)
 
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
@@ -161,9 +167,11 @@ set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
 
 target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
-target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
-target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
-target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
+if(USE_DBXML)
+  target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
+  target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
+  target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
+endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
 install(TARGETS alpino_corpus
@@ -172,7 +180,8 @@ install(TARGETS alpino_corpus
 )
 
 install(DIRECTORY include/AlpinoCorpus
-  DESTINATION include)
+  DESTINATION include
+  FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
 
 # Unit tests
 
@@ -181,6 +190,9 @@ if(USE_DBXML)
   target_link_libraries(writer_test alpino_corpus)
   #add_test(writer writer_test)
 endif()
+
+add_executable(readers_available test/readers_available.cpp)
+target_link_libraries(readers_available alpino_corpus)
 
 add_subdirectory(util)
 

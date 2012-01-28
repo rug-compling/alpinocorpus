@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <tr1/memory>
+#include <boost/tr1/memory.hpp>
 
 template <typename T>
 class EqualsPrevious : public std::unary_function<T, bool>

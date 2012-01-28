@@ -14,6 +14,7 @@ MultiCorpusReader::MultiCorpusReader() :
 
 MultiCorpusReader::~MultiCorpusReader()
 {
+  delete d_private;
 }
 
 CorpusReader::EntryIterator MultiCorpusReader::getBegin() const

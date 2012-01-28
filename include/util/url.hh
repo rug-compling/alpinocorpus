@@ -12,3 +12,4 @@ std::string toPercentEncoding(std::string const &str);
 }
 
 #endif // ALPINOCORPUS_UTIL_URL
+

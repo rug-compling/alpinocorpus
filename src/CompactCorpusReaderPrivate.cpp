@@ -5,7 +5,7 @@
 #include <typeinfo>
 #include <vector>
 
-#include <tr1/unordered_map>
+#include <boost/tr1/unordered_map.hpp>
 
 #include <boost/config.hpp>
 #include <boost/filesystem.hpp>
@@ -112,6 +112,12 @@ void CompactCorpusReaderPrivate::canonicalize(std::string &filename)
         filename = filename.substr(0, filename.size() - 6);
     else
         throw OpenError(filename, "not an indexed (.dz) corpus file");
+}
+
+CorpusReader::IterImpl *CompactCorpusReaderPrivate::IndexIter::copy() const
+{
+    // No pointer members.
+    return new IndexIter(*this);
 }
 
 std::string CompactCorpusReaderPrivate::IndexIter::current() const

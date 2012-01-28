@@ -48,7 +48,7 @@ CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEnd() const
 
 std::string DirectoryCorpusReaderPrivate::getName() const
 {
-  return d_directory.native();
+  return d_directory.string();
 }
 
 size_t DirectoryCorpusReaderPrivate::getSize() const
@@ -68,18 +68,23 @@ DirectoryCorpusReaderPrivate::DirIter::DirIter(
         next();
 }
 
+CorpusReader::IterImpl *DirectoryCorpusReaderPrivate::DirIter::copy() const
+{
+    // No pointer members
+    return new DirIter(*this);
+}
 
 std::string DirectoryCorpusReaderPrivate::DirIter::current() const
 {
-    std::string entryPathStr = iter->path().native();
-    entryPathStr.erase(0, d_directory.native().size());
+    std::string entryPathStr = iter->path().string();
+    entryPathStr.erase(0, d_directory.string().size());
 
     if (entryPathStr[0] == '/')
         entryPathStr.erase(0, 1);
 
     bf::path entryPath(entryPathStr);
 
-    return entryPath.native();
+    return entryPath.string();
 }
 
 bool DirectoryCorpusReaderPrivate::DirIter::equals(IterImpl const &other) const
@@ -116,7 +121,7 @@ std::string DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) co
 {
     bf::path p(d_directory);
     p /= entry;
-    return util::readFile(p.native());
+    return util::readFile(p.string());
 }
 
 bf::path DirectoryCorpusReaderPrivate::cachePath() const

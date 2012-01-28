@@ -2,7 +2,6 @@
 #define RECURSIVE_CORPUSREADER_HH
 
 #include <string>
-#include <tr1/memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -25,7 +24,7 @@ private:
   EntryIterator runXPath(std::string const &query) const;
   bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
-  std::tr1::shared_ptr<RecursiveCorpusReaderPrivate> d_private;
+  RecursiveCorpusReaderPrivate *d_private;
 };
 
 }

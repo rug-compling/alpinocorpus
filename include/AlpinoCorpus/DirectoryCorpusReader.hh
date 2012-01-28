@@ -2,7 +2,6 @@
 #define ALPINO_DIRECTORYCORPUSREADER_HH
 
 #include <string>
-#include <tr1/memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -33,7 +32,7 @@ private:
     virtual std::string readEntry(std::string const &entry) const;
     virtual size_t getSize() const;
 
-    std::tr1::shared_ptr<DirectoryCorpusReaderPrivate> d_private;
+    DirectoryCorpusReaderPrivate *d_private;
 };
 
 }

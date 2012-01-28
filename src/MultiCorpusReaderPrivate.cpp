@@ -3,7 +3,7 @@
 #include <string>
 #include <utility>
 
-#include <tr1/unordered_map>
+#include <boost/tr1/unordered_map.hpp>
 
 #include <boost/filesystem.hpp>
 
@@ -34,8 +34,10 @@ CorpusReader::EntryIterator MultiCorpusReaderPrivate::getBegin() const
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::getEnd() const
 {
-  return EntryIterator(new MultiIter(
-    std::tr1::unordered_map<std::string, CorpusReader *>()));
+  // XXX - Constructing an empty map in the argument of the constructor
+  // breaks with Boost 1.48.0. See ticket 6167.
+  std::tr1::unordered_map<std::string, CorpusReader *> emptyMap;
+  return EntryIterator(new MultiIter(emptyMap));
 }
 
 std::string MultiCorpusReaderPrivate::getName() const
@@ -146,6 +148,13 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
 
+CorpusReader::IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
+{
+  // No pointer members, and pointer member in ReaderIter is not managed
+  // by ReaderIter.
+  return new MultiIter(*this);
+}
+
 std::string MultiCorpusReaderPrivate::MultiIter::current() const
 {
   if (d_iters.size() == 0)
@@ -168,7 +177,7 @@ bool MultiCorpusReaderPrivate::MultiIter::equals(IterImpl const &other) const
   try {
     MultiIter &that = const_cast<MultiIter &>(dynamic_cast<MultiIter const&>(other));
     return that.d_iters == d_iters;
-  } catch (std::bad_cast const &e) {
+  } catch (std::bad_cast const &) {
     return false;
   }
 }

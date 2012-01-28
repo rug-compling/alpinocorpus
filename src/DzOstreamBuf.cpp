@@ -7,16 +7,21 @@
 #include <string>
 #include <vector>
 
-#include <unistd.h>
 #include <zlib.h>
-#include <sys/time.h>
 
 #include <boost/cstdint.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/filesystem.hpp>
 
 #include <util/bufutil.hh>
 
 #include "DzOstreamBuf.hh"
 #include "gzip.hh"
+
+namespace bf = boost::filesystem;
+namespace pt = boost::posix_time;
+namespace bg = boost::gregorian;
 
 namespace {
 
@@ -42,13 +47,13 @@ DzOstreamBuf::DzOstreamBuf(char const *filename) : d_size(0), d_crc32(crc32(0L, 
 		return;
 	}
 
-	std::string tmpTemplate = std::string(filename) + "-XXXXXX";	
-	char *tmpFilename = strdup(tmpTemplate.c_str());
-	int fd = mkstemp(tmpFilename);
-
-	d_tmpFilename = tmpFilename;
-	d_zDataStream = fdopen(fd, "w");
-	free(tmpFilename);
+  // XXX - There is a race condition here, but Boost does not seem to
+  // provide a variant that returns a file descriptor. We used mkstemp
+  // previously, but it is not portable.
+  std::string tmpFilename =
+    bf::unique_path(std::string(filename) + "-%%%%-%%%%-%%%%-%%%%").string();
+  d_tmpFilename = tmpFilename;
+  d_zDataStream = fopen(tmpFilename.c_str(), "w");
 	
 	if (d_zDataStream == NULL)
 		throw std::runtime_error(std::string("DzOstreamBuf::DzOstreamBuf: Could not open ") +
@@ -112,7 +117,7 @@ DzOstreamBuf::~DzOstreamBuf()
 	
 	fclose(d_dzStream);
 
-	unlink(d_tmpFilename.c_str());
+  bf::remove(d_tmpFilename);
 }
 
 void DzOstreamBuf::flushBuffer()
@@ -193,16 +198,20 @@ void DzOstreamBuf::writeHeader()
 	std::vector<unsigned char> header(GZ_HEADER_SIZE);
 
 	// Get the current time. gzip only allows for 32-bit timestamps.
-	struct timeval tv;
-	if (gettimeofday(&tv, NULL) == -1 ||
-			tv.tv_sec > std::numeric_limits<int32_t>::max())
-		tv.tv_sec = 0;
+  pt::ptime epoch(bg::date(1970, 1, 1));
+  pt::time_duration diff = pt::second_clock::universal_time() - epoch;
+ 
+  long secsSinceEpoch;
+  if (diff.total_seconds() > std::numeric_limits<boost::int32_t>::max())
+      secsSinceEpoch = 0;
+  else
+      secsSinceEpoch = diff.total_seconds();
 
 	header[GZ_HEADER_ID1] = gzipId1;
 	header[GZ_HEADER_ID2] = gzipId2;
 	header[GZ_HEADER_CM] = GZ_CM_DEFLATE;
 	header[GZ_HEADER_FLG] = GZ_FLG_EXTRA;
-	util::writeToBuf<uint32_t>(&header[0] + GZ_HEADER_MTIME, tv.tv_sec);
+	util::writeToBuf<boost::uint32_t>(&header[0] + GZ_HEADER_MTIME, secsSinceEpoch);
 	header[GZ_HEADER_XFL] = GZ_XFL_MAX;
 	header[GZ_HEADER_OS] = GZ_OS_UNIX;
 	
@@ -213,8 +222,8 @@ void DzOstreamBuf::writeTrailer()
 {
 	std::vector<unsigned char> trailer(GZ_TRAILER_SIZE);
 	
-	util::writeToBuf<uint32_t>(&trailer[0] + GZ_TRAILER_CRC32, d_crc32);
-	util::writeToBuf<uint32_t>(&trailer[0] + GZ_TRAILER_ISIZE, d_size);
+	util::writeToBuf<boost::uint32_t>(&trailer[0] + GZ_TRAILER_CRC32, d_crc32);
+	util::writeToBuf<boost::uint32_t>(&trailer[0] + GZ_TRAILER_ISIZE, d_size);
 
 	fwrite(&trailer[0], 1, GZ_TRAILER_SIZE, d_dzStream);
 }

@@ -66,6 +66,12 @@ void alpinocorpus_iter_next(alpinocorpus_reader corpus,
 char *alpinocorpus_iter_value(alpinocorpus_iter iter);
 
 /**
+ * Get the iterator contents.
+ */
+char *alpinocorpus_iter_contents(alpinocorpus_reader reader,
+    alpinocorpus_iter iter);
+
+/**
  * Read an entry from the corpus.
  */
 char *alpinocorpus_read(alpinocorpus_reader corpus, char const *entry);

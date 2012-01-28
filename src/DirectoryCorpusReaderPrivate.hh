@@ -25,6 +25,7 @@ class DirectoryCorpusReaderPrivate : public CorpusReader
       public:
         DirIter(boost::filesystem::path const &path,
             boost::filesystem::recursive_directory_iterator i);
+        IterImpl *copy() const;
         std::string current() const;
         bool equals(IterImpl const &) const;
         void next();

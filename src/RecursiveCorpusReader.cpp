@@ -3,7 +3,7 @@
 #include <string>
 #include <utility>
 
-#include <tr1/unordered_map>
+#include <boost/tr1/unordered_map.hpp>
 
 #include <boost/filesystem.hpp>
 
@@ -44,6 +44,7 @@ class RecursiveCorpusReaderPrivate : public CorpusReader
       std::string const &query);
     ~RecursiveIter();
     std::string contents(CorpusReader const &) const;
+    IterImpl *copy() const;
     std::string current() const;
     bool equals(IterImpl const &other) const;
     void next();
@@ -83,6 +84,7 @@ RecursiveCorpusReader::RecursiveCorpusReader(std::string const &directory) :
 
 RecursiveCorpusReader::~RecursiveCorpusReader()
 {
+  delete d_private;
 }
 
 CorpusReader::EntryIterator RecursiveCorpusReader::getBegin() const
@@ -147,13 +149,13 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
         iter->path().extension() != ".index")
       continue;
 
-    CorpusReader *reader(CorpusReader::open(iter->path().native()));
+    CorpusReader *reader(CorpusReader::open(iter->path().string()));
 
     bf::path namePath = iter->path();
     namePath.replace_extension("");
-    std::string name = namePath.native();
+    std::string name = namePath.string();
 
-    name.erase(0, d_directory.native().size() + 1);
+    name.erase(0, d_directory.string().size() + 1);
     
     push_back(name, reader);
   }
@@ -173,8 +175,10 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getBegin() const
 
 CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getEnd() const
 {
-  return EntryIterator(new RecursiveIter(
-    std::tr1::unordered_map<std::string, CorpusReader *>()));
+  // XXX - Constructing an empty map in the argument of the constructor
+  // breaks with Boost 1.48.0. See ticket 6167.
+  std::tr1::unordered_map<std::string, CorpusReader *> emptyMap;
+  return EntryIterator(new RecursiveIter(emptyMap));
 }
 
 std::string RecursiveCorpusReaderPrivate::getName() const
@@ -295,6 +299,13 @@ std::string RecursiveCorpusReaderPrivate::RecursiveIter::contents(
   return d_iters.front().iter.contents(reader);
 }
 
+CorpusReader::IterImpl *RecursiveCorpusReaderPrivate::RecursiveIter::copy() const
+{
+  // No pointer members, pointer member of ReaderIter is not managed by
+  // ReaderIter.
+  return new RecursiveIter(*this);
+}
+
 std::string RecursiveCorpusReaderPrivate::RecursiveIter::current() const
 {
   if (d_iters.size() == 0)
@@ -308,7 +319,7 @@ bool RecursiveCorpusReaderPrivate::RecursiveIter::equals(IterImpl const &other) 
   try {
     RecursiveIter &that = const_cast<RecursiveIter &>(dynamic_cast<RecursiveIter const&>(other));
     return that.d_iters == d_iters;
-  } catch (std::bad_cast const &e) {
+  } catch (std::bad_cast const &) {
     return false;
   }
 }

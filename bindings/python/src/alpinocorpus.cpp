@@ -283,6 +283,7 @@ static PyObject *CorpusReader_query(CorpusReader *self, PyObject *args)
       Py_INCREF(iter->reader);
     }
   } catch (std::runtime_error &e) {
+    EntryIteratorType.tp_free(iter);
     raise_exception(e.what());
     return NULL;
   }
@@ -318,7 +319,7 @@ static void EntryIterator_dealloc(EntryIterator *self)
   delete self->iter;
   self->ob_type->tp_free(self);
 
-  Py_DECREF(self->reader);
+  Py_DECREF(reader);
 }
 
 static PyObject *EntryIterator_iter(PyObject *self)

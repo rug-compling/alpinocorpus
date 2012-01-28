@@ -3,7 +3,6 @@
 
 #include <list>
 #include <string>
-#include <tr1/memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 
@@ -33,7 +32,7 @@ class DbCorpusReader : public CorpusReader
     EntryIterator runXQuery(std::string const &) const;
     size_t getSize() const;
     
-    std::tr1::shared_ptr<DbCorpusReaderPrivate> d_private;
+    DbCorpusReaderPrivate *d_private;
 };
 
 }   // namespace alpinocorpus
