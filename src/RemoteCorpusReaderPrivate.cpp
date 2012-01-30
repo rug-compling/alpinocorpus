@@ -126,7 +126,8 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
-        util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" + util::toPercentEncoding(query) + "&plain=1");
+        util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" +
+            util::toPercentEncoding(query) + "&plain=1&contents=1");
         return EntryIterator(new RemoteIter(p, 0, true));
     }
 
