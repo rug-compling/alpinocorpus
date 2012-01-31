@@ -40,7 +40,7 @@ namespace alpinocorpus { namespace util {
             typedef std::map<std::string, std::string> Headers;
 
             //! Constructor with a url. The headers for the webpage are retrieved immediately.
-            GetUrl(std::string const& url);
+            GetUrl(std::string const& url, std::string const& body="");
 
             ~GetUrl();
 
@@ -93,7 +93,7 @@ namespace alpinocorpus { namespace util {
             };
 
             void clean_up();
-            void download(std::string const& url, int maxhop);
+            void download(std::string const& url, int maxhop, std::string const &body);
             void parseResponse(std::istream *response_stream);
             void parseHeaders(std::istream *response_stream);
             void parseContentType();

@@ -24,7 +24,7 @@ namespace ssl = boost::asio::ssl;
 
 namespace alpinocorpus { namespace util {
 
-        GetUrl::GetUrl(std::string const& url) :
+        GetUrl::GetUrl(std::string const& url, std::string const& body) :
             d_redirect(false),
             d_content_type(""),
             d_charset(""),
@@ -36,7 +36,7 @@ namespace alpinocorpus { namespace util {
             d_eof(false),
             d_eoflast(false)
         {
-            download(url, 6);
+            download(url, 6, body);
         }
 
         GetUrl::~GetUrl()
@@ -190,7 +190,7 @@ namespace alpinocorpus { namespace util {
             return d_headers;
         }
 
-        void GetUrl::download(std::string const& url, int maxhop) {
+        void GetUrl::download(std::string const& url, int maxhop, std::string const &body) {
 
             d_url = url;
             d_result.clear();
@@ -212,19 +212,26 @@ namespace alpinocorpus { namespace util {
             if (urlc.domain == "")
                 throw std::invalid_argument("GetUrl: missing domain in url " + d_url);
 
-
             // Form the request. We specify the "Connection: close" header so that the
             // server will close the socket after transmitting the response. This will
             // allow us to treat all data up until the EOF as the content.
             boost::asio::streambuf request;
             std::ostream request_stream(&request);
-            request_stream << "GET " << urlc.path << " HTTP/1.0\r\n";
+            if (body.size() == 0)
+                request_stream << "GET " << urlc.path << " HTTP/1.0\r\n";
+            else {
+                request_stream << "POST " << urlc.path << " HTTP/1.0\r\n";
+                request_stream << "Content-Length: " << body.size() << "\r\n";
+            }
             request_stream << "Host: " << urlc.domain << "\r\n";
             request_stream << "Accept: */*\r\n";
             // request_stream << "Accept-Encoding: gzip\r\n";  // can't do this, can't detect newlines in gzip'ed data
             request_stream << "User-Agent: Alpino Corpus\r\n";
             request_stream << "Connection: close\r\n";
             request_stream << "\r\n";
+            if (body.size()) {
+                request_stream << body;
+            }
 
             boost::system::error_code error;
             tcp::resolver resolver(d_io_service);
@@ -313,7 +320,7 @@ namespace alpinocorpus { namespace util {
             d_response.consume(d_response.size());
             clean_up();
             d_io_service.reset();
-            download(u, maxhop - 1);
+            download(u, maxhop - 1, body);
 
         }
 

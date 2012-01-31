@@ -123,6 +123,31 @@ namespace alpinocorpus {
         return p.body();
     }
 
+    // TODO: multiple queries (now: only the first is used)
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::beginWithStylesheet(std::string const &stylesheet,
+                                                    std::list<MarkerQuery> const &markerQueries) const
+    {
+        std::list<MarkerQuery>::const_iterator iter = markerQueries.begin();
+
+        if (iter == markerQueries.end())
+            throw Error("RemoteCorpusReaderPrivate: Missing query");
+
+        util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" +
+                                           util::toPercentEncoding(iter->query) +
+                                           "&markerQuery=" + util::toPercentEncoding(iter->query) +
+                                           "&markerAttr=" + util::toPercentEncoding(iter->attr) +
+                                           "&markerValue=" + util::toPercentEncoding(iter->value) +
+                                           "&plain=1&contents=1", stylesheet);
+
+        ++iter;
+        if (iter != markerQueries.end())
+            throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
+
+        return EntryIterator(new RemoteIter(p, 0, true));
+
+
+    }
+
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {

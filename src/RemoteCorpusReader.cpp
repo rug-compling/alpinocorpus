@@ -51,6 +51,12 @@ namespace alpinocorpus {
         return d_private->readEntryMarkQueries(entry, queries);
     }
 
+    CorpusReader::EntryIterator RemoteCorpusReader::beginWithStylesheet(std::string const &stylesheet,
+                                                    std::list<MarkerQuery> const &markerQueries) const
+    {
+        return d_private->beginWithStylesheet(stylesheet, markerQueries);
+    }
+
     CorpusReader::EntryIterator RemoteCorpusReader::runXPath(std::string const &query) const
     {
         return d_private->runXPath(query);
