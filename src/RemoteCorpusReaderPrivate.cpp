@@ -119,7 +119,7 @@ namespace alpinocorpus {
     }
 
     // TODO: multiple queries (now: only the first is used)
-    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::queryWithStylesheet(QueryDialect d, std::string const &q,
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runQueryWithStylesheet(QueryDialect d, std::string const &q,
                                                                                std::string const &stylesheet,
                                                                                std::list<MarkerQuery> const &markerQueries) const
     {

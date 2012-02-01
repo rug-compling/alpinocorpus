@@ -51,7 +51,7 @@ namespace alpinocorpus {
         return d_private->readEntryMarkQueries(entry, queries);
     }
 
-    CorpusReader::EntryIterator RemoteCorpusReader::queryWithStylesheet(QueryDialect d, std::string const &q,
+    CorpusReader::EntryIterator RemoteCorpusReader::runQueryWithStylesheet(QueryDialect d, std::string const &q,
                                                                         std::string const &stylesheet,
                                                                         std::list<MarkerQuery> const &markerQueries) const
     {

@@ -280,6 +280,14 @@ namespace alpinocorpus {
       std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries) const
     {
+      runQueryWithStylesheet(d, query, stylesheet, markerQueries);
+    }
+
+    CorpusReader::EntryIterator CorpusReader::runQueryWithStylesheet(
+        QueryDialect d, std::string const &query,
+      std::string const &stylesheet,
+      std::list<MarkerQuery> const &markerQueries) const
+    {
         if (d == XQUERY)
             throw NotImplemented(typeid(*this).name(),
                 "XQuery functionality");
