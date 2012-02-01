@@ -293,10 +293,10 @@ namespace alpinocorpus {
                 break;
             if (e2 < e3) {
                 s = s.substr(0, e2) + "\n" + s.substr(e2 + 2);
-                start = e2 + 2;
+                start = e2 + 1;
             } else {
                 s = s.substr(0, e3) + "\\n" + s.substr(e3 + 3);
-                start = e3 + 3;
+                start = e3 + 2;
             }
         }
 
