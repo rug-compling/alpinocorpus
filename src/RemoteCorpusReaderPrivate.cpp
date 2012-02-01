@@ -281,7 +281,26 @@ namespace alpinocorpus {
 
         std::string s = d_geturl->line(d_idx);
         size_t i = s.find('\t');
-        return s.substr(i + 1);
+        s = s.substr(i + 1);
+
+        size_t start = 0;
+        size_t e2;
+        size_t e3;
+        for (;;) {
+            e2 = s.find("\\n", start);
+            e3 = s.find("\\\\n", start);
+            if (e2 == std::string::npos && e3 == std::string::npos)
+                break;
+            if (e2 < e3) {
+                s = s.substr(0, e2) + "\n" + s.substr(e2 + 2);
+                start = e2 + 2;
+            } else {
+                s = s.substr(0, e3) + "\\n" + s.substr(e3 + 3);
+                start = e3 + 3;
+            }
+        }
+
+        return s;
     }
 
 }   // namespace alpinocorpus
