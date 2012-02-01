@@ -54,6 +54,9 @@ namespace alpinocorpus {
         virtual std::string readEntry(std::string const &filename) const;
         virtual std::string readEntryMarkQueries(std::string const &entry,
                                                  std::list<MarkerQuery> const &queries) const;
+        virtual EntryIterator queryWithStylesheet(QueryDialect d, std::string const &q,
+                                                  std::string const &stylesheet,
+                                                  std::list<MarkerQuery> const &markerQueries) const;
         virtual EntryIterator beginWithStylesheet(std::string const &stylesheet,
                                                   std::list<MarkerQuery> const &markerQueries) const;
         virtual EntryIterator runXPath(std::string const &) const;

@@ -12,9 +12,6 @@
 #include <cctype>
 #include <cstdio>
 
-// TODO: remove next line and all lines with std::cerr
-#include <iostream>
-
 namespace alpinocorpus {
 
     // done
@@ -109,8 +106,6 @@ namespace alpinocorpus {
         if (iter == queries.end())
             return readEntry(entry);
 
-        std::cerr << "RemoteCorpusReaderPrivate::readEntryMarkQueries(" << entry << ", (" << iter->query << ", " << iter->attr << ", " << iter->value << "))" << std::endl;
-
         util::GetUrl p(d_url + "/entry/" + entry +   // escape(entry) +
                        "?markerQuery=" + util::toPercentEncoding(iter->query) +
                        "&markerAttr=" + util::toPercentEncoding(iter->attr) +
@@ -124,8 +119,9 @@ namespace alpinocorpus {
     }
 
     // TODO: multiple queries (now: only the first is used)
-    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::beginWithStylesheet(std::string const &stylesheet,
-                                                    std::list<MarkerQuery> const &markerQueries) const
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::queryWithStylesheet(QueryDialect d, std::string const &q,
+                                                                               std::string const &stylesheet,
+                                                                               std::list<MarkerQuery> const &markerQueries) const
     {
         std::list<MarkerQuery>::const_iterator iter = markerQueries.begin();
 
@@ -133,8 +129,31 @@ namespace alpinocorpus {
             throw Error("RemoteCorpusReaderPrivate: Missing query");
 
         util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" +
-                                           util::toPercentEncoding(iter->query) +
+                                           util::toPercentEncoding(q) +
                                            "&markerQuery=" + util::toPercentEncoding(iter->query) +
+                                           "&markerAttr=" + util::toPercentEncoding(iter->attr) +
+                                           "&markerValue=" + util::toPercentEncoding(iter->value) +
+                                           "&plain=1&contents=1", stylesheet);
+
+        ++iter;
+        if (iter != markerQueries.end())
+            throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
+
+        return EntryIterator(new RemoteIter(p, 0, true));
+    }
+
+
+    // TODO: multiple queries (now: only the first is used)
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::beginWithStylesheet(std::string const &stylesheet,
+                                                                               std::list<MarkerQuery> const &markerQueries) const
+    {
+        std::list<MarkerQuery>::const_iterator iter = markerQueries.begin();
+
+        if (iter == markerQueries.end())
+            throw Error("RemoteCorpusReaderPrivate: Missing query");
+
+        util::GetUrl *p = new util::GetUrl(d_url + "/entries" +
+                                           "?markerQuery=" + util::toPercentEncoding(iter->query) +
                                            "&markerAttr=" + util::toPercentEncoding(iter->attr) +
                                            "&markerValue=" + util::toPercentEncoding(iter->value) +
                                            "&plain=1&contents=1", stylesheet);

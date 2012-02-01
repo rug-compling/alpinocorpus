@@ -1,7 +1,13 @@
+#define GETURL_DEBUG
+
 #include <config.hh>
 
 #include <istream>
 #include <ostream>
+#ifdef GETURL_DEBUG
+#include <iostream>
+#endif
+
 #include <string>
 #include <boost/asio.hpp>
 #ifdef ALPINOCORPUS_WITH_SSL
@@ -191,6 +197,10 @@ namespace alpinocorpus { namespace util {
         }
 
         void GetUrl::download(std::string const& url, int maxhop, std::string const &body) {
+
+#ifdef GETURL_DEBUG
+            std::cerr << "[GetUrl] " << (body.size() ? "POST " : "GET ") << url << std::endl;
+#endif
 
             d_url = url;
             d_result.clear();
