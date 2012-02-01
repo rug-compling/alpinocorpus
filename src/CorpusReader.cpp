@@ -280,7 +280,7 @@ namespace alpinocorpus {
       std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries) const
     {
-      runQueryWithStylesheet(d, query, stylesheet, markerQueries);
+      return runQueryWithStylesheet(d, query, stylesheet, markerQueries);
     }
 
     CorpusReader::EntryIterator CorpusReader::runQueryWithStylesheet(
