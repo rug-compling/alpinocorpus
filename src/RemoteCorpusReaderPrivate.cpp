@@ -283,24 +283,35 @@ namespace alpinocorpus {
         size_t i = s.find('\t');
         s = s.substr(i + 1);
 
-        size_t start = 0;
-        size_t e1;
-        size_t e2;
+        std::string result = "";
+        size_t e;
         for (;;) {
-            e1 = s.find("\\n", start);
-            e2 = s.find("\\\\", start);
-            if (e1 == std::string::npos && e2 == std::string::npos)
+            e = s.find('\\');
+            if (e > s.size() - 2) {
+                result += s;
                 break;
-            if (e1 < e2) {
-                s = s.substr(0, e1) + "\n" + s.substr(e1 + 2);
-                start = e1 + 1;
-            } else {
-                s = s.substr(0, e2) + "\\" + s.substr(e2 + 2);
-                start = e2 + 1;
             }
+            result += s.substr(0, e);
+            switch (s[e + 1]) {
+            case 'f':
+                result += '\f';
+                break;
+            case 'n':
+                result += '\n';
+                break;
+            case 'r':
+                result += '\r';
+                break;
+            case 't':
+                result += '\t';
+                break;
+            default:
+                result += s[e + 1];
+            }
+            s = s.substr(e + 2);
         }
 
-        return s;
+        return result;
     }
 
 }   // namespace alpinocorpus
