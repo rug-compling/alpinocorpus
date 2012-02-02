@@ -9,7 +9,6 @@
 #include "util/url.hh"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/regex.hpp>
 #include <cctype>
 #include <cstdio>
 
@@ -284,12 +283,22 @@ namespace alpinocorpus {
         size_t i = s.find('\t');
         s = s.substr(i + 1);
 
-        // Unescape '\n' or '\\\n', but not '\\n'.
-        s = boost::regex_replace(s, boost::regex("(\\\\\\\\)*\\\\n"), "\\1\n",
-            boost::match_default | boost::format_perl);
-        // Unescape '\'.
-        s = boost::regex_replace(s, boost::regex("\\\\"), "\\",
-            boost::match_default | boost::format_perl);
+        size_t start = 0;
+        size_t e1;
+        size_t e2;
+        for (;;) {
+            e1 = s.find("\\n", start);
+            e2 = s.find("\\\\", start);
+            if (e1 == std::string::npos && e2 == std::string::npos)
+                break;
+            if (e1 < e2) {
+                s = s.substr(0, e1) + "\n" + s.substr(e1 + 2);
+                start = e1 + 1;
+            } else {
+                s = s.substr(0, e2) + "\\" + s.substr(e2 + 2);
+                start = e2 + 1;
+            }
+        }
 
         return s;
     }
