@@ -1,4 +1,10 @@
-alpino-corpus (1.0.1-1) oneiric; urgency=low
+alpino-corpus (1.0.1-2) precise; urgency=low
+
+  * Build for Ubuntu 12.04 (Precise Pangolin).
+
+ -- Daniël de Kok <me@danieldk.eu>  Sun, 05 Feb 2012 14:11:23 +0100
+
+alpino-corpus (1.0.1-1) precise; urgency=low
 
   * New upstream release.
 
