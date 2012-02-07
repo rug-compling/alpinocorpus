@@ -27,7 +27,7 @@ namespace alpinocorpus {
         d_url = url;
 
         bool OK = false;
-        util::GetUrl p1(url.substr(0, i) + "/corpora?plain=1");
+        util::GetUrl p1(url.substr(0, i) + "/corpora");
         std::vector<std::string> lines;
         std::vector<std::string> words;
         boost::algorithm::split(lines, p1.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
@@ -41,7 +41,7 @@ namespace alpinocorpus {
         if (! OK)
             throw std::invalid_argument("URL is not a valid corpus: " + d_url);
 
-        d_geturl = new util::GetUrl(d_url + "/entries?plain=1");
+        d_geturl = new util::GetUrl(d_url + "/entries");
     }
 
     // done
@@ -133,7 +133,7 @@ namespace alpinocorpus {
                                            "&markerQuery=" + util::toPercentEncoding(iter->query) +
                                            "&markerAttr=" + util::toPercentEncoding(iter->attr) +
                                            "&markerValue=" + util::toPercentEncoding(iter->value) +
-                                           "&plain=1&contents=1", stylesheet);
+                                           "&contents=1", stylesheet);
 
         ++iter;
         if (iter != markerQueries.end())
@@ -156,7 +156,7 @@ namespace alpinocorpus {
                                            "?markerQuery=" + util::toPercentEncoding(iter->query) +
                                            "&markerAttr=" + util::toPercentEncoding(iter->attr) +
                                            "&markerValue=" + util::toPercentEncoding(iter->value) +
-                                           "&plain=1&contents=1", stylesheet);
+                                           "&contents=1", stylesheet);
 
         ++iter;
         if (iter != markerQueries.end())
@@ -171,7 +171,7 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
         util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" +
-            util::toPercentEncoding(query) + "&plain=1&contents=1");
+            util::toPercentEncoding(query) + "&contents=1");
         return EntryIterator(new RemoteIter(p, 0, true));
     }
 
