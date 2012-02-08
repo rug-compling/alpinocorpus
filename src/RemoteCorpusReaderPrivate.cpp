@@ -7,6 +7,7 @@
 #include "RemoteCorpusReaderPrivate.hh"
 #include "util/GetUrl.hh"
 #include "util/url.hh"
+#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <cctype>
@@ -85,7 +86,9 @@ namespace alpinocorpus {
 #else
         util::GetUrl p(d_url + "/validQuery?query=" + util::toPercentEncoding(query));
         std::string result = p.body();
-        return (result.substr(0, 4) == "true");
+        boost::to_lower(result);
+        boost::trim(result);
+        return (result == "true" || result == "yes" || result == "1");
 #endif
     }
 
