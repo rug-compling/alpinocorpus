@@ -7,6 +7,7 @@
 #include <AlpinoCorpus/CompactCorpusReader.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
+#include <AlpinoCorpus/RemoteCorpusReader.hh>
 #include <config.hh>
 
 #if defined(USE_DBXML)
@@ -275,6 +276,14 @@ namespace alpinocorpus {
     }
 
     CorpusReader::EntryIterator CorpusReader::queryWithStylesheet(
+        QueryDialect d, std::string const &query,
+      std::string const &stylesheet,
+      std::list<MarkerQuery> const &markerQueries) const
+    {
+      return runQueryWithStylesheet(d, query, stylesheet, markerQueries);
+    }
+
+    CorpusReader::EntryIterator CorpusReader::runQueryWithStylesheet(
         QueryDialect d, std::string const &query,
       std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries) const
