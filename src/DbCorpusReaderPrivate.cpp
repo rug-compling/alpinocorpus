@@ -247,12 +247,18 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
         throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
     }
 
+    // No exceptions according to the documentation...
+    AutoRelease<xerces::DOMXPathNSResolver> resolver(
+        document->createNSResolver(document->getDocumentElement()));
+    resolver->addNamespaceBinding(X("fn"),
+        X("http://www.w3.org/2005/xpath-functions"));
+
     for (std::list<MarkerQuery>::const_iterator iter = queries.begin();
          iter != queries.end(); ++iter)
     {
         AutoRelease<xerces::DOMXPathExpression> expression(0);
         try {
-            expression.set(document->createExpression(X(iter->query.c_str()), 0));
+            expression.set(document->createExpression(X(iter->query.c_str()), resolver));
         } catch (xerces::DOMXPathException const &) {
             throw Error("Could not parse expression.");
         } catch (xerces::DOMException const &) {
