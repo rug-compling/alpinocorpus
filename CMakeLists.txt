@@ -46,7 +46,7 @@ option(WITH_PYTHON
 option(WITH_RUBY
   "Compile Ruby bindings" OFF)
 
-find_package(Boost 1.46.1 COMPONENTS system date_time
+find_package(Boost 1.46.1 COMPONENTS system date_time iostreams
   filesystem thread REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -87,6 +87,13 @@ if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
 
+find_package(OpenSSL)
+if (OPENSSL_FOUND)
+  set(ALPINOCORPUS_WITH_SSL ON)
+  option(ALPINOCORPUS_WITH_SSL_STRICT
+	"With SSL, enable domain verification" OFF)
+endif()
+
 find_package(LibXslt REQUIRED)
 if(LIBXSLT_FOUND)
   include_directories(${LIBXSLT_INCLUDE_DIR})
@@ -109,7 +116,7 @@ set(HEADERS
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
-  include/AlpinoCorpus/util/NonCopyable.hh
+  include/AlpinoCorpus/RemoteCorpusReader.hh
   include/AlpinoCorpus/capi.h
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
@@ -120,15 +127,15 @@ set(HEADERS
   src/CompactCorpusReaderPrivate.hh
   src/FilterIter.hh
   src/MultiCorpusReaderPrivate.hh
+  src/RemoteCorpusReaderPrivate.hh
+  src/util/GetUrl.hh
   src/StylesheetIter.hh
   src/XSLTransformer.hh
-  src/gzip.hh
   src/util/base64.hh
   src/util/bufutil.hh
   src/util/textfile.hh
   src/util/url.hh
   src/util/vs_stdint.h
-
 )
 
 set(SOURCES
@@ -147,10 +154,13 @@ set(SOURCES
   src/FilterIter.cpp
   src/CompactCorpusReader.cpp
   src/CompactCorpusReaderPrivate.cpp
-  src/IterImpl.cpp
+  src/util/GetUrl.cpp
   src/MultiCorpusReader.cpp
   src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
+  src/RemoteCorpusReader.cpp
+  src/RemoteCorpusReaderPrivate.cpp
+  src/IterImpl.cpp
   src/StylesheetIter.cpp
   src/XSLTransformer.cpp
   src/capi.cpp
@@ -189,6 +199,11 @@ if(USE_DBXML)
   target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
+
+if(ALPINOCORPUS_WITH_SSL)
+  target_link_libraries(alpino_corpus ${OPENSSL_LIBRARIES})
+endif(ALPINOCORPUS_WITH_SSL)
+
 target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
 
 install(TARGETS alpino_corpus
@@ -207,6 +222,9 @@ if(USE_DBXML)
   target_link_libraries(writer_test alpino_corpus)
   #add_test(writer writer_test)
 endif()
+
+add_executable(geturl_test test/geturl.cpp)
+target_link_libraries(geturl_test alpino_corpus)
 
 add_executable(readers_available test/readers_available.cpp)
 target_link_libraries(readers_available alpino_corpus)

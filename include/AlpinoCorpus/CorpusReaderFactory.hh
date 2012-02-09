@@ -18,7 +18,8 @@ namespace alpinocorpus {
         enum ReaderType {
             DIRECTORY_CORPUS_READER = 0,
             COMPACT_CORPUS_READER,
-            DBXML_CORPUS_READER
+            DBXML_CORPUS_READER,
+            REMOTE_CORPUS_READER
         };
 
         /**

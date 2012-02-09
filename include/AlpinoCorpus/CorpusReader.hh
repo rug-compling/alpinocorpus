@@ -121,6 +121,9 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         std::list<MarkerQuery> const &queries) const;
     virtual EntryIterator runXPath(std::string const &) const;
     virtual EntryIterator runXQuery(std::string const &) const;
+    virtual EntryIterator runQueryWithStylesheet(QueryDialect d,
+      std::string const &q, std::string const &stylesheet,
+      std::list<MarkerQuery> const &markerQueries) const;
     virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;
 };
 
