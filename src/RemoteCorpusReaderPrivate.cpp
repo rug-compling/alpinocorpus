@@ -270,6 +270,7 @@ namespace alpinocorpus {
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::interrupt()
     {
+        d_geturl->interrupt();
         d_interrupted = true;
     }
 

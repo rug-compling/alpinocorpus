@@ -1,4 +1,4 @@
-#define GETURL_DEBUG
+// #define GETURL_DEBUG
 
 #include <config.hh>
 
@@ -50,6 +50,10 @@ namespace alpinocorpus { namespace util {
             clean_up();
         }
 
+        void GetUrl::interrupt() {
+            d_io_service.stop();
+        }
+
         void GetUrl::clean_up() {
             d_io_service.stop();
 
@@ -94,6 +98,12 @@ namespace alpinocorpus { namespace util {
 
             while (d_nlines <= lineno) {
 
+                if (d_io_service.stopped()) {
+                    d_eof = true;
+                    d_eoflast = true;
+                    return d_nullstring;
+                }
+
 #ifdef ALPINOCORPUS_WITH_SSL
                 if (d_ssl)
                     i = boost::asio::read_until(*d_ssl_socket, d_response, '\n', error);
@@ -115,6 +125,12 @@ namespace alpinocorpus { namespace util {
                 }
 
                 */
+
+                if (d_io_service.stopped()) {
+                    d_eof = true;
+                    d_eoflast = true;
+                    return d_nullstring;
+                }
 
                 std::string line;
                 if (! std::getline(*d_response_stream, line)) {

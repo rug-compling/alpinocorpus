@@ -75,6 +75,8 @@ namespace alpinocorpus { namespace util {
             //! Get charset for the retrieved webpage, converted to lower case
             std::string const & charset() const;
 
+            void interrupt ();
+
         private:
             struct URLComponents {
                 URLComponents(std::string const &newScheme,
