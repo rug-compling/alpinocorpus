@@ -174,11 +174,13 @@ namespace alpinocorpus { namespace util {
                     d_eoflast = true;
                     return d_nullstring;
                 } else {
-                    if (line[0] == '\004') {
+                    if (line == "\004") {
                         d_eof = true;
                         d_eoflast = true;
                         return d_nullstring;
                     }
+                    if (d_nlines == 0 && line == "\002")
+                        continue;
                     d_lines.push_back(line);
                     d_nlines++;
                 }
