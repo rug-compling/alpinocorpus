@@ -88,17 +88,6 @@ namespace alpinocorpus { namespace util {
 
             d_requested_line = true;
 
-            if (d_interrupted) {
-#ifdef GETURL_DEBUG
-                std::cerr << "[GetUrl] Interrupting... (1) at line " << lineno << std::endl;
-                std::cerr << "\t URL: " << d_url << std::endl;
-#endif
-                clean_up();
-                d_eof = true;
-                d_eoflast = true;
-                return d_nullstring;
-            }
-
             d_eoflast = false;
 
             if (lineno < 0)
@@ -121,7 +110,7 @@ namespace alpinocorpus { namespace util {
 
                 if (d_interrupted) {
 #ifdef GETURL_DEBUG
-                    std::cerr << "[GetUrl] Interrupting... (2) at line " << lineno << std::endl;
+                    std::cerr << "[GetUrl] Interrupting... at line " << lineno << std::endl;
                     std::cerr << "\t URL: " << d_url << std::endl;
 #endif
                     clean_up();
