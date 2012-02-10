@@ -1,5 +1,6 @@
 #include <cctype>
 #include <cstdio>
+#include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -15,12 +16,14 @@
 #include <AlpinoCorpus/IterImpl.hh>
 #include "RemoteCorpusReaderPrivate.hh"
 #include "util/GetUrl.hh"
+#include "util/parseString.hh"
 #include "util/url.hh"
 
 namespace alpinocorpus {
 
     // done
     RemoteCorpusReaderPrivate::RemoteCorpusReaderPrivate(std::string const &url)
+        : d_validSize(true)
     {
         if (url.substr(0, 7) != "http://" && url.substr(0, 8) != "https://")
             throw OpenError(url, "Not a valid URL");
@@ -40,7 +43,12 @@ namespace alpinocorpus {
             boost::algorithm::split(words, lines[i], boost::algorithm::is_any_of("\t"));
             if (words.size() == 4 && words[0] == d_name) {
                 OK = true;
-                d_size = std::atoi(words[1].c_str());
+                try {
+                    d_size = util::parseString<size_t>(words[1]);
+                } catch (std::invalid_argument &) {
+                  d_size = 0;
+                  d_validSize = false;
+                }
             }
         }
         if (! OK)
@@ -75,10 +83,10 @@ namespace alpinocorpus {
     // done
     size_t RemoteCorpusReaderPrivate::getSize() const
     {
-        if (d_size < 0)
+        if (d_validSize)
+          return d_size;
+        else
             throw std::runtime_error("RemoteCorpusReader: size is unknown");
-
-        return d_size;
     }
 
     bool RemoteCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const

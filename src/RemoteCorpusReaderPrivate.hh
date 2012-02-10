@@ -66,7 +66,8 @@ namespace alpinocorpus {
 
         std::string d_name;
         std::string d_url;
-        long int d_size;
+        size_t d_size;
+        bool d_validSize;
         std::vector<std::string> d_entries;
         std::vector<std::string> d_results;
 
