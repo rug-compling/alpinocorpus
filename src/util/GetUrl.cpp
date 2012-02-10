@@ -160,10 +160,10 @@ namespace alpinocorpus { namespace util {
                 // solution seems to be: just skip this test
 
                 if (! i && error == boost::asio::error::eof) {
-                    std::cerr << error << std::endl;
-                    d_eof = true;
-                    d_eoflast = true;
-                    return d_nullstring;
+                std::cerr << error << std::endl;
+                d_eof = true;
+                d_eoflast = true;
+                return d_nullstring;
                 }
 
                 */

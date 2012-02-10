@@ -133,6 +133,7 @@ set(HEADERS
   src/XSLTransformer.hh
   src/util/base64.hh
   src/util/bufutil.hh
+  src/util/parseString.hh
   src/util/textfile.hh
   src/util/url.hh
   src/util/vs_stdint.h

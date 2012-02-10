@@ -46,17 +46,17 @@ namespace alpinocorpus { namespace util {
 
             /*! \brief Retrieve and return the body of the webpage.
 
-                \note Don't mix calls to body() and line().
+              \note Don't mix calls to body() and line().
             */
             std::string const& body();
 
             /*! \brief Return a single line of the body of the webpage. Retrieve it from the server if necessary.
 
-                If lineno < 0, then next line, else line with that number.
+              If lineno < 0, then next line, else line with that number.
 
-                - Use eof() after line() to check for end-of-file.
+              - Use eof() after line() to check for end-of-file.
 
-                \note Don't mix calls to line() and body().
+              \note Don't mix calls to line() and body().
             */
             std::string const& line(long signed int = -1);
 
