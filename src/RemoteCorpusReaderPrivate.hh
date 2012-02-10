@@ -27,7 +27,8 @@ namespace alpinocorpus {
         class RemoteIter : public IterImpl {
         public:
             RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
-                long signed int n);
+                       long signed int n,
+                       bool isquery = false);
             ~RemoteIter();
             IterImpl *copy() const;
             std::string current() const;
@@ -38,6 +39,7 @@ namespace alpinocorpus {
         private:
             std::tr1::shared_ptr<util::GetUrl> d_geturl;
             size_t d_idx;
+            bool d_isquery;
             bool d_interrupted;
         };
 
@@ -59,8 +61,8 @@ namespace alpinocorpus {
         virtual EntryIterator runXPath(std::string const &) const;
         virtual EntryIterator runXQuery(std::string const &) const;
         virtual EntryIterator runQueryWithStylesheet(QueryDialect d, std::string const &q,
-                                                  std::string const &stylesheet,
-                                                  std::list<MarkerQuery> const &markerQueries) const;
+                                                     std::string const &stylesheet,
+                                                     std::list<MarkerQuery> const &markerQueries) const;
 
     private:
 
