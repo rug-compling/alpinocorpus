@@ -40,7 +40,8 @@ namespace alpinocorpus { namespace util {
             d_prevline(-1),
             d_nullstring(""),
             d_eof(false),
-            d_eoflast(false)
+            d_eoflast(false),
+            d_interrupted(false)
         {
             download(url, 6, body);
         }
@@ -51,7 +52,7 @@ namespace alpinocorpus { namespace util {
         }
 
         void GetUrl::interrupt() {
-            d_io_service.stop();
+            d_interrupted = true;
         }
 
         void GetUrl::clean_up() {
@@ -98,10 +99,25 @@ namespace alpinocorpus { namespace util {
 
             while (d_nlines <= lineno) {
 
-                if (d_io_service.stopped()) {
-                    d_eof = true;
-                    d_eoflast = true;
-                    return d_nullstring;
+                if (! d_response.size()) {
+                    std::size_t a;
+#ifdef ALPINOCORPUS_WITH_SSL
+                    if (d_ssl)
+                        a = d_ssl_socket->lowest_layer().available();
+                    else
+#endif
+                        a = d_socket->available();
+                    if (! a) {
+                        boost::asio::deadline_timer t(d_io_service);
+                        t.expires_from_now(boost::posix_time::millisec(100));
+                        t.wait();
+                        if (d_interrupted) {
+                            d_eof = true;
+                            d_eoflast = true;
+                            return d_nullstring;
+                        }
+                        continue;
+                    }
                 }
 
 #ifdef ALPINOCORPUS_WITH_SSL
@@ -126,18 +142,17 @@ namespace alpinocorpus { namespace util {
 
                 */
 
-                if (d_io_service.stopped()) {
-                    d_eof = true;
-                    d_eoflast = true;
-                    return d_nullstring;
-                }
-
                 std::string line;
                 if (! std::getline(*d_response_stream, line)) {
                     d_eof = true;
                     d_eoflast = true;
                     return d_nullstring;
                 } else {
+                    if (line[0] == '\004') {
+                        d_eof = true;
+                        d_eoflast = true;
+                        return d_nullstring;
+                    }
                     d_lines.push_back(line);
                     d_nlines++;
                 }

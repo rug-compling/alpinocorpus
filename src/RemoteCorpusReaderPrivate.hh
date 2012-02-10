@@ -35,9 +35,11 @@ namespace alpinocorpus {
         private:
             util::GetUrl *d_geturl;
             size_t *d_refcount;
-            size_t d_idx;
+            mutable size_t d_idx;
             bool const d_ownsdata;
             bool d_interrupted;
+            mutable bool d_active;
+            void activate() const;
         };
 
     public:

@@ -189,16 +189,11 @@ namespace alpinocorpus {
                                                       long signed int n,
                                                       bool const ownsdata,
                                                       size_t * refcount) :
-        d_idx(n), d_ownsdata(ownsdata), d_refcount(refcount), d_interrupted(false)
+        d_idx(n), d_ownsdata(ownsdata), d_refcount(refcount), d_interrupted(false), d_active(false)
     {
         d_geturl = geturl;
         if (d_ownsdata) {
             if (d_refcount == 0) {
-                if (n >= 0) {
-                    geturl->line(n);
-                    if (geturl->eof())
-                        d_idx = -1;
-                }
                 d_refcount = new size_t;
                 *d_refcount = 1;
             } else
@@ -218,9 +213,27 @@ namespace alpinocorpus {
         }
     }
 
+    void RemoteCorpusReaderPrivate::RemoteIter::activate() const
+    {
+        if (d_active)
+            return;
+        if (d_idx < 0) {
+            d_active = true;
+            return;
+        }
+
+        d_geturl->line(d_idx);
+        if (d_geturl->eof())
+            d_idx = -1;
+
+        d_active = true;
+    }
+
     // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
+        activate();
+
         if (d_idx >= 0) {
             if (d_ownsdata) {
                 std::string s = d_geturl->line(d_idx);
@@ -236,8 +249,11 @@ namespace alpinocorpus {
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::next()
     {
+        activate();
+
         if (d_interrupted)
             throw alpinocorpus::IterationInterrupted();
+
         if (d_idx >= 0) {
             d_idx++;
             d_geturl->line(d_idx);
@@ -249,7 +265,9 @@ namespace alpinocorpus {
     // done
     bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
     {
-        RemoteIter const &that = (RemoteIter const &)other;
+        RemoteIter &that = (RemoteIter &)other;
+        activate();
+        that.activate();
         return d_idx == that.d_idx;
     }
 
@@ -277,6 +295,8 @@ namespace alpinocorpus {
     // TODO ????? parameter rdr not used, what is this for?
     std::string RemoteCorpusReaderPrivate::RemoteIter::contents(CorpusReader const &rdr) const
     {
+        activate();
+
         if (d_idx < 0)
             return std::string("");
 
