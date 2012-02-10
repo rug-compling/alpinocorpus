@@ -1,3 +1,5 @@
+#define RemCorReaPri_DEBUG
+
 #include <config.hh>
 #ifdef USE_DBXML
 #include <dbxml/DbXml.hpp>
@@ -12,6 +14,10 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <cctype>
 #include <cstdio>
+
+#ifdef RemCorReaPri_DEBUG
+#include <iostream>
+#endif
 
 namespace alpinocorpus {
 
@@ -288,6 +294,9 @@ namespace alpinocorpus {
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::interrupt()
     {
+#ifdef RemCorReaPri_DEBUG
+        std::cerr << "[RemoteCorpusReaderPrivate] interrupting..." << std::endl;
+#endif
         d_geturl->interrupt();
         d_interrupted = true;
     }

@@ -117,6 +117,7 @@ namespace alpinocorpus { namespace util {
             bool d_eof;
             bool d_eoflast;
             bool d_interrupted;
+            bool d_cleaned_up;
             boost::asio::io_service d_io_service;
             boost::asio::streambuf d_response;
             std::istream *d_response_stream;

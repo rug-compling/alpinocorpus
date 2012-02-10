@@ -1,4 +1,4 @@
-// #define GETURL_DEBUG
+#define GETURL_DEBUG
 
 #include <config.hh>
 
@@ -52,10 +52,19 @@ namespace alpinocorpus { namespace util {
         }
 
         void GetUrl::interrupt() {
+#ifdef GETURL_DEBUG
+            std::cerr << "[GetUrl] Calling interrupt at line " << d_nlines << std::endl;
+            std::cerr << "\t URL: " << d_url << std::endl;
+#endif
             d_interrupted = true;
         }
 
         void GetUrl::clean_up() {
+            if (d_cleaned_up)
+                return;
+
+            d_cleaned_up = true;
+
             d_io_service.stop();
 
             delete d_response_stream;
@@ -79,6 +88,17 @@ namespace alpinocorpus { namespace util {
 
             d_requested_line = true;
 
+            if (d_interrupted) {
+#ifdef GETURL_DEBUG
+                std::cerr << "[GetUrl] Interrupting... (1) at line " << lineno << std::endl;
+                std::cerr << "\t URL: " << d_url << std::endl;
+#endif
+                clean_up();
+                d_eof = true;
+                d_eoflast = true;
+                return d_nullstring;
+            }
+
             d_eoflast = false;
 
             if (lineno < 0)
@@ -99,6 +119,17 @@ namespace alpinocorpus { namespace util {
 
             while (d_nlines <= lineno) {
 
+                if (d_interrupted) {
+#ifdef GETURL_DEBUG
+                    std::cerr << "[GetUrl] Interrupting... (2) at line " << lineno << std::endl;
+                    std::cerr << "\t URL: " << d_url << std::endl;
+#endif
+                    clean_up();
+                    d_eof = true;
+                    d_eoflast = true;
+                    return d_nullstring;
+                }
+
                 if (! d_response.size()) {
                     std::size_t a;
 #ifdef ALPINOCORPUS_WITH_SSL
@@ -111,11 +142,6 @@ namespace alpinocorpus { namespace util {
                         boost::asio::deadline_timer t(d_io_service);
                         t.expires_from_now(boost::posix_time::millisec(100));
                         t.wait();
-                        if (d_interrupted) {
-                            d_eof = true;
-                            d_eoflast = true;
-                            return d_nullstring;
-                        }
                         continue;
                     }
                 }
@@ -237,6 +263,7 @@ namespace alpinocorpus { namespace util {
             d_result.clear();
             d_headers.clear();
             d_redirect = false;
+            d_cleaned_up = false;
 
             if (maxhop == 0)
                 throw std::runtime_error("GetUrl: too many redirects");
