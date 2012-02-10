@@ -1,17 +1,21 @@
+#include <cctype>
+#include <cstdio>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+
 #include <config.hh>
+
 #ifdef USE_DBXML
 #include <dbxml/DbXml.hpp>
 #endif // USE_DBXML
+
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include "RemoteCorpusReaderPrivate.hh"
 #include "util/GetUrl.hh"
 #include "util/url.hh"
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <cctype>
-#include <cstdio>
 
 namespace alpinocorpus {
 
@@ -42,7 +46,11 @@ namespace alpinocorpus {
         if (! OK)
             throw std::invalid_argument("URL is not a valid corpus: " + d_url);
 
-        d_geturl = new util::GetUrl(d_url + "/entries");
+        d_geturl.reset(new util::GetUrl(d_url + "/entries"));
+    }
+
+    RemoteCorpusReaderPrivate::~RemoteCorpusReaderPrivate()
+    {
     }
 
     // done
@@ -131,18 +139,18 @@ namespace alpinocorpus {
         if (iter == markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Missing query");
 
-        util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" +
+        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url + "/entries?query=" +
                                            util::toPercentEncoding(q) +
                                            "&markerQuery=" + util::toPercentEncoding(iter->query) +
                                            "&markerAttr=" + util::toPercentEncoding(iter->attr) +
                                            "&markerValue=" + util::toPercentEncoding(iter->value) +
-                                           "&contents=1", stylesheet);
+                                           "&contents=1", stylesheet));
 
         ++iter;
         if (iter != markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
 
-        return EntryIterator(new RemoteIter(p, 0, true));
+        return EntryIterator(new RemoteIter(p, 0));
     }
 
 
@@ -155,17 +163,17 @@ namespace alpinocorpus {
         if (iter == markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Missing query");
 
-        util::GetUrl *p = new util::GetUrl(d_url + "/entries" +
+        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url + "/entries" +
                                            "?markerQuery=" + util::toPercentEncoding(iter->query) +
                                            "&markerAttr=" + util::toPercentEncoding(iter->attr) +
                                            "&markerValue=" + util::toPercentEncoding(iter->value) +
-                                           "&contents=1", stylesheet);
+                                           "&contents=1", stylesheet));
 
         ++iter;
         if (iter != markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
 
-        return EntryIterator(new RemoteIter(p, 0, true));
+        return EntryIterator(new RemoteIter(p, 0));
 
 
     }
@@ -173,9 +181,9 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
     {
-        util::GetUrl *p = new util::GetUrl(d_url + "/entries?query=" +
-            util::toPercentEncoding(query) + "&contents=1");
-        return EntryIterator(new RemoteIter(p, 0, true));
+        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url + "/entries?query=" +
+            util::toPercentEncoding(query) + "&contents=1"));
+        return EntryIterator(new RemoteIter(p, 0));
     }
 
     // done? TODO: klopt dit? (blijkbaar wel)
@@ -185,50 +193,33 @@ namespace alpinocorpus {
     }
 
     // done
-    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(util::GetUrl * geturl,
-                                                      long signed int n,
-                                                      bool const ownsdata,
-                                                      size_t * refcount) :
-        d_idx(n), d_ownsdata(ownsdata), d_refcount(refcount), d_interrupted(false)
+    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(
+        std::tr1::shared_ptr<util::GetUrl> geturl,
+        long signed int n)
+        : d_geturl(geturl), d_idx(n), d_interrupted(false)
     {
-        d_geturl = geturl;
-        if (d_ownsdata) {
-            if (d_refcount == 0) {
-                if (n >= 0) {
-                    geturl->line(n);
-                    if (geturl->eof())
-                        d_idx = -1;
-                }
-                d_refcount = new size_t;
-                *d_refcount = 1;
-            } else
-                (*d_refcount)++;
-        }
+      if (d_idx >= 0) {
+          geturl->line(d_idx);
+          if (geturl->eof())
+              d_idx = -1;
+      }
     }
 
     // done
     RemoteCorpusReaderPrivate::RemoteIter::~RemoteIter()
     {
-        if (d_ownsdata) {
-            (*d_refcount)--;
-            if (*d_refcount == 0) {
-                delete d_refcount;
-                delete d_geturl;
-            }
-        }
     }
 
     // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
         if (d_idx >= 0) {
-            if (d_ownsdata) {
-                std::string s = d_geturl->line(d_idx);
-                size_t i = s.find('\t');
+            std::string s = d_geturl->line(d_idx);
+            size_t i = s.find('\t');
+            if (i == std::string::npos)
+                return s;
+            else
                 return s.substr(0, i);
-            } else {
-                return d_geturl->line(d_idx);
-            }
         } else
             return "";
     }
@@ -256,15 +247,12 @@ namespace alpinocorpus {
     // done
     IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        IterImpl * other;
-        if (this->d_ownsdata)
-            other = new RemoteIter(this->d_geturl, this->d_idx, true, this->d_refcount);
-        else
-            other = new RemoteIter(this->d_geturl, this->d_idx);
+        IterImpl *other = new RemoteIter(this->d_geturl, this->d_idx);
+
         if (this->d_interrupted)
             other->interrupt();
-        return other;
 
+        return other;
     }
 
     // done
@@ -277,9 +265,6 @@ namespace alpinocorpus {
     std::string RemoteCorpusReaderPrivate::RemoteIter::contents(CorpusReader const &rdr) const
     {
         if (d_idx < 0)
-            return std::string("");
-
-        if (! d_ownsdata)
             return std::string("");
 
         std::string s = d_geturl->line(d_idx);

@@ -1,6 +1,11 @@
 #ifndef ALPINO_REMOTE_CORPUSREADER_PRIVATE_HH
 #define ALPINO_REMOTE_CORPUSREADER_PRIVATE_HH
 
+#include <string>
+#include <vector>
+
+#include <boost/tr1/memory.hpp>
+
 #include <config.hh>
 #ifdef USE_DBXML
 #include <dbxml/DbXml.hpp>
@@ -9,8 +14,6 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <../src/util/GetUrl.hh>
-#include <string>
-#include <vector>
 
 namespace alpinocorpus {
 
@@ -23,8 +26,8 @@ namespace alpinocorpus {
 
         class RemoteIter : public IterImpl {
         public:
-            RemoteIter(util::GetUrl * geturl, long signed int n,
-                       bool ownsdata = false, size_t * refcount = 0);
+            RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
+                long signed int n);
             ~RemoteIter();
             IterImpl *copy() const;
             std::string current() const;
@@ -33,18 +36,15 @@ namespace alpinocorpus {
             void interrupt();
             std::string contents(CorpusReader const &) const;
         private:
-            util::GetUrl *d_geturl;
-            size_t *d_refcount;
+            std::tr1::shared_ptr<util::GetUrl> d_geturl;
             size_t d_idx;
-            bool const d_ownsdata;
             bool d_interrupted;
         };
 
     public:
 
         RemoteCorpusReaderPrivate(std::string const &url);
-
-        virtual ~RemoteCorpusReaderPrivate() { delete d_geturl; }
+        virtual ~RemoteCorpusReaderPrivate();
 
         virtual EntryIterator getBegin() const;
         virtual EntryIterator getEnd() const;
@@ -70,7 +70,7 @@ namespace alpinocorpus {
         std::vector<std::string> d_entries;
         std::vector<std::string> d_results;
 
-        util::GetUrl *d_geturl;
+        std::tr1::shared_ptr<util::GetUrl> d_geturl;
 
     };
 
