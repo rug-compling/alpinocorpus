@@ -37,8 +37,10 @@ namespace alpinocorpus {
         std::vector<std::string> lines;
         std::vector<std::string> words;
         boost::algorithm::split(lines, p1.body(), boost::algorithm::is_any_of("\n"), boost::algorithm::token_compress_on);
-        for (i = 0; i < lines.size(); i++) {
-            boost::algorithm::split(words, lines[i], boost::algorithm::is_any_of("\t"));
+        for (std::vector<std::string>::const_iterator iter = lines.begin();
+            iter != lines.end(); ++iter)
+        {
+            boost::algorithm::split(words, *iter, boost::algorithm::is_any_of("\t"));
             if (words.size() == 4 && words[0] == d_name) {
                 OK = true;
                 try {

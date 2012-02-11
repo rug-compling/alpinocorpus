@@ -446,9 +446,11 @@ namespace alpinocorpus { namespace util {
                 boost::algorithm::trim(d_content_type);
             }
 
-            for (size_t i = 1; i < sv.size(); i++) {
+            for (split_vector_type::const_iterator iter = sv.begin() + 1;
+                iter != sv.end(); ++iter)
+            {
                 split_vector_type sv2;
-                boost::algorithm::split(sv2, sv[i], boost::algorithm::is_any_of("="), boost::algorithm::token_compress_on);
+                boost::algorithm::split(sv2, *iter, boost::algorithm::is_any_of("="), boost::algorithm::token_compress_on);
                 if (sv2.size() == 2) {
                     boost::algorithm::trim(sv2[0]);
                     if (sv2[0] == "charset") {
