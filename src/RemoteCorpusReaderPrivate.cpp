@@ -51,7 +51,7 @@ namespace alpinocorpus {
                 }
             }
         }
-        if (! OK)
+        if (!OK)
             throw std::invalid_argument("URL is not a valid corpus: " + d_url);
 
         d_geturl.reset(new util::GetUrl(d_url + "/entries"));
@@ -89,7 +89,8 @@ namespace alpinocorpus {
             throw std::runtime_error("RemoteCorpusReader: size is unknown");
     }
 
-    bool RemoteCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
+    bool RemoteCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
+        std::string const &query) const
     {
 #ifdef USE_DBXML
         try {
@@ -118,7 +119,7 @@ namespace alpinocorpus {
 
     // TODO: multiple queries (now: only the first is used)
     std::string RemoteCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry,
-                                                                std::list<MarkerQuery> const &queries) const
+        std::list<MarkerQuery> const &queries) const
     {
         std::list<MarkerQuery>::const_iterator iter = queries.begin();
 
@@ -138,9 +139,9 @@ namespace alpinocorpus {
     }
 
     // TODO: multiple queries (now: only the first is used)
-    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runQueryWithStylesheet(QueryDialect d, std::string const &q,
-                                                                                  std::string const &stylesheet,
-                                                                                  std::list<MarkerQuery> const &markerQueries) const
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runQueryWithStylesheet(
+        QueryDialect d, std::string const &q, std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries) const
     {
         std::list<MarkerQuery>::const_iterator iter = markerQueries.begin();
 
@@ -163,8 +164,9 @@ namespace alpinocorpus {
 
 
     // TODO: multiple queries (now: only the first is used)
-    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::beginWithStylesheet(std::string const &stylesheet,
-                                                                               std::list<MarkerQuery> const &markerQueries) const
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::beginWithStylesheet(
+        std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries) const
     {
         std::list<MarkerQuery>::const_iterator iter = markerQueries.begin();
 
@@ -187,7 +189,8 @@ namespace alpinocorpus {
     }
 
     // done
-    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(std::string const &query) const
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(
+        std::string const &query) const
     {
         std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url + "/entries?query=" +
                                                               util::toPercentEncoding(query) + "&contents=1"));
@@ -195,15 +198,16 @@ namespace alpinocorpus {
     }
 
     // done? TODO: klopt dit? (blijkbaar wel)
-    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXQuery(std::string const &query) const
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXQuery(
+        std::string const &query) const
     {
         return runXPath(query);
     }
 
     // done
-    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
-                                                      long signed int n,
-                                                      bool isquery)
+    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(
+        std::tr1::shared_ptr<util::GetUrl> geturl, long signed int n,
+        bool isquery)
         : d_geturl(geturl), d_idx(n), d_isquery(isquery), d_interrupted(false)
     {
         if (d_idx >= 0) {
@@ -273,7 +277,8 @@ namespace alpinocorpus {
     }
 
     // TODO ????? parameter rdr not used, what is this for?
-    std::string RemoteCorpusReaderPrivate::RemoteIter::contents(CorpusReader const &rdr) const
+    std::string RemoteCorpusReaderPrivate::RemoteIter::contents(
+        CorpusReader const &rdr) const
     {
         if (d_idx < 0)
             return std::string("");

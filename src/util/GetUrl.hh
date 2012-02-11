@@ -40,7 +40,7 @@ namespace alpinocorpus { namespace util {
             typedef std::map<std::string, std::string> Headers;
 
             //! Constructor with a url. The headers for the webpage are retrieved immediately.
-            GetUrl(std::string const& url, std::string const& body="");
+            GetUrl(std::string const &url, std::string const &body = "");
 
             ~GetUrl();
 
@@ -48,7 +48,7 @@ namespace alpinocorpus { namespace util {
 
                 \note Don't mix calls to body() and line().
             */
-            std::string const& body();
+            std::string const &body();
 
             /*! \brief Return a single line of the body of the webpage. Retrieve it from the server if necessary.
 
@@ -58,22 +58,22 @@ namespace alpinocorpus { namespace util {
 
                 \note Don't mix calls to line() and body().
             */
-            std::string const& line(long signed int = -1);
+            std::string const &line(long signed int = -1);
 
             //! Did last call to line() result in end-of-file?
             bool eof() const { return d_eoflast; }
 
             //! Get a header for the retrieved webpage. Field names are case-insensitive.
-            std::string const& header(std::string const& field) const;
+            std::string const &header(std::string const& field) const;
 
             //! All headers for the retrieved webpage. Field names are converted to lowercase.
             Headers const &headers() const;
 
             //! Get the bare Content-Type for the retrieved webpage, converted to lower case, without charset etc.
-            std::string const & content_type() const;
+            std::string const &content_type() const;
 
             //! Get charset for the retrieved webpage, converted to lower case
-            std::string const & charset() const;
+            std::string const &charset() const;
 
         private:
             struct URLComponents {
@@ -93,7 +93,8 @@ namespace alpinocorpus { namespace util {
             };
 
             void clean_up();
-            void download(std::string const& url, int maxhop, std::string const &body);
+            void download(std::string const &url, int maxhop,
+                std::string const &body);
             void parseResponse(std::istream *response_stream);
             void parseHeaders(std::istream *response_stream);
             void parseContentType();

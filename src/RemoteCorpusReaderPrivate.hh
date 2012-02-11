@@ -27,8 +27,8 @@ namespace alpinocorpus {
         class RemoteIter : public IterImpl {
         public:
             RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
-                       long signed int n,
-                       bool isquery = false);
+                long signed int n,
+                bool isquery = false);
             ~RemoteIter();
             IterImpl *copy() const;
             std::string current() const;
@@ -52,17 +52,19 @@ namespace alpinocorpus {
         virtual EntryIterator getEnd() const;
         virtual std::string getName() const;
         virtual size_t getSize() const;
-        bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+        bool validQuery(QueryDialect d, bool variables,
+            std::string const &query) const;
         virtual std::string readEntry(std::string const &filename) const;
         virtual std::string readEntryMarkQueries(std::string const &entry,
-                                                 std::list<MarkerQuery> const &queries) const;
+            std::list<MarkerQuery> const &queries) const;
         virtual EntryIterator beginWithStylesheet(std::string const &stylesheet,
-                                                  std::list<MarkerQuery> const &markerQueries) const;
+            std::list<MarkerQuery> const &markerQueries) const;
         virtual EntryIterator runXPath(std::string const &) const;
         virtual EntryIterator runXQuery(std::string const &) const;
-        virtual EntryIterator runQueryWithStylesheet(QueryDialect d, std::string const &q,
-                                                     std::string const &stylesheet,
-                                                     std::list<MarkerQuery> const &markerQueries) const;
+        virtual EntryIterator runQueryWithStylesheet(
+            QueryDialect d, std::string const &q,
+            std::string const &stylesheet,
+            std::list<MarkerQuery> const &markerQueries) const;
 
     private:
 

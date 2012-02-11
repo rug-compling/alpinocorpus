@@ -46,35 +46,40 @@ namespace alpinocorpus {
     }
 
     std::string RemoteCorpusReader::readEntryMarkQueries(std::string const &entry, 
-                                                         std::list<MarkerQuery> const &queries) const
+        std::list<MarkerQuery> const &queries) const
     {
         return d_private->readEntryMarkQueries(entry, queries);
     }
 
-    CorpusReader::EntryIterator RemoteCorpusReader::runQueryWithStylesheet(QueryDialect d, std::string const &q,
-                                                                        std::string const &stylesheet,
-                                                                        std::list<MarkerQuery> const &markerQueries) const
+    CorpusReader::EntryIterator RemoteCorpusReader::runQueryWithStylesheet(
+        QueryDialect d, std::string const &q,
+        std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries) const
     {
         return d_private->queryWithStylesheet(d, q, stylesheet, markerQueries);
     }
 
-    CorpusReader::EntryIterator RemoteCorpusReader::beginWithStylesheet(std::string const &stylesheet,
-                                                                        std::list<MarkerQuery> const &markerQueries) const
+    CorpusReader::EntryIterator RemoteCorpusReader::beginWithStylesheet(
+        std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries) const
     {
         return d_private->beginWithStylesheet(stylesheet, markerQueries);
     }
 
-    CorpusReader::EntryIterator RemoteCorpusReader::runXPath(std::string const &query) const
+    CorpusReader::EntryIterator RemoteCorpusReader::runXPath(
+        std::string const &query) const
     {
         return d_private->runXPath(query);
     }
 
-    CorpusReader::EntryIterator RemoteCorpusReader::runXQuery(std::string const &query) const
+    CorpusReader::EntryIterator RemoteCorpusReader::runXQuery(
+        std::string const &query) const
     {
         return d_private->runXQuery(query);
     }
 
-    bool RemoteCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
+    bool RemoteCorpusReader::validQuery(QueryDialect d, bool variables,
+        std::string const &query) const
     {
         return d_private->isValidQuery(d, variables, query);
     }

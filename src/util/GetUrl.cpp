@@ -30,7 +30,7 @@ namespace ssl = boost::asio::ssl;
 
 namespace alpinocorpus { namespace util {
 
-        GetUrl::GetUrl(std::string const& url, std::string const& body) :
+        GetUrl::GetUrl(std::string const &url, std::string const &body) :
             d_redirect(false),
             d_content_type(""),
             d_charset(""),
@@ -67,7 +67,7 @@ namespace alpinocorpus { namespace util {
                 }
         }
 
-        std::string const& GetUrl::line(long signed int lineno)
+        std::string const &GetUrl::line(long signed int lineno)
         {
             if (d_requested_body)
                 throw std::runtime_error("GetUrl: requesting line after requesting body");
@@ -130,7 +130,7 @@ namespace alpinocorpus { namespace util {
             return d_lines[lineno];
         }
 
-        std::string const& GetUrl::body()
+        std::string const &GetUrl::body()
         {
             if (d_requested_body)
                 return d_result;
@@ -168,7 +168,7 @@ namespace alpinocorpus { namespace util {
             return d_result;
         }
 
-        std::string const& GetUrl::header(std::string const& field) const
+        std::string const &GetUrl::header(std::string const &field) const
         {
             static const std::string null("");
 
@@ -181,12 +181,12 @@ namespace alpinocorpus { namespace util {
             return it->second;
         }
 
-        std::string const & GetUrl::content_type() const
+        std::string const &GetUrl::content_type() const
         {
             return d_content_type;
         }
 
-        std::string const & GetUrl::charset() const
+        std::string const &GetUrl::charset() const
         {
             return d_charset;
         }
@@ -196,7 +196,9 @@ namespace alpinocorpus { namespace util {
             return d_headers;
         }
 
-        void GetUrl::download(std::string const& url, int maxhop, std::string const &body) {
+        void GetUrl::download(std::string const &url, int maxhop,
+            std::string const &body)
+        {
 
 #ifdef GETURL_DEBUG
             std::cerr << "[GetUrl] " << (body.size() ? "POST " : "GET ") << url << std::endl;
