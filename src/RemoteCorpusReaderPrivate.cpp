@@ -281,16 +281,16 @@ namespace alpinocorpus {
         CorpusReader const &rdr) const
     {
         if (d_idx < 0)
-            return std::string("");
+            return std::string();
 
-        if (! d_isquery)
-            return std::string("");
+        if (!d_isquery)
+            return std::string();
 
         std::string s = d_geturl->line(d_idx);
         size_t i = s.find('\t');
         s = s.substr(i + 1);
 
-        std::string result = "";
+        std::string result;
         size_t e;
         for (;;) {
             e = s.find('\\');

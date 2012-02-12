@@ -32,13 +32,10 @@ namespace alpinocorpus { namespace util {
 
         GetUrl::GetUrl(std::string const &url, std::string const &body) :
             d_redirect(false),
-            d_content_type(""),
-            d_charset(""),
             d_requested_body(false),
             d_requested_line(false),
             d_nlines(0),
             d_prevline(-1),
-            d_nullstring(""),
             d_eof(false),
             d_eoflast(false)
         {
@@ -170,8 +167,7 @@ namespace alpinocorpus { namespace util {
 
         std::string const &GetUrl::header(std::string const &field) const
         {
-            static const std::string null("");
-
+            static std::string null; // XXX- static is ugly.
             std::string s(field);
             boost::algorithm::to_lower(s);
             Headers::const_iterator it = d_headers.find(s);
@@ -339,7 +335,7 @@ namespace alpinocorpus { namespace util {
         void GetUrl::parseHeaders(std::istream *response_stream)
         {
             std::string line;
-            std::string previous ("");
+            std::string previous;
             while (std::getline(*response_stream, line)) {
 
                 boost::algorithm::trim_right(line);
