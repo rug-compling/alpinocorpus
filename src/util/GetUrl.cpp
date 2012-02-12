@@ -165,18 +165,6 @@ namespace alpinocorpus { namespace util {
             return d_result;
         }
 
-        std::string const &GetUrl::header(std::string const &field) const
-        {
-            static std::string null; // XXX- static is ugly.
-            std::string s(field);
-            boost::algorithm::to_lower(s);
-            Headers::const_iterator it = d_headers.find(s);
-            if (it == d_headers.end()) {
-                return null;
-            }
-            return it->second;
-        }
-
         std::string const &GetUrl::content_type() const
         {
             return d_content_type;
@@ -431,7 +419,11 @@ namespace alpinocorpus { namespace util {
         {
             typedef std::vector< std::string > split_vector_type;
 
-            std::string ct(header("Content-Type"));
+            std::string ct;
+            Headers::const_iterator iter = d_headers.find("content-type");
+            if (iter != d_headers.end())
+                ct = iter->second;
+
             boost::algorithm::to_lower(ct);
             boost::algorithm::erase_all(ct, "\"");
             boost::algorithm::erase_all(ct, "'");

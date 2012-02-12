@@ -63,9 +63,6 @@ namespace alpinocorpus { namespace util {
             //! Did last call to line() result in end-of-file?
             bool eof() const { return d_eoflast; }
 
-            //! Get a header for the retrieved webpage. Field names are case-insensitive.
-            std::string const &header(std::string const& field) const;
-
             //! All headers for the retrieved webpage. Field names are converted to lowercase.
             Headers const &headers() const;
 
