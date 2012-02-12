@@ -44,10 +44,10 @@ namespace alpinocorpus { namespace util {
 
         GetUrl::~GetUrl()
         {
-            clean_up();
+            cleanup();
         }
 
-        void GetUrl::clean_up() {
+        void GetUrl::cleanup() {
             d_io_service.stop();
 
             delete d_response_stream;
@@ -148,9 +148,9 @@ namespace alpinocorpus { namespace util {
             std::string enc(d_headers["content-encoding"]);
             boost::algorithm::to_lower(enc);
             boost::iostreams::filtering_stream<boost::iostreams::input> in;
-            if (enc == "gzip") { // not used anymore because you can't detect newlines in gzip'ed data
+            if (enc == "gzip") // not used anymore because you can't detect newlines in gzip'ed data
                 in.push(boost::iostreams::gzip_decompressor());
-            }
+
             in.push(*d_response_stream);
 
             char delim = '\0';
@@ -314,7 +314,7 @@ namespace alpinocorpus { namespace util {
                 u = d_headers["location"];
 
             d_response.consume(d_response.size());
-            clean_up();
+            cleanup();
             d_io_service.reset();
             download(u, maxhop - 1, body);
 
@@ -340,15 +340,15 @@ namespace alpinocorpus { namespace util {
                     std::string s1, s2;
                     size_t i;
                     i = line.find(":");
-                    if (i == std::string::npos) {
+                    if (i == std::string::npos)
                         throw std::runtime_error("GetUrl: invalid header line: " + line);
-                    } else {
-                        s1 = line.substr(0, i);
-                        boost::algorithm::to_lower(s1);
-                        boost::algorithm::trim_right(s1);
-                        s2 = line.substr(i + 1);
-                        boost::algorithm::trim_left(s2);
-                    }
+
+                    s1 = line.substr(0, i);
+                    boost::algorithm::to_lower(s1);
+                    boost::algorithm::trim_right(s1);
+                    s2 = line.substr(i + 1);
+                    boost::algorithm::trim_left(s2);
+
                     d_headers[s1] = s2;
                     previous = s1;
                 }
@@ -396,18 +396,17 @@ namespace alpinocorpus { namespace util {
             }
 
             i = u.find("/");
-            if (i == std::string::npos) {
+            if (i == std::string::npos)
                 path = "/";
-            } else {
+            else {
                 path = u.substr(i);
                 u = u.substr(0, i);
             }
 
             i = u.find(":");
-            if (i == std::string::npos) {
+            if (i == std::string::npos)
                 domain = u;
-                port = "";
-            } else {
+            else {
                 domain = u.substr(0, i);
                 port = u.substr(i + 1);
             }

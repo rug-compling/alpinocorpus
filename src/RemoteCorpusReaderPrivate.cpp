@@ -192,8 +192,9 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(
         std::string const &query) const
     {
-        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url + "/entries?query=" +
-                                                              util::toPercentEncoding(query) + "&contents=1"));
+        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url +
+            "/entries?query=" + util::toPercentEncoding(query) +
+            "&contents=1"));
         return EntryIterator(new RemoteIter(p, 0, true));
     }
 
@@ -207,8 +208,8 @@ namespace alpinocorpus {
     // done
     RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(
         std::tr1::shared_ptr<util::GetUrl> geturl, long signed int n,
-        bool isquery)
-        : d_geturl(geturl), d_idx(n), d_isquery(isquery), d_interrupted(false)
+        bool isQuery)
+        : d_geturl(geturl), d_idx(n), d_isQuery(isQuery), d_interrupted(false)
     {
         if (d_idx >= 0) {
             geturl->line(d_idx);
@@ -227,7 +228,7 @@ namespace alpinocorpus {
     {
         if (d_idx >= 0) {
             std::string s = d_geturl->line(d_idx);
-            if (d_isquery) {
+            if (d_isQuery) {
                 size_t i = s.find('\t');
                 if (i == std::string::npos)
                     return s;
@@ -236,7 +237,7 @@ namespace alpinocorpus {
             } else
                 return s;
         } else
-            return "";
+            return std::string();
     }
 
     // done
@@ -262,9 +263,9 @@ namespace alpinocorpus {
     // done
     IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        IterImpl *other = new RemoteIter(this->d_geturl, this->d_idx, this->d_isquery);
+        IterImpl *other = new RemoteIter(d_geturl, d_idx, d_isQuery);
 
-        if (this->d_interrupted)
+        if (d_interrupted)
             other->interrupt();
 
         return other;
@@ -283,7 +284,7 @@ namespace alpinocorpus {
         if (d_idx < 0)
             return std::string();
 
-        if (!d_isquery)
+        if (!d_isQuery)
             return std::string();
 
         std::string s = d_geturl->line(d_idx);
@@ -300,20 +301,20 @@ namespace alpinocorpus {
             }
             result += s.substr(0, e);
             switch (s[e + 1]) {
-            case 'f':
-                result += '\f';
-                break;
-            case 'n':
-                result += '\n';
-                break;
-            case 'r':
-                result += '\r';
-                break;
-            case 't':
-                result += '\t';
-                break;
-            default:
-                result += s[e + 1];
+                case 'f':
+                    result += '\f';
+                    break;
+                case 'n':
+                    result += '\n';
+                    break;
+                case 'r':
+                    result += '\r';
+                    break;
+                case 't':
+                    result += '\t';
+                    break;
+                default:
+                    result += s[e + 1];
             }
             s = s.substr(e + 2);
         }

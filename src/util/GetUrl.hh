@@ -89,7 +89,7 @@ namespace alpinocorpus { namespace util {
                 std::string path;
             };
 
-            void clean_up();
+            void cleanup();
             void download(std::string const &url, int maxhop,
                 std::string const &body);
             void parseResponse(std::istream *response_stream);
