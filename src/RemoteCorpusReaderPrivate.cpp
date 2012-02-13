@@ -210,7 +210,8 @@ namespace alpinocorpus {
                                                       bool isquery)
         : d_geturl(geturl), d_idx(n), d_isquery(isquery), d_active(false)
     {
-        d_interrupted.reset(new bool(false));
+        std::tr1::shared_ptr<bool> p(new bool(false));
+        d_interrupted = p;
     }
 
     // done
@@ -285,10 +286,9 @@ namespace alpinocorpus {
     // done
     IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        IterImpl *other = new RemoteIter(d_geturl, d_idx, d_isquery);
+        RemoteIter *other = new RemoteIter(d_geturl, d_idx, d_isquery);
 
-        if (*d_interrupted)
-            other->interrupt();
+        other->d_interrupted = d_interrupted;
 
         return other;
     }
