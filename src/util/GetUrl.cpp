@@ -1,4 +1,4 @@
-#define GETURL_DEBUG
+//#define GETURL_DEBUG
 
 #include <config.hh>
 
