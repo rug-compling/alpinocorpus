@@ -17,6 +17,7 @@
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/format.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
@@ -31,12 +32,14 @@ namespace ssl = boost::asio::ssl;
 namespace alpinocorpus { namespace util {
 
         GetUrl::GetUrl(std::string const& url, std::string const& body) :
+            d_body(body),
             d_redirect(false),
             d_content_type(""),
             d_charset(""),
             d_requested_body(false),
             d_requested_line(false),
             d_nlines(0),
+            d_startline(0),
             d_prevline(-1),
             d_nullstring(""),
             d_eof(false),
@@ -44,7 +47,7 @@ namespace alpinocorpus { namespace util {
             d_completed(false),
             d_interrupted(false)
         {
-            download(url, 6, body);
+            download(url, 6);
         }
 
         GetUrl::~GetUrl()
@@ -58,6 +61,25 @@ namespace alpinocorpus { namespace util {
             std::cerr << "\t URL: " << d_url << std::endl;
 #endif
             d_interrupted = true;
+        }
+
+        void GetUrl::resume() {
+
+            d_response.consume(d_response.size());
+            clean_up();
+            d_io_service.reset();
+
+            std::string u1 = d_url;
+            size_t i = d_url.find('?');
+            std::string u = (boost::format("%1%%2%start=%3%") % d_url % (i == std::string::npos ? "?" : "&") % d_nlines).str();
+            download(u, 1);
+            d_url = u1;
+
+            d_eof = false;
+            d_eoflast = false;
+            d_interrupted = false;
+            d_startline = d_nlines;
+            d_prevline = -1;
         }
 
         void GetUrl::clean_up() {
@@ -172,7 +194,7 @@ namespace alpinocorpus { namespace util {
                         d_completed = true;
                         return d_nullstring;
                     }
-                    if (d_nlines == 0 && line == "\002")
+                    if (d_nlines == d_startline && line == "\002")
                         continue;
                     d_lines.push_back(line);
                     d_nlines++;
@@ -248,10 +270,10 @@ namespace alpinocorpus { namespace util {
             return d_headers;
         }
 
-        void GetUrl::download(std::string const& url, int maxhop, std::string const &body) {
+        void GetUrl::download(std::string const& url, int maxhop) {
 
 #ifdef GETURL_DEBUG
-            std::cerr << "[GetUrl] " << (body.size() ? "POST " : "GET ") << url << std::endl;
+            std::cerr << "[GetUrl] " << (d_body.size() ? "POST " : "GET ") << url << std::endl;
 #endif
 
             d_url = url;
@@ -280,11 +302,11 @@ namespace alpinocorpus { namespace util {
             // allow us to treat all data up until the EOF as the content.
             boost::asio::streambuf request;
             std::ostream request_stream(&request);
-            if (body.size() == 0)
+            if (d_body.size() == 0)
                 request_stream << "GET " << urlc.path << " HTTP/1.0\r\n";
             else {
                 request_stream << "POST " << urlc.path << " HTTP/1.0\r\n";
-                request_stream << "Content-Length: " << body.size() << "\r\n";
+                request_stream << "Content-Length: " << d_body.size() << "\r\n";
             }
             request_stream << "Host: " << urlc.domain << "\r\n";
             request_stream << "Accept: */*\r\n";
@@ -292,8 +314,8 @@ namespace alpinocorpus { namespace util {
             request_stream << "User-Agent: Alpino Corpus\r\n";
             request_stream << "Connection: close\r\n";
             request_stream << "\r\n";
-            if (body.size()) {
-                request_stream << body;
+            if (d_body.size()) {
+                request_stream << d_body;
             }
 
             boost::system::error_code error;
@@ -383,7 +405,7 @@ namespace alpinocorpus { namespace util {
             d_response.consume(d_response.size());
             clean_up();
             d_io_service.reset();
-            download(u, maxhop - 1, body);
+            download(u, maxhop - 1);
 
         }
 

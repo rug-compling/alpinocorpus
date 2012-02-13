@@ -70,7 +70,7 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getBegin() const
     {
         if (d_geturl->interrupted() && ! d_geturl->completed())
-            const_cast<RemoteCorpusReaderPrivate *>(this)->d_geturl.reset(new util::GetUrl(d_url + "/entries"));
+            const_cast<RemoteCorpusReaderPrivate *>(this)->d_geturl->resume();
 
         return EntryIterator(new RemoteIter(d_geturl, 0));
     }

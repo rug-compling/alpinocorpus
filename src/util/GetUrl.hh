@@ -79,6 +79,8 @@ namespace alpinocorpus { namespace util {
             bool interrupted () const { return d_interrupted; }
             bool completed() const { return d_completed; }
 
+            void resume();
+
         private:
             struct URLComponents {
                 URLComponents(std::string const &newScheme,
@@ -97,18 +99,20 @@ namespace alpinocorpus { namespace util {
             };
 
             void clean_up();
-            void download(std::string const& url, int maxhop, std::string const &body);
+            void download(std::string const& url, int maxhop);
             void parseResponse(std::istream *response_stream);
             void parseHeaders(std::istream *response_stream);
             void parseContentType();
             URLComponents parseUrl();
 
+            std::string d_body;
             std::string d_charset;
             std::string d_content_type;
             std::string d_result;
             std::string d_nullstring;
             std::vector<std::string> d_lines;
             long unsigned int d_nlines;
+            long unsigned int d_startline;
             long unsigned int d_prevline;
             std::string d_url; // url of last redirect
             Headers d_headers;
