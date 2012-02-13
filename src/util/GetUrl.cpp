@@ -41,6 +41,7 @@ namespace alpinocorpus { namespace util {
             d_nullstring(""),
             d_eof(false),
             d_eoflast(false),
+            d_completed(false),
             d_interrupted(false)
         {
             download(url, 6, body);
@@ -168,6 +169,7 @@ namespace alpinocorpus { namespace util {
                     if (line == "\004") {
                         d_eof = true;
                         d_eoflast = true;
+                        d_completed = true;
                         return d_nullstring;
                     }
                     if (d_nlines == 0 && line == "\002")

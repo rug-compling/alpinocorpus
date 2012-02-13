@@ -58,6 +58,7 @@ namespace alpinocorpus {
         if (! OK)
             throw std::invalid_argument("URL is not a valid corpus: " + d_url);
 
+        // why a reset here?
         d_geturl.reset(new util::GetUrl(d_url + "/entries"));
     }
 
@@ -68,6 +69,9 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getBegin() const
     {
+        if (d_geturl->interrupted() && ! d_geturl->completed())
+            const_cast<RemoteCorpusReaderPrivate *>(this)->d_geturl.reset(new util::GetUrl(d_url + "/entries"));
+
         return EntryIterator(new RemoteIter(d_geturl, 0));
     }
 

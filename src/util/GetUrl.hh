@@ -76,6 +76,8 @@ namespace alpinocorpus { namespace util {
             std::string const & charset() const;
 
             void interrupt ();
+            bool interrupted () const { return d_interrupted; }
+            bool completed() const { return d_completed; }
 
         private:
             struct URLComponents {
@@ -116,6 +118,7 @@ namespace alpinocorpus { namespace util {
             bool d_requested_line;
             bool d_eof;
             bool d_eoflast;
+            bool d_completed;
             bool d_interrupted;
             bool d_cleaned_up;
             boost::asio::io_service d_io_service;
