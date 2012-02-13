@@ -1,3 +1,5 @@
+#define RemCorReaPri_DEBUG
+
 #include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
@@ -16,6 +18,10 @@
 #include "util/GetUrl.hh"
 #include "util/parseString.hh"
 #include "util/url.hh"
+
+#ifdef RemCorReaPri_DEBUG
+#include <iostream>
+#endif
 
 namespace alpinocorpus {
 
@@ -54,6 +60,7 @@ namespace alpinocorpus {
         if (!OK)
             throw std::invalid_argument("URL is not a valid corpus: " + d_url);
 
+        // why a reset here?
         d_geturl.reset(new util::GetUrl(d_url + "/entries"));
     }
 
@@ -64,6 +71,9 @@ namespace alpinocorpus {
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getBegin() const
     {
+        if (d_geturl->interrupted() && ! d_geturl->completed())
+            const_cast<RemoteCorpusReaderPrivate *>(this)->d_geturl->resume();
+
         return EntryIterator(new RemoteIter(d_geturl, 0));
     }
 
@@ -206,16 +216,13 @@ namespace alpinocorpus {
     }
 
     // done
-    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(
-        std::tr1::shared_ptr<util::GetUrl> geturl, long signed int n,
-        bool isQuery)
-        : d_geturl(geturl), d_idx(n), d_isQuery(isQuery), d_interrupted(false)
+    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
+                                                      long signed int n,
+                                                      bool isquery)
+        : d_geturl(geturl), d_idx(n), d_isquery(isquery), d_active(false)
     {
-        if (d_idx >= 0) {
-            geturl->line(d_idx);
-            if (geturl->eof())
-                d_idx = -1;
-        }
+        std::tr1::shared_ptr<bool> p(new bool(false));
+        d_interrupted = p;
     }
 
     // done
@@ -223,9 +230,27 @@ namespace alpinocorpus {
     {
     }
 
+    void RemoteCorpusReaderPrivate::RemoteIter::activate() const
+    {
+        if (d_active)
+            return;
+        if (d_idx < 0) {
+            d_active = true;
+            return;
+        }
+
+        d_geturl->line(d_idx);
+        if (d_geturl->eof())
+            d_idx = -1;
+
+        d_active = true;
+    }
+
     // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
+        activate();
+
         if (d_idx >= 0) {
             std::string s = d_geturl->line(d_idx);
             if (d_isQuery) {
@@ -243,8 +268,15 @@ namespace alpinocorpus {
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::next()
     {
-        if (d_interrupted)
+        activate();
+
+        if (*d_interrupted) {
+#ifdef RemCorReaPri_DEBUG
+            std::cerr << "[RemoteCorpusReaderPrivate] Calling next on interrupted RemoteIter" << std::endl;
+#endif
             throw alpinocorpus::IterationInterrupted();
+        }
+
         if (d_idx >= 0) {
             d_idx++;
             d_geturl->line(d_idx);
@@ -257,16 +289,17 @@ namespace alpinocorpus {
     bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
     {
         RemoteIter const &that = (RemoteIter const &)other;
+        activate();
+        that.activate();
         return d_idx == that.d_idx;
     }
 
     // done
     IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        IterImpl *other = new RemoteIter(d_geturl, d_idx, d_isQuery);
+        RemoteIter *other = new RemoteIter(d_geturl, d_idx, d_isquery);
 
-        if (d_interrupted)
-            other->interrupt();
+        other->d_interrupted = d_interrupted;
 
         return other;
     }
@@ -274,13 +307,19 @@ namespace alpinocorpus {
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::interrupt()
     {
-        d_interrupted = true;
+#ifdef RemCorReaPri_DEBUG
+        std::cerr << "[RemoteCorpusReaderPrivate] interrupting..." << std::endl;
+#endif
+        d_geturl->interrupt();
+        *d_interrupted = true;
     }
 
     // TODO ????? parameter rdr not used, what is this for?
     std::string RemoteCorpusReaderPrivate::RemoteIter::contents(
         CorpusReader const &rdr) const
     {
+        activate();
+
         if (d_idx < 0)
             return std::string();
 

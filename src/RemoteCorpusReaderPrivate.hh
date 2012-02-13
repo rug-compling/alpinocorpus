@@ -37,10 +37,12 @@ namespace alpinocorpus {
             void interrupt();
             std::string contents(CorpusReader const &) const;
         private:
+            void activate() const;
             std::tr1::shared_ptr<util::GetUrl> d_geturl;
-            size_t d_idx;
-            bool d_isQuery;
-            bool d_interrupted;
+            mutable size_t d_idx;
+            bool const d_isquery;
+            std::tr1::shared_ptr<bool> d_interrupted;
+            mutable bool d_active;
         };
 
     public:
@@ -74,7 +76,6 @@ namespace alpinocorpus {
         bool d_validSize;
         std::vector<std::string> d_entries;
         std::vector<std::string> d_results;
-
         std::tr1::shared_ptr<util::GetUrl> d_geturl;
 
     };

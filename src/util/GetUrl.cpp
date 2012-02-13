@@ -1,4 +1,4 @@
-// #define GETURL_DEBUG
+#define GETURL_DEBUG
 
 #include <config.hh>
 
@@ -17,6 +17,7 @@
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/format.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
@@ -30,16 +31,20 @@ namespace ssl = boost::asio::ssl;
 
 namespace alpinocorpus { namespace util {
 
-        GetUrl::GetUrl(std::string const &url, std::string const &body) :
+        GetUrl::GetUrl(std::string const& url, std::string const& body) :
+            d_body(body),
             d_redirect(false),
             d_requested_body(false),
             d_requested_line(false),
             d_nlines(0),
+            d_startline(0),
             d_prevline(-1),
             d_eof(false),
-            d_eoflast(false)
+            d_eoflast(false),
+            d_completed(false),
+            d_interrupted(false)
         {
-            download(url, 6, body);
+            download(url, 6);
         }
 
         GetUrl::~GetUrl()
@@ -47,7 +52,39 @@ namespace alpinocorpus { namespace util {
             cleanup();
         }
 
-        void GetUrl::cleanup() {
+        void GetUrl::interrupt() {
+#ifdef GETURL_DEBUG
+            std::cerr << "[GetUrl] Calling interrupt at line " << d_nlines << std::endl;
+            std::cerr << "\t URL: " << d_url << std::endl;
+#endif
+            d_interrupted = true;
+        }
+
+        void GetUrl::resume() {
+
+            d_response.consume(d_response.size());
+            clean_up();
+            d_io_service.reset();
+
+            std::string u1 = d_url;
+            size_t i = d_url.find('?');
+            std::string u = (boost::format("%1%%2%start=%3%") % d_url % (i == std::string::npos ? "?" : "&") % d_nlines).str();
+            download(u, 1);
+            d_url = u1;
+
+            d_eof = false;
+            d_eoflast = false;
+            d_interrupted = false;
+            d_startline = d_nlines;
+            d_prevline = -1;
+        }
+
+        void GetUrl::clean_up() {
+            if (d_cleaned_up)
+                return;
+
+            d_cleaned_up = true;
+
             d_io_service.stop();
 
             delete d_response_stream;
@@ -91,6 +128,33 @@ namespace alpinocorpus { namespace util {
 
             while (d_nlines <= lineno) {
 
+                if (d_interrupted) {
+#ifdef GETURL_DEBUG
+                    std::cerr << "[GetUrl] Interrupting... at line " << lineno << std::endl;
+                    std::cerr << "\t URL: " << d_url << std::endl;
+#endif
+                    clean_up();
+                    d_eof = true;
+                    d_eoflast = true;
+                    return d_nullstring;
+                }
+
+                if (! d_response.size()) {
+                    std::size_t a;
+#ifdef ALPINOCORPUS_WITH_SSL
+                    if (d_ssl)
+                        a = d_ssl_socket->lowest_layer().available();
+                    else
+#endif
+                        a = d_socket->available();
+                    if (! a) {
+                        boost::asio::deadline_timer t(d_io_service);
+                        t.expires_from_now(boost::posix_time::millisec(100));
+                        t.wait();
+                        continue;
+                    }
+                }
+
 #ifdef ALPINOCORPUS_WITH_SSL
                 if (d_ssl)
                     i = boost::asio::read_until(*d_ssl_socket, d_response, '\n', error);
@@ -105,10 +169,10 @@ namespace alpinocorpus { namespace util {
                 // solution seems to be: just skip this test
 
                 if (! i && error == boost::asio::error::eof) {
-                    std::cerr << error << std::endl;
-                    d_eof = true;
-                    d_eoflast = true;
-                    return d_nullstring;
+                std::cerr << error << std::endl;
+                d_eof = true;
+                d_eoflast = true;
+                return d_nullstring;
                 }
 
                 */
@@ -119,6 +183,16 @@ namespace alpinocorpus { namespace util {
                     d_eoflast = true;
                     return d_nullstring;
                 } else {
+                    if (line == "[ Timeout ]")
+                        throw std::runtime_error("GetUrl: timeout on server");
+                    if (line == "\004") {
+                        d_eof = true;
+                        d_eoflast = true;
+                        d_completed = true;
+                        return d_nullstring;
+                    }
+                    if (d_nlines == d_startline && line == "\002")
+                        continue;
                     d_lines.push_back(line);
                     d_nlines++;
                 }
@@ -180,18 +254,17 @@ namespace alpinocorpus { namespace util {
             return d_headers;
         }
 
-        void GetUrl::download(std::string const &url, int maxhop,
-            std::string const &body)
-        {
+        void GetUrl::download(std::string const& url, int maxhop) {
 
 #ifdef GETURL_DEBUG
-            std::cerr << "[GetUrl] " << (body.size() ? "POST " : "GET ") << url << std::endl;
+            std::cerr << "[GetUrl] " << (d_body.size() ? "POST " : "GET ") << url << std::endl;
 #endif
 
             d_url = url;
             d_result.clear();
             d_headers.clear();
             d_redirect = false;
+            d_cleaned_up = false;
 
             if (maxhop == 0)
                 throw std::runtime_error("GetUrl: too many redirects");
@@ -213,11 +286,11 @@ namespace alpinocorpus { namespace util {
             // allow us to treat all data up until the EOF as the content.
             boost::asio::streambuf request;
             std::ostream request_stream(&request);
-            if (body.size() == 0)
+            if (d_body.size() == 0)
                 request_stream << "GET " << urlc.path << " HTTP/1.0\r\n";
             else {
                 request_stream << "POST " << urlc.path << " HTTP/1.0\r\n";
-                request_stream << "Content-Length: " << body.size() << "\r\n";
+                request_stream << "Content-Length: " << d_body.size() << "\r\n";
             }
             request_stream << "Host: " << urlc.domain << "\r\n";
             request_stream << "Accept: */*\r\n";
@@ -225,8 +298,8 @@ namespace alpinocorpus { namespace util {
             request_stream << "User-Agent: Alpino Corpus\r\n";
             request_stream << "Connection: close\r\n";
             request_stream << "\r\n";
-            if (body.size()) {
-                request_stream << body;
+            if (d_body.size()) {
+                request_stream << d_body;
             }
 
             boost::system::error_code error;
@@ -316,7 +389,7 @@ namespace alpinocorpus { namespace util {
             d_response.consume(d_response.size());
             cleanup();
             d_io_service.reset();
-            download(u, maxhop - 1, body);
+            download(u, maxhop - 1);
 
         }
 
