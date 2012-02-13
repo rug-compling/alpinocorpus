@@ -41,7 +41,7 @@ namespace alpinocorpus {
             std::tr1::shared_ptr<util::GetUrl> d_geturl;
             mutable size_t d_idx;
             bool const d_isquery;
-            bool d_interrupted;
+            std::tr1::shared_ptr<bool> d_interrupted;
             mutable bool d_active;
         };
 

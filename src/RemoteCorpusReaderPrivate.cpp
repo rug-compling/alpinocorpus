@@ -208,8 +208,9 @@ namespace alpinocorpus {
     RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
                                                       long signed int n,
                                                       bool isquery)
-        : d_geturl(geturl), d_idx(n), d_isquery(isquery), d_interrupted(false), d_active(false)
+        : d_geturl(geturl), d_idx(n), d_isquery(isquery), d_active(false)
     {
+        d_interrupted.reset(new bool(false));
     }
 
     // done
@@ -257,8 +258,12 @@ namespace alpinocorpus {
     {
         activate();
 
-        if (d_interrupted)
+        if (*d_interrupted) {
+#ifdef RemCorReaPri_DEBUG
+            std::cerr << "[RemoteCorpusReaderPrivate] Calling next on interrupted RemoteIter" << std::endl;
+#endif
             throw alpinocorpus::IterationInterrupted();
+        }
 
         if (d_idx >= 0) {
             d_idx++;
@@ -280,9 +285,9 @@ namespace alpinocorpus {
     // done
     IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        IterImpl *other = new RemoteIter(this->d_geturl, this->d_idx, this->d_isquery);
+        IterImpl *other = new RemoteIter(d_geturl, d_idx, d_isquery);
 
-        if (this->d_interrupted)
+        if (*d_interrupted)
             other->interrupt();
 
         return other;
@@ -295,7 +300,7 @@ namespace alpinocorpus {
         std::cerr << "[RemoteCorpusReaderPrivate] interrupting..." << std::endl;
 #endif
         d_geturl->interrupt();
-        d_interrupted = true;
+        *d_interrupted = true;
     }
 
     // TODO ????? parameter rdr not used, what is this for?
