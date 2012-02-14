@@ -179,12 +179,16 @@ namespace alpinocorpus { namespace util {
 
                 std::string line;
                 if (! std::getline(*d_response_stream, line)) {
+                    // this won't happen
                     d_eof = true;
                     d_eoflast = true;
                     return d_nullstring;
                 } else {
-                    if (line == "[ Timeout ]")
-                        throw std::runtime_error("GetUrl: timeout on server");
+                    if (line.substr(0, 1) == "\033") {
+                        d_eof = true;
+                        d_eoflast = true;
+                        throw std::runtime_error("GetUrl: " + line.substr(1));
+                    }
                     if (line == "\004") {
                         d_eof = true;
                         d_eoflast = true;
