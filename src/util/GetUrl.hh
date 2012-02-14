@@ -60,7 +60,10 @@ namespace alpinocorpus { namespace util {
             */
             std::string const &line(long signed int = -1);
 
-            //! Did last call to line() result in end-of-file?
+            /*! \brief Did last call to line() result in end-of-file?
+
+              Calling interrupt() before the last line was retrieved from the server also results in end-of-file.
+            */
             bool eof() const { return d_eoflast; }
 
             //! All headers for the retrieved webpage. Field names are converted to lowercase.
@@ -72,10 +75,19 @@ namespace alpinocorpus { namespace util {
             //! Get charset for the retrieved webpage, converted to lower case
             std::string const &charset() const;
 
+            //! Interrupt a call to line()
             void interrupt ();
+
+            //! Was line() interrupted?
             bool interrupted () const { return d_interrupted; }
+
+            //! Did line() reach eof from the server?
             bool completed() const { return d_completed; }
 
+            /*! \brief Enable line() that was interrupted to fetch the remaining data from the server
+
+              A new reques is sent to the server, because the earlier call may be timed-out
+            */
             void resume();
 
         private:
@@ -102,30 +114,38 @@ namespace alpinocorpus { namespace util {
             void parseContentType();
             URLComponents parseUrl();
 
-            std::string d_body;
-            std::string d_charset;
-            std::string d_content_type;
-            std::string d_result;
-            std::string d_nullstring;
-            std::vector<std::string> d_lines;
-            long unsigned int d_nlines;
-            long unsigned int d_startline;
-            long unsigned int d_prevline;
-            std::string d_url; // url of last redirect
-            Headers d_headers;
-            bool d_redirect;
-            bool d_ssl;
-            bool d_requested_body;
-            bool d_requested_line;
-            bool d_eof;
-            bool d_eoflast;
-            bool d_completed;
-            bool d_interrupted;
-            bool d_cleaned_up;
+            // Request
+            std::string d_body;               // sent as body in POST to server
+            bool d_redirect;                  // do we need to do a redirect?
+            bool d_ssl;                       // are we using SSL?
+            std::string d_url;                // url of last redirect, or original url if no redirects required
+
+            // Reponse headers
+            Headers d_headers;                // all response headers
+            std::string d_content_type;       // response content-type
+            std::string d_charset;            // response charset
+
+            // Response body as one block
+            bool d_requested_body;            // was body() ever called?
+            std::string d_result;             // response body saved by call to body()
+
+            // Response body as single lines
+            bool d_requested_line;            // was line() ever called?
+            std::vector<std::string> d_lines; // response lines saved by calls to line()
+            long unsigned int d_nlines;       // number of response lines saved by calls to line()
+            long unsigned int d_startline;    // at what offset should line() start retreiving data from the server?
+            long unsigned int d_prevline;     // what was the line number requested in the last call to line()?
+            bool d_eof;                       // did some call to line() result in eof?
+            bool d_eoflast;                   // did the last call to line() result in eof?
+            bool d_completed;                 // did line() reach eof before any interrupt() was called?
+            bool d_interrupted;               // was interrupt() called?
+            bool d_cleaned_up;                // was clean_up() called?
+            std::string d_nullstring;         // an empty string
+
+            // Transfer
             boost::asio::io_service d_io_service;
             boost::asio::streambuf d_response;
             std::istream *d_response_stream;
-
             boost::asio::ip::tcp::socket *d_socket;
 #ifdef ALPINOCORPUS_WITH_SSL
             typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
