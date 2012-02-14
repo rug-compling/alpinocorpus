@@ -253,7 +253,7 @@ namespace alpinocorpus {
 
         if (d_idx >= 0) {
             std::string s = d_geturl->line(d_idx);
-            if (d_isQuery) {
+            if (d_isquery) {
                 size_t i = s.find('\t');
                 if (i == std::string::npos)
                     return s;
@@ -323,7 +323,7 @@ namespace alpinocorpus {
         if (d_idx < 0)
             return std::string();
 
-        if (!d_isQuery)
+        if (!d_isquery)
             return std::string();
 
         std::string s = d_geturl->line(d_idx);

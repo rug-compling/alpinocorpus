@@ -49,7 +49,7 @@ namespace alpinocorpus { namespace util {
 
         GetUrl::~GetUrl()
         {
-            cleanup();
+            clean_up();
         }
 
         void GetUrl::interrupt() {
@@ -169,10 +169,10 @@ namespace alpinocorpus { namespace util {
                 // solution seems to be: just skip this test
 
                 if (! i && error == boost::asio::error::eof) {
-                std::cerr << error << std::endl;
-                d_eof = true;
-                d_eoflast = true;
-                return d_nullstring;
+                    std::cerr << error << std::endl;
+                    d_eof = true;
+                    d_eoflast = true;
+                    return d_nullstring;
                 }
 
                 */
@@ -387,7 +387,7 @@ namespace alpinocorpus { namespace util {
                 u = d_headers["location"];
 
             d_response.consume(d_response.size());
-            cleanup();
+            clean_up();
             d_io_service.reset();
             download(u, maxhop - 1);
 
