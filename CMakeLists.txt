@@ -40,6 +40,10 @@ endif(APPLE OR WIN32)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
+if(BOOST_ROOT)
+  set(Boost_NO_SYSTEM_PATHS ON)
+endif()
+
 option(WITH_PYTHON
   "Compile Python bindings" OFF)
 
