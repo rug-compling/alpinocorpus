@@ -74,13 +74,13 @@ namespace alpinocorpus {
         if (d_geturl->interrupted() && ! d_geturl->completed())
             const_cast<RemoteCorpusReaderPrivate *>(this)->d_geturl->resume();
 
-        return EntryIterator(new RemoteIter(d_geturl, 0));
+        return EntryIterator(new RemoteIter(d_geturl, 0, false));
     }
 
     // done
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getEnd() const
     {
-        return EntryIterator(new RemoteIter(d_geturl, -1));
+        return EntryIterator(new RemoteIter(d_geturl, 0, true));
     }
 
     // done? TODO: alleen naam van corpus of complete url? (nu: complete url)
@@ -169,7 +169,7 @@ namespace alpinocorpus {
         if (iter != markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
 
-        return EntryIterator(new RemoteIter(p, 0, true));
+        return EntryIterator(new RemoteIter(p, 0, false, true));
     }
 
 
@@ -193,7 +193,7 @@ namespace alpinocorpus {
         if (iter != markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
 
-        return EntryIterator(new RemoteIter(p, 0, true));
+        return EntryIterator(new RemoteIter(p, 0, false, true));
 
 
     }
@@ -205,7 +205,7 @@ namespace alpinocorpus {
         std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url +
             "/entries?query=" + util::toPercentEncoding(query) +
             "&contents=1"));
-        return EntryIterator(new RemoteIter(p, 0, true));
+        return EntryIterator(new RemoteIter(p, 0, false, true));
     }
 
     // done? TODO: klopt dit? (blijkbaar wel)
@@ -216,10 +216,10 @@ namespace alpinocorpus {
     }
 
     // done
-    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
-                                                      long signed int n,
-                                                      bool isquery)
-        : d_geturl(geturl), d_idx(n), d_isquery(isquery), d_active(false)
+    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(
+        std::tr1::shared_ptr<util::GetUrl> geturl,
+        size_t n, bool end, bool isquery)
+        : d_geturl(geturl), d_idx(n), d_end(end), d_isquery(isquery)
     {
         std::tr1::shared_ptr<bool> p(new bool(false));
         d_interrupted = p;
@@ -230,28 +230,10 @@ namespace alpinocorpus {
     {
     }
 
-    void RemoteCorpusReaderPrivate::RemoteIter::activate() const
-    {
-        if (d_active)
-            return;
-        if (d_idx < 0) {
-            d_active = true;
-            return;
-        }
-
-        d_geturl->line(d_idx);
-        if (d_geturl->eof())
-            d_idx = -1;
-
-        d_active = true;
-    }
-
     // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
-        activate();
-
-        if (d_idx >= 0) {
+        if (!d_end) {
             std::string s = d_geturl->line(d_idx);
             if (d_isquery) {
                 size_t i = s.find('\t');
@@ -268,8 +250,6 @@ namespace alpinocorpus {
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::next()
     {
-        activate();
-
         if (*d_interrupted) {
 #ifdef RemCorReaPri_DEBUG
             std::cerr << "[RemoteCorpusReaderPrivate] Calling next on interrupted RemoteIter" << std::endl;
@@ -277,11 +257,11 @@ namespace alpinocorpus {
             throw alpinocorpus::IterationInterrupted();
         }
 
-        if (d_idx >= 0) {
-            d_idx++;
+        if (!d_end) {
+            ++d_idx;
             d_geturl->line(d_idx);
             if (d_geturl->eof())
-                d_idx = -1;
+              d_end = true;
         }
     }
 
@@ -289,15 +269,16 @@ namespace alpinocorpus {
     bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
     {
         RemoteIter const &that = (RemoteIter const &)other;
-        activate();
-        that.activate();
-        return d_idx == that.d_idx;
+        if (d_end && that.d_end)
+          return true;
+        else
+          return (d_end == that.d_end && d_idx == that.d_idx);
     }
 
     // done
     IterImpl *RemoteCorpusReaderPrivate::RemoteIter::copy() const
     {
-        RemoteIter *other = new RemoteIter(d_geturl, d_idx, d_isquery);
+        RemoteIter *other = new RemoteIter(d_geturl, d_idx, d_end, d_isquery);
 
         other->d_interrupted = d_interrupted;
 
@@ -318,9 +299,7 @@ namespace alpinocorpus {
     std::string RemoteCorpusReaderPrivate::RemoteIter::contents(
         CorpusReader const &rdr) const
     {
-        activate();
-
-        if (d_idx < 0)
+        if (d_end)
             return std::string();
 
         if (!d_isquery)
