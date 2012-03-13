@@ -38,6 +38,7 @@ class MultiCorpusReaderPrivate : public CorpusReader
     std::string contents(CorpusReader const &) const;
     std::string current() const;
     bool equals(IterImpl const &other) const;
+    void nextIterator();
     void next();
   private:
     std::list<ReaderIter> d_iters;
