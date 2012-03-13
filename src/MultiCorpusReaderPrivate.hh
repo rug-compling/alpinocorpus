@@ -35,6 +35,7 @@ private:
     IterImpl *copy() const;
     std::string current() const;
     bool equals(IterImpl const &other) const;
+    void nextIterator();
     void next();
   private:
     std::list<ReaderIter> d_iters;
