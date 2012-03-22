@@ -70,6 +70,10 @@ namespace alpinocorpus {
 
         \verbatim markerQuery=[query]&markerAttr=[attr]&markerValue=[value] \endverbatim
 
+        To skip some lines at the beginning (for resuming an interrupted download), use:
+
+        \verbatim start=[n] \endverbatim
+
         <b> GET [url-prefix]/[corpusname]/validQuery?query=[query] </b>
 
         Validate the query on the server. Should return `true`, `yes` or `1` if the query is valid.
