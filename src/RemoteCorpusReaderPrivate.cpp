@@ -216,15 +216,13 @@ namespace alpinocorpus {
     }
 
     // done
-    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(
-        std::tr1::shared_ptr<util::GetUrl> geturl,
-        size_t n, bool end, bool isquery)
-        : d_geturl(geturl), d_idx(n), d_end(end), d_isquery(isquery)
+    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
+                                                      size_t n,
+                                                      bool end,
+                                                      bool isquery)
+        : d_geturl(geturl), d_idx(n), d_end(end), d_isquery(isquery), d_active(false)
     {
         d_interrupted = std::tr1::shared_ptr<bool>(new bool(false));
-        d_geturl->line(0);
-        if (d_geturl->eof())
-          d_end = true;
     }
 
     // done
@@ -232,9 +230,27 @@ namespace alpinocorpus {
     {
     }
 
+    void RemoteCorpusReaderPrivate::RemoteIter::activate() const
+    {
+        if (d_active)
+            return;
+        if (d_end) {
+            d_active = true;
+            return;
+        }
+
+        d_geturl->line(d_idx);
+        if (d_geturl->eof())
+            d_end = true;
+
+        d_active = true;
+    }
+
     // done
     std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
     {
+        activate();
+
         if (!d_end) {
             std::string s = d_geturl->line(d_idx);
             if (d_isquery) {
@@ -252,6 +268,8 @@ namespace alpinocorpus {
     // done
     void RemoteCorpusReaderPrivate::RemoteIter::next()
     {
+        activate();
+
         if (*d_interrupted) {
 #ifdef RemCorReaPri_DEBUG
             std::cerr << "[RemoteCorpusReaderPrivate] Calling next on interrupted RemoteIter" << std::endl;
@@ -263,7 +281,7 @@ namespace alpinocorpus {
             ++d_idx;
             d_geturl->line(d_idx);
             if (d_geturl->eof())
-              d_end = true;
+                d_end = true;
         }
     }
 
@@ -271,6 +289,8 @@ namespace alpinocorpus {
     bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
     {
         RemoteIter const &that = (RemoteIter const &)other;
+        activate();
+        that.activate();
         if (d_end && that.d_end)
           return true;
         else
@@ -301,6 +321,8 @@ namespace alpinocorpus {
     std::string RemoteCorpusReaderPrivate::RemoteIter::contents(
         CorpusReader const &rdr) const
     {
+        activate();
+
         if (d_end)
             return std::string();
 

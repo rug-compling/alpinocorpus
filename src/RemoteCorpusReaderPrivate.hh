@@ -27,8 +27,9 @@ namespace alpinocorpus {
         class RemoteIter : public IterImpl {
         public:
             RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
-                size_t n, bool end = false,
-                bool isQuery = false);
+                       size_t n,
+                       bool end = false,
+                       bool isQuery = false);
             ~RemoteIter();
             IterImpl *copy() const;
             std::string current() const;
@@ -37,6 +38,7 @@ namespace alpinocorpus {
             void interrupt();
             std::string contents(CorpusReader const &) const;
         private:
+            void activate() const;
             std::tr1::shared_ptr<util::GetUrl> d_geturl;
             mutable bool d_end;
             mutable size_t d_idx;
