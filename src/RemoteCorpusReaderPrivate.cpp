@@ -221,8 +221,10 @@ namespace alpinocorpus {
         size_t n, bool end, bool isquery)
         : d_geturl(geturl), d_idx(n), d_end(end), d_isquery(isquery)
     {
-        std::tr1::shared_ptr<bool> p(new bool(false));
-        d_interrupted = p;
+        d_interrupted = std::tr1::shared_ptr<bool>(new bool(false));
+        d_geturl->line(0);
+        if (d_geturl->eof())
+          d_end = true;
     }
 
     // done
