@@ -21,6 +21,11 @@ typedef struct {
 alpinocorpus_reader alpinocorpus_open(char const *path);
 
 /**
+ * Open an Alpino treebank. Returns NULL if the corpus could not be opened.
+ */
+alpinocorpus_reader alpinocorpus_open_recursive(char const *path);
+
+/**
  * Close an Alpino treebank.
  */
 void alpinocorpus_close(alpinocorpus_reader corpus);

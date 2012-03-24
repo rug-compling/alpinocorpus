@@ -35,6 +35,19 @@ alpinocorpus_reader alpinocorpus_open(char const *path)
     return new alpinocorpus_reader_t(reader);
 }
 
+alpinocorpus_reader alpinocorpus_open_recursive(char const *path)
+{
+    alpinocorpus::CorpusReader *reader;
+
+    try {
+        reader = alpinocorpus::CorpusReaderFactory::openRecursive(path);
+    } catch (std::exception const &) {
+        return NULL;
+    }
+
+    return new alpinocorpus_reader_t(reader);
+}
+
 void alpinocorpus_close(alpinocorpus_reader reader)
 {
     delete reader->corpusReader;
