@@ -12,29 +12,29 @@ extern "C" {
 
 struct alpinocorpus_reader_t {
     alpinocorpus_reader_t(alpinocorpus::CorpusReader *reader) : corpusReader(reader) {}
-    
+
     alpinocorpus::CorpusReader *corpusReader;
 };
 
 struct alpinocorpus_iter_t {
     alpinocorpus_iter_t(alpinocorpus::CorpusReader::EntryIterator iter) : entryIter(iter) {}
-    
+
     alpinocorpus::CorpusReader::EntryIterator entryIter;
 };
 
 alpinocorpus_reader alpinocorpus_open(char const *path)
 {
     alpinocorpus::CorpusReader *reader;
-    
+
     try {
         reader = alpinocorpus::CorpusReaderFactory::open(path);
     } catch (std::exception const &) {
         return NULL;
     }
-    
+
     return new alpinocorpus_reader_t(reader);
 }
-    
+
 void alpinocorpus_close(alpinocorpus_reader reader)
 {
     delete reader->corpusReader;
@@ -50,7 +50,7 @@ int alpinocorpus_is_valid_query(alpinocorpus_reader reader, char const *query)
 alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
 {
     alpinocorpus_iter i = new alpinocorpus_iter_t(corpus->corpusReader->begin());
-    
+
     return i;
 }
 
@@ -82,18 +82,32 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
     return new alpinocorpus_iter_t(iter);
 }
 
+alpinocorpus_iter alpinocorpus_query_stylesheet_marker_iter(alpinocorpus_reader corpus,
+							    char const *query,
+							    char const *stylesheet,
+							    char const *markerQuery,
+							    char const *markerAttr,
+							    char const *markerValue)
+{
+    marker_query_t m [1];
+    m[0].query = markerQuery;
+    m[0].attr = markerAttr;
+    m[0].value = markerValue;
+    return alpinocorpus_query_stylesheet_iter(corpus, query, stylesheet, m, 1);
+}
+
 alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query)
 {
     alpinocorpus::CorpusReader::EntryIterator iter;
-    
+
     try {
         iter = reader->corpusReader->query(alpinocorpus::CorpusReader::XPATH, query);
     } catch (std::exception const &) {
         return NULL;
     }
-        
+
     alpinocorpus_iter i = new alpinocorpus_iter_t(iter);
-    
+
     return i;
 }
 
@@ -112,7 +126,7 @@ void alpinocorpus_iter_next(alpinocorpus_reader reader,
 {
   ++(iter->entryIter);
 }
-    
+
 char *alpinocorpus_iter_value(alpinocorpus_iter iter)
 {
     std::string entry;
@@ -121,7 +135,7 @@ char *alpinocorpus_iter_value(alpinocorpus_iter iter)
     } catch (std::exception const &) {
         return NULL;
     }
-    
+
     size_t len = entry.size() + 1;
     char *cstr = reinterpret_cast<char *>(std::malloc(len));
     if (cstr != NULL)
@@ -146,19 +160,19 @@ char *alpinocorpus_iter_contents(alpinocorpus_reader reader,
     char *cstr = reinterpret_cast<char *>(std::malloc(len));
     if (cstr != NULL)
         std::memcpy(cstr, contents.c_str(), len);
-    
+
     return cstr;
 }
 
 char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
 {
     std::string str;
-    try{ 
+    try{
         str = reader->corpusReader->read(entry);
     } catch (std::exception const &) {
         return NULL;
     }
-    
+
     size_t len = str.size() + 1;
     char *cstr = reinterpret_cast<char *>(std::malloc(len));
     if (cstr)
@@ -182,17 +196,30 @@ char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
     }
 
     std::string str;
-    try{ 
+    try{
         str = reader->corpusReader->read(entry, markerQueries);
     } catch (std::exception const &) {
         return NULL;
     }
-    
+
     size_t len = str.size() + 1;
     char *cstr = reinterpret_cast<char *>(std::malloc(len));
     if (cstr)
         std::memcpy(cstr, str.c_str(), len);
     return cstr;
+}
+
+char *alpinocorpus_read_mark_query(alpinocorpus_reader reader,
+				   char const *entry,
+				   char const *markerQuery,
+				   char const *markerAttr,
+				   char const *markerValue)
+{
+    marker_query_t m [1];
+    m[0].query = markerQuery;
+    m[0].attr = markerAttr;
+    m[0].value = markerValue;
+    return alpinocorpus_read_mark_queries(reader, entry, m, 1);
 }
 
 char *alpinocorpus_name(alpinocorpus_reader reader)

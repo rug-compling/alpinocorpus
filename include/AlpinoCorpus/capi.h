@@ -19,7 +19,7 @@ typedef struct {
  * Open an Alpino treebank. Returns NULL if the corpus could not be opened.
  */
 alpinocorpus_reader alpinocorpus_open(char const *path);
-    
+
 /**
  * Close an Alpino treebank.
  */
@@ -43,6 +43,18 @@ alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus);
 alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
     char const *query, char const *stylesheet, marker_query_t *queries,
     size_t n_queries);
+
+/**
+ * Get an iterator over the entries in a corpus, where the contents
+ * are transformed using the given stylesheet.
+ */
+alpinocorpus_iter alpinocorpus_query_stylesheet_marker_iter(alpinocorpus_reader corpus,
+							    char const *query,
+							    char const *stylesheet,
+							    char const *markerQuery,
+							    char const *markerAttr,
+							    char const *markerValue);
+
 
 /**
  * Get an iterator over the entries in a corpus that match a query.
@@ -91,6 +103,15 @@ char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
     char const *entry, marker_query_t *queries, size_t n_queries);
 
 /**
+ * Read an entry, marking nodes matching a given query.
+ */
+char *alpinocorpus_read_mark_query(alpinocorpus_reader reader,
+				   char const *entry,
+				   char const *markerQuery,
+				   char const *markerAttr,
+				   char const *markerValue);
+
+/**
  * Return the canonical name of the corpus.
  */
 char *alpinocorpus_name(alpinocorpus_reader corpus);
@@ -103,5 +124,5 @@ unsigned long long alpinocorpus_size(alpinocorpus_reader corpus);
 #ifdef __cplusplus
 }
 #endif
-    
+
 #endif // ALPINOCORPUS_C_API
