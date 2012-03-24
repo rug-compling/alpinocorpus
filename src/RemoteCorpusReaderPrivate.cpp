@@ -74,7 +74,7 @@ namespace alpinocorpus {
         if (d_geturl->interrupted() && ! d_geturl->completed())
             const_cast<RemoteCorpusReaderPrivate *>(this)->d_geturl->resume();
 
-        return EntryIterator(new RemoteIter(d_geturl, 0, false));
+        return EntryIterator(new RemoteIter(d_geturl, 0));
     }
 
     // done
