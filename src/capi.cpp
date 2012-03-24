@@ -245,9 +245,9 @@ char *alpinocorpus_name(alpinocorpus_reader reader)
     return cstr;
 }
 
-unsigned long long alpinocorpus_size(alpinocorpus_reader reader)
+size_t alpinocorpus_size(alpinocorpus_reader reader)
 {
-    return (unsigned long long) reader->corpusReader->size();
+    return reader->corpusReader->size();
 }
 
 }

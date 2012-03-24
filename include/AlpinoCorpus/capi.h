@@ -124,7 +124,7 @@ char *alpinocorpus_name(alpinocorpus_reader corpus);
 /**
  * Return the number of entries in the corpus.
  */
-unsigned long long alpinocorpus_size(alpinocorpus_reader corpus);
+size_t alpinocorpus_size(alpinocorpus_reader corpus);
 
 #ifdef __cplusplus
 }
