@@ -195,4 +195,19 @@ char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
     return cstr;
 }
 
+char *alpinocorpus_name(alpinocorpus_reader reader)
+{
+    std::string str(reader->corpusReader->name());
+    size_t len = str.size() + 1;
+    char *cstr = reinterpret_cast<char *>(std::malloc(len));
+    if (cstr)
+        std::memcpy(cstr, str.c_str(), len);
+    return cstr;
+}
+
+unsigned long long alpinocorpus_size(alpinocorpus_reader reader)
+{
+    return (unsigned long long) reader->corpusReader->size();
+}
+
 }

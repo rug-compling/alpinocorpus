@@ -90,6 +90,16 @@ char *alpinocorpus_read(alpinocorpus_reader corpus, char const *entry);
 char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
     char const *entry, marker_query_t *queries, size_t n_queries);
 
+/**
+ * Return the canonical name of the corpus.
+ */
+char *alpinocorpus_name(alpinocorpus_reader corpus);
+
+/**
+ * Return the number of entries in the corpus.
+ */
+unsigned long long alpinocorpus_size(alpinocorpus_reader corpus);
+
 #ifdef __cplusplus
 }
 #endif
