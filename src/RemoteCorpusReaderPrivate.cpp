@@ -155,19 +155,18 @@ namespace alpinocorpus {
     {
         std::list<MarkerQuery>::const_iterator iter = markerQueries.begin();
 
-        if (iter == markerQueries.end())
-            throw Error("RemoteCorpusReaderPrivate: Missing query");
+        std::string url(d_url + "/entries?query=" + util::toPercentEncoding(q) + "&contents=1");
 
-        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url + "/entries?query=" +
-                                                              util::toPercentEncoding(q) +
-                                                              "&markerQuery=" + util::toPercentEncoding(iter->query) +
-                                                              "&markerAttr=" + util::toPercentEncoding(iter->attr) +
-                                                              "&markerValue=" + util::toPercentEncoding(iter->value) +
-                                                              "&contents=1", stylesheet));
+        if (iter != markerQueries.end())
+            url += "&markerQuery=" + util::toPercentEncoding(iter->query) +
+                "&markerAttr=" + util::toPercentEncoding(iter->attr) +
+                "&markerValue=" + util::toPercentEncoding(iter->value);
 
         ++iter;
         if (iter != markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
+
+        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(url, stylesheet));
 
         return EntryIterator(new RemoteIter(p, 0, false, true));
     }
