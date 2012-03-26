@@ -45,6 +45,13 @@ Requirements
 
 Execute 'cmake .', followed by 'make' in the source directory.
 
+Bindings
+--------
+
+Bindings for Python 2 and 3 are availabile from:
+
+  http://github.com/rug-compling/alpinocorpus-python
+
 Contributors
 ------------
 

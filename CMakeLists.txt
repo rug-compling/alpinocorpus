@@ -44,9 +44,6 @@ if(BOOST_ROOT)
   set(Boost_NO_SYSTEM_PATHS ON)
 endif()
 
-option(WITH_PYTHON
-  "Compile Python bindings" OFF)
-
 option(WITH_RUBY
   "Compile Ruby bindings" OFF)
 
@@ -235,10 +232,6 @@ add_executable(readers_available test/readers_available.cpp)
 target_link_libraries(readers_available alpino_corpus)
 
 add_subdirectory(util)
-
-if(WITH_PYTHON)
-  add_subdirectory(bindings/python)
-endif()
 
 if(WITH_RUBY)
   add_subdirectory(bindings/ruby)
