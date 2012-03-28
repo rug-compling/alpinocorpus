@@ -1,3 +1,8 @@
+// #define CAPI_DEBUG
+
+#ifdef CAPI_DEBUG
+#include <iostream>
+#endif
 #include <cstdlib>
 #include <cstring>
 #include <exception>
@@ -5,6 +10,7 @@
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusWriter.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/capi.h>
 
@@ -248,6 +254,79 @@ char *alpinocorpus_name(alpinocorpus_reader reader)
 size_t alpinocorpus_size(alpinocorpus_reader reader)
 {
     return reader->corpusReader->size();
+}
+
+struct alpinocorpus_writer_t {
+    alpinocorpus_writer_t(alpinocorpus::CorpusWriter *writer) : corpusWriter(writer) {}
+
+    alpinocorpus::CorpusWriter *corpusWriter;
+};
+
+
+alpinocorpus_writer alpinocorpus_writer_open(char const *path, int overwrite, char const *writertype)
+{
+    alpinocorpus::CorpusWriter *writer;
+    alpinocorpus::CorpusWriter::WriterType wt;
+    std::string WriterType(writertype);
+
+    if (WriterType == "DBXML_CORPUS_WRITER")
+        wt = alpinocorpus::CorpusWriter::DBXML_CORPUS_WRITER;
+    else {
+#ifdef CAPI_DEBUG
+        std::cerr << "Invalid writertype " << writertype << std::endl;
+#endif
+        return NULL;
+    }
+
+    try {
+        writer = alpinocorpus::CorpusWriter::open(path, overwrite ? true : false,  wt);
+    } catch (std::exception const &e) {
+#ifdef CAPI_DEBUG
+        std::cerr << e.what() << std::endl;
+#endif
+        return NULL;
+    }
+
+    return new alpinocorpus_writer_t(writer);
+}
+
+void alpinocorpus_writer_close(alpinocorpus_writer writer)
+{
+    delete writer->corpusWriter;
+    delete writer;
+}
+
+int alpinocorpus_writer_available(char const *writertype)
+{
+    alpinocorpus::CorpusWriter::WriterType wt;
+    std::string WriterType(writertype);
+
+    if (WriterType == "DBXML_CORPUS_WRITER")
+        wt = alpinocorpus::CorpusWriter::DBXML_CORPUS_WRITER;
+    else
+        return 0;
+
+    return alpinocorpus::CorpusWriter::writerAvailable(wt) ? 1 : 0;
+}
+
+char const * alpinocorpus_write(alpinocorpus_writer writer, char const *name, char const *content)
+{
+    try {
+        writer->corpusWriter->write(name, content);
+    } catch (std::exception const &e) {
+        return e.what();
+    }
+    return NULL;
+}
+
+char const * alpinocorpus_write_corpus(alpinocorpus_writer writer, alpinocorpus_reader reader, int failsafe)
+{
+    try {
+        writer->corpusWriter->write(*(reader->corpusReader), failsafe ? true : false);
+    } catch (std::exception const &e) {
+        return e.what();
+    }
+    return NULL;
 }
 
 }
