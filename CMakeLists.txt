@@ -105,6 +105,12 @@ configure_file (
   "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
 )
 
+configure_file (
+  "${AlpinoCorpus_SOURCE_DIR}/alpinocorpus.pc.in"
+  "${AlpinoCorpus_BINARY_DIR}/alpinocorpus.pc"
+  @ONLY
+)
+
 set(HEADERS
   include/AlpinoCorpus/CompactCorpusWriter.hh
   include/AlpinoCorpus/CorpusReader.hh
@@ -185,7 +191,7 @@ if(USE_DBXML)
   )
 endif()
 
-add_library(alpino_corpus SHARED 
+add_library(alpino_corpus SHARED
 	${SOURCES}
 	${HEADERS}
 )
@@ -216,6 +222,9 @@ install(TARGETS alpino_corpus
 install(DIRECTORY include/AlpinoCorpus
   DESTINATION include
   FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
+
+install(FILES alpinocorpus.pc
+  DESTINATION lib/pkgconfig)
 
 # Unit tests
 
