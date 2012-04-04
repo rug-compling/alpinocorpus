@@ -271,6 +271,8 @@ alpinocorpus_writer alpinocorpus_writer_open(char const *path, int overwrite, ch
 
     if (WriterType == "DBXML_CORPUS_WRITER")
         wt = alpinocorpus::CorpusWriter::DBXML_CORPUS_WRITER;
+    else if (WriterType == "COMPACT_CORPUS_WRITER")
+        wt = alpinocorpus::CorpusWriter::COMPACT_CORPUS_WRITER;
     else {
 #ifdef CAPI_DEBUG
         std::cerr << "Invalid writertype " << writertype << std::endl;
@@ -303,6 +305,8 @@ int alpinocorpus_writer_available(char const *writertype)
 
     if (WriterType == "DBXML_CORPUS_WRITER")
         wt = alpinocorpus::CorpusWriter::DBXML_CORPUS_WRITER;
+    else if (WriterType == "COMPACT_CORPUS_WRITER")
+        wt = alpinocorpus::CorpusWriter::COMPACT_CORPUS_WRITER;
     else
         return 0;
 
