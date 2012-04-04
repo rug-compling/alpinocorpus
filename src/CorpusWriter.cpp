@@ -1,5 +1,6 @@
 #include <string>
 
+#include <AlpinoCorpus/CompactCorpusWriter.hh>
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
 #include <AlpinoCorpus/DbCorpusWriter.hh>
@@ -17,6 +18,9 @@ namespace alpinocorpus {
 #else
           throw Error("AlpinoCorpus library without DBXML support");
 #endif
+          break;
+        case COMPACT_CORPUS_WRITER:
+          return new CompactCorpusWriter(filename);
           break;
         default:
           throw Error("Trying to write to a corpus of an unknown type type");

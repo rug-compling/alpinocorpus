@@ -10,7 +10,7 @@ namespace alpinocorpus {
     class ALPINO_CORPUS_EXPORT CorpusWriter : public util::NonCopyable
     {
     public:
-        enum WriterType { DBXML_CORPUS_WRITER } ;
+        enum WriterType { DBXML_CORPUS_WRITER, COMPACT_CORPUS_WRITER } ;
 
         virtual ~CorpusWriter() {}
 
