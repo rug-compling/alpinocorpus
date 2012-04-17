@@ -172,7 +172,6 @@ set(SOURCES
   src/StylesheetIter.cpp
   src/XSLTransformer.cpp
   src/capi.cpp
-  src/util/base64.cpp
   src/util/textfile.cpp
   src/util/url.cpp
 )

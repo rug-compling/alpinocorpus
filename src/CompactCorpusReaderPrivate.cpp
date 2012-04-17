@@ -162,11 +162,11 @@ void CompactCorpusReaderPrivate::open(std::string const &dataPath,
         
         std::string offset64;
         iss >> offset64;
-        size_t offset = util::b64_decode(offset64);
+        size_t offset = util::b64_decode<size_t>(offset64);
         
         std::string size64;
         iss >> size64;
-        size_t size = util::b64_decode(size64);
+        size_t size = util::b64_decode<size_t>(size64);
         
         IndexItemPtr item(new IndexItem(name, offset, size));
         d_indices.push_back(item);
