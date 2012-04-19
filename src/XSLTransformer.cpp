@@ -27,7 +27,8 @@ XSLTransformer::~XSLTransformer()
 
 void XSLTransformer::initWithStylesheet(std::string const &xsl)
 {
-    xmlDocPtr xslDoc = xmlReadMemory(xsl.c_str(), xsl.size(), 0, 0, 0);
+    xmlDocPtr xslDoc = xmlReadMemory(xsl.c_str(), xsl.size(), 0, 0,
+        XSLT_PARSE_OPTIONS);
     d_xslPtr = xsltParseStylesheetDoc(xslDoc);
 }
 
@@ -40,6 +41,7 @@ std::string XSLTransformer::transform(std::string const &xml) const
         throw Error("XSLTransformer::transform: Could not open XML data");
 
     xsltTransformContextPtr ctx = xsltNewTransformContext(d_xslPtr, doc);
+    xsltSetCtxtParseOptions(ctx, XSLT_PARSE_OPTIONS);
 
     // Transform...
     xmlDocPtr res = xsltApplyStylesheetUser(d_xslPtr, doc, NULL, NULL,
