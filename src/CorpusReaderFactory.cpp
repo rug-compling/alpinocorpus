@@ -5,21 +5,30 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <AlpinoCorpus/DbCorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
-#include <AlpinoCorpus/RemoteCorpusReader.hh>
 
 #include <config.hh>
+
+#if defined(USE_DBXML)
+    #include <AlpinoCorpus/DbCorpusReader.hh>
+#endif
+
+#if defined(USE_REMOTE_CORPUS)
+  #include <AlpinoCorpus/RemoteCorpusReader.hh>
+#endif
 
 namespace alpinocorpus {
 
     CorpusReader *CorpusReaderFactory::open(std::string const &corpusPath)
     {
+
+#if defined(USE_REMOTE_CORPUS)
         try {
             return new RemoteCorpusReader(corpusPath);
         } catch (OpenError const &) {}
+#endif
 
         try {
             return new DirectoryCorpusReader(corpusPath);
