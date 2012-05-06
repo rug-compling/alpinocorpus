@@ -222,7 +222,7 @@ install(DIRECTORY include/AlpinoCorpus
   DESTINATION include
   FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
 
-install(FILES alpinocorpus.pc
+install(FILES ${AlpinoCorpus_BINARY_DIR}/alpinocorpus.pc
   DESTINATION lib/pkgconfig)
 
 # Unit tests
