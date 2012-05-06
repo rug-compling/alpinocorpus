@@ -1,3 +1,9 @@
+alpino-corpus (1.2.0-1) precise; urgency=low
+
+  * New upstream release.
+
+ -- Daniël de Kok <me@danieldk.eu>  Sun, 06 May 2012 10:45:42 +0200
+
 alpino-corpus (1.0.1-2) precise; urgency=low
 
   * Build for Ubuntu 12.04 (Precise Pangolin).
