@@ -16,10 +16,10 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <util/url.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 #include "DbCorpusReaderPrivate.hh"
-
+#include "util/url.hh"
 
 namespace db = DbXml;
 
@@ -51,7 +51,7 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlManager &mgr)
 {
 }
 
-CorpusReader::IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
+IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
 {
     // XXX - Copy constructor of XmlResults copies handle but not body.
     //       The copyResults() method returns an XmlResults instance that
@@ -141,7 +141,7 @@ std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) con
     return std::string();
 }
 
-CorpusReader::IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
+IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
 {
     // XXX - See DbIter::copy()
 
@@ -247,12 +247,18 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
         throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
     }
 
+    // No exceptions according to the documentation...
+    AutoRelease<xerces::DOMXPathNSResolver> resolver(
+        document->createNSResolver(document->getDocumentElement()));
+    resolver->addNamespaceBinding(X("fn"),
+        X("http://www.w3.org/2005/xpath-functions"));
+
     for (std::list<MarkerQuery>::const_iterator iter = queries.begin();
          iter != queries.end(); ++iter)
     {
         AutoRelease<xerces::DOMXPathExpression> expression(0);
         try {
-            expression.set(document->createExpression(X(iter->query.c_str()), 0));
+            expression.set(document->createExpression(X(iter->query.c_str()), resolver));
         } catch (xerces::DOMXPathException const &) {
             throw Error("Could not parse expression.");
         } catch (xerces::DOMException const &) {

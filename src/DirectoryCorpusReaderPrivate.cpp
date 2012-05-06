@@ -9,9 +9,10 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/Error.hh>
-#include <util/textfile.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 #include "DirectoryCorpusReaderPrivate.hh"
+#include "util/textfile.hh"
 
 namespace bf = boost::filesystem;
 
@@ -68,7 +69,7 @@ DirectoryCorpusReaderPrivate::DirIter::DirIter(
         next();
 }
 
-CorpusReader::IterImpl *DirectoryCorpusReaderPrivate::DirIter::copy() const
+IterImpl *DirectoryCorpusReaderPrivate::DirIter::copy() const
 {
     // No pointer members
     return new DirIter(*this);

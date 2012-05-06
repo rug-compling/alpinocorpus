@@ -8,7 +8,9 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
 #include <iostream>
@@ -36,7 +38,7 @@ bool operator==(ReaderIter const &left, ReaderIter const &right)
 
 class RecursiveCorpusReaderPrivate : public CorpusReader
 {
-  class RecursiveIter : public CorpusReader::IterImpl
+  class RecursiveIter : public IterImpl
   {
   public:
     RecursiveIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);
@@ -149,7 +151,7 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
         iter->path().extension() != ".index")
       continue;
 
-    CorpusReader *reader(CorpusReader::open(iter->path().string()));
+    CorpusReader *reader(CorpusReaderFactory::open(iter->path().string()));
 
     bf::path namePath = iter->path();
     namePath.replace_extension("");
@@ -218,7 +220,7 @@ CorpusReader const *RecursiveCorpusReaderPrivate::corpusReaderFromPath(
     if (path.find(iter->first) == 0)
       return iter->second;
   
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Unknown corpus: " + path));
 }
 
 std::string RecursiveCorpusReaderPrivate::entryFromPath(
@@ -229,7 +231,7 @@ std::string RecursiveCorpusReaderPrivate::entryFromPath(
     if (path.find(iter->first) == 0)
       return path.substr(iter->first.size() + 1);
 
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Could not find entry: " + path));
 }
 
 std::string RecursiveCorpusReaderPrivate::readEntry(std::string const &path) const
@@ -242,7 +244,7 @@ std::string RecursiveCorpusReaderPrivate::readEntryMarkQueries(
     std::string const &path, std::list<MarkerQuery> const &queries) const
 {
   CorpusReader const *reader = corpusReaderFromPath(path);
-  return reader->readMarkQueries(entryFromPath(path), queries);
+  return reader->read(entryFromPath(path), queries);
 }
 
 CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXPath(
@@ -299,7 +301,7 @@ std::string RecursiveCorpusReaderPrivate::RecursiveIter::contents(
   return d_iters.front().iter.contents(reader);
 }
 
-CorpusReader::IterImpl *RecursiveCorpusReaderPrivate::RecursiveIter::copy() const
+IterImpl *RecursiveCorpusReaderPrivate::RecursiveIter::copy() const
 {
   // No pointer members, pointer member of ReaderIter is not managed by
   // ReaderIter.

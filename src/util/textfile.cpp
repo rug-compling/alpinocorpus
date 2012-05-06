@@ -6,7 +6,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include <util/textfile.hh>
+#include "textfile.hh"
 
 namespace alpinocorpus { namespace util {
 

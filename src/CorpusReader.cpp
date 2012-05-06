@@ -5,7 +5,9 @@
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/CompactCorpusReader.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
+#include <AlpinoCorpus/RemoteCorpusReader.hh>
 #include <config.hh>
 
 #if defined(USE_DBXML)
@@ -18,6 +20,9 @@
 #include <libxml/tree.h>
 #include <libxml/xmlerror.h>
 #include <libxml/xpath.h>
+
+#include "FilterIter.hh"
+#include "StylesheetIter.hh"
 
 namespace {
     void ignoreStructuredError(void *userdata, xmlErrorPtr err)
@@ -77,6 +82,14 @@ namespace alpinocorpus {
     {
         return getBegin();
     }
+
+    CorpusReader::EntryIterator CorpusReader::beginWithStylesheet(
+        std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries) const
+    {
+        return EntryIterator(new StylesheetIter(getBegin(), getEnd(),
+            stylesheet, markerQueries));
+    }
     
     std::string CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
     {
@@ -104,70 +117,14 @@ namespace alpinocorpus {
     {
         return getName();
     }
-        
-    CorpusReader *CorpusReader::open(std::string const &corpusPath)
-    {
-        try {
-            return new DirectoryCorpusReader(corpusPath);
-        } catch (OpenError const &) {}
-
-        try {
-            return new CompactCorpusReader(corpusPath);
-        } catch (OpenError const &) {}
-
-#if defined(USE_DBXML)
-        try {
-            return new DbCorpusReader(corpusPath);
-        } catch (OpenError const &) {}
-#endif
-        
-        throw OpenError(corpusPath);
-    }
-
-    CorpusReader *CorpusReader::openRecursive(std::string const &path)
-    {
-      return new RecursiveCorpusReader(path);
-    }
-
-    std::string CorpusReader::read(std::string const &entry) const
-    {
-        return readEntry(entry);
-    }
-
-    bool CorpusReader::readerAvailable(ReaderType readerType)
-    {
-#ifndef USE_DBXML
-        if (readerType == DBXML_CORPUS_READER)
-            return false;
-#endif USE_DBXML
-
-        return true;
-    }
-
-    std::list<CorpusReader::ReaderInfo> CorpusReader::readersAvailable()
-    {
-        std::list<ReaderInfo> readers;
-
-        // XXX - How to present directory corpus readers?
-
-        readers.push_back(ReaderInfo(DIRECTORY_CORPUS_READER,
-            "Directory reader", std::list<std::string>()));
-
-        #ifdef USE_DBXML
-        readers.push_back(ReaderInfo(DBXML_CORPUS_READER,
-            "Dact (DBXML) corpus reader", std::list<std::string>(1, "dact")));
-        #endif
-
-        readers.push_back(ReaderInfo(COMPACT_CORPUS_READER,
-            "Compact corpus reader", std::list<std::string>(1, "data.dz")));
-        
-        return readers;
-    }
     
-    std::string CorpusReader::readMarkQueries(std::string const &entry,
+    std::string CorpusReader::read(std::string const &entry,
         std::list<MarkerQuery> const &queries) const
     {
-        return readEntryMarkQueries(entry, queries);
+        if (queries.size() == 0)
+            return readEntry(entry);
+        else
+            return readEntryMarkQueries(entry, queries);
     }
         
     std::string CorpusReader::readEntryMarkQueries(std::string const &entry,
@@ -318,6 +275,29 @@ namespace alpinocorpus {
         }
     }
 
+    CorpusReader::EntryIterator CorpusReader::queryWithStylesheet(
+        QueryDialect d, std::string const &query,
+      std::string const &stylesheet,
+      std::list<MarkerQuery> const &markerQueries) const
+    {
+      return runQueryWithStylesheet(d, query, stylesheet, markerQueries);
+    }
+
+    CorpusReader::EntryIterator CorpusReader::runQueryWithStylesheet(
+        QueryDialect d, std::string const &query,
+      std::string const &stylesheet,
+      std::list<MarkerQuery> const &markerQueries) const
+    {
+        if (d == XQUERY)
+            throw NotImplemented(typeid(*this).name(),
+                "XQuery functionality");
+        
+        EntryIterator iter = runXPath(query);
+
+        return EntryIterator(new StylesheetIter(iter, getEnd(), stylesheet,
+            markerQueries));
+    }
+
     CorpusReader::EntryIterator CorpusReader::runXPath(std::string const &query) const
     {
         //throw NotImplemented(typeid(*this).name(), "XQuery functionality");
@@ -329,139 +309,10 @@ namespace alpinocorpus {
         throw NotImplemented(typeid(*this).name(), "XQuery functionality");
     }
     
-    CorpusReader::FilterIter::FilterIter(CorpusReader const &corpus,
-        EntryIterator itr, EntryIterator end, std::string const &query)
-    :
-        d_corpus(corpus),
-        d_itr(itr),
-        d_end(end),
-        d_query(query),
-        d_initialState(true)
+    bool CorpusReader::MarkerQuery::operator==(MarkerQuery const &other) const
     {
-        //next();
-    }
-    
-    CorpusReader::IterImpl *CorpusReader::FilterIter::copy() const
-    {
-        // FilterIter is no pointer members.
-        return new FilterIter(*this);
-    }
-
-    std::string CorpusReader::FilterIter::current() const
-    {
-        return d_file;
-    }
-    
-    bool CorpusReader::FilterIter::equals(IterImpl const &itr) const
-    {
-        if (d_initialState) {
-          d_initialState = false;
-          FilterIter *self = const_cast<FilterIter *>(this);
-          self->next();
-        }
-
-        try {
-            // TODO fix me to be more like isEqual instead of hasNext.
-            return d_itr == d_end
-                && d_buffer.size() == 0;
-        } catch (std::bad_cast const &e) {
-            return false;
-        }
-    }
-
-    void CorpusReader::FilterIter::interrupt()
-    {
-      d_interrupted = true;
-    }
-    
-    void CorpusReader::FilterIter::next()
-    {
-        if (!d_buffer.empty())
-            d_buffer.pop();
-       
-        d_interrupted = false;
-
-        while (d_buffer.empty() && d_itr != d_end)
-        {
-            if (d_interrupted)
-              throw IterationInterrupted();
-
-            d_file = *d_itr;
-            parseFile(d_file);
-            
-            ++d_itr;
-        }
-    }
-    
-    std::string CorpusReader::FilterIter::contents(CorpusReader const &rdr) const
-    {
-        return d_buffer.empty()
-        ?   std::string() // XXX - should be a null string???
-            : d_buffer.front();
-    }
-    
-    void CorpusReader::FilterIter::parseFile(std::string const &file)
-    {
-        std::string xml(d_corpus.read(file));
-
-        xmlDocPtr doc = xmlParseMemory(xml.c_str(), xml.size());
-
-        if (!doc)
-        {
-            //qWarning() << "CorpusReader::FilterIter::parseFile: could not parse XML data: " << QString::fromUtf8((*d_itr).c_str());
-            return;
-        }
-        
-        // Parse XPath query
-        xmlXPathContextPtr ctx = xmlXPathNewContext(doc);
-        if (!ctx)
-        {
-            xmlFreeDoc(doc);
-            //qWarning() << "CorpusReader::FilterIter::parseFile: could not construct XPath context from document: " << QString::fromUtf8((*d_itr).c_str());
-            return;
-        }
-        
-        xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(
-            reinterpret_cast<xmlChar const *>(d_query.c_str()), ctx);
-        if (!xpathObj)
-        {
-            xmlXPathFreeContext(ctx);
-            xmlFreeDoc(doc);
-            throw Error("CorpusReader::FilterIter::parseFile: could not evaluate XPath expression.");
-        }
-
-        if (xpathObj->nodesetval && xpathObj->nodesetval->nodeNr > 0)
-        {
-            for (int i = 0; i < xpathObj->nodesetval->nodeNr; ++i)
-            {
-                xmlChar *str = xmlNodeListGetString(doc, xpathObj->nodesetval->nodeTab[i]->children, 1);
-                
-                std::string value;
-                if (str != 0) // XXX - is this correct?
-                    value = reinterpret_cast<const char *>(str);
-                
-                xmlFree(str);
-                
-                if (value.empty()) // XXX - trim!
-                    d_buffer.push(std::string());
-                else
-                    d_buffer.push(value);
-            }
-        }
-
-        xmlXPathFreeObject(xpathObj);
-        xmlXPathFreeContext(ctx);
-        xmlFreeDoc(doc);
-    }
-    
-    std::string CorpusReader::IterImpl::contents(CorpusReader const &rdr) const
-    {
-        //return rdr.read(current());
-        return std::string(); // XXX - should be a null string
-    }
-
-    void CorpusReader::IterImpl::interrupt()
-    {
-        // XXX no default behavior implemented
+        return other.query == query &&
+            other.attr == attr &&
+            other.value == value;
     }
 }

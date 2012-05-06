@@ -1,0 +1,3 @@
+Python 2 and 3 bindings are available from:
+
+  http://github.com/rug-compling/alpinocorpus-python

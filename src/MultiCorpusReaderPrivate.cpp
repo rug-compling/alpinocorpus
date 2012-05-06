@@ -9,6 +9,7 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/IterImpl.hh>
 
 #include "MultiCorpusReaderPrivate.hh"
 
@@ -77,7 +78,7 @@ CorpusReader const *MultiCorpusReaderPrivate::corpusReaderFromPath(
     if (path.find(iter->first) == 0)
       return iter->second;
   
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Unknown corpus: " + path));
 }
 
 std::string MultiCorpusReaderPrivate::entryFromPath(
@@ -88,7 +89,7 @@ std::string MultiCorpusReaderPrivate::entryFromPath(
     if (path.find(iter->first) == 0)
       return path.substr(iter->first.size() + 1);
 
-  throw std::runtime_error(std::string("Could not find corpus for: " + path));
+  throw std::runtime_error(std::string("Could not find entry: " + path));
 }
 
 std::string MultiCorpusReaderPrivate::readEntry(std::string const &path) const
@@ -101,7 +102,7 @@ std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
     std::string const &path, std::list<MarkerQuery> const &queries) const
 {
   CorpusReader const *reader = corpusReaderFromPath(path);
-  return reader->readMarkQueries(entryFromPath(path), queries);
+  return reader->read(entryFromPath(path), queries);
 }
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
@@ -133,6 +134,11 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
       iter != readers.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second,
           (iter->second->begin())));
+
+  // If we have a query for which none of the corpora has a matching result,
+  // then the iterator is in fact an end-iterator. We just don't know it yet,
+  // unless we attempt to move the iterator.
+  nextIterator();
 }
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
@@ -144,11 +150,16 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
       iter != readers.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second,
           (iter->second->query(XPATH, query))));
+
+  // If we have a query for which none of the corpora has a matching result,
+  // then the iterator is in fact an end-iterator. We just don't know it yet,
+  // unless we attempt to move the iterator.
+  nextIterator();
 }
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
 
-CorpusReader::IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
+IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
 {
   // No pointer members, and pointer member in ReaderIter is not managed
   // by ReaderIter.
@@ -182,18 +193,23 @@ bool MultiCorpusReaderPrivate::MultiIter::equals(IterImpl const &other) const
   }
 }
 
-void MultiCorpusReaderPrivate::MultiIter::next() {
-  // Iteration is done. Yay.
-  if (d_iters.size() == 0)
-    return;
+void MultiCorpusReaderPrivate::MultiIter::nextIterator()
+{
+  while (d_iters.size() != 0 &&
+      d_iters.front().iter == d_iters.front().reader->end())
+    d_iters.pop_front();
+}
 
-  // Move the iterator over the current corpus .
-  if (++d_iters.front().iter != d_iters.front().reader->end())
-    return;
-
-  // Ok, we are at the end of the current corpus, so we'll remove the
-  // corpus from the iteration list, and get started on the next corpus.
-  d_iters.pop_front();
+void MultiCorpusReaderPrivate::MultiIter::next()
+{
+  // If we are already in an end-state, attempt to find the next usable
+  // iterator.
+  if (d_iters.front().iter == d_iters.front().reader->end())
+    nextIterator();
+  // If we arrive at the end of the current iterator, find the next usable
+  // iterator.
+  else if (++d_iters.front().iter == d_iters.front().reader->end())
+    nextIterator();
 }
 
 }

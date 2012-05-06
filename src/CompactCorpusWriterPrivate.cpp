@@ -9,10 +9,10 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <util/base64.hh>
 
 #include "CompactCorpusWriterPrivate.hh"
 #include "DzOstream.hh"
+#include "util/base64.hh"
 
 using namespace std;
 

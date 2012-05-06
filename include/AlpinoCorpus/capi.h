@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 typedef struct alpinocorpus_reader_t *alpinocorpus_reader;
+typedef struct alpinocorpus_writer_t *alpinocorpus_writer;
 typedef struct alpinocorpus_iter_t *alpinocorpus_iter;
 
 typedef struct {
@@ -14,12 +15,18 @@ typedef struct {
   char const *value;
 } marker_query_t;
 
+/*** CORPUS READER ***/
 
 /**
  * Open an Alpino treebank. Returns NULL if the corpus could not be opened.
  */
 alpinocorpus_reader alpinocorpus_open(char const *path);
-    
+
+/**
+ * Open an Alpino treebank. Returns NULL if the corpus could not be opened.
+ */
+alpinocorpus_reader alpinocorpus_open_recursive(char const *path);
+
 /**
  * Close an Alpino treebank.
  */
@@ -35,11 +42,31 @@ int alpinocorpus_is_valid_query(alpinocorpus_reader corpus, char const *query);
  */
 alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus);
 
+
+/**
+ * Get an iterator over the entries in a corpus, where the contents
+ * are transformed using the given stylesheet.
+ */
+alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
+    char const *query, char const *stylesheet, marker_query_t *queries,
+    size_t n_queries);
+
+/**
+ * Get an iterator over the entries in a corpus, where the contents
+ * are transformed using the given stylesheet.
+ */
+alpinocorpus_iter alpinocorpus_query_stylesheet_marker_iter(alpinocorpus_reader corpus,
+							    char const *query,
+							    char const *stylesheet,
+							    char const *markerQuery,
+							    char const *markerAttr,
+							    char const *markerValue);
+
+
 /**
  * Get an iterator over the entries in a corpus that match a query.
  */
 alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query);
-
 
 /**
  * Destroy an iterator. This is only necessary if not all entries are
@@ -82,8 +109,56 @@ char *alpinocorpus_read(alpinocorpus_reader corpus, char const *entry);
 char *alpinocorpus_read_mark_queries(alpinocorpus_reader reader,
     char const *entry, marker_query_t *queries, size_t n_queries);
 
+/**
+ * Read an entry, marking nodes matching a given query.
+ */
+char *alpinocorpus_read_mark_query(alpinocorpus_reader reader,
+				   char const *entry,
+				   char const *markerQuery,
+				   char const *markerAttr,
+				   char const *markerValue);
+
+/**
+ * Return the canonical name of the corpus.
+ */
+char *alpinocorpus_name(alpinocorpus_reader corpus);
+
+/**
+ * Return the number of entries in the corpus.
+ */
+size_t alpinocorpus_size(alpinocorpus_reader corpus);
+
+/*** CORPUS WRITER ***/
+
+/*
+ * Open an Alpino treebank of the given type for writing. Returns NULL if the corpus could not be opened.
+ * Currently, the only writertype supported is DBXML_CORPUS_WRITER.
+ */
+alpinocorpus_writer alpinocorpus_writer_open(char const *path, int overwrite, char const *writertype);
+
+/*
+ * Open an Alpino treebank that was opened for writing.
+ */
+void alpinocorpus_writer_close(alpinocorpus_writer);
+
+/*
+ * Check whether a particular writer type is available.
+ */
+int alpinocorpus_writer_available(char const *writertype);
+
+/*
+ * Write a single entry to the corpus. Returns NULL on succes, error message on failure.
+ */
+char const * alpinocorpus_write(alpinocorpus_writer, char const *name, char const *content);
+
+/*
+ * Write all entries from another corpus to corpus. Returns NULL on succes, error message on failure.
+ */
+char const * alpinocorpus_write_corpus(alpinocorpus_writer, alpinocorpus_reader, int failsafe);
+
+
 #ifdef __cplusplus
 }
 #endif
-    
+
 #endif // ALPINOCORPUS_C_API

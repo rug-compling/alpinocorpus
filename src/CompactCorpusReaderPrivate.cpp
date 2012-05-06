@@ -15,10 +15,10 @@
 #endif
 
 #include <AlpinoCorpus/Error.hh>
-#include <util/base64.hh>
 
 #include "DzIstream.hh"
 #include "CompactCorpusReaderPrivate.hh"
+#include "util/base64.hh"
 
 namespace {
     char const * const DATA_EXT = ".data.dz";
@@ -114,7 +114,7 @@ void CompactCorpusReaderPrivate::canonicalize(std::string &filename)
         throw OpenError(filename, "not an indexed (.dz) corpus file");
 }
 
-CorpusReader::IterImpl *CompactCorpusReaderPrivate::IndexIter::copy() const
+IterImpl *CompactCorpusReaderPrivate::IndexIter::copy() const
 {
     // No pointer members.
     return new IndexIter(*this);
@@ -162,11 +162,11 @@ void CompactCorpusReaderPrivate::open(std::string const &dataPath,
         
         std::string offset64;
         iss >> offset64;
-        size_t offset = util::b64_decode(offset64);
+        size_t offset = util::b64_decode<size_t>(offset64);
         
         std::string size64;
         iss >> size64;
-        size_t size = util::b64_decode(size64);
+        size_t size = util::b64_decode<size_t>(size64);
         
         IndexItemPtr item(new IndexItem(name, offset, size));
         d_indices.push_back(item);
