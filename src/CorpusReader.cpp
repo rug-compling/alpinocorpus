@@ -2,17 +2,9 @@
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
-#include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <AlpinoCorpus/CompactCorpusReader.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
-#include <AlpinoCorpus/RemoteCorpusReader.hh>
-#include <config.hh>
-
-#if defined(USE_DBXML)
-    #include <AlpinoCorpus/DbCorpusReader.hh>
-#endif
 
 #include <typeinfo>
 
