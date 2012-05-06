@@ -47,7 +47,7 @@ endif()
 option(WITH_RUBY
   "Compile Ruby bindings" OFF)
 
-option(USE_REMOTE_CORPUS "Enable remote corpus" OFF)
+option(USE_REMOTE_CORPUS "Enable remote corpus" ON)
 
 if(USE_REMOTE_CORPUS)
 find_package(Boost 1.46.1 COMPONENTS system date_time iostreams
