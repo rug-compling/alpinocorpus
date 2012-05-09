@@ -144,6 +144,7 @@ set(HEADERS
   src/MultiCorpusReaderPrivate.hh
   src/StylesheetIter.hh
   src/XSLTransformer.hh
+  src/util/NameCompare.hh
   src/util/base64.hh
   src/util/bufutil.hh
   src/util/parseString.hh
@@ -175,6 +176,7 @@ set(SOURCES
   src/StylesheetIter.cpp
   src/XSLTransformer.cpp
   src/capi.cpp
+  src/util/NameCompare.cpp
   src/util/textfile.cpp
   src/util/url.cpp
 )

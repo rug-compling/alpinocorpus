@@ -1,4 +1,5 @@
 #include <list>
+#include <map>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -13,7 +14,7 @@
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
-#include <iostream>
+#include "util/NameCompare.hh"
 
 namespace bf = boost::filesystem;
 
@@ -38,11 +39,12 @@ bool operator==(ReaderIter const &left, ReaderIter const &right)
 
 class RecursiveCorpusReaderPrivate : public CorpusReader
 {
+  typedef std::map<std::string, CorpusReader *, NameCompare> CorpusReaders;
   class RecursiveIter : public IterImpl
   {
   public:
-    RecursiveIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);
-    RecursiveIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
+    RecursiveIter(CorpusReaders const &readers);
+    RecursiveIter(CorpusReaders const &readers,
       std::string const &query);
     ~RecursiveIter();
     std::string contents(CorpusReader const &) const;
@@ -74,7 +76,7 @@ private:
 
   bf::path d_directory;
   std::list<CorpusReader *> d_corpusReaders;
-  std::tr1::unordered_map<std::string, CorpusReader *> d_corpusReaderMap;
+  CorpusReaders d_corpusReaderMap;
 };
 
 
@@ -179,7 +181,7 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getEnd() const
 {
   // XXX - Constructing an empty map in the argument of the constructor
   // breaks with Boost 1.48.0. See ticket 6167.
-  std::tr1::unordered_map<std::string, CorpusReader *> emptyMap;
+  CorpusReaders emptyMap;
   return EntryIterator(new RecursiveIter(emptyMap));
 }
 
@@ -215,7 +217,7 @@ void RecursiveCorpusReaderPrivate::push_back(std::string const &name,
 CorpusReader const *RecursiveCorpusReaderPrivate::corpusReaderFromPath(
     std::string const &path) const
 {
-  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
+  for (CorpusReaders::const_iterator iter =
       d_corpusReaderMap.begin(); iter != d_corpusReaderMap.end(); ++iter)
     if (path.find(iter->first) == 0)
       return iter->second;
@@ -226,7 +228,7 @@ CorpusReader const *RecursiveCorpusReaderPrivate::corpusReaderFromPath(
 std::string RecursiveCorpusReaderPrivate::entryFromPath(
     std::string const &path) const
 {
-  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
+  for (CorpusReaders::const_iterator iter =
       d_corpusReaderMap.begin(); iter != d_corpusReaderMap.end(); ++iter)
     if (path.find(iter->first) == 0)
       return path.substr(iter->first.size() + 1);
@@ -270,9 +272,9 @@ bool RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, st
 // Iteration over RecursiveCorpusReaders
 
 RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
-  std::tr1::unordered_map<std::string, CorpusReader *> const &readers)
+  CorpusReaders const &readers)
 {
-  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator
+  for (CorpusReaders::const_iterator
       iter = readers.begin();
       iter != readers.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second,
@@ -280,10 +282,10 @@ RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
 }
 
 RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
-  std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
+  CorpusReaders const &readers,
   std::string const &query)
 {
-  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator
+  for (CorpusReaders::const_iterator
       iter = readers.begin();
       iter != readers.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second,
