@@ -41,7 +41,9 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         /**
          * Get contents of entry pointed to by iterator.
          * This will be a null string for an ordinary iterator,
-         * and the matching part for a query iterator.
+         * and the string value for a query iterator. If the query
+         * does not evaluate to a string, the node value will be
+         * returned (which may be empty).
          */
         std::string contents(CorpusReader const &rdr) const;
 
