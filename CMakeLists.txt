@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(AlpinoCorpus)
 
-set (ALPINOCORPUS_VERSION "0.9.9")
+set (ALPINOCORPUS_VERSION "1.2.0")
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
@@ -47,8 +47,15 @@ endif()
 option(WITH_RUBY
   "Compile Ruby bindings" OFF)
 
+option(USE_REMOTE_CORPUS "Enable remote corpus" ON)
+
+if(USE_REMOTE_CORPUS)
 find_package(Boost 1.46.1 COMPONENTS system date_time iostreams
   filesystem thread REQUIRED)
+else()
+find_package(Boost 1.46.1 COMPONENTS system date_time filesystem
+  thread REQUIRED)
+endif()
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
@@ -88,11 +95,13 @@ if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
 
-find_package(OpenSSL)
-if (OPENSSL_FOUND)
-  set(ALPINOCORPUS_WITH_SSL ON)
-  option(ALPINOCORPUS_WITH_SSL_STRICT
-	"With SSL, enable domain verification" OFF)
+if(USE_REMOTE_CORPUS)
+  find_package(OpenSSL)
+  if (OPENSSL_FOUND)
+    set(ALPINOCORPUS_WITH_SSL ON)
+    option(ALPINOCORPUS_WITH_SSL_STRICT
+ 	"With SSL, enable domain verification" OFF)
+  endif()
 endif()
 
 find_package(LibXslt REQUIRED)
@@ -123,7 +132,6 @@ set(HEADERS
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
-  include/AlpinoCorpus/RemoteCorpusReader.hh
   include/AlpinoCorpus/capi.h
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
@@ -134,8 +142,6 @@ set(HEADERS
   src/CompactCorpusReaderPrivate.hh
   src/FilterIter.hh
   src/MultiCorpusReaderPrivate.hh
-  src/RemoteCorpusReaderPrivate.hh
-  src/util/GetUrl.hh
   src/StylesheetIter.hh
   src/XSLTransformer.hh
   src/util/base64.hh
@@ -162,12 +168,9 @@ set(SOURCES
   src/FilterIter.cpp
   src/CompactCorpusReader.cpp
   src/CompactCorpusReaderPrivate.cpp
-  src/util/GetUrl.cpp
   src/MultiCorpusReader.cpp
   src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
-  src/RemoteCorpusReader.cpp
-  src/RemoteCorpusReaderPrivate.cpp
   src/IterImpl.cpp
   src/StylesheetIter.cpp
   src/XSLTransformer.cpp
@@ -190,6 +193,19 @@ if(USE_DBXML)
   )
 endif()
 
+if(USE_REMOTE_CORPUS)
+  list(APPEND HEADERS
+    include/AlpinoCorpus/RemoteCorpusReader.hh
+    src/RemoteCorpusReaderPrivate.hh
+    src/util/GetUrl.hh
+  )
+  list(APPEND SOURCES
+    src/RemoteCorpusReader.cpp
+    src/RemoteCorpusReaderPrivate.cpp
+    src/util/GetUrl.cpp
+  )
+endif()
+
 add_library(alpino_corpus SHARED
 	${SOURCES}
 	${HEADERS}
@@ -207,9 +223,11 @@ if(USE_DBXML)
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
 
-if(ALPINOCORPUS_WITH_SSL)
-  target_link_libraries(alpino_corpus ${OPENSSL_LIBRARIES})
-endif(ALPINOCORPUS_WITH_SSL)
+if(USE_REMOTE_CORPUS)
+  if(ALPINOCORPUS_WITH_SSL)
+    target_link_libraries(alpino_corpus ${OPENSSL_LIBRARIES})
+  endif(ALPINOCORPUS_WITH_SSL)
+endif()
 
 target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
 
@@ -222,7 +240,7 @@ install(DIRECTORY include/AlpinoCorpus
   DESTINATION include
   FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
 
-install(FILES alpinocorpus.pc
+install(FILES ${AlpinoCorpus_BINARY_DIR}/alpinocorpus.pc
   DESTINATION lib/pkgconfig)
 
 # Unit tests
@@ -233,8 +251,10 @@ if(USE_DBXML)
   #add_test(writer writer_test)
 endif()
 
-add_executable(geturl_test test/geturl.cpp)
-target_link_libraries(geturl_test alpino_corpus)
+if(USE_REMOTE_CORPUS)
+  add_executable(geturl_test test/geturl.cpp)
+  target_link_libraries(geturl_test alpino_corpus)
+endif()
 
 add_executable(readers_available test/readers_available.cpp)
 target_link_libraries(readers_available alpino_corpus)
