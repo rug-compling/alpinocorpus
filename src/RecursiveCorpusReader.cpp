@@ -49,6 +49,7 @@ class RecursiveCorpusReaderPrivate : public CorpusReader
     IterImpl *copy() const;
     std::string current() const;
     bool equals(IterImpl const &other) const;
+    void nextIterator();
     void next();
   private:
 
@@ -277,6 +278,11 @@ RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
       iter != readers.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second,
           (iter->second->begin())));
+
+  // If we have a query for which none of the corpora has a matching result,
+  // then the iterator is in fact an end-iterator. We just don't know it yet,
+  // unless we attempt to move the iterator.
+  nextIterator();
 }
 
 RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
@@ -288,6 +294,11 @@ RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
       iter != readers.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second,
           (iter->second->query(XPATH, query))));
+
+  // If we have a query for which none of the corpora has a matching result,
+  // then the iterator is in fact an end-iterator. We just don't know it yet,
+  // unless we attempt to move the iterator.
+  nextIterator();
 }
 
 RecursiveCorpusReaderPrivate::RecursiveIter::~RecursiveIter() {}
@@ -326,18 +337,24 @@ bool RecursiveCorpusReaderPrivate::RecursiveIter::equals(IterImpl const &other) 
   }
 }
 
-void RecursiveCorpusReaderPrivate::RecursiveIter::next() {
-  // Iteration is done. Yay.
-  if (d_iters.size() == 0)
-    return;
+void RecursiveCorpusReaderPrivate::RecursiveIter::next()
+{
+  // If we are already in an end-state, attempt to find the next usable
+  // iterator.
+  if (d_iters.front().iter == d_iters.front().reader->end())
+    nextIterator();
+  // If we arrive at the end of the current iterator, find the next usable
+  // iterator.
+  else if (++d_iters.front().iter == d_iters.front().reader->end())
+    nextIterator();
+}
 
-  // Move the iterator over the current corpus .
-  if (++d_iters.front().iter != d_iters.front().reader->end())
-    return;
 
-  // Ok, we are at the end of the current corpus, so we'll remove the
-  // corpus from the iteration list, and get started on the next corpus.
-  d_iters.pop_front();
+void RecursiveCorpusReaderPrivate::RecursiveIter::nextIterator()
+{
+  while (d_iters.size() != 0 &&
+    d_iters.front().iter == d_iters.front().reader->end())
+    d_iters.pop_front();
 }
 
 }
