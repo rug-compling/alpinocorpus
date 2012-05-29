@@ -15,6 +15,16 @@ typedef struct {
   char const *value;
 } marker_query_t;
 
+/**
+ * Initialize the library.
+ */
+void alpinocorpus_initialize();
+
+/**
+ * Cleanup the library.
+ */
+void alpinocorpus_cleanup();
+
 /*** CORPUS READER ***/
 
 /**

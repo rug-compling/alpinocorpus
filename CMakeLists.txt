@@ -109,6 +109,12 @@ if(LIBXSLT_FOUND)
   include_directories(${LIBXSLT_INCLUDE_DIR})
 endif()
 
+find_package(LibExslt REQUIRED)
+if(LIBEXSLT_FOUND)
+  include_directories(${LIBEXSLT_INCLUDE_DIR})
+endif()
+
+
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
   "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
@@ -232,6 +238,7 @@ if(USE_REMOTE_CORPUS)
 endif()
 
 target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
+target_link_libraries(alpino_corpus ${LIBEXSLT_LIBRARIES})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib

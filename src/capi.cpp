@@ -16,6 +16,25 @@
 
 extern "C" {
 
+#include <libxslt/xslt.h>
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
+#include <libexslt/exslt.h>
+
+void alpinocorpus_initialize()
+{
+  xmlInitMemory();
+  xmlInitParser();
+  xmlXPathInit();
+  exsltRegisterAll();
+}
+
+void alpinocorpus_cleanup()
+{
+  xsltCleanupGlobals();
+  xmlCleanupParser();
+}
+
 struct alpinocorpus_reader_t {
     alpinocorpus_reader_t(alpinocorpus::CorpusReader *reader) : corpusReader(reader) {}
 
