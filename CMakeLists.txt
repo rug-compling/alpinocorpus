@@ -29,6 +29,7 @@ list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
 include_directories(
   ${AlpinoCorpus_SOURCE_DIR}/include
   ${AlpinoCorpus_BINARY_DIR}/include
+  ${AlpinoCorpus_SOURCE_DIR}/vendor/websocketpp/src
 )
 
 if (APPLE OR WIN32)
@@ -50,11 +51,11 @@ option(WITH_RUBY
 option(USE_REMOTE_CORPUS "Enable remote corpus" ON)
 
 if(USE_REMOTE_CORPUS)
-find_package(Boost 1.46.1 COMPONENTS system date_time iostreams
-  filesystem thread REQUIRED)
+find_package(Boost 1.48 COMPONENTS system date_time iostreams
+  filesystem random regex thread REQUIRED)
 else()
-find_package(Boost 1.46.1 COMPONENTS system date_time filesystem
-  thread REQUIRED)
+find_package(Boost 1.48 COMPONENTS system date_time filesystem
+  random regex thread REQUIRED)
 endif()
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -114,6 +115,10 @@ if(LIBEXSLT_FOUND)
   include_directories(${LIBEXSLT_INCLUDE_DIR})
 endif()
 
+find_package(LibJson REQUIRED)
+if(LIBJSON_FOUND)
+  include_directories(${LIBJSON_INCLUDE_DIR})
+endif()
 
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
@@ -138,6 +143,7 @@ set(HEADERS
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
+  include/AlpinoCorpus/WebSocketReader.hh
   include/AlpinoCorpus/capi.h
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
@@ -149,7 +155,12 @@ set(HEADERS
   src/FilterIter.hh
   src/MultiCorpusReaderPrivate.hh
   src/StylesheetIter.hh
+  src/WebSocketReaderPrivate.hh
   src/XSLTransformer.hh
+  src/MessageListener/MessageListener.hh
+  src/MessageListener/GetMessageListener.hh
+  src/MessageListener/QueuedMessageListener.hh
+  src/util/JSONObject.hh
   src/util/NameCompare.hh
   src/util/base64.hh
   src/util/bufutil.hh
@@ -178,13 +189,26 @@ set(SOURCES
   src/MultiCorpusReader.cpp
   src/MultiCorpusReaderPrivate.cpp
   src/RecursiveCorpusReader.cpp
+  src/WebSocketReader.cpp
+  src/WebSocketReaderPrivate.cpp
   src/IterImpl.cpp
   src/StylesheetIter.cpp
   src/XSLTransformer.cpp
   src/capi.cpp
+  src/MessageListener/GetMessageListener.cpp
+  src/MessageListener/QueuedMessageListener.cpp
+  src/util/JSONObject.cpp
   src/util/NameCompare.cpp
   src/util/textfile.cpp
   src/util/url.cpp
+
+  vendor/websocketpp/src/base64/base64.cpp
+  vendor/websocketpp/src/messages/data.cpp
+  vendor/websocketpp/src/network_utilities.cpp
+  vendor/websocketpp/src/processors/hybi_header.cpp
+  vendor/websocketpp/src/processors/hybi_util.cpp
+  vendor/websocketpp/src/sha1/sha1.cpp
+  vendor/websocketpp/src/uri.cpp
 )
 
 if(USE_DBXML)
@@ -230,6 +254,8 @@ if(USE_DBXML)
   target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
+
+target_link_libraries(alpino_corpus ${LIBJSON_LIBRARY})
 
 if(USE_REMOTE_CORPUS)
   if(ALPINOCORPUS_WITH_SSL)

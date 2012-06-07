@@ -8,6 +8,8 @@
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
+#include <AlpinoCorpus/WebSocketReader.hh>
+
 
 #include <config.hh>
 
@@ -23,6 +25,10 @@ namespace alpinocorpus {
 
     CorpusReader *CorpusReaderFactory::open(std::string const &corpusPath)
     {
+
+        try {
+            return new WebSocketReader(corpusPath);
+        } catch (OpenError const &) {}
 
 #if defined(USE_REMOTE_CORPUS)
         try {
