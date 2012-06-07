@@ -1,0 +1,8 @@
+- Even the most basic error handling is missing.
+- Reconnect when a connection is dropped for some reason.
+
+Blocked until there is server-side support:
+
+- Specify the corpus in JSON commands.
+- Retrieve a list of corpora from the server.
+- Real query termination.
