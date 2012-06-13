@@ -62,7 +62,7 @@ WebSocketReaderPrivate::WebSocketReaderPrivate(std::string const &url)
       d_connection.reset();
       d_handler.reset();
 
-      throw Error(std::string("WebSocket: ") + reason);
+      throw ConnectionError(std::string("WebSocket: ") + reason);
   }
 }
 
@@ -161,7 +161,7 @@ std::string WebSocketReaderPrivate::readEntry(std::string const &entry) const
   if (obj)
     return (*obj)->stringValue("data");
   else
-    throw Error("Connection closed");
+    throw ConnectionError("Connection closed");
 }
 
 WebSocketReaderPrivate::WebSocketIter::WebSocketIter(
@@ -209,7 +209,7 @@ void WebSocketReaderPrivate::WebSocketIter::next()
     d_current = (*d_listener)();
 
     if (!d_current)
-        throw Error("Connection closed");
+        throw ConnectionError("Connection closed");
 
     if (*d_current == boost::shared_ptr<JSONObject>())
         throw IterationInterrupted();

@@ -99,6 +99,17 @@ namespace alpinocorpus {
     };
 
     /**
+     * Connection error.
+     */
+    class ConnectionError : public Error
+    {
+      public:
+        explicit ConnectionError(std::string const &msg)
+          : Error(msg) {}
+        virtual ~ConnectionError() throw() {}
+    };
+
+    /**
      * Iteration is interrupted.
      */
     class IterationInterrupted : public Error
