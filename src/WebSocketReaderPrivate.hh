@@ -24,6 +24,7 @@ public:
   virtual ~AlpinoCorpusHandler() {}
   void addListener(MessageListener *listener);
   void on_message(connection_ptr conn, message_ptr msg);
+  void on_close(connection_ptr conn);
   void on_open(connection_ptr connection);
   void removeListener(MessageListener *listener);
   void send(std::string const &msg);
@@ -74,7 +75,7 @@ private:
         bool d_first;
         boost::shared_ptr<AlpinoCorpusHandler> d_handler;
         boost::shared_ptr<QueuedMessageListener> d_listener;
-        boost::shared_ptr<JSONObject> d_current;
+        boost::optional<JSONObjectPtr> d_current;
     };
 
     boost::shared_ptr<AlpinoCorpusHandler> d_handler;

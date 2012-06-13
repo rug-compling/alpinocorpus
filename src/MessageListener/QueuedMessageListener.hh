@@ -4,6 +4,7 @@
 #include <queue>
 #include <string>
 
+#include <boost/optional.hpp>
 #include <boost/thread.hpp>
 
 #include "MessageListener.hh"
@@ -18,16 +19,17 @@ public:
       d_identifier(newIdentifier), d_interrupted(false) {}
   ~QueuedMessageListener();
 
-  boost::shared_ptr<JSONObject> operator()();
+  boost::optional<JSONObjectPtr> operator()();
   bool operator==(QueuedMessageListener const &other);
 
+  void close();
   std::string const &identifier();
   void interrupt();
-  void process(boost::shared_ptr<JSONObject> payload);
+  void process(JSONObjectPtr payload);
 
 private:
   std::string d_identifier;
-  std::queue<boost::shared_ptr<JSONObject> > d_payloads;
+  std::queue<boost::optional<JSONObjectPtr> > d_payloads;
   mutable boost::mutex d_payloadsMutex;
   boost::condition_variable d_payloadReady;
   bool d_interrupted;

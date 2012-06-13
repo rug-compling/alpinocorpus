@@ -1,5 +1,6 @@
 #include <string>
 
+#include <boost/optional.hpp>
 #include <boost/thread.hpp>
 
 #include "../util/JSONObject.hh"
@@ -8,7 +9,7 @@
 
 namespace alpinocorpus {
 
-boost::shared_ptr<JSONObject> GetMessageListener::operator()()
+boost::optional<JSONObjectPtr> GetMessageListener::operator()()
 {
     boost::mutex connection_mutex;
     boost::unique_lock<boost::mutex> connection_lock(connection_mutex);
@@ -17,8 +18,13 @@ boost::shared_ptr<JSONObject> GetMessageListener::operator()()
     return d_payload;
 }
 
+void GetMessageListener::close()
+{
+    d_payload = boost::optional<JSONObjectPtr>();
+    d_payloadReady.notify_one();
+}
 
-boost::shared_ptr<JSONObject> GetMessageListener::payload()
+boost::optional<JSONObjectPtr> GetMessageListener::payload()
 {
     return d_payload;
 }
@@ -33,7 +39,6 @@ void GetMessageListener::process(boost::shared_ptr<JSONObject> payload)
     d_payload = payload;
     d_payloadReady.notify_one();
 }
-
 
 
 }

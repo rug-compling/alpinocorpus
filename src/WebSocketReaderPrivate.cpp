@@ -5,6 +5,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/optional.hpp>
 #include <boost/thread.hpp>
 
 #include <json/json.h>
@@ -141,12 +142,13 @@ std::string WebSocketReaderPrivate::readEntry(std::string const &entry) const
   d_handler->addListener(&getListener);
   d_handler->send(std::string("{\"command\": \"get\", \"identifier\": \"") +
       id + "\", \"entry\": \"" + entry + "\"}");
-  boost::shared_ptr<JSONObject> obj = getListener();
+  boost::optional<JSONObjectPtr> obj = getListener();
   d_handler->removeListener(&getListener);
  
-  std::string data = obj->stringValue("data");
-
-  return data;
+  if (obj)
+    return (*obj)->stringValue("data");
+  else
+    throw Error("Connection closed");
 }
 
 WebSocketReaderPrivate::WebSocketIter::WebSocketIter(
@@ -193,12 +195,15 @@ void WebSocketReaderPrivate::WebSocketIter::next()
 {
     d_current = (*d_listener)();
 
-    if (d_current == boost::shared_ptr<JSONObject>())
+    if (!d_current)
+        throw Error("Connection closed");
+
+    if (*d_current == boost::shared_ptr<JSONObject>())
         throw IterationInterrupted();
 
     // If the server sends a message that it has enumerated
     // all entries, change this iterator in an end iterator...
-    if (d_current->stringValue("result") == "end")
+    if ((*d_current)->stringValue("result") == "end")
     {
         d_first = false; // We could've had zero results...
         d_handler->removeListener(d_listener.get());
@@ -211,14 +216,14 @@ void WebSocketReaderPrivate::WebSocketIter::next()
 std::string WebSocketReaderPrivate::WebSocketIter::contents(CorpusReader const &) const
 {
     advanceToFirst();
-    return d_current->stringValue("contents");
+    return (*d_current)->stringValue("contents");
 }
 
 
 std::string WebSocketReaderPrivate::WebSocketIter::current() const
 {
     advanceToFirst();
-    return d_current->stringValue("entry");
+    return (*d_current)->stringValue("entry");
 }
 
 IterImpl *WebSocketReaderPrivate::WebSocketIter::copy() const
@@ -266,6 +271,19 @@ void AlpinoCorpusHandler::removeListener(MessageListener *listener)
 {
   boost::mutex::scoped_lock lock(d_listenersMutex);
   d_listeners.erase(listener);
+}
+
+void AlpinoCorpusHandler::on_close(connection_ptr conn)
+{
+  if (d_listeners.size() != 0)
+  {
+    boost::shared_ptr<JSONObject> json(JSONObject::parse(
+      "{\"result\": \"connection_closed\"}"));
+
+    for (Listeners::const_iterator iter = d_listeners.begin();
+        iter != d_listeners.end(); ++iter)
+      (*iter)->close();
+  }
 }
 
 void AlpinoCorpusHandler::on_message(connection_ptr conn, message_ptr msg)

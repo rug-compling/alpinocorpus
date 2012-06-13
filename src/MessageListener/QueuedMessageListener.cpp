@@ -1,6 +1,7 @@
 #include <queue>
 #include <string>
 
+#include <boost/optional.hpp>
 #include <boost/thread.hpp>
 
 #include "QueuedMessageListener.hh"
@@ -11,7 +12,21 @@ namespace alpinocorpus {
 QueuedMessageListener::~QueuedMessageListener()
 {
     boost::mutex::scoped_lock lock(d_payloadsMutex);
-    d_payloads = std::queue<boost::shared_ptr<JSONObject> >();
+    d_payloads = std::queue<boost::optional<JSONObjectPtr> >();
+}
+
+void QueuedMessageListener::close()
+{
+    bool wasEmpty;
+    {
+        boost::mutex::scoped_lock lock(d_payloadsMutex);
+
+        wasEmpty = d_payloads.empty();
+        d_payloads.push(boost::optional<JSONObjectPtr>());
+
+        if (wasEmpty)
+            d_payloadReady.notify_one();
+    }
 }
 
 std::string const &QueuedMessageListener::identifier()
@@ -25,7 +40,7 @@ void QueuedMessageListener::interrupt()
   d_payloadReady.notify_one();
 }
 
-void QueuedMessageListener::process(boost::shared_ptr<JSONObject> payload)
+void QueuedMessageListener::process(JSONObjectPtr payload)
 {
   std::string identifier = payload->stringValue("identifier");
 
@@ -47,7 +62,7 @@ void QueuedMessageListener::process(boost::shared_ptr<JSONObject> payload)
   //if (wasEmpty)
 }
 
-boost::shared_ptr<JSONObject> QueuedMessageListener::operator()()
+boost::optional<JSONObjectPtr> QueuedMessageListener::operator()()
 {
   {
     boost::mutex::scoped_lock lock(d_payloadsMutex);
@@ -57,12 +72,12 @@ boost::shared_ptr<JSONObject> QueuedMessageListener::operator()()
   }
 
   if (d_interrupted)
-      return boost::shared_ptr<JSONObject>();
+      return boost::optional<JSONObjectPtr>();
 
   boost::mutex::scoped_lock lock(d_payloadsMutex);
 
   assert(!d_payloads.empty());
-  boost::shared_ptr<JSONObject> next = d_payloads.front();
+  boost::optional<JSONObjectPtr> next = d_payloads.front();
   d_payloads.pop();
 
   return next;
