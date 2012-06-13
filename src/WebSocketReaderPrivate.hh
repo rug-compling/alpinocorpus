@@ -25,6 +25,7 @@ public:
   void addListener(MessageListener *listener);
   void on_message(connection_ptr conn, message_ptr msg);
   void on_close(connection_ptr conn);
+  void on_fail(connection_ptr con);
   void on_open(connection_ptr connection);
   void removeListener(MessageListener *listener);
   void send(std::string const &msg);

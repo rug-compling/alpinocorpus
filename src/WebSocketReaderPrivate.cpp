@@ -39,7 +39,7 @@ WebSocketReaderPrivate::WebSocketReaderPrivate(std::string const &url)
   : d_handler(new AlpinoCorpusHandler()), d_endpoint(d_handler)
 {
   if (url.find("ws://") == string::npos)
-    throw OpenError("Could not open WebSocket corpus.");
+    throw OpenError("Corpus is not a WebSocket URL.");
 
   d_endpoint.alog().unset_level(websocketpp::log::alevel::ALL);
   d_endpoint.elog().unset_level(websocketpp::log::elevel::ALL);
@@ -51,6 +51,19 @@ WebSocketReaderPrivate::WebSocketReaderPrivate(std::string const &url)
 
   // Wait until the connection is ready.
   d_handler->d_connectionReady.wait(lock);
+
+  if (d_connection->get_fail_code() != websocketpp::fail::status::GOOD)
+  {
+      std::string reason = d_connection->get_fail_reason();
+
+      d_endpoint.close_all();
+      d_endpointThread->join();
+      d_endpointThread.reset();
+      d_connection.reset();
+      d_handler.reset();
+
+      throw Error(std::string("WebSocket: ") + reason);
+  }
 }
 
 WebSocketReaderPrivate::~WebSocketReaderPrivate()
@@ -284,6 +297,15 @@ void AlpinoCorpusHandler::on_close(connection_ptr conn)
         iter != d_listeners.end(); ++iter)
       (*iter)->close();
   }
+}
+
+void AlpinoCorpusHandler::on_fail(connection_ptr conn)
+{
+    // Handler user should check state, since we are in a
+    // different thread.
+    boost::mutex::scoped_lock lock(d_connectionReadyMutex);
+    d_connection.reset();
+    d_connectionReady.notify_one();
 }
 
 void AlpinoCorpusHandler::on_message(connection_ptr conn, message_ptr msg)
