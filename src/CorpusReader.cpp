@@ -5,6 +5,7 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
+#include <AlpinoCorpus/QueryResultHandler.hh>
 
 #include <typeinfo>
 
@@ -88,6 +89,11 @@ namespace alpinocorpus {
         return d_impl->contents(rdr);
     }
 
+    void CorpusReader::entries(QueryResultHandler *handler) const
+    {
+      runEntries(handler);
+    }
+
     void CorpusReader::EntryIterator::interrupt()
     {
         // XXX this shouldn't be necessary, we don't do this in other places
@@ -108,6 +114,13 @@ namespace alpinocorpus {
     std::string CorpusReader::name() const
     {
         return getName();
+    }
+
+    /** Execute a query */
+    void CorpusReader::query(QueryDialect d, std::string const &q,
+        QueryResultHandler *handler) const
+    {
+      runQuery(d, q, handler);
     }
     
     std::string CorpusReader::read(std::string const &entry,
@@ -273,6 +286,29 @@ namespace alpinocorpus {
       std::list<MarkerQuery> const &markerQueries) const
     {
       return runQueryWithStylesheet(d, query, stylesheet, markerQueries);
+    }
+
+    /* Temporary implementation, until we have implemted handlers in all
+       corpus readers. */
+    void CorpusReader::runEntries(QueryResultHandler *handler) const
+    {
+        for (EntryIterator iter = begin(); iter != end(); ++iter)
+        {
+            Entry entry = {*iter, iter.contents(*this)};
+            handler->handleEntry(entry);
+        }
+   }
+    
+    /* Temporary implementation, until we have implemted handlers in all
+       corpus readers. */
+    void CorpusReader::runQuery(QueryDialect d, std::string const &q,
+        QueryResultHandler *handler) const
+    {
+      for (EntryIterator iter = query(d, q); iter != end(); ++iter)
+      {
+          Entry entry = {*iter, iter.contents(*this)};
+          handler->handleEntry(entry);
+      }
     }
 
     CorpusReader::EntryIterator CorpusReader::runQueryWithStylesheet(

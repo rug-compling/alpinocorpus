@@ -9,6 +9,7 @@
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
+#include <AlpinoCorpus/QueryResultHandler.hh>
 
 namespace alpinocorpus {
 
@@ -21,7 +22,6 @@ namespace alpinocorpus {
 class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 {
   public:
-    /** Forward iterator over entry names */
     class ALPINO_CORPUS_EXPORT EntryIterator
     : public std::iterator<std::input_iterator_tag, std::string, ptrdiff_t, std::string *, std::string>
     {
@@ -89,11 +89,18 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
 
     enum QueryDialect { XPATH, XQUERY };
 
+    /** Return the entries in a corpus */
+    void entries(QueryResultHandler *handler) const;
+
     /** Is a query valid? */
     bool isValidQuery(QueryDialect d, bool variables, std::string const &q) const;
     
     /** Execute query. The end of the range is given by end(). */
     EntryIterator query(QueryDialect d, std::string const &q) const;
+
+    /** Execute a query */
+    void query(QueryDialect d, std::string const &q,
+        QueryResultHandler *handler) const;
 
     /**
      * Execute a query, applying the given stylesheet to each entry. The
@@ -121,8 +128,11 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,
         std::list<MarkerQuery> const &queries) const;
+    void runEntries(QueryResultHandler *handler) const;
     virtual EntryIterator runXPath(std::string const &) const;
     virtual EntryIterator runXQuery(std::string const &) const;
+    virtual void runQuery(QueryDialect d, std::string const &q,
+        QueryResultHandler *handler) const;
     virtual EntryIterator runQueryWithStylesheet(QueryDialect d,
       std::string const &q, std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries) const;

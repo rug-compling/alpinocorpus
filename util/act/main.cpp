@@ -15,6 +15,7 @@
 #include <AlpinoCorpus/CorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
+#include <AlpinoCorpus/QueryResultHandler.hh>
 #include <config.hh>
 
 #if defined(USE_DBXML)
@@ -44,20 +45,32 @@ namespace tr1 = std::tr1;
 typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
     UniqueFilterIter;
 
+class PrintHandler : public QueryResultHandler
+{
+public:
+    PrintHandler(bool unique = true) : d_unique(unique) {}
+
+    void handleEntry(Entry const &entry)
+    {
+        if (!d_unique || entry.name != d_previous)
+          std::cout << entry.name << std::endl;
+
+        d_previous = entry.name;
+    }
+private:
+    std::string d_previous;
+    bool d_unique;
+};
+
 void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   std::string const &query)
 {
-  CorpusReader::EntryIterator i, end(reader->end());
-  
+  PrintHandler ph;
+
   if (query.empty())
-    i = reader->begin();
+    reader->entries(&ph);
   else
-    i = reader->query(CorpusReader::XPATH, query);
-
-  NotEqualsPrevious<std::string> pred;
-
-  std::copy(UniqueFilterIter(pred, i, end), UniqueFilterIter(pred, end, end),
-    std::ostream_iterator<std::string>(std::cout, "\n"));
+    reader->query(CorpusReader::XPATH, query, &ph);
 }
 
 void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
