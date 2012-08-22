@@ -62,53 +62,17 @@ IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
     return new DbIter(*this);
 }
 
-/* operator* */
-std::string DbCorpusReaderPrivate::DbIter::current() const
+bool DbCorpusReaderPrivate::DbIter::hasNext()
 {
-    db::XmlValue v;
-    try {
-        r.peek(v);
-    } catch (db::XmlException const &e) {
-        throw Error(e.what());
-    }
-
-    if (v.isNode()) {
-        db::XmlDocument doc = v.asDocument();
-        return doc.getName();
-    } else
-        return std::string();
-}
-
-/* operator== */
-bool DbCorpusReaderPrivate::DbIter::equals(IterImpl const &that) const
-{
-    try {
-        // The const_casts are needed because hasNext() is not const.
-        // XXX should be safe.
-        DbIter &other= const_cast<DbIter&>(dynamic_cast<DbIter const &>(that));
-        DbIter &self = const_cast<DbIter&>(*this);
-        try {
-            // XXX - Why do we check whether we are at the end first, rather than
-            // comparing the XmlResult objects immediately?
-            if (!self.r.hasNext() && !other.r.hasNext())
-                return true;        // both at end()
-        } catch (db::XmlException const &e) {
-        if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
-                throw IterationInterrupted();
-            else
-                throw Error(e.what());
-        }
-        return self.r == other.r;
-    } catch (std::bad_cast const &e) {
-        return false;
-    }
+  return r.hasNext();
 }
 
 /* operator++ */
-void DbCorpusReaderPrivate::DbIter::next()
+Entry DbCorpusReaderPrivate::DbIter::next(CorpusReader const &)
 {
+    db::XmlValue v;
+
     try {
-        db::XmlValue v;
         r.next(v);
     } catch (db::XmlException const &e) {
         if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
@@ -116,6 +80,20 @@ void DbCorpusReaderPrivate::DbIter::next()
         else
           throw Error(e.what());
     }
+   
+    std::string name;
+    std::string value;
+
+    if (v.isNode()) {
+        db::XmlDocument doc = v.asDocument();
+        value = v.getNodeValue();
+        name = doc.getName();
+    } else if (v.isString())
+      value = v.asString();
+
+    Entry e = {name, value};
+
+    return e;
 }
 
 DbCorpusReaderPrivate::QueryIter::QueryIter(db::XmlResults const &r, db::XmlQueryContext const &ctx)
@@ -126,19 +104,6 @@ DbCorpusReaderPrivate::QueryIter::QueryIter(db::XmlResults const &r, db::XmlQuer
 void DbCorpusReaderPrivate::QueryIter::interrupt()
 {
     context.interruptQuery();
-}
-
-std::string DbCorpusReaderPrivate::QueryIter::contents(CorpusReader const &) const
-{
-    db::XmlValue v;
-    r.peek(v);
-
-    if (v.isNode())
-        return v.getNodeValue();
-    else if (v.isString())
-        return v.asString();
-
-    return std::string();
 }
 
 IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
@@ -166,14 +131,9 @@ DbCorpusReaderPrivate::~DbCorpusReaderPrivate()
 {
 }
 
-CorpusReader::EntryIterator DbCorpusReaderPrivate::getBegin() const
+CorpusReader::EntryIterator DbCorpusReaderPrivate::getEntries() const
 {
     return EntryIterator(new DbIter(container));
-}
-
-CorpusReader::EntryIterator DbCorpusReaderPrivate::getEnd() const
-{
-    return EntryIterator(new DbIter(mgr));
 }
 
 std::string DbCorpusReaderPrivate::getName() const

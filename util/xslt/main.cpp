@@ -3,8 +3,8 @@
 #include <string>
 
 #include <boost/tr1/memory.hpp>
+#include <boost/tr1/unordered_set.hpp>
 
-#include <boost/iterator/filter_iterator.hpp>
 #include <boost/scoped_ptr.hpp>
 
 extern "C" {
@@ -15,6 +15,7 @@ extern "C" {
 }
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 
 #include "../src/util/textfile.hh" // XXX - hmpf
@@ -28,35 +29,34 @@ using alpinocorpus::CorpusReader;
 
 namespace tr1 = std::tr1;
 
-typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
-    UniqueFilterIter;
-
 void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
   tr1::shared_ptr<std::string const> query, std::string const &stylesheet)
 {
-  std::list<CorpusReader::MarkerQuery> markerQueries;
-  if (query) {
-     // Markers
-    CorpusReader::MarkerQuery activeMarker(*query, "active", "1");
-    markerQueries.push_back(activeMarker); 
-  }
+    std::list<CorpusReader::MarkerQuery> markerQueries;
+    if (query) {
+        // Markers
+        CorpusReader::MarkerQuery activeMarker(*query, "active", "1");
+        markerQueries.push_back(activeMarker); 
+    }
 
-  CorpusReader::EntryIterator i, end(reader->end());
-  
-  if (query)
-    i = reader->queryWithStylesheet(CorpusReader::XPATH, *query,
-      stylesheet, markerQueries);
-  else
-    i = reader->beginWithStylesheet(stylesheet);
+    CorpusReader::EntryIterator i;
+    
+    if (query)
+        i = reader->queryWithStylesheet(CorpusReader::XPATH, *query,
+            stylesheet, markerQueries);
+    else
+        i = reader->entriesWithStylesheet(stylesheet);
 
-  NotEqualsPrevious<std::string> pred;
+    tr1::unordered_set<std::string> seen;
 
-  for (UniqueFilterIter iter(pred, i, end); iter != UniqueFilterIter(pred, end, end);
-      ++iter)
-    try {
-      std::cout << i.contents(*reader);
-    } catch (std::runtime_error &e) {
-      std::cerr << "Could not apply stylesheet to: " << *iter << std::endl;
+    while (i.hasNext())
+    {
+        alpinocorpus::Entry e = i.next(*reader);
+        if (seen.find(e.name) == seen.end())
+        {
+            seen.insert(e.name);
+            std::cout << e.contents;
+        }
     }
 }
 

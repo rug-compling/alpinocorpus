@@ -16,8 +16,7 @@ public:
   virtual ~MultiCorpusReader();
   void push_back(std::string const &name, CorpusReader *Reader);
 private:
-  EntryIterator getBegin() const;
-  EntryIterator getEnd() const;
+  EntryIterator getEntries() const;
   std::string getName() const;
   size_t getSize() const;
   std::string readEntry(std::string const &) const;

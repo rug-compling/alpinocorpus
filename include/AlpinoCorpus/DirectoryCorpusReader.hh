@@ -26,8 +26,7 @@ public:
     ~DirectoryCorpusReader();
 
 private:
-    virtual EntryIterator getBegin() const;
-    virtual EntryIterator getEnd() const;
+    virtual EntryIterator getEntries() const;
     virtual std::string getName() const;
     virtual std::string readEntry(std::string const &entry) const;
     virtual size_t getSize() const;

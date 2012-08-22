@@ -11,10 +11,9 @@
 namespace alpinocorpus {
 
     StylesheetIter::StylesheetIter(CorpusReader::EntryIterator iter,
-            CorpusReader::EntryIterator end,
             std::string const &stylesheet,
             std::list<CorpusReader::MarkerQuery> const &markerQueries) :
-        d_iter(iter), d_end(end),
+        d_iter(iter),
         d_markerQueries(markerQueries),
         d_stylesheet(stylesheet),
         d_transformer(new XSLTransformer(stylesheet))
@@ -30,34 +29,7 @@ namespace alpinocorpus {
     {
         // The only state are the wrapped iterators. We can safely reconstruct
         // the transformer.
-        return new StylesheetIter(d_iter, d_end, d_stylesheet, d_markerQueries);
-    }
-
-    std::string StylesheetIter::current() const
-    {
-        return *d_iter;
-    }
-
-    bool StylesheetIter::equals(IterImpl const &other)
-        const
-    {
-        try {
-            StylesheetIter const &otherSI =
-                dynamic_cast<StylesheetIter const &>(other);
-            
-            return (d_iter == otherSI.d_iter &&
-                d_markerQueries == otherSI.d_markerQueries &&
-                d_stylesheet == otherSI.d_stylesheet);
-        } catch (std::bad_cast const &) {
-            // The other class is not a StylesheetIter, but the user may
-            // be comparing this iterator with the wrapped end iterator.
-            return d_iter == d_end;
-        } 
-    }
-    
-    std::string StylesheetIter::contents(CorpusReader const &rdr) const
-    {
-        return d_transformer->transform(rdr.read(*d_iter, d_markerQueries));
+        return new StylesheetIter(d_iter, d_stylesheet, d_markerQueries);
     }
 
     void StylesheetIter::interrupt()
@@ -65,9 +37,24 @@ namespace alpinocorpus {
         d_iter.interrupt();
     }
 
+    bool StylesheetIter::hasNext()
+    {
+        return d_iter.hasNext();
+    }
+
+    Entry StylesheetIter::next(CorpusReader const &rdr)
+    {
+        Entry e = d_iter.next(rdr);
+        e.contents = d_transformer->transform(rdr.read(e.name, d_markerQueries));
+
+        return e;
+    }
+
+    /*
     void StylesheetIter::next()
     {
-        ++d_iter;
+        d_iter.next();
     }
+    */
 
 }

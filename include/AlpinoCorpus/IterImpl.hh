@@ -1,6 +1,8 @@
 #ifndef ALPINOCORPUS_ITERIMPL_HH
 #define ALPINOCORPUS_ITERIMPL_HH
 
+#include <AlpinoCorpus/Entry.hh>
+
 namespace alpinocorpus {
 
     class CorpusReader;
@@ -9,12 +11,11 @@ namespace alpinocorpus {
     struct IterImpl {
         virtual ~IterImpl() {}
         virtual IterImpl *copy() const = 0;
-        virtual std::string current() const = 0;
-        virtual bool equals(IterImpl const &) const = 0;
-        virtual void next() = 0;
+        //virtual bool equals(IterImpl const &) const = 0;
+        virtual bool hasNext() = 0;
+        virtual Entry next(CorpusReader const &rdr) = 0;
 
         // Query iterators must override this
-        virtual std::string contents(CorpusReader const &rdr) const;
         virtual void interrupt();
     };
 

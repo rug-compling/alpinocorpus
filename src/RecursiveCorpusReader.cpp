@@ -10,6 +10,7 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
@@ -31,11 +32,13 @@ struct ReaderIter
   CorpusReader::EntryIterator iter;
 };
 
+/*
 bool operator==(ReaderIter const &left, ReaderIter const &right)
 {
   return left.name == right.name && left.reader == right.reader &&
     left.iter == right.iter;
 }
+*/
 
 class RecursiveCorpusReaderPrivate : public CorpusReader
 {
@@ -47,12 +50,10 @@ class RecursiveCorpusReaderPrivate : public CorpusReader
     RecursiveIter(CorpusReaders const &readers,
       std::string const &query);
     ~RecursiveIter();
-    std::string contents(CorpusReader const &) const;
     IterImpl *copy() const;
-    std::string current() const;
-    bool equals(IterImpl const &other) const;
     void nextIterator();
-    void next();
+    bool hasNext();
+    Entry next(CorpusReader const &rdr);
   private:
 
     std::list<ReaderIter> d_iters;
@@ -61,8 +62,7 @@ public:
   RecursiveCorpusReaderPrivate(std::string const &directory);
   virtual ~RecursiveCorpusReaderPrivate();
 
-  EntryIterator getBegin() const;
-  EntryIterator getEnd() const;
+  EntryIterator getEntries() const;
   std::string getName() const;
   size_t getSize() const;
   void push_back(std::string const &name, CorpusReader *reader);
@@ -92,14 +92,9 @@ RecursiveCorpusReader::~RecursiveCorpusReader()
   delete d_private;
 }
 
-CorpusReader::EntryIterator RecursiveCorpusReader::getBegin() const
+CorpusReader::EntryIterator RecursiveCorpusReader::getEntries() const
 {
-  return d_private->getBegin();
-}
-
-CorpusReader::EntryIterator RecursiveCorpusReader::getEnd() const
-{
-  return d_private->getEnd();
+  return d_private->getEntries();
 }
 
 std::string RecursiveCorpusReader::getName() const
@@ -173,17 +168,9 @@ RecursiveCorpusReaderPrivate::~RecursiveCorpusReaderPrivate()
     delete *iter;
 }
 
-CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getBegin() const
+CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getEntries() const
 {
   return EntryIterator(new RecursiveIter(d_corpusReaderMap));
-}
-
-CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getEnd() const
-{
-  // XXX - Constructing an empty map in the argument of the constructor
-  // breaks with Boost 1.48.0. See ticket 6167.
-  CorpusReaders emptyMap;
-  return EntryIterator(new RecursiveIter(emptyMap));
 }
 
 std::string RecursiveCorpusReaderPrivate::getName() const
@@ -279,7 +266,7 @@ RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
       iter = readers.begin();
       iter != readers.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second,
-          (iter->second->begin())));
+          (iter->second->entries())));
 
   // If we have a query for which none of the corpora has a matching result,
   // then the iterator is in fact an end-iterator. We just don't know it yet,
@@ -305,15 +292,6 @@ RecursiveCorpusReaderPrivate::RecursiveIter::RecursiveIter(
 
 RecursiveCorpusReaderPrivate::RecursiveIter::~RecursiveIter() {}
 
-std::string RecursiveCorpusReaderPrivate::RecursiveIter::contents(
-  CorpusReader const &reader) const
-{
-  if (d_iters.size() == 0)
-    throw std::runtime_error("Cannot dereference an end iterator!");
-
-  return d_iters.front().iter.contents(reader);
-}
-
 IterImpl *RecursiveCorpusReaderPrivate::RecursiveIter::copy() const
 {
   // No pointer members, pointer member of ReaderIter is not managed by
@@ -321,41 +299,28 @@ IterImpl *RecursiveCorpusReaderPrivate::RecursiveIter::copy() const
   return new RecursiveIter(*this);
 }
 
-std::string RecursiveCorpusReaderPrivate::RecursiveIter::current() const
+bool RecursiveCorpusReaderPrivate::RecursiveIter::hasNext()
 {
-  if (d_iters.size() == 0)
-    throw std::runtime_error("Cannot dereference an end iterator!");
-
-  return d_iters.front().name + "/" + *d_iters.front().iter;
+    return d_iters.size() != 0;
 }
 
-bool RecursiveCorpusReaderPrivate::RecursiveIter::equals(IterImpl const &other) const
+Entry RecursiveCorpusReaderPrivate::RecursiveIter::next(CorpusReader const &rdr)
 {
-  try {
-    RecursiveIter &that = const_cast<RecursiveIter &>(dynamic_cast<RecursiveIter const&>(other));
-    return that.d_iters == d_iters;
-  } catch (std::bad_cast const &) {
-    return false;
-  }
-}
+    if (d_iters.size() == 0)
+        throw std::runtime_error("Called next() on a finished iterator!");
 
-void RecursiveCorpusReaderPrivate::RecursiveIter::next()
-{
-  // If we are already in an end-state, attempt to find the next usable
-  // iterator.
-  if (d_iters.front().iter == d_iters.front().reader->end())
+    Entry e = d_iters.front().iter.next(rdr);
+    e.name = d_iters.front().name + "/" + e.name;
+
     nextIterator();
-  // If we arrive at the end of the current iterator, find the next usable
-  // iterator.
-  else if (++d_iters.front().iter == d_iters.front().reader->end())
-    nextIterator();
-}
 
+    return e;
+}
 
 void RecursiveCorpusReaderPrivate::RecursiveIter::nextIterator()
 {
   while (d_iters.size() != 0 &&
-    d_iters.front().iter == d_iters.front().reader->end())
+    !d_iters.front().iter.hasNext())
     d_iters.pop_front();
 }
 

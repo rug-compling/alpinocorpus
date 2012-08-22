@@ -9,6 +9,7 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 
 #include "DirectoryCorpusReaderPrivate.hh"
@@ -35,16 +36,10 @@ DirectoryCorpusReaderPrivate::DirectoryCorpusReaderPrivate(
 DirectoryCorpusReaderPrivate::~DirectoryCorpusReaderPrivate()
 {}
 
-CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getBegin() const
+CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEntries() const
 {
     return EntryIterator(new DirIter(d_directory,
         bf::recursive_directory_iterator(d_directory, bf::symlink_option::recurse)));
-}
-
-CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEnd() const
-{
-    return EntryIterator(new DirIter(d_directory,
-        bf::recursive_directory_iterator()));
 }
 
 std::string DirectoryCorpusReaderPrivate::getName() const
@@ -55,7 +50,18 @@ std::string DirectoryCorpusReaderPrivate::getName() const
 size_t DirectoryCorpusReaderPrivate::getSize() const
 {
     if (d_nEntries == std::numeric_limits<size_t>::max())
-        d_nEntries = std::distance(getBegin(), getEnd());
+    {
+      size_t nEntries = 0;
+
+      EntryIterator i = getEntries();
+      while (i.hasNext())
+      {
+        ++nEntries;
+        i.next(*this);
+      }
+
+      d_nEntries = nEntries;
+    }
     
     return d_nEntries;
 }
@@ -65,37 +71,14 @@ DirectoryCorpusReaderPrivate::DirIter::DirIter(
     bf::path const &path, bf::recursive_directory_iterator i) :
     d_directory(path), iter(i)
 {
-    if (!isValid())
-        next();
+    //if (!isValid())
+    //    next();
 }
 
 IterImpl *DirectoryCorpusReaderPrivate::DirIter::copy() const
 {
     // No pointer members
     return new DirIter(*this);
-}
-
-std::string DirectoryCorpusReaderPrivate::DirIter::current() const
-{
-    std::string entryPathStr = iter->path().string();
-    entryPathStr.erase(0, d_directory.string().size());
-
-    if (entryPathStr[0] == '/')
-        entryPathStr.erase(0, 1);
-
-    bf::path entryPath(entryPathStr);
-
-    return entryPath.string();
-}
-
-bool DirectoryCorpusReaderPrivate::DirIter::equals(IterImpl const &other) const
-{
-    try {
-        DirIter const &that = dynamic_cast<DirIter const &>(other);
-        return iter == that.iter;
-    } catch (std::bad_cast const &) {
-        return false;
-    }
 }
 
 bool DirectoryCorpusReaderPrivate::DirIter::isValid()
@@ -107,15 +90,35 @@ bool DirectoryCorpusReaderPrivate::DirIter::isValid()
     return iter->path().extension() == ".xml";
 }
 
-void DirectoryCorpusReaderPrivate::DirIter::next()
+bool DirectoryCorpusReaderPrivate::DirIter::hasNext()
 {
-    // Don't recurse past end.
-    //if (iter == bf::recursive_directory_iterator())
-    //    return;
+    // Position iterator at the next valid entry
+    while (!isValid()) {
+      ++iter;
+    }
 
-    do {
-        ++iter;
-    } while (!isValid());
+    return iter != bf::recursive_directory_iterator();
+}
+
+Entry DirectoryCorpusReaderPrivate::DirIter::next(CorpusReader const &rdr)
+{
+    // We assume the iterator is valid, since hasNext() should be called
+    // before next().
+
+    std::string entryPathStr = iter->path().string();
+    entryPathStr.erase(0, d_directory.string().size());
+
+    if (entryPathStr[0] == '/')
+        entryPathStr.erase(0, 1);
+
+    bf::path entryPath(entryPathStr);
+
+    // Move the iterator.
+    ++iter;
+
+    Entry entry = {entryPath.string(), ""};
+
+    return entry;
 }
 
 std::string DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) const

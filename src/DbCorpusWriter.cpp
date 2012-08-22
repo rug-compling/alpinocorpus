@@ -9,6 +9,7 @@
 #include <dbxml/DbXml.hpp>
 
 #include <AlpinoCorpus/DbCorpusWriter.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
@@ -98,9 +99,12 @@ namespace alpinocorpus {
     void DbCorpusWriterPrivate::writeFailFirst(CorpusReader const &corpus,
         db::XmlUpdateContext &ctx)
     {
-        for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
-             i != end; ++i)
-            write(*i, corpus.read(*i), ctx);
+        CorpusReader::EntryIterator i = corpus.entries();
+        while (i.hasNext())
+        {
+            Entry entry = i.next(corpus);
+            write(entry.name, corpus.read(entry.name), ctx);
+        }
     }
 
     void DbCorpusWriterPrivate::writeFailSafe(CorpusReader const &corpus,
@@ -108,13 +112,16 @@ namespace alpinocorpus {
     {
         BatchError err;
 
-        for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
-             i != end; ++i)
+        CorpusReader::EntryIterator i = corpus.entries();
+        while (i.hasNext())
+        {
+            Entry entry = i.next(corpus);
             try {
-                write(*i, corpus.read(*i), ctx);
+                write(entry.name, corpus.read(entry.name), ctx);
             } catch (Error const &e) {
                 err.append(e);
             }
+        }
 
         if (!err.empty())
             throw err;

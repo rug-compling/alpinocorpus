@@ -31,21 +31,9 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         EntryIterator(EntryIterator const &other);
         virtual ~EntryIterator();
         EntryIterator &operator=(EntryIterator const &other);
-        EntryIterator &operator++();
-        EntryIterator operator++(int);
-        bool operator==(EntryIterator const &other) const;
-        bool operator!=(EntryIterator const &other) const;
+        bool hasNext();
+        Entry next(CorpusReader const &reader);
         value_type operator*() const;
-        //value_type const *operator->() const { return impl->current(); }
-
-        /**
-         * Get contents of entry pointed to by iterator.
-         * This will be a null string for an ordinary iterator,
-         * and the string value for a query iterator. If the query
-         * does not evaluate to a string, the node value will be
-         * returned (which may be empty).
-         */
-        std::string contents(CorpusReader const &rdr) const;
 
         /**
          * Interrupt an iterator that is blocking.
@@ -74,18 +62,15 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     /** Return canonical name of corpus */
     std::string name() const;
 
-    /** Iterator to begin of entry names */
-    EntryIterator begin() const;
+    /** Iterator over entry names. */
+    EntryIterator entries() const;
 
     /**
-     * Iterator to begin of entry names, contents are transformed with
+     * Iterator over entry names, contents are transformed with
      * the given stylesheet.
      */
-    EntryIterator beginWithStylesheet(std::string const &stylesheet,
+    EntryIterator entriesWithStylesheet(std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries = std::list<MarkerQuery>()) const;
-
-    /** Iterator to end of entry names */
-    EntryIterator end() const;
 
     enum QueryDialect { XPATH, XQUERY };
 
@@ -114,8 +99,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     size_t size() const;
 
   private:
-    virtual EntryIterator getBegin() const = 0;
-    virtual EntryIterator getEnd() const = 0;
+    virtual EntryIterator getEntries() const = 0;
     virtual std::string getName() const = 0;
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;

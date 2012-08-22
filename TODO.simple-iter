@@ -1,0 +1,2 @@
+- Simplify the API (e.g. no end() is needed anymore).
+- Convert RemoteCorpusReader

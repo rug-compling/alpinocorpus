@@ -17,14 +17,9 @@ DirectoryCorpusReader::~DirectoryCorpusReader()
     delete d_private;
 }
 
-CorpusReader::EntryIterator DirectoryCorpusReader::getBegin() const
+CorpusReader::EntryIterator DirectoryCorpusReader::getEntries() const
 {
-    return d_private->getBegin();
-}
-
-CorpusReader::EntryIterator DirectoryCorpusReader::getEnd() const
-{
-    return d_private->getEnd();
+    return d_private->getEntries();
 }
 
 std::string DirectoryCorpusReader::getName() const

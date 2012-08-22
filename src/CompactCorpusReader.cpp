@@ -21,14 +21,9 @@ CompactCorpusReader::~CompactCorpusReader()
     delete d_private;
 }
 
-CorpusReader::EntryIterator CompactCorpusReader::getBegin() const
+CorpusReader::EntryIterator CompactCorpusReader::getEntries() const
 {
-    return d_private->getBegin();
-}
-
-CorpusReader::EntryIterator CompactCorpusReader::getEnd() const
-{
-    return d_private->getEnd();
+    return d_private->getEntries();
 }
 
 std::string CompactCorpusReader::getName() const

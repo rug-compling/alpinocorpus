@@ -20,14 +20,9 @@ namespace alpinocorpus {
         delete d_private;
     }
     
-    CorpusReader::EntryIterator RemoteCorpusReader::getBegin() const
+    CorpusReader::EntryIterator RemoteCorpusReader::getEntries() const
     {
-        return d_private->getBegin();
-    }
-
-    CorpusReader::EntryIterator RemoteCorpusReader::getEnd() const
-    {
-        return d_private->getEnd();
+        return d_private->getEntries();
     }
 
     std::string RemoteCorpusReader::getName() const

@@ -15,8 +15,7 @@ public:
   RecursiveCorpusReader(std::string const &directory);
   virtual ~RecursiveCorpusReader();
 private:
-  EntryIterator getBegin() const;
-  EntryIterator getEnd() const;
+  EntryIterator getEntries() const;
   std::string getName() const;
   size_t getSize() const;
   std::string readEntry(std::string const &) const;

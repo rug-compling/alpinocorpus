@@ -7,6 +7,7 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 
 namespace alpinocorpus {
@@ -27,9 +28,8 @@ class DirectoryCorpusReaderPrivate : public CorpusReader
         DirIter(boost::filesystem::path const &path,
             boost::filesystem::recursive_directory_iterator i);
         IterImpl *copy() const;
-        std::string current() const;
-        bool equals(IterImpl const &) const;
-        void next();
+        bool hasNext();
+        Entry next(CorpusReader const &rdr);
       private:
         bool isValid();
     };
@@ -41,8 +41,7 @@ public:
     DirectoryCorpusReaderPrivate(std::string const &directory);
     virtual ~DirectoryCorpusReaderPrivate();
 
-    virtual EntryIterator getBegin() const;
-    virtual EntryIterator getEnd() const;
+    virtual EntryIterator getEntries() const;
     virtual std::string getName() const;
     virtual std::string readEntry(std::string const &entry) const;
     virtual size_t getSize() const;

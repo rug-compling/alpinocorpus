@@ -2,6 +2,7 @@
 #include <typeinfo>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 
 #include "FilterIter.hh"
@@ -14,12 +15,11 @@
 namespace alpinocorpus {
 
     FilterIter::FilterIter(CorpusReader const &corpus,
-        CorpusReader::EntryIterator itr, CorpusReader::EntryIterator end,
+        CorpusReader::EntryIterator itr,
         std::string const &query)
     :
         d_corpus(corpus),
         d_itr(itr),
-        d_end(end),
         d_query(query),
         d_initialState(true)
     {
@@ -32,58 +32,38 @@ namespace alpinocorpus {
         return new FilterIter(*this);
     }
 
-    std::string FilterIter::current() const
+    bool FilterIter::hasNext()
     {
-        return d_file;
-    }
-    
-    bool FilterIter::equals(IterImpl const &itr) const
-    {
-        if (d_initialState) {
-          d_initialState = false;
-          FilterIter *self = const_cast<FilterIter *>(this);
-          self->next();
+        d_interrupted = false;
+
+        while (d_buffer.empty() && d_itr.hasNext())
+        {
+            Entry e = d_itr.next(d_corpus);
+
+            if (d_interrupted)
+              throw IterationInterrupted();
+
+            d_file = e.name;
+            parseFile(d_file);
         }
 
-        try {
-            // TODO fix me to be more like isEqual instead of hasNext.
-            // XXX - Where is the possibility of a bad cast here?
-            return d_itr == d_end
-                && d_buffer.size() == 0;
-        } catch (std::bad_cast const &e) {
-            return false;
-        }
+        return !d_buffer.empty();
     }
 
     void FilterIter::interrupt()
     {
       d_interrupted = true;
     }
+
     
-    void FilterIter::next()
+    Entry FilterIter::next(CorpusReader const &rdr)
     {
         if (!d_buffer.empty())
             d_buffer.pop();
-       
-        d_interrupted = false;
 
-        while (d_buffer.empty() && d_itr != d_end)
-        {
-            if (d_interrupted)
-              throw IterationInterrupted();
+        Entry e = {d_file, d_buffer.empty() ? std::string() : d_buffer.front()};
 
-            d_file = *d_itr;
-            parseFile(d_file);
-            
-            ++d_itr;
-        }
-    }
-    
-    std::string FilterIter::contents(CorpusReader const &rdr) const
-    {
-        return d_buffer.empty()
-        ?   std::string() // XXX - should be a null string???
-            : d_buffer.front();
+        return e;
     }
     
     void FilterIter::parseFile(std::string const &file)

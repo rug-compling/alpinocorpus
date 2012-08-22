@@ -116,12 +116,14 @@ namespace alpinocorpus { namespace util {
             d_prevline = lineno;
 
             if (d_eof)
+            {
                 if (lineno < d_nlines)
                     return d_lines[lineno];
                 else {
                     d_eoflast = true;
                     return d_nullstring;
                 }
+            }
 
             boost::system::error_code error;
             size_t i;

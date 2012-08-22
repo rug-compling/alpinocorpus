@@ -9,10 +9,10 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/iterator/filter_iterator.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 #include <config.hh>
@@ -33,6 +33,7 @@
 using alpinocorpus::CorpusReader;
 using alpinocorpus::CorpusWriter;
 using alpinocorpus::CompactCorpusWriter;
+using alpinocorpus::Entry;
 
 #if defined(USE_DBXML)
 using alpinocorpus::DbCorpusWriter;
@@ -41,23 +42,27 @@ using alpinocorpus::DbCorpusWriter;
 namespace bf = boost::filesystem;
 namespace tr1 = std::tr1;
 
-typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
-    UniqueFilterIter;
-
 void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   std::string const &query)
 {
-  CorpusReader::EntryIterator i, end(reader->end());
+  CorpusReader::EntryIterator i;
   
   if (query.empty())
-    i = reader->begin();
+    i = reader->entries();
   else
     i = reader->query(CorpusReader::XPATH, query);
 
   NotEqualsPrevious<std::string> pred;
 
-  std::copy(UniqueFilterIter(pred, i, end), UniqueFilterIter(pred, end, end),
-    std::ostream_iterator<std::string>(std::cout, "\n"));
+  tr1::unordered_set<std::string> seen;
+  while (i.hasNext())
+  {
+    Entry entry = i.next(*reader);
+    if (seen.find(entry.name) == seen.end()) {
+      std::cout << entry.name << std::endl;
+      seen.insert(entry.name);
+    }
+  }
 }
 
 void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
@@ -83,21 +88,24 @@ void writeCorpus(tr1::shared_ptr<CorpusReader> reader,
   tr1::shared_ptr<CorpusWriter> writer,
   std::string const &query)
 {
-  CorpusReader::EntryIterator i, end(reader->end());
+  CorpusReader::EntryIterator i;
   if (query.empty())
-    i = reader->begin();
+    i = reader->entries();
   else
     i = reader->query(CorpusReader::XPATH, query);
   
   // We need to be *really* sure when writing a corpus that an entry was not written
   // before. So, we'll use a set, rather than a basic filter.
   tr1::unordered_set<std::string> seen;
-  for (; i != end; ++i)
-    if (seen.find(*i) == seen.end()) {
-        writer->write(*i, reader->read(*i));
-      seen.insert(*i);
+  while (i.hasNext()) {
+    Entry e = i.next(*reader);
+
+    if (seen.find(e.name) == seen.end()) {
+        writer->write(e.name, reader->read(e.name));
+        seen.insert(e.name);
     } else
-      std::cerr << "Duplicate entry: " << *i << std::endl;
+      std::cerr << "Duplicate entry: " << e.name << std::endl;
+  }
 }
 
 int main(int argc, char *argv[])

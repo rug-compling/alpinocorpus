@@ -17,14 +17,9 @@ MultiCorpusReader::~MultiCorpusReader()
   delete d_private;
 }
 
-CorpusReader::EntryIterator MultiCorpusReader::getBegin() const
+CorpusReader::EntryIterator MultiCorpusReader::getEntries() const
 {
-  return d_private->getBegin();
-}
-
-CorpusReader::EntryIterator MultiCorpusReader::getEnd() const
-{
-  return d_private->getEnd();
+  return d_private->getEntries();
 }
 
 std::string MultiCorpusReader::getName() const

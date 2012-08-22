@@ -58,11 +58,6 @@ namespace alpinocorpus {
         return *this;
     }
 
-    bool CorpusReader::EntryIterator::operator!=(EntryIterator const &other) const
-    {
-        return !operator==(other);
-    }
-
     void CorpusReader::EntryIterator::copy(EntryIterator const &other)
     {        
         if (other.d_impl != 0)
@@ -70,34 +65,35 @@ namespace alpinocorpus {
     }
     
     
-    CorpusReader::EntryIterator CorpusReader::begin() const
+    CorpusReader::EntryIterator CorpusReader::entries() const
     {
-        return getBegin();
+        return getEntries();
     }
 
-    CorpusReader::EntryIterator CorpusReader::beginWithStylesheet(
+    CorpusReader::EntryIterator CorpusReader::entriesWithStylesheet(
         std::string const &stylesheet,
         std::list<MarkerQuery> const &markerQueries) const
     {
-        return EntryIterator(new StylesheetIter(getBegin(), getEnd(),
+        return EntryIterator(new StylesheetIter(getEntries(),
             stylesheet, markerQueries));
     }
-    
-    std::string CorpusReader::EntryIterator::contents(CorpusReader const &rdr) const
+
+    bool CorpusReader::EntryIterator::hasNext()
     {
-        return d_impl->contents(rdr);
+      return d_impl->hasNext();
     }
 
+    Entry CorpusReader::EntryIterator::next(CorpusReader const &reader)
+    {
+      return d_impl->next(reader);
+    }
+
+    
     void CorpusReader::EntryIterator::interrupt()
     {
         // XXX this shouldn't be necessary, we don't do this in other places
         if (d_impl != 0)
             d_impl->interrupt();
-    }
-    
-    CorpusReader::EntryIterator CorpusReader::end() const
-    {
-        return getEnd();
     }
     
     bool CorpusReader::isValidQuery(QueryDialect d, bool variables, std::string const &q) const
@@ -227,36 +223,6 @@ namespace alpinocorpus {
         return true;
     }
     
-    CorpusReader::EntryIterator::value_type CorpusReader::EntryIterator::operator*() const
-    {
-        return d_impl->current();
-    }
-    
-    bool CorpusReader::EntryIterator::operator==(EntryIterator const &other) const
-    {
-        if (d_impl == 0)
-            return other.d_impl == 0;
-        else if (other.d_impl == 0)
-            return d_impl == 0;
-        else
-            return d_impl->equals(*other.d_impl);
-    }
-    
-    CorpusReader::EntryIterator &CorpusReader::EntryIterator::operator++()
-    {
-        d_impl->next();
-        return *this;
-    }
-
-    
-    CorpusReader::EntryIterator CorpusReader::EntryIterator::operator++(int)
-    {
-        EntryIterator r(*this);
-        operator++();
-        return r;
-    }
-
-
     CorpusReader::EntryIterator CorpusReader::query(QueryDialect d,
         std::string const &q) const
     {
@@ -284,16 +250,14 @@ namespace alpinocorpus {
             throw NotImplemented(typeid(*this).name(),
                 "XQuery functionality");
         
-        EntryIterator iter = runXPath(query);
-
-        return EntryIterator(new StylesheetIter(iter, getEnd(), stylesheet,
+        return EntryIterator(new StylesheetIter(runXPath(query), stylesheet,
             markerQueries));
     }
 
     CorpusReader::EntryIterator CorpusReader::runXPath(std::string const &query) const
     {
         //throw NotImplemented(typeid(*this).name(), "XQuery functionality");
-        return EntryIterator(new FilterIter(*this, getBegin(), getEnd(), query));
+        return EntryIterator(new FilterIter(*this, getEntries(), query));
     }
 
     CorpusReader::EntryIterator CorpusReader::runXQuery(std::string const &) const

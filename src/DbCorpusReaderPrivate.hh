@@ -4,6 +4,7 @@
 #include <dbxml/DbXml.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 
 namespace alpinocorpus {
@@ -24,9 +25,9 @@ class DbCorpusReaderPrivate : public CorpusReader
         DbIter(DbXml::XmlManager &);
 
         virtual IterImpl *copy() const;        
-        std::string current() const;
         bool equals(IterImpl const &) const;
-        void next();
+        bool hasNext();
+        Entry next(CorpusReader const &);
         
     protected:
         mutable DbXml::XmlResults r;
@@ -39,7 +40,6 @@ class DbCorpusReaderPrivate : public CorpusReader
     public:
         QueryIter(DbXml::XmlResults const &, DbXml::XmlQueryContext const &);
         IterImpl *copy() const;
-        std::string contents(CorpusReader const &) const;
         void interrupt();
     
     protected:
@@ -49,8 +49,7 @@ class DbCorpusReaderPrivate : public CorpusReader
 public:
     DbCorpusReaderPrivate(std::string const &);
     virtual ~DbCorpusReaderPrivate();
-    EntryIterator getBegin() const;
-    EntryIterator getEnd() const;
+    EntryIterator getEntries() const;
     std::string getName() const;
     size_t getSize() const
     {

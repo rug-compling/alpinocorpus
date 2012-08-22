@@ -27,14 +27,9 @@ DbCorpusReader::~DbCorpusReader()
     delete d_private;
 }
     
-CorpusReader::EntryIterator DbCorpusReader::getBegin() const
+CorpusReader::EntryIterator DbCorpusReader::getEntries() const
 {
-    return d_private->getBegin();
-}
-
-CorpusReader::EntryIterator DbCorpusReader::getEnd() const
-{
-    return d_private->getEnd();
+    return d_private->getEntries();
 }
 
 std::string DbCorpusReader::getName() const

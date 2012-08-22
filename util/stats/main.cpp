@@ -23,12 +23,12 @@ typedef tr1::unordered_map<std::string, size_t> ValueCounts;
 ValueCounts countQuery(tr1::shared_ptr<CorpusReader> reader,
     std::string const &query)
 {
-    CorpusReader::EntryIterator i, end(reader->end());
+    CorpusReader::EntryIterator i;
   
     ValueCounts counts;
-    for (CorpusReader::EntryIterator iter = reader->query(CorpusReader::XPATH, query);
-            iter != reader->end(); ++iter)
-        ++counts[iter.contents(*reader)];
+    CorpusReader::EntryIterator iter = reader->query(CorpusReader::XPATH, query);
+    while (iter.hasNext())
+      ++counts[iter.next(*reader).contents];
     
     return counts;
 }

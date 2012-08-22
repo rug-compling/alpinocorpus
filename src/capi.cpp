@@ -35,6 +35,11 @@ void alpinocorpus_cleanup()
   xmlCleanupParser();
 }
 
+struct alpinocorpus_entry_t {
+  char const *name;
+  char const *contents;
+};
+
 struct alpinocorpus_reader_t {
     alpinocorpus_reader_t(alpinocorpus::CorpusReader *reader) : corpusReader(reader) {}
 
@@ -87,9 +92,26 @@ int alpinocorpus_is_valid_query(alpinocorpus_reader reader, char const *query)
 
 alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
 {
-    alpinocorpus_iter i = new alpinocorpus_iter_t(corpus->corpusReader->begin());
+    alpinocorpus_iter i = new alpinocorpus_iter_t(corpus->corpusReader->entries());
 
     return i;
+}
+
+char const * alpinocorpus_entry_contents(alpinocorpus_entry entry)
+{
+    return entry->contents;
+}
+
+void alpinocorpus_entry_free(alpinocorpus_entry entry)
+{
+    std::free(const_cast<char *>(entry->name));
+    std::free(const_cast<char *>(entry->contents));
+    std::free(entry);
+}
+
+char const * alpinocorpus_entry_name(alpinocorpus_entry entry)
+{
+    return entry->name;
 }
 
 alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
@@ -151,55 +173,35 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
 
 void alpinocorpus_iter_destroy(alpinocorpus_iter iter)
 {
-  delete iter;
+    delete iter;
 }
 
-int alpinocorpus_iter_end(alpinocorpus_reader reader, alpinocorpus_iter iter)
+int alpinocorpus_iter_has_next(alpinocorpus_reader reader, alpinocorpus_iter iter)
 {
-  return iter->entryIter == reader->corpusReader->end();
+    try {
+        return iter->entryIter.hasNext();
+    } catch (std::exception const &) {
+        return 0;
+    }
 }
 
-void alpinocorpus_iter_next(alpinocorpus_reader reader,
+alpinocorpus_entry alpinocorpus_iter_next(alpinocorpus_reader reader,
     alpinocorpus_iter iter)
 {
-  ++(iter->entryIter);
-}
-
-char *alpinocorpus_iter_value(alpinocorpus_iter iter)
-{
-    std::string entry;
+    alpinocorpus::Entry e;
     try {
-        entry = *(iter->entryIter);
+        e = iter->entryIter.next(*reader->corpusReader);
     } catch (std::exception const &) {
         return NULL;
     }
 
-    size_t len = entry.size() + 1;
-    char *cstr = reinterpret_cast<char *>(std::malloc(len));
-    if (cstr != NULL)
-        std::memcpy(cstr, entry.c_str(), len);
-    return cstr;
-}
+    alpinocorpus_entry ce = reinterpret_cast<alpinocorpus_entry>(
+        std::malloc(sizeof(alpinocorpus_entry_t)));
 
-char *alpinocorpus_iter_contents(alpinocorpus_reader reader,
-    alpinocorpus_iter iter)
-{
-    if (reader->corpusReader == NULL)
-        return NULL;
+    ce->name = strndup(e.name.c_str(), e.name.size());
+    ce->contents = strndup(e.contents.c_str(), e.contents.size());
 
-    std::string contents;
-    try {
-        contents = iter->entryIter.contents(*reader->corpusReader);
-    } catch (std::exception const &) {
-        return NULL;
-    }
-
-    size_t len = contents.size() + 1;
-    char *cstr = reinterpret_cast<char *>(std::malloc(len));
-    if (cstr != NULL)
-        std::memcpy(cstr, contents.c_str(), len);
-
-    return cstr;
+    return ce;
 }
 
 char *alpinocorpus_read(alpinocorpus_reader reader, char const *entry)
