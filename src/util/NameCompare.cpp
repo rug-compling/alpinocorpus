@@ -68,6 +68,9 @@ namespace alpinocorpus {
                     return i1[i] < i2[i];
             }
 
+        if (i1.size() != i2.size())
+          return i1.size() < i2.size();
+
         // The pairs are equal...
         return false;
     }
