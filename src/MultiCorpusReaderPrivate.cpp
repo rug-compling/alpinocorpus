@@ -8,6 +8,7 @@
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 
@@ -23,14 +24,11 @@ MultiCorpusReaderPrivate::MultiCorpusReaderPrivate()
 
 MultiCorpusReaderPrivate::~MultiCorpusReaderPrivate()
 {
-  for (std::list<CorpusReader *>::iterator iter = d_corpusReaders.begin();
-      iter != d_corpusReaders.end(); ++iter)
-    delete *iter;
 }
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::getEntries() const
 {
-  return EntryIterator(new MultiIter(d_corpusReaderMap));
+  return EntryIterator(new MultiIter(d_corporaMap));
 }
 
 std::string MultiCorpusReaderPrivate::getName() const
@@ -42,31 +40,39 @@ size_t MultiCorpusReaderPrivate::getSize() const
 {
   size_t size = 0;
 
-  for (std::list<CorpusReader *>::const_iterator iter =
-      d_corpusReaders.begin(); iter != d_corpusReaders.end(); ++iter)
-    size += (*iter)->size();
+  for (std::list<std::pair<std::string, bool> >::const_iterator iter =
+      d_corpora.begin(); iter != d_corpora.end(); ++iter)
+  {
+      CorpusReader *reader;
+      try {
+          if (iter->second)
+            reader = CorpusReaderFactory::openRecursive(iter->first);
+          else
+            reader = CorpusReaderFactory::open(iter->first);
+      } catch (OpenError const &)
+      {
+        // XXX - Print a warning?
+        continue;
+      }
+      size += reader->size();
+      delete reader;
+  }
 
   return size;
 }
 
 void MultiCorpusReaderPrivate::push_back(std::string const &name,
-    CorpusReader *reader)
+    std::string const &filename, bool recursive)
 {
-  // Ignore empty corpus readers, simplifies assumptions.
-  if (reader->size() == 0) {
-    delete reader;
-    return;
-  }
-
-  d_corpusReaders.push_back(reader);
-  d_corpusReaderMap[name] = reader; // XXX - exists check?
+  d_corpora.push_back(std::make_pair(filename, recursive));
+  d_corporaMap[name] = std::make_pair(filename, recursive); // XXX - exists check?
 }
 
-CorpusReader const *MultiCorpusReaderPrivate::corpusReaderFromPath(
+std::pair<std::string, bool> MultiCorpusReaderPrivate::corpusFromPath(
     std::string const &path) const
 {
-  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
-      d_corpusReaderMap.begin(); iter != d_corpusReaderMap.end(); ++iter)
+  for (Corpora::const_iterator iter =
+      d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter)
     if (path.find(iter->first) == 0)
       return iter->second;
   
@@ -76,8 +82,8 @@ CorpusReader const *MultiCorpusReaderPrivate::corpusReaderFromPath(
 std::string MultiCorpusReaderPrivate::entryFromPath(
     std::string const &path) const
 {
-  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator iter =
-      d_corpusReaderMap.begin(); iter != d_corpusReaderMap.end(); ++iter)
+  for (Corpora::const_iterator iter =
+      d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter)
     if (path.find(iter->first) == 0)
       return path.substr(iter->first.size() + 1);
 
@@ -86,67 +92,80 @@ std::string MultiCorpusReaderPrivate::entryFromPath(
 
 std::string MultiCorpusReaderPrivate::readEntry(std::string const &path) const
 {
-  CorpusReader const *reader = corpusReaderFromPath(path);
-  return reader->read(entryFromPath(path));
+  std::pair<std::string, bool> fnRec = corpusFromPath(path);
+  CorpusReader *reader;
+  if (fnRec.second)
+    reader = CorpusReaderFactory::openRecursive(fnRec.first);
+  else
+    reader = CorpusReaderFactory::open(fnRec.first);
+
+  std::string data = reader->read(entryFromPath(path));
+  delete reader;
+  return data;
 }
 
 std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
     std::string const &path, std::list<MarkerQuery> const &queries) const
 {
-  CorpusReader const *reader = corpusReaderFromPath(path);
-  return reader->read(entryFromPath(path), queries);
+  std::pair<std::string, bool> fnRec = corpusFromPath(path);
+  CorpusReader *reader;
+  if (fnRec.second)
+    reader = CorpusReaderFactory::openRecursive(fnRec.first);
+  else
+    reader = CorpusReaderFactory::open(fnRec.first);
+
+  std::string data = reader->read(entryFromPath(path), queries);
+  delete reader;
+  return data;
 }
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
     std::string const &query) const
 {
-  return EntryIterator(new MultiIter(d_corpusReaderMap, query));
+  return EntryIterator(new MultiIter(d_corporaMap, query));
 }
 
 bool MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
-  if (d_corpusReaders.size() == 0)
+  if (d_corpora.size() == 0)
     return false;
 
-  for (std::list<CorpusReader *>::const_iterator iter = d_corpusReaders.begin();
-      iter != d_corpusReaders.end(); ++iter)
-    if (!(*iter)->isValidQuery(d, variables, query))
-      return false;
+  // Only check using the first reader, otherwise, this is too expensive.
+  std::pair<std::string, bool> fnRec = d_corpora.front();
+  CorpusReader *reader;
+  if (fnRec.second)
+    reader = CorpusReaderFactory::openRecursive(fnRec.first);
+  else
+    reader = CorpusReaderFactory::open(fnRec.first);
+  bool valid = reader->isValidQuery(d, variables, query);
+  delete reader;
 
-  return true;
+  return valid;
 }
 
 // Iteration over MultiCorpusReaders
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
-  std::tr1::unordered_map<std::string, CorpusReader *> const &readers)
+  Corpora const &corpora) : d_hasQuery(false)
 {
-  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator
-      iter = readers.begin();
-      iter != readers.end(); ++iter)
-    d_iters.push_back(ReaderIter(iter->first, iter->second,
-          (iter->second->entries())));
-
-  // If we have a query for which none of the corpora has a matching result,
-  // then the iterator is in fact an end-iterator. We just don't know it yet,
-  // unless we attempt to move the iterator.
-  nextIterator();
+  for (Corpora::const_iterator
+      iter = corpora.begin();
+      iter != corpora.end(); ++iter)
+    d_iters.push_back(ReaderIter(iter->first, iter->second.first,
+          iter->second.second));
 }
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
-  std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
-  std::string const &query)
+  Corpora const &corpora,
+  std::string const &query) : d_hasQuery(true)
 {
-  for (std::tr1::unordered_map<std::string, CorpusReader *>::const_iterator
-      iter = readers.begin();
-      iter != readers.end(); ++iter)
-    d_iters.push_back(ReaderIter(iter->first, iter->second,
-          (iter->second->query(XPATH, query))));
+  for (Corpora::const_iterator
+      iter = corpora.begin();
+      iter != corpora.end(); ++iter)
+    d_iters.push_back(ReaderIter(iter->first, iter->second.first,
+          iter->second.second));
 
-  // If we have a query for which none of the corpora has a matching result,
-  // then the iterator is in fact an end-iterator. We just don't know it yet,
-  // unless we attempt to move the iterator.
-  nextIterator();
+    d_query = query;
 }
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
@@ -158,29 +177,59 @@ IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
   return new MultiIter(*this);
 }
 
-void MultiCorpusReaderPrivate::MultiIter::nextIterator()
-{
-    while (d_iters.size() != 0 &&
-          !d_iters.front().iter.hasNext())
-      d_iters.pop_front();
-}
-
 bool MultiCorpusReaderPrivate::MultiIter::hasNext()
 {
-    return d_iters.size() != 0;
+    nextIterator();
+    return d_currentIter && d_currentIter->hasNext();
 }
 
 Entry MultiCorpusReaderPrivate::MultiIter::next(CorpusReader const &rdr)
 {
-    if (d_iters.size() == 0)
-        throw std::runtime_error("Called next() on a finished iterator!");
-
-    Entry e = d_iters.front().iter.next(rdr);
-    e.name = d_iters.front().name + "/" + e.name;
-
-    nextIterator();
+    Entry e = d_currentIter->next(rdr);
+    e.name = d_currentName + "/" + e.name;
 
     return e;
+}
+
+void MultiCorpusReaderPrivate::MultiIter::nextIterator()
+{
+  while (d_iters.size() != 0 &&
+    (!d_currentIter || !d_currentIter->hasNext()))
+  {
+    d_currentIter.reset();
+    d_currentReader.reset();
+    openTip();
+    d_iters.pop_front();
+  }
+}
+
+void MultiCorpusReaderPrivate::MultiIter::openTip()
+{
+    CorpusReader *reader;
+    try {
+        if (d_iters.front().recursive)
+          reader = CorpusReaderFactory::openRecursive(d_iters.front().filename);
+        else
+          reader = CorpusReaderFactory::open(d_iters.front().filename);
+    } catch (OpenError const &e)
+    {
+        // XXX - print warning?
+        return;
+    }
+
+    try {
+      if (d_hasQuery)
+        d_currentIter.reset(new EntryIterator(reader->query(CorpusReader::XPATH, d_query)));
+      else
+        d_currentIter.reset(new EntryIterator(reader->entries()));
+    } catch (std::runtime_error &e)
+    {
+      delete reader;
+      return;
+    }
+
+    d_currentReader.reset(reader);
+    d_currentName = d_iters.front().name;
 }
 
 }

@@ -14,7 +14,8 @@ class ALPINO_CORPUS_EXPORT MultiCorpusReader : public CorpusReader
 public:
   MultiCorpusReader();
   virtual ~MultiCorpusReader();
-  void push_back(std::string const &name, CorpusReader *Reader);
+  void push_back(std::string const &name, std::string const &filename,
+      bool recursive);
 private:
   EntryIterator getEntries() const;
   std::string getName() const;
