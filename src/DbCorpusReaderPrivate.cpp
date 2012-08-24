@@ -64,7 +64,14 @@ IterImpl *DbCorpusReaderPrivate::DbIter::copy() const
 
 bool DbCorpusReaderPrivate::DbIter::hasNext()
 {
-  return r.hasNext();
+  try {
+      return r.hasNext();
+    } catch (db::XmlException const &e) {
+        if (e.getExceptionCode() == db::XmlException::OPERATION_INTERRUPTED)
+          throw IterationInterrupted();
+        else
+          throw Error(e.what());
+    }
 }
 
 /* operator++ */
