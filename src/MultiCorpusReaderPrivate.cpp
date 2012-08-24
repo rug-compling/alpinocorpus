@@ -135,6 +135,9 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
       iter != corpora.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second.first,
           iter->second.second));
+
+    // Initial number of 'iterators'.
+    d_totalIters = d_iters.size();
 }
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
@@ -148,6 +151,9 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
           iter->second.second));
 
     d_query = query;
+
+    // Initial number of 'iterators'.
+    d_totalIters = d_iters.size();
 }
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
@@ -163,6 +169,11 @@ bool MultiCorpusReaderPrivate::MultiIter::hasNext()
 {
     nextIterator();
     return d_currentIter && d_currentIter->hasNext();
+}
+
+bool MultiCorpusReaderPrivate::MultiIter::hasProgress()
+{
+    return true;
 }
 
 Entry MultiCorpusReaderPrivate::MultiIter::next(CorpusReader const &rdr)
@@ -212,6 +223,16 @@ void MultiCorpusReaderPrivate::MultiIter::openTip()
 
     d_currentReader.reset(reader);
     d_currentName = d_iters.front().name;
+}
+
+double MultiCorpusReaderPrivate::MultiIter::progress()
+{
+    if (d_currentIter)
+      return static_cast<double>(d_totalIters - d_iters.size() - 1) /
+          static_cast<double>(d_totalIters) * 100.0;
+    else
+      return static_cast<double>(d_totalIters - d_iters.size()) /
+          static_cast<double>(d_totalIters) * 100.0;
 }
 
 }

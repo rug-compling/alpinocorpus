@@ -83,11 +83,20 @@ namespace alpinocorpus {
       return d_impl->hasNext();
     }
 
+    bool CorpusReader::EntryIterator::hasProgress() const
+    {
+      return d_impl->hasProgress();
+    }
+
     Entry CorpusReader::EntryIterator::next(CorpusReader const &reader)
     {
       return d_impl->next(reader);
     }
 
+    double CorpusReader::EntryIterator::progress() const
+    {
+      return d_impl->progress();
+    }
     
     void CorpusReader::EntryIterator::interrupt()
     {
@@ -105,7 +114,7 @@ namespace alpinocorpus {
     {
         return getName();
     }
-    
+
     std::string CorpusReader::read(std::string const &entry,
         std::list<MarkerQuery> const &queries) const
     {

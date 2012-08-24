@@ -13,7 +13,9 @@ namespace alpinocorpus {
         virtual IterImpl *copy() const = 0;
         //virtual bool equals(IterImpl const &) const = 0;
         virtual bool hasNext() = 0;
+        virtual bool hasProgress();
         virtual Entry next(CorpusReader const &rdr) = 0;
+        virtual double progress();
 
         // Query iterators must override this
         virtual void interrupt();

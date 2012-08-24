@@ -32,7 +32,9 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         virtual ~EntryIterator();
         EntryIterator &operator=(EntryIterator const &other);
         bool hasNext();
+        bool hasProgress() const;
         Entry next(CorpusReader const &reader);
+        double progress() const;
         value_type operator*() const;
 
         /**

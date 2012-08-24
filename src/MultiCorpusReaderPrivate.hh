@@ -40,10 +40,13 @@ private:
     IterImpl *copy() const;
     void nextIterator();
     bool hasNext();
+    bool hasProgress();
     Entry next(CorpusReader const &rdr);
+    double progress();
   private:
     void openTip();
 
+    size_t d_totalIters;
     std::list<ReaderIter> d_iters;
     std::tr1::shared_ptr<CorpusReader> d_currentReader;
     std::tr1::shared_ptr<CorpusReader::EntryIterator> d_currentIter;
