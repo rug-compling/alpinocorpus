@@ -17,7 +17,8 @@ namespace alpinocorpus {
 class RecursiveCorpusReaderPrivate : public CorpusReader
 {
 public:
-  RecursiveCorpusReaderPrivate(std::string const &directory);
+  RecursiveCorpusReaderPrivate(std::string const &directory,
+      bool dactOnly);
   virtual ~RecursiveCorpusReaderPrivate();
 
   EntryIterator getEntries() const;
@@ -34,8 +35,9 @@ private:
 
 
 // Implementation of the public interface.
-RecursiveCorpusReader::RecursiveCorpusReader(std::string const &directory) :
-  d_private(new RecursiveCorpusReaderPrivate(directory))
+RecursiveCorpusReader::RecursiveCorpusReader(std::string const &directory,
+    bool dactOnly) :
+  d_private(new RecursiveCorpusReaderPrivate(directory, dactOnly))
 {
 }
 
@@ -82,7 +84,8 @@ CorpusReader::EntryIterator RecursiveCorpusReader::runXPath(std::string const &q
 
 // Implementation of the private interface
 
-RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &directory) :
+RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &directory,
+    bool dactOnly) :
   d_multiReader(new MultiCorpusReader)
 {
   if (directory[directory.size() - 1] == '/')
@@ -99,7 +102,7 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
        ++iter)
   {
     if (iter->path().extension() != ".dact" &&
-        iter->path().extension() != ".index")
+        (dactOnly || iter->path().extension() != ".index"))
       continue;
 
     bf::path namePath = iter->path();

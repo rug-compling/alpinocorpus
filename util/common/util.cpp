@@ -18,7 +18,7 @@ CorpusReader* openCorpus(std::string const &path,
     bool recursive)
 {
     if (recursive)
-      return CorpusReaderFactory::openRecursive(path);
+      return CorpusReaderFactory::openRecursive(path, false);
     else
       return CorpusReaderFactory::open(path);
 }
