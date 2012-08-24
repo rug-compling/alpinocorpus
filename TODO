@@ -1,3 +1,0 @@
- * Rewrite RecursiveCorpusReader in terms of MultiCorpusReader. Both
-   readers diverged over time, but I'm pretty sure they're nearly equal
-   now.
