@@ -64,7 +64,6 @@ public:
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   EntryIterator runXPath(std::string const &query) const;
-  bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
 private:
   std::pair<std::string, bool> corpusFromPath(std::string const &path) const;

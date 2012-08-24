@@ -125,24 +125,6 @@ CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
   return EntryIterator(new MultiIter(d_corporaMap, query));
 }
 
-bool MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
-{
-  if (d_corpora.size() == 0)
-    return false;
-
-  // Only check using the first reader, otherwise, this is too expensive.
-  std::pair<std::string, bool> fnRec = d_corpora.front();
-  CorpusReader *reader;
-  if (fnRec.second)
-    reader = CorpusReaderFactory::openRecursive(fnRec.first);
-  else
-    reader = CorpusReaderFactory::open(fnRec.first);
-  bool valid = reader->isValidQuery(d, variables, query);
-  delete reader;
-
-  return valid;
-}
-
 // Iteration over MultiCorpusReaders
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
