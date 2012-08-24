@@ -128,7 +128,7 @@ CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
 // Iteration over MultiCorpusReaders
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
-  Corpora const &corpora) : d_hasQuery(false)
+  Corpora const &corpora) : d_hasQuery(false), d_interrupted(false)
 {
   for (Corpora::const_iterator
       iter = corpora.begin();
@@ -142,7 +142,7 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
   Corpora const &corpora,
-  std::string const &query) : d_hasQuery(true)
+  std::string const &query) : d_hasQuery(true), d_interrupted(false)
 {
   for (Corpora::const_iterator
       iter = corpora.begin();
@@ -167,6 +167,8 @@ IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
 
 bool MultiCorpusReaderPrivate::MultiIter::hasNext()
 {
+    if (d_interrupted == true)
+        throw IterationInterrupted();
     nextIterator();
     return d_currentIter && d_currentIter->hasNext();
 }
@@ -174,6 +176,14 @@ bool MultiCorpusReaderPrivate::MultiIter::hasNext()
 bool MultiCorpusReaderPrivate::MultiIter::hasProgress()
 {
     return true;
+}
+
+void MultiCorpusReaderPrivate::MultiIter::interrupt()
+{
+  d_interrupted = true;
+
+  if (d_currentIter)
+    d_currentIter->progress();
 }
 
 Entry MultiCorpusReaderPrivate::MultiIter::next(CorpusReader const &rdr)

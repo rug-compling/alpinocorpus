@@ -41,6 +41,7 @@ private:
     void nextIterator();
     bool hasNext();
     bool hasProgress();
+    void interrupt();
     Entry next(CorpusReader const &rdr);
     double progress();
   private:
@@ -53,6 +54,7 @@ private:
     std::string d_currentName;
     bool d_hasQuery;
     std::string d_query;
+    bool d_interrupted;
   };
 
 public:
