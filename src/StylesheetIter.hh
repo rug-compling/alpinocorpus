@@ -19,7 +19,9 @@ namespace alpinocorpus {
       virtual ~StylesheetIter();
       IterImpl *copy() const;
       bool hasNext();
+      bool hasProgress();
       Entry next(CorpusReader const &rdr);
+      double progress();
     
     protected:
       void interrupt();

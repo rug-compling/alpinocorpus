@@ -50,6 +50,11 @@ namespace alpinocorpus {
         return !d_buffer.empty();
     }
 
+    bool FilterIter::hasProgress()
+    {
+      return d_itr.hasProgress();
+    }
+
     void FilterIter::interrupt()
     {
       d_interrupted = true;
@@ -118,6 +123,11 @@ namespace alpinocorpus {
         xmlXPathFreeObject(xpathObj);
         xmlXPathFreeContext(ctx);
         xmlFreeDoc(doc);
-    }    
+    }
+
+    double FilterIter::progress()
+    {
+        return d_itr.progress();
+    }
 
 }

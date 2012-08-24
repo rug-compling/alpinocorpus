@@ -37,6 +37,11 @@ namespace alpinocorpus {
         d_iter.interrupt();
     }
 
+    bool StylesheetIter::hasProgress()
+    {
+        return d_iter.hasProgress();
+    }
+
     bool StylesheetIter::hasNext()
     {
         return d_iter.hasNext();
@@ -48,6 +53,11 @@ namespace alpinocorpus {
         e.contents = d_transformer->transform(rdr.read(e.name, d_markerQueries));
 
         return e;
+    }
+
+    double StylesheetIter::progress()
+    {
+        return d_iter.progress();
     }
 
     /*
