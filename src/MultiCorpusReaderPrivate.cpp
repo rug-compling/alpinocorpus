@@ -7,6 +7,12 @@
 
 #include <boost/filesystem.hpp>
 
+#include <boost/config.hpp>
+
+#if defined(BOOST_HAS_THREADS)
+#include <boost/thread/mutex.hpp>
+#endif
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>
@@ -130,6 +136,10 @@ CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
   Corpora const &corpora) : d_hasQuery(false), d_interrupted(false)
 {
+#if defined(BOOST_HAS_THREADS)
+    d_currentIterMutex.reset(new boost::mutex);
+#endif
+
   for (Corpora::const_iterator
       iter = corpora.begin();
       iter != corpora.end(); ++iter)
@@ -144,6 +154,10 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
   Corpora const &corpora,
   std::string const &query) : d_hasQuery(true), d_interrupted(false)
 {
+#if defined(BOOST_HAS_THREADS)
+    d_currentIterMutex.reset(new boost::mutex);
+#endif
+
   for (Corpora::const_iterator
       iter = corpora.begin();
       iter != corpora.end(); ++iter)
@@ -167,7 +181,7 @@ IterImpl *MultiCorpusReaderPrivate::MultiIter::copy() const
 
 bool MultiCorpusReaderPrivate::MultiIter::hasNext()
 {
-    if (d_interrupted == true)
+    if (d_interrupted)
         throw IterationInterrupted();
     nextIterator();
     return d_currentIter && d_currentIter->hasNext();
@@ -182,12 +196,20 @@ void MultiCorpusReaderPrivate::MultiIter::interrupt()
 {
   d_interrupted = true;
 
+  // d_currentIter could be resetted in the iteration thread after the
+  // null-pointer check.
+#if defined(BOOST_HAS_THREADS)
+  boost::mutex::scoped_lock lock(*d_currentIterMutex);
+#endif
   if (d_currentIter)
-    d_currentIter->progress();
+    d_currentIter->interrupt();
 }
 
 Entry MultiCorpusReaderPrivate::MultiIter::next(CorpusReader const &rdr)
 {
+    if (d_interrupted)
+        throw IterationInterrupted();
+
     Entry e = d_currentIter->next(rdr);
     e.name = d_currentName + "/" + e.name;
 
@@ -196,9 +218,12 @@ Entry MultiCorpusReaderPrivate::MultiIter::next(CorpusReader const &rdr)
 
 void MultiCorpusReaderPrivate::MultiIter::nextIterator()
 {
-  while (d_iters.size() != 0 &&
+  while (d_iters.size() != 0 && !d_interrupted &&
     (!d_currentIter || !d_currentIter->hasNext()))
   {
+#if defined(BOOST_HAS_THREADS)
+    boost::mutex::scoped_lock lock(*d_currentIterMutex);
+#endif
     d_currentIter.reset();
     d_currentReader.reset();
     openTip();

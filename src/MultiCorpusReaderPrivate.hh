@@ -7,6 +7,12 @@
 #include <boost/tr1/memory.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
+#include <boost/config.hpp>
+
+#if defined(BOOST_HAS_THREADS)
+#include <boost/thread/mutex.hpp>
+#endif
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
@@ -51,6 +57,9 @@ private:
     std::list<ReaderIter> d_iters;
     std::tr1::shared_ptr<CorpusReader> d_currentReader;
     std::tr1::shared_ptr<CorpusReader::EntryIterator> d_currentIter;
+#if defined(BOOST_HAS_THREADS)
+    std::tr1::shared_ptr<boost::mutex> d_currentIterMutex;
+#endif
     std::string d_currentName;
     bool d_hasQuery;
     std::string d_query;
