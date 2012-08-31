@@ -18,6 +18,12 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 
+#include <config.hh>
+
+#ifdef USE_DBXML
+#include <dbxml/DbXml.hpp>
+#endif
+
 #include "MultiCorpusReaderPrivate.hh"
 
 namespace bf = boost::filesystem;
@@ -268,6 +274,20 @@ double MultiCorpusReaderPrivate::MultiIter::progress()
     else
       return static_cast<double>(d_totalIters - d_iters.size()) /
           static_cast<double>(d_totalIters) * 100.0;
+}
+
+#ifdef USE_DBXML
+bool MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
+    std::string const &query) const
+{
+        try {
+            DbXml::XmlQueryContext ctx = d_mgr.createQueryContext();
+            d_mgr.prepare(query, ctx);
+        } catch (DbXml::XmlException const &e) {
+            return false;
+        }
+        return true;
+#endif
 }
 
 }

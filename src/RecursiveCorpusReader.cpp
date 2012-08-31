@@ -27,6 +27,7 @@ public:
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   EntryIterator runXPath(std::string const &query) const;
+  bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
 private:
   bf::path d_directory;
@@ -150,6 +151,16 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXPath(
 {
   return d_multiReader->query(CorpusReader::XPATH, query);
 }
+
+bool RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
+    std::string const &query) const
+{
+    if (!d_multiReader)
+      return false;
+
+    return d_multiReader->isValidQuery(d, variables, query);
+}
+
 
 }
 
