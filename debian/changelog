@@ -1,3 +1,9 @@
+alpino-corpus (1.2.0-1quantal1) quantal; urgency=low
+
+  * Build for Quantal Quetzal.
+
+ -- Daniël de Kok <me@danieldk.eu>  Sun, 09 Sep 2012 16:52:01 +0200
+
 alpino-corpus (1.2.0-1) precise; urgency=low
 
   * New upstream release.
