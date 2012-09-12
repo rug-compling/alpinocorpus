@@ -22,6 +22,7 @@
 #endif
 
 #include <AlpinoCorpus/CompactCorpusWriter.hh>
+#include <AlpinoCorpus/LexItem.hh>
 
 #include <iostream>
 #include <stdexcept>
@@ -34,6 +35,7 @@ using alpinocorpus::CorpusReader;
 using alpinocorpus::CorpusWriter;
 using alpinocorpus::CompactCorpusWriter;
 using alpinocorpus::Entry;
+using alpinocorpus::LexItem;
 
 #if defined(USE_DBXML)
 using alpinocorpus::DbCorpusWriter;
@@ -43,7 +45,7 @@ namespace bf = boost::filesystem;
 namespace tr1 = std::tr1;
 
 void listCorpus(tr1::shared_ptr<CorpusReader> reader,
-  std::string const &query)
+  std::string const &query, bool bracketed = false)
 {
   CorpusReader::EntryIterator i;
   
@@ -59,7 +61,49 @@ void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   {
     Entry entry = i.next(*reader);
     if (seen.find(entry.name) == seen.end()) {
-      std::cout << entry.name << std::endl;
+      std::cout << entry.name;
+
+      if (bracketed) {
+        std::cout << " ";
+
+        std::vector<LexItem> items = reader->sentence(entry.name, query);
+
+        size_t prevDepth = 0;
+        for (std::vector<LexItem>::const_iterator itemIter = items.begin();
+          itemIter != items.end(); ++itemIter)
+        {
+          size_t depth = itemIter->matches.size();
+
+          if (depth != prevDepth) {
+            if (depth == 0)
+              std::cout << "\033[0;22m";
+            else if (depth == 1)
+              std::cout << "\033[38;5;99m";
+            else if (depth == 2)
+              std::cout << "\033[38;5;111m";
+            else if (depth == 3)
+              std::cout << "\033[38;5;123m";
+            else if (depth == 4)
+              std::cout << "\033[38;5;121m";
+            else
+              std::cout << "\033[38;5;119m";
+          }
+
+          std::cout << itemIter->word;
+
+          std::vector<LexItem>::const_iterator next = itemIter + 1;
+          if (next != items.end() && next->matches.size() < depth)
+            std::cout << "\033[0;22m";
+
+          std::cout << " ";
+
+          prevDepth = depth;
+        }
+
+        std::cout << "\033[0;22m" << std::endl;
+      }
+
+      std::cout << std::endl;
       seen.insert(entry.name);
     }
   }
@@ -81,6 +125,7 @@ void usage(std::string const &programName)
       "  -g entry\tPrint a treebank entry to stdout" << std::endl <<
       "  -l\t\tList the entries of a treebank" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
+      "  -s\t\tInclude a bracketed sentence" << std::endl <<
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 }
 
@@ -113,7 +158,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "c:d:g:lq:r"));
+      "c:d:g:lq:rs"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -226,7 +271,7 @@ int main(int argc, char *argv[])
   }
   else if (opts->option('l')) {
     try {
-        listCorpus(reader, query);
+        listCorpus(reader, query, opts->option('s'));
     } catch (std::runtime_error const &e) {
         std::cerr << opts->programName() <<
         ": error listing treebank: " << e.what() << std::endl;
