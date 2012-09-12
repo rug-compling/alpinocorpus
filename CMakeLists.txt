@@ -136,6 +136,7 @@ set(HEADERS
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IterImpl.hh
   include/AlpinoCorpus/CompactCorpusReader.hh
+  include/AlpinoCorpus/LexItem.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/capi.h

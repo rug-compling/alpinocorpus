@@ -8,6 +8,7 @@
 
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+#include <AlpinoCorpus/LexItem.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
 namespace alpinocorpus {
@@ -35,7 +36,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         bool hasProgress() const;
         Entry next(CorpusReader const &reader);
         double progress() const;
-        value_type operator*() const;
 
         /**
          * Interrupt an iterator that is blocking.
@@ -97,12 +97,17 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     std::string read(std::string const &entry,
       std::list<MarkerQuery> const &queries = std::list<MarkerQuery>()) const;
 
+    std::vector<LexItem> sentence(std::string const &entry,
+      std::string const &query) const;
+
     /** The number of entries in the corpus. */
     size_t size() const;
 
   private:
     virtual EntryIterator getEntries() const = 0;
     virtual std::string getName() const = 0;
+    virtual std::vector<LexItem> getSentence(std::string const &entry,
+        std::string const &query) const;
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,
