@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cstring>
 #include <list>
 #include <string>
 #include <tr1/unordered_map>
@@ -113,7 +115,7 @@ namespace {
             (*matchDepth)[node].insert(matchId);
         else // Attempt to recurse...
         {
-            for (xmlNodePtr child = xmlFirstElementChild(node);
+            for (xmlNodePtr child = node->children;
                 child != NULL; child = child->next)
               markLexicals(child, matchDepth, matchId);
         }
