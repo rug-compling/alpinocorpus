@@ -23,8 +23,6 @@ struct LexItem
     }
 };
 
-static std::vector<LexItem> *parseSentence(std::string const &sentence);
-
 }
 
 #endif // ALPINOCORPUS_LEX_ITEM_HH
