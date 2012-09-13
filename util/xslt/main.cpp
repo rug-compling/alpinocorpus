@@ -23,6 +23,7 @@ extern "C" {
 #include <EqualsPrevious.hh>
 #include <ProgramOptions.hh>
 #include <Stylesheet.hh>
+#include <macros.hh>
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
@@ -30,19 +31,19 @@ using alpinocorpus::CorpusReader;
 namespace tr1 = std::tr1;
 
 void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
-  tr1::shared_ptr<std::string const> query, std::string const &stylesheet)
+  std::string const &query, std::string const &stylesheet)
 {
     std::list<CorpusReader::MarkerQuery> markerQueries;
-    if (query) {
+    if (!query.empty()) {
         // Markers
-        CorpusReader::MarkerQuery activeMarker(*query, "active", "1");
+        CorpusReader::MarkerQuery activeMarker(query, "active", "1");
         markerQueries.push_back(activeMarker); 
     }
 
     CorpusReader::EntryIterator i;
     
-    if (query)
-        i = reader->queryWithStylesheet(CorpusReader::XPATH, *query,
+    if (!query.empty())
+        i = reader->queryWithStylesheet(CorpusReader::XPATH, query,
             stylesheet, markerQueries);
     else
         i = reader->entriesWithStylesheet(stylesheet);
@@ -61,15 +62,16 @@ void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
 }
 
 void transformEntry(tr1::shared_ptr<CorpusReader> reader,
-  tr1::shared_ptr<std::string const> query, std::string stylesheet,
+  std::string const &query,
+  std::string const &stylesheet,
   std::string const &entry)
 {
   Stylesheet compiledStylesheet(stylesheet);
 
   std::list<CorpusReader::MarkerQuery> markerQueries;
-  if (query) {
+  if (!query.empty()) {
      // Markers
-    CorpusReader::MarkerQuery activeMarker(*query, "active", "1");
+    CorpusReader::MarkerQuery activeMarker(query, "active", "1");
     markerQueries.push_back(activeMarker);
   }
   std::cout << compiledStylesheet.transform(reader->read(entry, markerQueries));
@@ -80,6 +82,7 @@ void usage(std::string const &programName)
     std::cerr << "Usage: " << programName << " [OPTION] stylesheet treebanks" <<
       std::endl << std::endl <<
       "  -g entry\tApply the stylesheet to a single entry" << std::endl <<
+      "  -m filename\tLoad macro file" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 }
@@ -98,7 +101,7 @@ int main (int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "g:q:r"));
+      "g:m:q:r"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -132,12 +135,23 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  tr1::shared_ptr<std::string> query;
-  if (opts->option('q')) {
-    query.reset(new std::string(opts->optionValue('q')));
+  Macros macros;
+  if (opts->option('m')) {
+    std::string macrosFn = opts->optionValue('m');
+    try {
+      macros = loadMacros(macrosFn);
+    } catch (std::runtime_error &e) {
+      std::cerr << e.what() << std::endl;
+      return 1;
+    }
+  }
 
-    if (!reader->isValidQuery(CorpusReader::XPATH, false, *query)) {
-      std::cerr << "Invalid (or unwanted) query: " << *query << std::endl;
+  std::string query;
+  if (opts->option('q')) {
+    query = expandMacros(macros, opts->optionValue('q'));
+
+    if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
+      std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
       return 1;
     }
   }

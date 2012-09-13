@@ -29,6 +29,7 @@
 
 #include <EqualsPrevious.hh>
 #include <ProgramOptions.hh>
+#include <macros.hh>
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
@@ -124,6 +125,7 @@ void usage(std::string const &programName)
 #endif
       "  -g entry\tPrint a treebank entry to stdout" << std::endl <<
       "  -l\t\tList the entries of a treebank" << std::endl <<
+      "  -m filename\tLoad macro file" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
       "  -s\t\tInclude a bracketed sentence" << std::endl <<
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
@@ -158,7 +160,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "c:d:g:lq:rs"));
+      "c:d:g:lm:q:rs"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -203,10 +205,21 @@ int main(int argc, char *argv[])
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;
   }
-  
+
+  Macros macros;
+  if (opts->option('m')) {
+    std::string macrosFn = opts->optionValue('m');
+    try {
+      macros = loadMacros(macrosFn);
+    } catch (std::runtime_error &e) {
+      std::cerr << e.what() << std::endl;
+      return 1;
+    }
+  }
+
   std::string query;
   if (opts->option('q')) {
-    query = opts->optionValue('q');  
+    query = expandMacros(macros, opts->optionValue('q'));
 
     if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
       std::cerr << "Invalid (or unwanted) query: " << query << std::endl;

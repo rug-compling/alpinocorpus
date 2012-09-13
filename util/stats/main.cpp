@@ -12,6 +12,7 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 
 #include <ProgramOptions.hh>
+#include <macros.hh>
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
@@ -24,13 +25,13 @@ ValueCounts countQuery(tr1::shared_ptr<CorpusReader> reader,
     std::string const &query)
 {
     CorpusReader::EntryIterator i;
-  
+
     ValueCounts counts;
     CorpusReader::EntryIterator iter = reader->query(CorpusReader::XPATH, query);
     while (iter.hasNext())
       ++counts[iter.next(*reader).contents];
-    
-    return counts;
+
+  return counts;
 }
 
 void printFrequencies(tr1::shared_ptr<CorpusReader> reader,
@@ -40,18 +41,18 @@ void printFrequencies(tr1::shared_ptr<CorpusReader> reader,
     {
         size_t count = 0;
         for (ValueCounts::const_iterator iter = counts.begin();
-                iter != counts.end(); ++iter)
+            iter != counts.end(); ++iter)
             count += iter->second;
 
         for (ValueCounts::const_iterator iter = counts.begin();
-                iter != counts.end(); ++iter)
+            iter != counts.end(); ++iter)
             std::cout << iter->first << " " <<
-                (static_cast<double>(iter->second) / count) << std::endl;
+        (static_cast<double>(iter->second) / count) << std::endl;
 
     }
     else
         for (ValueCounts::const_iterator iter = counts.begin();
-                iter != counts.end(); ++iter)
+            iter != counts.end(); ++iter)
             std::cout << iter->first << " " << iter->second << std::endl;
 }
 
@@ -59,9 +60,10 @@ void printFrequencies(tr1::shared_ptr<CorpusReader> reader,
 void usage(std::string const &programName)
 {
     std::cerr << "Usage: " << programName << " [OPTION] query treebanks" <<
-        std::endl << std::endl <<
-        "  -p\tRelative item frequencies" << std::endl <<
-        "  -r\tProcess a directory of corpora recursively" << std::endl << std::endl;
+    std::endl << std::endl <<
+    "  -m filename\tLoad macro file" << std::endl <<
+    "  -p\t\tRelative item frequencies" << std::endl <<
+    "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 
 }
 
@@ -70,7 +72,7 @@ int main(int argc, char *argv[])
     boost::scoped_ptr<ProgramOptions> opts;
     try {
         opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-            "pr"));
+            "m:pr"));
     } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
         return 1;
@@ -82,21 +84,32 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-  tr1::shared_ptr<CorpusReader> reader;
-  try {
-    if (opts->arguments().size() == 1)
-      reader = tr1::shared_ptr<CorpusReader>(
-        openCorpus(opts->arguments().at(0), opts->option('r')));
-    else
-      reader = tr1::shared_ptr<CorpusReader>(
-        openCorpora(opts->arguments().begin() + 1, 
-            opts->arguments().end(), opts->option('r')));
-  } catch (std::runtime_error &e) {
-    std::cerr << "Could not open corpus: " << e.what() << std::endl;
-    return 1;
-  }
-    std::string query;
-    query = opts->arguments().at(0);
+    tr1::shared_ptr<CorpusReader> reader;
+    try {
+        if (opts->arguments().size() == 1)
+          reader = tr1::shared_ptr<CorpusReader>(
+            openCorpus(opts->arguments().at(0), opts->option('r')));
+        else
+          reader = tr1::shared_ptr<CorpusReader>(
+            openCorpora(opts->arguments().begin() + 1, 
+                opts->arguments().end(), opts->option('r')));
+    } catch (std::runtime_error &e) {
+        std::cerr << "Could not open corpus: " << e.what() << std::endl;
+        return 1;
+    }
+
+    Macros macros;
+    if (opts->option('m')) {
+        std::string macrosFn = opts->optionValue('m');
+        try {
+          macros = loadMacros(macrosFn);
+        } catch (std::runtime_error &e) {
+          std::cerr << e.what() << std::endl;
+          return 1;
+        }
+    }
+
+    std::string query = expandMacros(macros, opts->arguments().at(0));
     if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
         std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
         return 1;
