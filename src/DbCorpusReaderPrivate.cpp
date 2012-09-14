@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
-#include <iostream>
 
 #include <dbxml/DbXml.hpp>
 
@@ -243,23 +242,28 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
         }
         
         std::list<xerces::DOMNode *> markNodes;
-        
-        while (result->iterateNext())
-        {
-            xerces::DOMNode *node;
-            try {
-              node = result->getNodeValue();
-            } catch (xerces::DOMXPathException &e) {
-              throw Error("Matching node value invalid while marking nodes.");
-            }
 
-            // Skip non-element nodes
-            if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
-                continue;
-            
-            markNodes.push_back(node);
+        try {
+            while (result->iterateNext())
+            {
+                xerces::DOMNode *node;
+                try {
+                  node = result->getNodeValue();
+                } catch (xerces::DOMXPathException &e) {
+                  throw Error("Matching node value invalid while marking nodes.");
+                }
+
+                // Skip non-element nodes
+                if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
+                    continue;
+
+                markNodes.push_back(node);
+            }
+        } catch (XQillaException &e) {
+            std::cerr << "xqilla excp" << std::endl;
+            throw Error("Matching node value invalid while marking nodes.");
         }
-        
+
         for (std::list<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
              nodeIter != markNodes.end(); ++nodeIter)
         {
@@ -281,6 +285,7 @@ std::string DbCorpusReaderPrivate::readEntryMarkQueries(std::string const &entry
             map->setNamedItem(attr);
             
         }
+
     }
 
     // Serialize DOM tree
