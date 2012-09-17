@@ -1,16 +1,37 @@
 #include <string>
 #include <typeinfo>
 
+#include <boost/tr1/memory.hpp>
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 
 #include "FilterIter.hh"
 
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <libxml/xmlerror.h>
-#include <libxml/xpath.h>
+#include <xercesc/framework/MemBufInputSource.hpp>
+#include <xqilla/functions/FunctionString.hpp>
+#include <xqilla/utils/XQillaPlatformUtils.hpp>
+#include <xqilla/xqilla-simple.hpp>
+
+namespace {
+    struct Globals {
+        Globals();
+        virtual ~Globals();
+    };
+
+    static Globals s_globals;
+    
+    Globals::Globals() {
+        XQillaPlatformUtils::initialize();
+    }
+    
+    Globals::~Globals() {
+        XQillaPlatformUtils::terminate();
+    }
+
+    static XQilla s_xqilla;
+}
 
 namespace alpinocorpus {
 
@@ -20,10 +41,16 @@ namespace alpinocorpus {
     :
         d_corpus(corpus),
         d_itr(itr),
-        d_query(query),
         d_initialState(true)
     {
-        //next();
+        DynamicContext *ctx = s_xqilla.createContext(XQilla::XPATH2);
+        ctx->setXPath1CompatibilityMode(true);
+
+        try {
+            d_query.reset(s_xqilla.parse(X(query.c_str()), ctx));
+        } catch (XQException &e) {
+            throw Error("CorpusReader::FilterIter::FilterIter: could not evaluate XPath expression.");
+        }
     }
     
     IterImpl *FilterIter::copy() const
@@ -63,10 +90,12 @@ namespace alpinocorpus {
     
     Entry FilterIter::next(CorpusReader const &rdr)
     {
-        if (!d_buffer.empty())
-            d_buffer.pop();
+        if (d_buffer.empty())
+            throw Error("Calling next() on an iterator that is exhausted.");
 
         Entry e = {d_file, d_buffer.empty() ? std::string() : d_buffer.front()};
+
+        d_buffer.pop();
 
         return e;
     }
@@ -75,54 +104,33 @@ namespace alpinocorpus {
     {
         std::string xml(d_corpus.read(file));
 
-        xmlDocPtr doc = xmlParseMemory(xml.c_str(), xml.size());
+        std::tr1::shared_ptr<DynamicContext> ctx(d_query->createDynamicContext());
+        XERCES_CPP_NAMESPACE::MemBufInputSource xmlInput(
+            reinterpret_cast<XMLByte const *>(xml.c_str()),
+            xml.size(), "input");
 
-        if (!doc)
-        {
-            //qWarning() << "FilterIter::parseFile: could not parse XML data: " << QString::fromUtf8((*d_itr).c_str());
-            return;
-        }
+        try {
+            Sequence seq(ctx->parseDocument(xmlInput));
         
-        // Parse XPath query
-        xmlXPathContextPtr ctx = xmlXPathNewContext(doc);
-        if (!ctx)
-        {
-            xmlFreeDoc(doc);
-            //qWarning() << "FilterIter::parseFile: could not construct XPath context from document: " << QString::fromUtf8((*d_itr).c_str());
-            return;
-        }
-        
-        xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(
-            reinterpret_cast<xmlChar const *>(d_query.c_str()), ctx);
-        if (!xpathObj)
-        {
-            xmlXPathFreeContext(ctx);
-            xmlFreeDoc(doc);
-            throw Error("FilterIter::parseFile: could not evaluate XPath expression.");
-        }
-
-        if (xpathObj->nodesetval && xpathObj->nodesetval->nodeNr > 0)
-        {
-            for (int i = 0; i < xpathObj->nodesetval->nodeNr; ++i)
-            {
-                xmlChar *str = xmlNodeListGetString(doc, xpathObj->nodesetval->nodeTab[i]->children, 1);
-                
-                std::string value;
-                if (str != 0) // XXX - is this correct?
-                    value = reinterpret_cast<const char *>(str);
-                
-                xmlFree(str);
-                
-                if (value.empty()) // XXX - trim!
-                    d_buffer.push(std::string());
-                else
-                    d_buffer.push(value);
+            if (!seq.isEmpty() && seq.first()->isNode()) {
+                ctx->setContextItem(seq.first());
+                ctx->setContextPosition(1);
+                ctx->setContextSize(1);
             }
+        } catch (XQException &e) {
+            // XXX - warning???
+            return;
         }
 
-        xmlXPathFreeObject(xpathObj);
-        xmlXPathFreeContext(ctx);
-        xmlFreeDoc(doc);
+        Result result = d_query->execute(ctx.get());
+        
+        Item::Ptr item;
+        while ((item = result->next(ctx.get()))) {
+            std::string value(UTF8(FunctionString::string(item, ctx.get())));
+           
+            // XXX - trim value!
+            d_buffer.push(value);
+        }
     }
 
     double FilterIter::progress()

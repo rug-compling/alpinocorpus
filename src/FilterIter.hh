@@ -4,9 +4,13 @@
 #include <queue>
 #include <string>
 
+#include <boost/tr1/memory.hpp>
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+
+class XQQuery;
 
 namespace alpinocorpus {
     class FilterIter : public IterImpl {
@@ -29,7 +33,7 @@ namespace alpinocorpus {
         CorpusReader const &d_corpus;
         CorpusReader::EntryIterator d_itr;
         std::string d_file;
-        std::string d_query;
+        std::tr1::shared_ptr<XQQuery> d_query;
         std::queue<std::string> d_buffer;
         mutable bool d_initialState;
         bool d_interrupted;
