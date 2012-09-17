@@ -52,12 +52,6 @@ std::string DbCorpusReader::readEntry(std::string const &entry) const
 {
     return d_private->readEntry(entry);
 }
-    
-std::string DbCorpusReader::readEntryMarkQueries(std::string const &entry, 
-    std::list<MarkerQuery> const &queries) const
-{
-    return d_private->readEntryMarkQueries(entry, queries);
-}
 
 CorpusReader::EntryIterator DbCorpusReader::runXPath(std::string const &query) const
 {

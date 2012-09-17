@@ -26,7 +26,6 @@ class DbCorpusReader : public CorpusReader
     EntryIterator getEntries() const;
     std::string getName() const;
     std::string readEntry(std::string const &) const;
-    std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
     EntryIterator runXPath(std::string const &) const;
     EntryIterator runXQuery(std::string const &) const;
     size_t getSize() const;

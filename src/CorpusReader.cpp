@@ -21,9 +21,18 @@
 #include <libxml/xmlerror.h>
 #include <libxml/xpath.h>
 
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
+#include <xercesc/framework/MemBufFormatTarget.hpp>
+#include <xercesc/framework/Wrapper4InputSource.hpp>
+
+#include <xqilla/xqilla-dom3.hpp>
+
 #include "FilterIter.hh"
 #include "StylesheetIter.hh"
 #include "util/parseString.hh"
+
+namespace xerces = XERCES_CPP_NAMESPACE;
 
 namespace {
     void ignoreStructuredError(void *userdata, xmlErrorPtr err)
@@ -321,74 +330,113 @@ namespace alpinocorpus {
     std::string CorpusReader::readEntryMarkQueries(std::string const &entry,
         std::list<MarkerQuery> const &queries) const
     {
-        std::string xmlData = readEntry(entry);
+        std::string content = read(entry);
         
-        xmlDocPtr doc = xmlParseMemory(xmlData.c_str(), xmlData.size());
-        if (doc == 0)
-            throw Error("Could not parse XML data.");
+        // Prepare the DOM parser.
+        xerces::DOMImplementation *xqillaImplementation =
+            xerces::DOMImplementationRegistry::getDOMImplementation(X("XPath2 3.0"));
+        AutoRelease<xerces::DOMLSParser> parser(xqillaImplementation->createLSParser(
+            xerces::DOMImplementationLS::MODE_SYNCHRONOUS, 0));
+        
+        // Parse the document.
+        xerces::MemBufInputSource xmlInput(reinterpret_cast<XMLByte const *>(content.c_str()),
+            content.size(), "input");
+
+        xerces::Wrapper4InputSource domInput(&xmlInput, false);
+
+        xerces::DOMDocument *document;
+        try {
+            document = parser->parse(&domInput);
+        } catch (xerces::DOMException const &e) {
+            throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
+        }
+
+        // No exceptions according to the documentation...
+        AutoRelease<xerces::DOMXPathNSResolver> resolver(
+            document->createNSResolver(document->getDocumentElement()));
+        resolver->addNamespaceBinding(X("fn"),
+            X("http://www.w3.org/2005/xpath-functions"));
 
         for (std::list<MarkerQuery>::const_iterator iter = queries.begin();
              iter != queries.end(); ++iter)
-        {            
-            xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
-            if (xpathCtx == 0) {
-                xmlFreeDoc(doc);
-                throw Error("Unable to create new XPath context.");
+        {
+            AutoRelease<xerces::DOMXPathExpression> expression(0);
+            try {
+                expression.set(document->createExpression(X(iter->query.c_str()), resolver));
+            } catch (xerces::DOMXPathException const &) {
+                throw Error("Could not parse expression.");
+            } catch (xerces::DOMException const &) {
+                throw Error("Could not resolve namespace prefixes.");
+            }
+
+            AutoRelease<xerces::DOMXPathResult> result(0);
+            try {
+                result.set(expression->evaluate(document,
+                                                xerces::DOMXPathResult::ITERATOR_RESULT_TYPE, 0));
+            } catch (xerces::DOMXPathException const &e) {
+                throw Error("Could not retrieve an iterator over evaluation results.");
+            } catch (xerces::DOMException &e) {
+                throw Error("Could not evaluate the expression on the given document.");
             }
             
-            xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(
-                reinterpret_cast<xmlChar const *>(iter->query.c_str()), xpathCtx);
-            if (xpathObj == 0) {
-                xmlXPathFreeContext(xpathCtx);
-                xmlFreeDoc(doc);
-                throw Error(std::string("Could not evaluate expression:") + iter->query);
+            std::list<xerces::DOMNode *> markNodes;
+
+            try {
+                while (result->iterateNext())
+                {
+                    xerces::DOMNode *node;
+                    try {
+                      node = result->getNodeValue();
+                    } catch (xerces::DOMXPathException &e) {
+                      throw Error("Matching node value invalid while marking nodes.");
+                    }
+
+                    // Skip non-element nodes
+                    if (node->getNodeType() != xerces::DOMNode::ELEMENT_NODE)
+                        continue;
+
+                    markNodes.push_back(node);
+                }
+            } catch (XQillaException &e) {
+                std::cerr << "xqilla excp" << std::endl;
+                throw Error("Matching node value invalid while marking nodes.");
             }
-            
-            if (xpathObj->nodesetval == 0)
-                continue;
-            
-            xmlNodeSetPtr nodeSet = xpathObj->nodesetval;
-            
-            std::list<xmlNodePtr> nodes;
-            for (int i = 0; i < nodeSet->nodeNr; ++i) {
-                xmlNodePtr node = nodeSet->nodeTab[i];
+
+            for (std::list<xerces::DOMNode *>::iterator nodeIter = markNodes.begin();
+                 nodeIter != markNodes.end(); ++nodeIter)
+            {
+                xerces::DOMNode *node = *nodeIter;
                 
-                if (node->type != XML_ELEMENT_NODE)
+                xerces::DOMNamedNodeMap *map = node->getAttributes();
+                if (map == 0)
                     continue;
                 
-                nodes.push_back(node);
-            }
-            
-            for (std::list<xmlNodePtr>::iterator nodeIter = nodes.begin();
-                 nodeIter != nodes.end(); ++nodeIter) {
-                xmlAttrPtr attrPtr = xmlSetProp(*nodeIter,
-                    reinterpret_cast<xmlChar const *>(iter->attr.c_str()),
-                    reinterpret_cast<xmlChar const *>(iter->value.c_str()));
-                if (attrPtr == 0) {
-                    xmlXPathFreeObject(xpathObj);
-                    xmlXPathFreeContext(xpathCtx);
-                    xmlFreeDoc(doc);
-                    throw Error(std::string("Could not set attribute '") + iter->attr +
-                        "' for the expression: " + iter->query);
-                    
+                // Create new attribute node.
+                xerces::DOMAttr *attr;
+                try {
+                    attr = document->createAttribute(X(iter->attr.c_str()));
+                } catch (xerces::DOMException const &e) {
+                    throw Error("Attribute name contains invalid character.");
                 }
+                attr->setNodeValue(X(iter->value.c_str()));
+                
+                map->setNamedItem(attr);
+                
             }
-            
-            xmlXPathFreeObject(xpathObj);
-            xmlXPathFreeContext(xpathCtx);
+
         }
+
+        // Serialize DOM tree
+        AutoRelease<xerces::DOMLSSerializer> serializer(xqillaImplementation->createLSSerializer());
+        AutoRelease<xerces::DOMLSOutput> output(xqillaImplementation->createLSOutput());
+        xerces::MemBufFormatTarget target;
+        output->setByteStream(&target);
+        serializer->write(document, output.get());
         
-        // Dump Data
-        xmlChar *newData;
-        int size;
-        xmlDocDumpMemory(doc, &newData, &size);
-        std::string newXmlData(reinterpret_cast<char const *>(newData), size);
-        
-        // Cleanup
-        xmlFree(newData);
-        xmlFreeDoc(doc);
-        
-        return newXmlData;
+        std::string outData(reinterpret_cast<char const *>(target.getRawBuffer()),
+            target.getLen());
+            
+        return outData;
     }
 
     std::vector<LexItem> CorpusReader::sentence(std::string const &entry,

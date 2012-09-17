@@ -57,7 +57,6 @@ public:
     }
     bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
     std::string readEntry(std::string const &) const;
-    std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
     EntryIterator runXPath(std::string const &) const;
     EntryIterator runXQuery(std::string const &) const;
     
