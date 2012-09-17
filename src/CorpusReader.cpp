@@ -435,24 +435,23 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator CorpusReader::query(QueryDialect d,
         std::string const &q) const
     {
-        /*
-        switch (d) {
-          case XPATH:  return runXPath(q);
-          case XQUERY: return runXQuery(q);
-          default:     throw NotImplemented("unknown query language");
+        if (d == XPATH)
+        {
+            std::vector<std::string> queries;
+            boost::split_regex(queries, q, boost::regex("\\+\\|\\+"));
+            assert(queries.size() > 0);
+
+            EntryIterator qIter = runXPath(queries[0]);
+            for (std::vector<std::string>::const_iterator iter = queries.begin() + 1;
+                    iter != queries.end(); ++iter)
+                qIter = EntryIterator(new FilterIter(*this, qIter, *iter));
+
+            return qIter;
         }
-        */
-
-        std::vector<std::string> queries;
-        boost::split_regex(queries, q, boost::regex("\\+\\|\\+"));
-        assert(queries.size() > 0);
-
-        EntryIterator qIter = runXPath(queries[0]);
-        for (std::vector<std::string>::const_iterator iter = queries.begin() + 1;
-                iter != queries.end(); ++iter)
-            qIter = EntryIterator(new FilterIter(*this, qIter, *iter));
-
-        return qIter;
+        else if (d == XQUERY)
+           return runXQuery(q);
+        else
+            throw NotImplemented("unknown query language");
     }
 
     CorpusReader::EntryIterator CorpusReader::queryWithStylesheet(
