@@ -178,12 +178,20 @@ namespace alpinocorpus {
 
     bool CorpusReader::EntryIterator::hasNext()
     {
-      return d_impl->hasNext();
+        // The empty iterator has no other values
+        if (!d_impl)
+            return false;
+
+        return d_impl->hasNext();
     }
 
     bool CorpusReader::EntryIterator::hasProgress() const
     {
-      return d_impl->hasProgress();
+        // The empty iterator has no progress.
+        if (!d_impl)
+            return false;
+
+        return d_impl->hasProgress();
     }
 
     Entry CorpusReader::EntryIterator::next(CorpusReader const &reader)
