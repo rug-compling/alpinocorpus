@@ -1,8 +1,13 @@
 #include <algorithm>
+#include <cassert>
 #include <cstring>
 #include <list>
 #include <string>
 #include <tr1/unordered_map>
+#include <vector>
+
+#include <boost/algorithm/string/regex.hpp>
+#include <boost/regex.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
@@ -124,7 +129,7 @@ namespace {
 }
 
 namespace alpinocorpus {
-    CorpusReader::EntryIterator::EntryIterator() : d_impl(0)
+    CorpusReader::EntryIterator::EntryIterator()
     { 
     }
 
@@ -133,36 +138,28 @@ namespace alpinocorpus {
     { 
     }
 
-    CorpusReader::EntryIterator::EntryIterator(EntryIterator const &other) :
-        d_impl(0)
+    CorpusReader::EntryIterator::EntryIterator(EntryIterator const &other)
     {
         copy(other);
     }
 
     CorpusReader::EntryIterator::~EntryIterator()
     {
-        delete d_impl;
     }
 
     CorpusReader::EntryIterator &CorpusReader::EntryIterator::operator=(
         EntryIterator const &other)
     {
-        if (this != &other) {
-            if (d_impl != 0) {
-                delete d_impl;
-                d_impl = 0;
-            }
-
+        if (this != &other)
             copy(other);
-        }
 
         return *this;
     }
 
     void CorpusReader::EntryIterator::copy(EntryIterator const &other)
     {        
-        if (other.d_impl != 0)
-            d_impl = other.d_impl->copy();
+        if (other.d_impl)
+            d_impl.reset(other.d_impl->copy());
     }
     
     
@@ -202,19 +199,25 @@ namespace alpinocorpus {
     void CorpusReader::EntryIterator::interrupt()
     {
         // XXX this shouldn't be necessary, we don't do this in other places
-        if (d_impl != 0)
+        if (d_impl)
             d_impl->interrupt();
     }
 
     std::vector<LexItem> CorpusReader::getSentence(std::string const &entry,
         std::string const &query) const
     {
+        std::vector<std::string> queries;
+        boost::split_regex(queries, query, boost::regex("\\+\\|\\+"));
+        assert(queries.size() > 0);
+
+        // Discard pre-filters
+        std::string q = queries.back();
 
         std::list<MarkerQuery> markers;
 
-        if (!query.empty())
+        if (!q.empty())
         {
-            MarkerQuery marker(query, "active", "1");
+            MarkerQuery marker(q, "active", "1");
             markers.push_back(marker);
         }
         std::string xmlData(read(entry, markers));
@@ -270,7 +273,16 @@ namespace alpinocorpus {
     
     bool CorpusReader::isValidQuery(QueryDialect d, bool variables, std::string const &q) const
     {
-        return validQuery(d, variables, q);
+        std::vector<std::string> queries;
+        boost::split_regex(queries, q, boost::regex("\\+\\|\\+"));
+        assert(queries.size() > 0);
+
+        for (std::vector<std::string>::const_iterator iter = queries.begin();
+                iter != queries.end(); ++iter)
+            if (!validQuery(d, variables, *iter))
+                return false;
+
+        return true;
     }
     
     std::string CorpusReader::name() const
@@ -283,8 +295,19 @@ namespace alpinocorpus {
     {
         if (queries.size() == 0)
             return readEntry(entry);
-        else
-            return readEntryMarkQueries(entry, queries);
+    
+        // Scrub any prefilters that we may have.
+        std::list<MarkerQuery> effectiveQueries(queries);
+        for (std::list<MarkerQuery>::iterator iter = effectiveQueries.begin();
+            iter != effectiveQueries.end(); ++iter)
+        {
+            std::vector<std::string> queries;
+            boost::split_regex(queries, iter->query, boost::regex("\\+\\|\\+"));
+            assert(queries.size() > 0);
+            iter->query = queries.back();
+        }
+
+        return readEntryMarkQueries(entry, effectiveQueries);
     }
         
     std::string CorpusReader::readEntryMarkQueries(std::string const &entry,
@@ -404,11 +427,24 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator CorpusReader::query(QueryDialect d,
         std::string const &q) const
     {
+        /*
         switch (d) {
           case XPATH:  return runXPath(q);
           case XQUERY: return runXQuery(q);
           default:     throw NotImplemented("unknown query language");
         }
+        */
+
+        std::vector<std::string> queries;
+        boost::split_regex(queries, q, boost::regex("\\+\\|\\+"));
+        assert(queries.size() > 0);
+
+        EntryIterator qIter = runXPath(queries[0]);
+        for (std::vector<std::string>::const_iterator iter = queries.begin() + 1;
+                iter != queries.end(); ++iter)
+            qIter = EntryIterator(new FilterIter(*this, qIter, *iter));
+
+        return qIter;
     }
 
     CorpusReader::EntryIterator CorpusReader::queryWithStylesheet(
@@ -433,7 +469,7 @@ namespace alpinocorpus {
     }
 
     CorpusReader::EntryIterator CorpusReader::runXPath(std::string const &query) const
-    {
+    {        
         //throw NotImplemented(typeid(*this).name(), "XQuery functionality");
         return EntryIterator(new FilterIter(*this, getEntries(), query));
     }

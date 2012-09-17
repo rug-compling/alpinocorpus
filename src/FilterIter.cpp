@@ -55,7 +55,7 @@ namespace alpinocorpus {
     
     IterImpl *FilterIter::copy() const
     {
-        // FilterIter is no pointer members.
+        // FilterIter is no bare pointer members.
         return new FilterIter(*this);
     }
 

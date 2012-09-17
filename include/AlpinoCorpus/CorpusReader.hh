@@ -6,6 +6,8 @@
 #include <queue>
 #include <string>
 
+#include <boost/tr1/memory.hpp>
+
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/LexItem.hh>
@@ -45,7 +47,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
       private:
         void copy(EntryIterator const &other);
 
-        IterImpl *d_impl;
+        std::tr1::shared_ptr<IterImpl> d_impl;
     };
     
     struct MarkerQuery {

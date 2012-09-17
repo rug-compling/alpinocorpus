@@ -51,10 +51,10 @@ option(USE_REMOTE_CORPUS "Enable remote corpus" ON)
 
 if(USE_REMOTE_CORPUS)
 find_package(Boost 1.46.1 COMPONENTS system date_time iostreams
-  filesystem thread REQUIRED)
+  filesystem thread regex REQUIRED)
 else()
 find_package(Boost 1.46.1 COMPONENTS system date_time filesystem
-  thread REQUIRED)
+  thread regex REQUIRED)
 endif()
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
