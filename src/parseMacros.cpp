@@ -15,11 +15,11 @@
 #include <iostream>
 #include <iterator>
 #include <sstream>
-#include <stdexcept>
 #include <vector>
 
 #include <cstring>
 
+#include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/macros.hh>
 
 #include "parseMacros.hh"
@@ -356,7 +356,7 @@ _again:
 	if (cs < macros_first_final)
 	{
 		if (p == pe)
-			throw std::runtime_error("Unexpected end of file");
+			throw Error("Unexpected end of file");
 		else {
 			std::ostringstream err;
 			size_t errPos = p - data;
@@ -376,7 +376,7 @@ _again:
 				err << " ";
 			err << "^";
 
-			throw std::runtime_error(err.str());
+			throw Error(err.str());
 		}
 	}
 

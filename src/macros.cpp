@@ -2,11 +2,11 @@
 #include <fstream>
 #include <iterator>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 
 #include <boost/algorithm/string/replace.hpp>
 
+#include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/macros.hh>
 
 #include "parseMacros.hh"
@@ -20,7 +20,7 @@ namespace alpinocorpus {
 Macros loadMacros(std::string const &filename) {
 	std::ifstream macroStream(filename.c_str());
 	if (!macroStream)
-		throw std::runtime_error(std::string("Could not read macro file: ") +
+		throw Error(std::string("Could not read macro file: ") +
 			filename);
 
 	std::ostringstream macroDataStream;
