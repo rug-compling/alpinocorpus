@@ -69,18 +69,12 @@ namespace alpinocorpus {
     }
 
     // done
-    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getBegin() const
+    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getEntries() const
     {
         if (d_geturl->interrupted() && ! d_geturl->completed())
             const_cast<RemoteCorpusReaderPrivate *>(this)->d_geturl->resume();
 
         return EntryIterator(new RemoteIter(d_geturl, 0));
-    }
-
-    // done
-    CorpusReader::EntryIterator RemoteCorpusReaderPrivate::getEnd() const
-    {
-        return EntryIterator(new RemoteIter(d_geturl, 0, true));
     }
 
     // done? TODO: alleen naam van corpus of complete url? (nu: complete url)
@@ -245,27 +239,7 @@ namespace alpinocorpus {
         d_active = true;
     }
 
-    // done
-    std::string RemoteCorpusReaderPrivate::RemoteIter::current() const
-    {
-        activate();
-
-        if (!d_end) {
-            std::string s = d_geturl->line(d_idx);
-            if (d_isquery) {
-                size_t i = s.find('\t');
-                if (i == std::string::npos)
-                    return s;
-                else
-                    return s.substr(0, i);
-            } else
-                return s;
-        } else
-            return std::string();
-    }
-
-    // done
-    void RemoteCorpusReaderPrivate::RemoteIter::next()
+    bool RemoteCorpusReaderPrivate::RemoteIter::hasNext()
     {
         activate();
 
@@ -276,24 +250,43 @@ namespace alpinocorpus {
             throw alpinocorpus::IterationInterrupted();
         }
 
-        if (!d_end) {
-            ++d_idx;
-            d_geturl->line(d_idx);
-            if (d_geturl->eof())
-                d_end = true;
+        if (d_end)
+            return false;
+
+        d_geturl->line(d_idx);
+        if (d_geturl->eof()) {
+            d_end = true;
+            return false;
         }
+
+        return true;
     }
 
-    // done
-    bool RemoteCorpusReaderPrivate::RemoteIter::equals(IterImpl const &other) const
+    Entry RemoteCorpusReaderPrivate::RemoteIter::next(CorpusReader const &)
     {
-        RemoteIter const &that = (RemoteIter const &)other;
         activate();
-        that.activate();
-        if (d_end && that.d_end)
-          return true;
-        else
-          return (d_end == that.d_end && d_idx == that.d_idx);
+
+        if (d_end)
+            throw std::runtime_error("Called next() on an iterator that does not have more entries!");
+
+        std::string line = d_geturl->line(d_idx);
+        Entry e;
+
+        if (d_isquery) {
+            size_t i = line.find('\t');
+            if (i == std::string::npos)
+                e.name = line;
+            else {
+                // We also have contents...
+                e.name = line.substr(0, i);
+                e.contents = unescape(line.substr(i + 1));
+            }
+        } else
+              e.name = line;
+
+        ++d_idx;
+
+        return e;
     }
 
     // done
@@ -316,51 +309,16 @@ namespace alpinocorpus {
         *d_interrupted = true;
     }
 
-    // TODO ????? parameter rdr not used, what is this for?
-    std::string RemoteCorpusReaderPrivate::RemoteIter::contents(
-        CorpusReader const &rdr) const
+    std::string RemoteCorpusReaderPrivate::RemoteIter::unescape(std::string text)
     {
-        activate();
+        boost::algorithm::replace_all(text, "\\f", "\f");
+        boost::algorithm::replace_all(text, "\\n", "\n");
+        boost::algorithm::replace_all(text, "\\n", "\n");
+        boost::algorithm::replace_all(text, "\\r", "\r");
+        boost::algorithm::replace_all(text, "\\t", "\t");
+        boost::algorithm::replace_all(text," \\\\", "\\");
 
-        if (d_end)
-            return std::string();
-
-        if (!d_isquery)
-            return std::string();
-
-        std::string s = d_geturl->line(d_idx);
-        size_t i = s.find('\t');
-        s = s.substr(i + 1);
-
-        std::string result;
-        size_t e;
-        for (;;) {
-            e = s.find('\\');
-            if (e > s.size() - 2) {
-                result += s;
-                break;
-            }
-            result += s.substr(0, e);
-            switch (s[e + 1]) {
-                case 'f':
-                    result += '\f';
-                    break;
-                case 'n':
-                    result += '\n';
-                    break;
-                case 'r':
-                    result += '\r';
-                    break;
-                case 't':
-                    result += '\t';
-                    break;
-                default:
-                    result += s[e + 1];
-            }
-            s = s.substr(e + 2);
-        }
-
-        return result;
+        return text;
     }
 
 }   // namespace alpinocorpus

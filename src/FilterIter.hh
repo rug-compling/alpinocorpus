@@ -4,19 +4,25 @@
 #include <queue>
 #include <string>
 
+#include <boost/tr1/memory.hpp>
+
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+
+class XQQuery;
 
 namespace alpinocorpus {
     class FilterIter : public IterImpl {
       public:
-        FilterIter(CorpusReader const &, CorpusReader::EntryIterator,
-            CorpusReader::EntryIterator, std::string const &);
+        FilterIter(CorpusReader const &corpus,
+            CorpusReader::EntryIterator i,
+            std::string const &query);
         IterImpl *copy() const;
-        std::string current() const;
-        bool equals(IterImpl const &) const;
-        void next();
-        std::string contents(CorpusReader const &) const;
+        bool hasNext();
+        bool hasProgress();
+        Entry next(CorpusReader const &rdr);
+        double progress();
 
       protected:
         void interrupt();
@@ -26,9 +32,8 @@ namespace alpinocorpus {
         
         CorpusReader const &d_corpus;
         CorpusReader::EntryIterator d_itr;
-        CorpusReader::EntryIterator d_end;
         std::string d_file;
-        std::string d_query;
+        std::tr1::shared_ptr<XQQuery> d_query;
         std::queue<std::string> d_buffer;
         mutable bool d_initialState;
         bool d_interrupted;

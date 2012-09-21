@@ -17,14 +17,9 @@ MultiCorpusReader::~MultiCorpusReader()
   delete d_private;
 }
 
-CorpusReader::EntryIterator MultiCorpusReader::getBegin() const
+CorpusReader::EntryIterator MultiCorpusReader::getEntries() const
 {
-  return d_private->getBegin();
-}
-
-CorpusReader::EntryIterator MultiCorpusReader::getEnd() const
-{
-  return d_private->getEnd();
+  return d_private->getEntries();
 }
 
 std::string MultiCorpusReader::getName() const
@@ -37,9 +32,10 @@ size_t MultiCorpusReader::getSize() const
   return d_private->getSize();
 }
 
-void MultiCorpusReader::push_back(std::string const &name, CorpusReader *reader)
+void MultiCorpusReader::push_back(std::string const &name, std::string const &reader,
+    bool recursive)
 {
-  d_private->push_back(name, reader);
+  d_private->push_back(name, reader, recursive);
 }
     
 bool MultiCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const

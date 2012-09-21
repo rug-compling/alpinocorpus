@@ -47,9 +47,10 @@ namespace alpinocorpus {
         throw OpenError(corpusPath);
     }
 
-    CorpusReader *CorpusReaderFactory::openRecursive(std::string const &path)
+    CorpusReader *CorpusReaderFactory::openRecursive(std::string const &path,
+        bool dactOnly)
     {
-      return new RecursiveCorpusReader(path);
+      return new RecursiveCorpusReader(path, dactOnly);
     }
 
     bool CorpusReaderFactory::readerAvailable(ReaderType readerType)

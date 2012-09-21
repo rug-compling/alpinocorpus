@@ -9,14 +9,21 @@ namespace alpinocorpus {
 
 class RecursiveCorpusReaderPrivate;
 
+/**
+ * Read a directory of Dact or compact corpora
+ */
 class RecursiveCorpusReader : public CorpusReader
 {
 public:
-  RecursiveCorpusReader(std::string const &directory);
+  /**
+   * Construct a recursive CorpusReader. If <i>dactOnly</i> is
+   * <tt>false</tt>, compact corpora are also opened. <b>Warning:</b>
+   * RecursiveCorpusReader will always use DBXML for query validation.
+   */
+  RecursiveCorpusReader(std::string const &directory, bool dactOnly = true);
   virtual ~RecursiveCorpusReader();
 private:
-  EntryIterator getBegin() const;
-  EntryIterator getEnd() const;
+  EntryIterator getEntries() const;
   std::string getName() const;
   size_t getSize() const;
   std::string readEntry(std::string const &) const;

@@ -69,16 +69,10 @@ void CompactCorpusReaderPrivate::construct(std::string const &canonical,
     d_name = canonical;
 }
 
-CorpusReader::EntryIterator CompactCorpusReaderPrivate::getBegin() const
+CorpusReader::EntryIterator CompactCorpusReaderPrivate::getEntries() const
 {
     ItemVector::const_iterator begin(d_indices.begin());
-    return EntryIterator(new IndexIter(begin));
-}
-
-CorpusReader::EntryIterator CompactCorpusReaderPrivate::getEnd() const
-{
-    ItemVector::const_iterator end(d_indices.end());
-    return EntryIterator(new IndexIter(end));
+    return EntryIterator(new IndexIter(begin, d_indices.end()));
 }
 
 std::string CompactCorpusReaderPrivate::getName() const
@@ -120,24 +114,18 @@ IterImpl *CompactCorpusReaderPrivate::IndexIter::copy() const
     return new IndexIter(*this);
 }
 
-std::string CompactCorpusReaderPrivate::IndexIter::current() const
+bool CompactCorpusReaderPrivate::IndexIter::hasNext()
 {
-    return (*iter)->name;
+  return d_iter != d_end;
 }
 
-bool CompactCorpusReaderPrivate::IndexIter::equals(IterImpl const &other) const
+Entry CompactCorpusReaderPrivate::IndexIter::next(CorpusReader const &)
 {
-    try {
-        IndexIter const &that = dynamic_cast<IndexIter const &>(other);
-        return iter == that.iter;
-    } catch (std::bad_cast const &) {
-        return false;
-    }
-}
+    Entry e = {(*d_iter)->name, ""};
 
-void CompactCorpusReaderPrivate::IndexIter::next()
-{
-    ++iter;
+    ++d_iter;
+
+    return e;
 }
 
 void CompactCorpusReaderPrivate::open(std::string const &dataPath,

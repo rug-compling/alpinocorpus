@@ -9,10 +9,10 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/iterator/filter_iterator.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 #include <config.hh>
@@ -22,6 +22,8 @@
 #endif
 
 #include <AlpinoCorpus/CompactCorpusWriter.hh>
+#include <AlpinoCorpus/LexItem.hh>
+#include <AlpinoCorpus/macros.hh>
 
 #include <iostream>
 #include <stdexcept>
@@ -33,6 +35,8 @@
 using alpinocorpus::CorpusReader;
 using alpinocorpus::CorpusWriter;
 using alpinocorpus::CompactCorpusWriter;
+using alpinocorpus::Entry;
+using alpinocorpus::LexItem;
 
 #if defined(USE_DBXML)
 using alpinocorpus::DbCorpusWriter;
@@ -41,23 +45,69 @@ using alpinocorpus::DbCorpusWriter;
 namespace bf = boost::filesystem;
 namespace tr1 = std::tr1;
 
-typedef boost::filter_iterator<NotEqualsPrevious<std::string>, CorpusReader::EntryIterator>
-    UniqueFilterIter;
-
 void listCorpus(tr1::shared_ptr<CorpusReader> reader,
-  std::string const &query)
+  std::string const &query, bool bracketed = false)
 {
-  CorpusReader::EntryIterator i, end(reader->end());
+  CorpusReader::EntryIterator i;
   
   if (query.empty())
-    i = reader->begin();
+    i = reader->entries();
   else
     i = reader->query(CorpusReader::XPATH, query);
 
   NotEqualsPrevious<std::string> pred;
 
-  std::copy(UniqueFilterIter(pred, i, end), UniqueFilterIter(pred, end, end),
-    std::ostream_iterator<std::string>(std::cout, "\n"));
+  tr1::unordered_set<std::string> seen;
+  while (i.hasNext())
+  {
+    Entry entry = i.next(*reader);
+    if (seen.find(entry.name) == seen.end()) {
+      std::cout << entry.name;
+
+      if (bracketed) {
+        std::cout << " ";
+
+        std::vector<LexItem> items = reader->sentence(entry.name, query);
+
+        size_t prevDepth = 0;
+        for (std::vector<LexItem>::const_iterator itemIter = items.begin();
+          itemIter != items.end(); ++itemIter)
+        {
+          size_t depth = itemIter->matches.size();
+
+          if (depth != prevDepth) {
+            if (depth == 0)
+              std::cout << "\033[0;22m";
+            else if (depth == 1)
+              std::cout << "\033[38;5;99m";
+            else if (depth == 2)
+              std::cout << "\033[38;5;111m";
+            else if (depth == 3)
+              std::cout << "\033[38;5;123m";
+            else if (depth == 4)
+              std::cout << "\033[38;5;121m";
+            else
+              std::cout << "\033[38;5;119m";
+          }
+
+          std::cout << itemIter->word;
+
+          std::vector<LexItem>::const_iterator next = itemIter + 1;
+          if (next != items.end() && next->matches.size() < depth)
+            std::cout << "\033[0;22m";
+
+          std::cout << " ";
+
+          prevDepth = depth;
+        }
+
+        std::cout << "\033[0;22m" << std::endl;
+      }
+
+      std::cout << std::endl;
+      seen.insert(entry.name);
+    }
+  }
 }
 
 void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
@@ -75,7 +125,9 @@ void usage(std::string const &programName)
 #endif
       "  -g entry\tPrint a treebank entry to stdout" << std::endl <<
       "  -l\t\tList the entries of a treebank" << std::endl <<
+      "  -m filename\tLoad macro file" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
+      "  -s\t\tInclude a bracketed sentence" << std::endl <<
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 }
 
@@ -83,21 +135,24 @@ void writeCorpus(tr1::shared_ptr<CorpusReader> reader,
   tr1::shared_ptr<CorpusWriter> writer,
   std::string const &query)
 {
-  CorpusReader::EntryIterator i, end(reader->end());
+  CorpusReader::EntryIterator i;
   if (query.empty())
-    i = reader->begin();
+    i = reader->entries();
   else
     i = reader->query(CorpusReader::XPATH, query);
   
   // We need to be *really* sure when writing a corpus that an entry was not written
   // before. So, we'll use a set, rather than a basic filter.
   tr1::unordered_set<std::string> seen;
-  for (; i != end; ++i)
-    if (seen.find(*i) == seen.end()) {
-        writer->write(*i, reader->read(*i));
-      seen.insert(*i);
+  while (i.hasNext()) {
+    Entry e = i.next(*reader);
+
+    if (seen.find(e.name) == seen.end()) {
+        writer->write(e.name, reader->read(e.name));
+        seen.insert(e.name);
     } else
-      std::cerr << "Duplicate entry: " << *i << std::endl;
+      std::cerr << "Duplicate entry: " << e.name << std::endl;
+  }
 }
 
 int main(int argc, char *argv[])
@@ -105,7 +160,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "c:d:g:lq:r"));
+      "c:d:g:lm:q:rs"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -150,10 +205,21 @@ int main(int argc, char *argv[])
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;
   }
-  
+
+  alpinocorpus::Macros macros;
+  if (opts->option('m')) {
+    std::string macrosFn = opts->optionValue('m');
+    try {
+      macros = alpinocorpus::loadMacros(macrosFn);
+    } catch (std::runtime_error &e) {
+      std::cerr << e.what() << std::endl;
+      return 1;
+    }
+  }
+
   std::string query;
   if (opts->option('q')) {
-    query = opts->optionValue('q');  
+    query = alpinocorpus::expandMacros(macros, opts->optionValue('q'));
 
     if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
       std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
@@ -218,7 +284,7 @@ int main(int argc, char *argv[])
   }
   else if (opts->option('l')) {
     try {
-        listCorpus(reader, query);
+        listCorpus(reader, query, opts->option('s'));
     } catch (std::runtime_error const &e) {
         std::cerr << opts->programName() <<
         ": error listing treebank: " << e.what() << std::endl;

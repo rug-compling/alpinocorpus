@@ -1,73 +1,103 @@
 #include <list>
+#include <map>
 #include <string>
+#include <utility>
 
 #include <boost/filesystem.hpp>
-
+#include <boost/tr1/memory.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
+#include <boost/config.hpp>
+
+#if defined(BOOST_HAS_THREADS)
+#include <boost/thread/mutex.hpp>
+#endif
+
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+
+#include "util/NameCompare.hh"
+
+#include <config.hh>
+
+#ifdef USE_DBXML
+#include <dbxml/DbXml.hpp>
+#endif
 
 namespace alpinocorpus {
 
 class MultiCorpusReaderPrivate : public CorpusReader
 {
 public:
-  struct ReaderIter
-  {
-    ReaderIter(std::string newName, alpinocorpus::CorpusReader *newReader,
-        alpinocorpus::CorpusReader::EntryIterator newIter) :
-      name(newName), reader(newReader), iter(newIter) {}
+struct ReaderIter
+{
+  ReaderIter(std::string newName, std::string newFilename, bool newRecursive) :
+    name(newName), filename(newFilename), recursive(newRecursive) {}
 
-    std::string name;
-    alpinocorpus::CorpusReader *reader;
-    alpinocorpus::CorpusReader::EntryIterator iter;
-  };
+  std::string name;
+  std::string filename;
+  bool recursive;
+};
 private:
+  typedef std::map<std::string, std::pair<std::string, bool>, NameCompare> Corpora;
+
   class MultiIter : public IterImpl
   {
   public:
-    MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers);
-    MultiIter(std::tr1::unordered_map<std::string, CorpusReader *> const &readers,
+    MultiIter(Corpora const &corpora);
+    MultiIter(Corpora const &corpora,
       std::string const &query);
     ~MultiIter();
-    std::string contents(CorpusReader const &) const;
     IterImpl *copy() const;
-    std::string current() const;
-    bool equals(IterImpl const &other) const;
     void nextIterator();
-    void next();
+    bool hasNext();
+    bool hasProgress();
+    void interrupt();
+    Entry next(CorpusReader const &rdr);
+    double progress();
   private:
+    void openTip();
+
+    size_t d_totalIters;
     std::list<ReaderIter> d_iters;
+    std::tr1::shared_ptr<CorpusReader> d_currentReader;
+    std::tr1::shared_ptr<CorpusReader::EntryIterator> d_currentIter;
+#if defined(BOOST_HAS_THREADS)
+    std::tr1::shared_ptr<boost::mutex> d_currentIterMutex;
+#endif
+    std::string d_currentName;
+    bool d_hasQuery;
+    std::string d_query;
+    bool d_interrupted;
   };
+
 public:
   MultiCorpusReaderPrivate();
   virtual ~MultiCorpusReaderPrivate();
 
-  EntryIterator getBegin() const;
-  EntryIterator getEnd() const;
+  EntryIterator getEntries() const;
   std::string getName() const;
   size_t getSize() const;
-  void push_back(std::string const &name, CorpusReader *reader);
+  void push_back(std::string const &name, std::string const &filename,
+      bool recursive = false);
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   EntryIterator runXPath(std::string const &query) const;
+#ifdef USE_DBXML
   bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+#endif
 
 private:
-  CorpusReader const *corpusReaderFromPath(std::string const &path) const;
+  std::pair<std::string, bool> corpusFromPath(std::string const &path) const;
   std::string entryFromPath(std::string const &path) const;
 
   boost::filesystem::path d_directory;
-  std::list<CorpusReader *> d_corpusReaders;
-  std::tr1::unordered_map<std::string, CorpusReader *> d_corpusReaderMap;
+  std::list<std::pair<std::string, bool> > d_corpora;
+  Corpora d_corporaMap;
+#ifdef USE_DBXML
+  mutable DbXml::XmlManager d_mgr;
+#endif
 };
-
-inline bool operator==(MultiCorpusReaderPrivate::ReaderIter const &left,
-  MultiCorpusReaderPrivate::ReaderIter const &right)
-{
-  return left.name == right.name && left.reader == right.reader &&
-    left.iter == right.iter;
-}
 
 }

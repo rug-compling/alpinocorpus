@@ -45,9 +45,13 @@ namespace alpinocorpus {
 
         /**
          * Factory method: open a directory with multiple corpora recursively.
-         * The caller is responsible for deleting the object returned.
+         * The caller is responsible for deleting the object returned. If
+         * <i>dactOnly</i> is set to false, the recursive reader will also
+         * open compact corpora. <b>Warning:</b> the recursive corpus reader
+         * will always use DBXML for query validation.
          */
-        static CorpusReader *openRecursive(std::string const &path);
+        static CorpusReader *openRecursive(std::string const &path,
+            bool dactOnly = true);
 
         /**
          * Check whether a particular reader type is available.

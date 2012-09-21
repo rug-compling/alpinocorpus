@@ -1,12 +1,17 @@
+#include <cmath>
 #include <string>
 
 #include <AlpinoCorpus/IterImpl.hh>
 
 namespace alpinocorpus {
-    std::string IterImpl::contents(CorpusReader const &rdr) const
+    bool IterImpl::hasProgress()
     {
-        //return rdr.read(current());
-        return std::string(); // XXX - should be a null string
+        return false;
+    }
+
+    double IterImpl::progress()
+    {
+        return NAN;
     }
 
     void IterImpl::interrupt()

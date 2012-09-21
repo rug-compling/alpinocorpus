@@ -27,14 +27,9 @@ DbCorpusReader::~DbCorpusReader()
     delete d_private;
 }
     
-CorpusReader::EntryIterator DbCorpusReader::getBegin() const
+CorpusReader::EntryIterator DbCorpusReader::getEntries() const
 {
-    return d_private->getBegin();
-}
-
-CorpusReader::EntryIterator DbCorpusReader::getEnd() const
-{
-    return d_private->getEnd();
+    return d_private->getEntries();
 }
 
 std::string DbCorpusReader::getName() const
@@ -56,12 +51,6 @@ bool DbCorpusReader::validQuery(QueryDialect d, bool variables, std::string cons
 std::string DbCorpusReader::readEntry(std::string const &entry) const
 {
     return d_private->readEntry(entry);
-}
-    
-std::string DbCorpusReader::readEntryMarkQueries(std::string const &entry, 
-    std::list<MarkerQuery> const &queries) const
-{
-    return d_private->readEntryMarkQueries(entry, queries);
 }
 
 CorpusReader::EntryIterator DbCorpusReader::runXPath(std::string const &query) const

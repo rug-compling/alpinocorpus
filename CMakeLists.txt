@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(AlpinoCorpus)
 
-set (ALPINOCORPUS_VERSION "1.2.0")
+set (ALPINOCORPUS_VERSION "1.4.0")
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
@@ -51,10 +51,10 @@ option(USE_REMOTE_CORPUS "Enable remote corpus" OFF)
 
 if(USE_REMOTE_CORPUS)
 find_package(Boost 1.46.1 COMPONENTS system date_time iostreams
-  filesystem thread REQUIRED)
+  filesystem thread regex REQUIRED)
 else()
 find_package(Boost 1.46.1 COMPONENTS system date_time filesystem
-  thread REQUIRED)
+  thread regex REQUIRED)
 endif()
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -109,6 +109,12 @@ if(LIBXSLT_FOUND)
   include_directories(${LIBXSLT_INCLUDE_DIR})
 endif()
 
+find_package(LibExslt REQUIRED)
+if(LIBEXSLT_FOUND)
+  include_directories(${LIBEXSLT_INCLUDE_DIR})
+endif()
+
+
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
   "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
@@ -130,9 +136,11 @@ set(HEADERS
   include/AlpinoCorpus/Error.hh
   include/AlpinoCorpus/IterImpl.hh
   include/AlpinoCorpus/CompactCorpusReader.hh
+  include/AlpinoCorpus/LexItem.hh
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/capi.h
+  include/AlpinoCorpus/macros.hh
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
   src/DzIstream.hh
@@ -144,6 +152,8 @@ set(HEADERS
   src/MultiCorpusReaderPrivate.hh
   src/StylesheetIter.hh
   src/XSLTransformer.hh
+  src/parseMacros.hh
+  src/util/NameCompare.hh
   src/util/base64.hh
   src/util/bufutil.hh
   src/util/parseString.hh
@@ -175,6 +185,9 @@ set(SOURCES
   src/StylesheetIter.cpp
   src/XSLTransformer.cpp
   src/capi.cpp
+  src/macros.cpp
+  src/parseMacros.cpp
+  src/util/NameCompare.cpp
   src/util/textfile.cpp
   src/util/url.cpp
 )
@@ -212,7 +225,7 @@ add_library(alpino_corpus SHARED
 )
 
 set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
-  SOVERSION 1.0)
+  SOVERSION 1.4)
 
 target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
@@ -230,6 +243,7 @@ if(USE_REMOTE_CORPUS)
 endif()
 
 target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
+target_link_libraries(alpino_corpus ${LIBEXSLT_LIBRARIES})
 
 install(TARGETS alpino_corpus
   LIBRARY DESTINATION lib

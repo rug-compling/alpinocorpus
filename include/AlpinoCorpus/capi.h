@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+typedef struct alpinocorpus_entry_t *alpinocorpus_entry;
 typedef struct alpinocorpus_reader_t *alpinocorpus_reader;
 typedef struct alpinocorpus_writer_t *alpinocorpus_writer;
 typedef struct alpinocorpus_iter_t *alpinocorpus_iter;
@@ -14,6 +15,16 @@ typedef struct {
   char const *attr;
   char const *value;
 } marker_query_t;
+
+/**
+ * Initialize the library.
+ */
+void alpinocorpus_initialize();
+
+/**
+ * Cleanup the library.
+ */
+void alpinocorpus_cleanup();
 
 /*** CORPUS READER ***/
 
@@ -62,6 +73,22 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_marker_iter(alpinocorpus_reader 
 							    char const *markerAttr,
 							    char const *markerValue);
 
+/**
+ * Get the contents of an entry. The content string is deallocated when
+ * the entry is deallocated using <i>alpinocorpus_entry_free</i>.
+ */
+char const * alpinocorpus_entry_contents(alpinocorpus_entry entry);
+
+/**
+ * Deallocate an entry.
+ */
+void alpinocorpus_entry_free(alpinocorpus_entry entry);
+
+/**
+ * Get the name of an entry. The name string is deallocated when
+ * the entry is deallocated using <i>alpinocorpus_entry_free</i>.
+ */
+char const * alpinocorpus_entry_name(alpinocorpus_entry entry);
 
 /**
  * Get an iterator over the entries in a corpus that match a query.
@@ -75,28 +102,18 @@ alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const
 void alpinocorpus_iter_destroy(alpinocorpus_iter iter);
 
 /**
- * Check whether the iterator is at its end.
+ * Check whether the iterator has more entries.
  */
-int alpinocorpus_iter_end(alpinocorpus_reader corpus,
+int alpinocorpus_iter_has_next(alpinocorpus_reader corpus,
   alpinocorpus_iter iter);
 
 /**
- * Move the iterator forward. This function return false (0) when there are
- * no more entries.
+ * Retrieve the next entry from the corpus. alpinocorpus_iter_has_next()
+ * should be called before this function, to ensure that another entry is
+ * available.
  */
-void alpinocorpus_iter_next(alpinocorpus_reader corpus,
+alpinocorpus_entry alpinocorpus_iter_next(alpinocorpus_reader corpus,
   alpinocorpus_iter iter);
-
-/**
- * Get the name of the current entry.
- */
-char *alpinocorpus_iter_value(alpinocorpus_iter iter);
-
-/**
- * Get the iterator contents.
- */
-char *alpinocorpus_iter_contents(alpinocorpus_reader reader,
-    alpinocorpus_iter iter);
 
 /**
  * Read an entry from the corpus.

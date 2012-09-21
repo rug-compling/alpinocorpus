@@ -8,6 +8,7 @@
 #endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 
 #include "CompactCorpusWriterPrivate.hh"
@@ -74,22 +75,28 @@ void CompactCorpusWriterPrivate::writeEntry(CorpusReader const &corpus, bool fai
 
 void CompactCorpusWriterPrivate::writeFailFirst(CorpusReader const &corpus)
 {
-    for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
-         i != end; ++i)
-        write(*i, corpus.read(*i));
+    CorpusReader::EntryIterator i = corpus.entries();
+    while(i.hasNext())
+    {
+        Entry e = i.next(corpus);
+        write(e.name, corpus.read(e.name));
+    }
 }
 
 void CompactCorpusWriterPrivate::writeFailSafe(CorpusReader const &corpus)
 {
     BatchError err;
 
-    for (CorpusReader::EntryIterator i(corpus.begin()), end(corpus.end());
-         i != end; ++i)
+    CorpusReader::EntryIterator i = corpus.entries();
+    while(i.hasNext())
+    {
+        Entry e = i.next(corpus);
         try {
-            write(*i, corpus.read(*i));
+            write(e.name, corpus.read(e.name));
         } catch (Error const &e) {
             err.append(e);
         }
+    }
 
     if (!err.empty())
         throw err;

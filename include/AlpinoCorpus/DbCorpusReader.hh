@@ -23,11 +23,9 @@ class DbCorpusReader : public CorpusReader
 
   private:
     bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
-    EntryIterator getBegin() const;
-    EntryIterator getEnd() const;
+    EntryIterator getEntries() const;
     std::string getName() const;
     std::string readEntry(std::string const &) const;
-    std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
     EntryIterator runXPath(std::string const &) const;
     EntryIterator runXQuery(std::string const &) const;
     size_t getSize() const;

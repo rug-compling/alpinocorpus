@@ -18,7 +18,7 @@ CorpusReader* openCorpus(std::string const &path,
     bool recursive)
 {
     if (recursive)
-      return CorpusReaderFactory::openRecursive(path);
+      return CorpusReaderFactory::openRecursive(path, false);
     else
       return CorpusReaderFactory::open(path);
 }
@@ -33,12 +33,6 @@ CorpusReader *openCorpora(
   for (std::vector<std::string>::const_iterator iter = pathBegin;
       iter != pathEnd; ++iter)
   {
-    CorpusReader *reader = openCorpus(*iter, recursive);
-    if (reader == 0) {
-      delete readers;
-      return 0;
-    }
-
     // If we are dealing with a directory, and the path ends with a trailing
     // slash, we remove the slash.
     bf::path p = bf::path(*iter);
@@ -51,10 +45,7 @@ CorpusReader *openCorpora(
     // Use the last path component as the corpus name.
     std::string name = p.filename().generic_string();
 
-
-    // Strip extensions
-
-    readers->push_back(name, reader);
+    readers->push_back(name, *iter, recursive);
   }
 
   return readers;

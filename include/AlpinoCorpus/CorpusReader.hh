@@ -6,8 +6,11 @@
 #include <queue>
 #include <string>
 
+#include <boost/tr1/memory.hpp>
+
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+#include <AlpinoCorpus/LexItem.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
 namespace alpinocorpus {
@@ -31,19 +34,10 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
         EntryIterator(EntryIterator const &other);
         virtual ~EntryIterator();
         EntryIterator &operator=(EntryIterator const &other);
-        EntryIterator &operator++();
-        EntryIterator operator++(int);
-        bool operator==(EntryIterator const &other) const;
-        bool operator!=(EntryIterator const &other) const;
-        value_type operator*() const;
-        //value_type const *operator->() const { return impl->current(); }
-
-        /**
-         * Get contents of entry pointed to by iterator.
-         * This will be a null string for an ordinary iterator,
-         * and the matching part for a query iterator.
-         */
-        std::string contents(CorpusReader const &rdr) const;
+        bool hasNext();
+        bool hasProgress() const;
+        Entry next(CorpusReader const &reader);
+        double progress() const;
 
         /**
          * Interrupt an iterator that is blocking.
@@ -53,7 +47,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
       private:
         void copy(EntryIterator const &other);
 
-        IterImpl *d_impl;
+        std::tr1::shared_ptr<IterImpl> d_impl;
     };
     
     struct MarkerQuery {
@@ -72,18 +66,15 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     /** Return canonical name of corpus */
     std::string name() const;
 
-    /** Iterator to begin of entry names */
-    EntryIterator begin() const;
+    /** Iterator over entry names. */
+    EntryIterator entries() const;
 
     /**
-     * Iterator to begin of entry names, contents are transformed with
+     * Iterator over entry names, contents are transformed with
      * the given stylesheet.
      */
-    EntryIterator beginWithStylesheet(std::string const &stylesheet,
+    EntryIterator entriesWithStylesheet(std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries = std::list<MarkerQuery>()) const;
-
-    /** Iterator to end of entry names */
-    EntryIterator end() const;
 
     enum QueryDialect { XPATH, XQUERY };
 
@@ -108,13 +99,17 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     std::string read(std::string const &entry,
       std::list<MarkerQuery> const &queries = std::list<MarkerQuery>()) const;
 
+    std::vector<LexItem> sentence(std::string const &entry,
+      std::string const &query) const;
+
     /** The number of entries in the corpus. */
     size_t size() const;
 
   private:
-    virtual EntryIterator getBegin() const = 0;
-    virtual EntryIterator getEnd() const = 0;
+    virtual EntryIterator getEntries() const = 0;
     virtual std::string getName() const = 0;
+    virtual std::vector<LexItem> getSentence(std::string const &entry,
+        std::string const &query) const;
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,

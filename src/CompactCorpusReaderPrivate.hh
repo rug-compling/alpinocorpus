@@ -13,6 +13,7 @@
 #endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 
 #include "DzIstream.hh"
@@ -39,14 +40,15 @@ class CompactCorpusReaderPrivate : public CorpusReader
 
     class IndexIter : public IterImpl
     {
-        ItemVector::const_iterator iter;
+        ItemVector::const_iterator d_iter;
+        ItemVector::const_iterator d_end;
 
     public:
-        IndexIter(ItemVector::const_iterator const &i) : iter(i) { }
+        IndexIter(ItemVector::const_iterator i,
+            ItemVector::const_iterator const end) : d_iter(i), d_end(end) { }
         IterImpl *copy() const;
-        std::string current() const;
-        bool equals(IterImpl const &) const;
-        void next();
+        bool hasNext();
+        Entry next(CorpusReader const &rdr);
     };
 
 public:
@@ -59,8 +61,7 @@ public:
     CompactCorpusReaderPrivate(std::string const &dataFilename, std::string const &indexFilename);
     virtual ~CompactCorpusReaderPrivate() {}
 
-    virtual EntryIterator getBegin() const;
-    virtual EntryIterator getEnd() const;
+    virtual EntryIterator getEntries() const;
     virtual std::string getName() const;
     virtual std::string readEntry(std::string const &filename) const;
     virtual size_t getSize() const;

@@ -12,6 +12,7 @@
 #endif // USE_DBXML
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <../src/util/GetUrl.hh>
 
@@ -32,13 +33,12 @@ namespace alpinocorpus {
                        bool isQuery = false);
             ~RemoteIter();
             IterImpl *copy() const;
-            std::string current() const;
-            bool equals(IterImpl const &) const;
-            void next();
+            bool hasNext();
+            Entry next(CorpusReader const &reader);
             void interrupt();
-            std::string contents(CorpusReader const &) const;
         private:
             void activate() const;
+            static std::string unescape(std::string text);
             std::tr1::shared_ptr<util::GetUrl> d_geturl;
             mutable bool d_end;
             mutable size_t d_idx;
@@ -52,8 +52,7 @@ namespace alpinocorpus {
         RemoteCorpusReaderPrivate(std::string const &url);
         virtual ~RemoteCorpusReaderPrivate();
 
-        virtual EntryIterator getBegin() const;
-        virtual EntryIterator getEnd() const;
+        virtual EntryIterator getEntries() const;
         virtual std::string getName() const;
         virtual size_t getSize() const;
         bool validQuery(QueryDialect d, bool variables,
