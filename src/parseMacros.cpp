@@ -1,5 +1,5 @@
 
-#line 1 "parseMacros.rl"
+#line 1 "src/parseMacros.rl"
 // Experimental parser for macros
 //
 // TODO:
@@ -20,12 +20,14 @@
 
 #include <cstring>
 
-#include <parseMacros.hh>
+#include <AlpinoCorpus/macros.hh>
+
+#include "parseMacros.hh"
 
 namespace {
 
 
-#line 29 "parseMacros.cpp"
+#line 31 "src/parseMacros.cpp"
 static const char _macros_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 1, 5, 2, 3, 0
@@ -118,7 +120,7 @@ static const int macros_error = 0;
 static const int macros_en_main = 17;
 
 
-#line 28 "parseMacros.rl"
+#line 30 "src/parseMacros.rl"
 
 
 
@@ -129,9 +131,11 @@ struct Substitution
 	std::string macro;
 };
 
+typedef std::vector<Substitution> Substitutions;
+
 }
 
-typedef std::vector<Substitution> Substitutions;
+namespace alpinocorpus {
 
 Macros parseMacros(char const *data)
 {
@@ -152,12 +156,12 @@ Macros parseMacros(char const *data)
 
 	std::ostringstream buf;
 
-#line 156 "parseMacros.cpp"
+#line 160 "src/parseMacros.cpp"
 	{
 	cs = macros_start;
 	}
 
-#line 161 "parseMacros.cpp"
+#line 165 "src/parseMacros.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -232,26 +236,26 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 61 "parseMacros.rl"
+#line 65 "src/parseMacros.rl"
 	{
 		buf << (*p);
 	}
 	break;
 	case 1:
-#line 65 "parseMacros.rl"
+#line 69 "src/parseMacros.rl"
 	{
 		lastKey = buf.str();
 		buf.str("");
 	}
 	break;
 	case 2:
-#line 70 "parseMacros.rl"
+#line 74 "src/parseMacros.rl"
 	{
 		strStart = p;
 	}
 	break;
 	case 3:
-#line 74 "parseMacros.rl"
+#line 78 "src/parseMacros.rl"
 	{
 		// This action is executed when the query is closed ("""), we have to
 		// three to avoid including the quotes.
@@ -276,13 +280,13 @@ _match:
 	}
 	break;
 	case 4:
-#line 97 "parseMacros.rl"
+#line 101 "src/parseMacros.rl"
 	{
 		substStart = p;
 	}
 	break;
 	case 5:
-#line 101 "parseMacros.rl"
+#line 105 "src/parseMacros.rl"
 	{
 		std::string macro(substStart, p);
 
@@ -297,7 +301,7 @@ _match:
 		substitutions.push_back(subst);
 	}
 	break;
-#line 301 "parseMacros.cpp"
+#line 305 "src/parseMacros.cpp"
 		}
 	}
 
@@ -314,7 +318,7 @@ _again:
 	while ( __nacts-- > 0 ) {
 		switch ( *__acts++ ) {
 	case 3:
-#line 74 "parseMacros.rl"
+#line 78 "src/parseMacros.rl"
 	{
 		// This action is executed when the query is closed ("""), we have to
 		// three to avoid including the quotes.
@@ -338,7 +342,7 @@ _again:
 		macros[lastKey] = query;
 	}
 	break;
-#line 342 "parseMacros.cpp"
+#line 346 "src/parseMacros.cpp"
 		}
 	}
 	}
@@ -346,7 +350,7 @@ _again:
 	_out: {}
 	}
 
-#line 129 "parseMacros.rl"
+#line 133 "src/parseMacros.rl"
 
 
 	if (cs < macros_first_final)
@@ -377,4 +381,6 @@ _again:
 	}
 
 	return macros;
+}
+
 }

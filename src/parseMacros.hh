@@ -1,10 +1,12 @@
 #ifndef PARSE_MACROS_HH
 #define PARSE_MACROS_HH
 
-#include <map>
+#include <AlpinoCorpus/macros.hh>
 
-typedef std::map<std::string, std::string> Macros;
+namespace alpinocorpus {
 
 Macros parseMacros(char const *data);
+
+}
 
 #endif // PARSE_MACROS_HH

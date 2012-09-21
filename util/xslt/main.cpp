@@ -17,13 +17,13 @@ extern "C" {
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/macros.hh>
 
 #include "../src/util/textfile.hh" // XXX - hmpf
 
 #include <EqualsPrevious.hh>
 #include <ProgramOptions.hh>
 #include <Stylesheet.hh>
-#include <macros.hh>
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
@@ -135,11 +135,11 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  Macros macros;
+  alpinocorpus::Macros macros;
   if (opts->option('m')) {
     std::string macrosFn = opts->optionValue('m');
     try {
-      macros = loadMacros(macrosFn);
+      macros = alpinocorpus::loadMacros(macrosFn);
     } catch (std::runtime_error &e) {
       std::cerr << e.what() << std::endl;
       return 1;
@@ -148,7 +148,7 @@ int main (int argc, char *argv[])
 
   std::string query;
   if (opts->option('q')) {
-    query = expandMacros(macros, opts->optionValue('q'));
+    query = alpinocorpus::expandMacros(macros, opts->optionValue('q'));
 
     if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
       std::cerr << "Invalid (or unwanted) query: " << query << std::endl;

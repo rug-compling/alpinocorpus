@@ -10,9 +10,9 @@
 #include <boost/scoped_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/macros.hh>
 
 #include <ProgramOptions.hh>
-#include <macros.hh>
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
@@ -98,18 +98,18 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    Macros macros;
+    alpinocorpus::Macros macros;
     if (opts->option('m')) {
         std::string macrosFn = opts->optionValue('m');
         try {
-          macros = loadMacros(macrosFn);
+          macros = alpinocorpus::loadMacros(macrosFn);
         } catch (std::runtime_error &e) {
           std::cerr << e.what() << std::endl;
           return 1;
         }
     }
 
-    std::string query = expandMacros(macros, opts->arguments().at(0));
+    std::string query = alpinocorpus::expandMacros(macros, opts->arguments().at(0));
     if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
         std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
         return 1;

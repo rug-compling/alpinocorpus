@@ -7,11 +7,15 @@
 
 #include <boost/algorithm/string/replace.hpp>
 
+#include <AlpinoCorpus/macros.hh>
+
 #include "parseMacros.hh"
 
 namespace {
 	std::string macroMarker("%");
 }
+
+namespace alpinocorpus {
 
 Macros loadMacros(std::string const &filename) {
 	std::ifstream macroStream(filename.c_str());
@@ -41,4 +45,6 @@ std::string expandMacros(Macros const &macros, std::string query)
 	}
 
 	return query;
+}
+
 }

@@ -140,6 +140,7 @@ set(HEADERS
   include/AlpinoCorpus/MultiCorpusReader.hh
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/capi.h
+  include/AlpinoCorpus/macros.hh
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
   src/DzIstream.hh
@@ -151,6 +152,7 @@ set(HEADERS
   src/MultiCorpusReaderPrivate.hh
   src/StylesheetIter.hh
   src/XSLTransformer.hh
+  src/parseMacros.hh
   src/util/NameCompare.hh
   src/util/base64.hh
   src/util/bufutil.hh
@@ -183,6 +185,8 @@ set(SOURCES
   src/StylesheetIter.cpp
   src/XSLTransformer.cpp
   src/capi.cpp
+  src/macros.cpp
+  src/parseMacros.cpp
   src/util/NameCompare.cpp
   src/util/textfile.cpp
   src/util/url.cpp
