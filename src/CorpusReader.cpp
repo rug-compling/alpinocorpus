@@ -398,7 +398,6 @@ namespace alpinocorpus {
                     markNodes.push_back(node);
                 }
             } catch (XQillaException &e) {
-                std::cerr << "xqilla excp" << std::endl;
                 throw Error("Matching node value invalid while marking nodes.");
             }
 
