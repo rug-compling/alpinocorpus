@@ -4,12 +4,14 @@
 #include <map>
 #include <string>
 
+#include <AlpinoCorpus/DLLDefines.hh>
+
 namespace alpinocorpus {
 
 typedef std::map<std::string, std::string> Macros;
 
-std::string expandMacros(Macros const &macros, std::string query);
-Macros loadMacros(std::string const &filename);
+ALPINO_CORPUS_EXPORT std::string expandMacros(Macros const &macros, std::string query);
+ALPINO_CORPUS_EXPORT Macros loadMacros(std::string const &filename);
 
 }
 
