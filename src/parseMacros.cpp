@@ -371,7 +371,10 @@ _again:
 			std::string context = str.substr(ctxBegin, ctxEnd - ctxBegin);
 			err << context << std::endl;
 
-			size_t cursor = errPos - ctxBegin;
+			size_t cursor = 0;
+			if (errPos > ctxBegin)
+				cursor = errPos - ctxBegin;
+
 			for (size_t i = 0; i < cursor; ++i)
 				err << " ";
 			err << "^";
