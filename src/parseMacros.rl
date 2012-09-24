@@ -118,7 +118,7 @@ Macros parseMacros(char const *data)
 
 	separator = "\"\"\"";
 	whitespace = [\n\r\t ]+;
-	comment = '#' [^\n]+ '\n';
+	comment = '#' [^\n]* '\n';
 
 	key = ([A-Za-z0-9_]+) $ str_char % key;
 
