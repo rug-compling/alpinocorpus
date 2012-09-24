@@ -3,11 +3,11 @@
 #include <cstring>
 #include <list>
 #include <string>
-#include <tr1/unordered_map>
 #include <vector>
 
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/regex.hpp>
+#include <boost/tr1/unordered_map.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
