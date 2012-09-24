@@ -198,8 +198,8 @@ alpinocorpus_entry alpinocorpus_iter_next(alpinocorpus_reader reader,
     alpinocorpus_entry ce = reinterpret_cast<alpinocorpus_entry>(
         std::malloc(sizeof(alpinocorpus_entry_t)));
 
-    ce->name = strndup(e.name.c_str(), e.name.size());
-    ce->contents = strndup(e.contents.c_str(), e.contents.size());
+	ce->name = strdup(e.name.c_str());
+    ce->contents = strdup(e.contents.c_str());
 
     return ce;
 }

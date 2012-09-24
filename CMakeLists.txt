@@ -50,10 +50,10 @@ option(WITH_RUBY
 option(USE_REMOTE_CORPUS "Enable remote corpus" ON)
 
 if(USE_REMOTE_CORPUS)
-find_package(Boost 1.46.1 COMPONENTS system date_time iostreams
+find_package(Boost 1.46.1 COMPONENTS system chrono date_time iostreams
   filesystem thread regex REQUIRED)
 else()
-find_package(Boost 1.46.1 COMPONENTS system date_time filesystem
+find_package(Boost 1.46.1 COMPONENTS system chrono date_time filesystem
   thread regex REQUIRED)
 endif()
 if(Boost_FOUND)
