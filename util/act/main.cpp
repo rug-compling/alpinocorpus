@@ -4,7 +4,8 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/tr1/memory.hpp>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
+
 #include <tr1/unordered_set>
 
 #include <boost/scoped_ptr.hpp>

@@ -3,8 +3,9 @@
 #include <string>
 #include <utility>
 
+#include <AlpinoCorpus/tr1wrap/memory.hh>
+
 #include <boost/filesystem.hpp>
-#include <boost/tr1/memory.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
 #include <boost/config.hpp>

@@ -5,7 +5,7 @@
 #include <typeinfo>
 #include <vector>
 
-#include <boost/tr1/unordered_map.hpp>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include <boost/config.hpp>
 #include <boost/filesystem.hpp>

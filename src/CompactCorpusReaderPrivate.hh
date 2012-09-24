@@ -2,9 +2,11 @@
 #define ALPINO_COMPACT_CORPUSREADER_PRIVATE_HH
 
 #include <string>
-#include <boost/tr1/unordered_map.hpp>
-#include <boost/tr1/memory.hpp>
 #include <vector>
+
+#include <AlpinoCorpus/tr1wrap/memory.hh>
+
+#include <boost/tr1/unordered_map.hpp>
 
 #include <boost/config.hpp>
 

@@ -141,6 +141,7 @@ set(HEADERS
   include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/capi.h
   include/AlpinoCorpus/macros.hh
+  include/AlpinoCorpus/tr1wrap/memory.hh
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
   src/DzIstream.hh
