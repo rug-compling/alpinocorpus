@@ -16,6 +16,8 @@
 #include <ProgramOptions.hh>
 #include <util.hh>
 
+#include "../src/util/textfile.hh"
+
 using alpinocorpus::CorpusReader;
 using alpinocorpus::Entry;
 
@@ -44,6 +46,7 @@ void usage(std::string const &programName)
 {
     std::cerr << "Usage: " << programName << " [OPTION] treebanks" <<
       std::endl << std::endl <<
+      "  -f filename\tRead XQuery program from file" << std::endl <<
       "  -m filename\tLoad macro file" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
@@ -54,7 +57,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "m:q:r"));
+      "f:m:q:r"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -66,12 +69,19 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  if (!opts->option('q')) {
+  if (!opts->option('q') && !opts->option('f')) {
     std::cerr << opts->programName() <<
-      ": you should provide a query with -q." <<
+      ": you should provide a query with -q or -f." <<
       std::endl;
     return 1;
-  }  
+  } 
+
+  if (opts->option('q') && opts->option('f')) {
+    std::cerr << opts->programName() <<
+      ": -q and -f are mutually exclusive." <<
+      std::endl;
+    return 1;
+  }   
  
   tr1::shared_ptr<CorpusReader> reader;
   try {
@@ -101,12 +111,20 @@ int main(int argc, char *argv[])
   std::string query;
   if (opts->option('q')) {
     query = alpinocorpus::expandMacros(macros, opts->optionValue('q'));
-
-    if (!reader->isValidQuery(CorpusReader::XQUERY, false, query)) {
-      std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
+  } else if (opts->option('f')) {
+    try {
+      query = alpinocorpus::util::readFile(opts->optionValue('f'));
+    } catch (std::runtime_error &e) {
+      std::cerr << e.what() << std::endl;
       return 1;
     }
   }
+
+  if (!reader->isValidQuery(CorpusReader::XQUERY, false, query)) {
+    std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
+    return 1;
+  }
+
   
   try {
       listCorpus(reader, query);
