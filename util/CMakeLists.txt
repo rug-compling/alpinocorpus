@@ -33,6 +33,18 @@ add_executable(alpinocorpus-act
 
 target_link_libraries(alpinocorpus-act alpino_corpus)
 
+set(XQUERY_SOURCES
+  xquery/main.cpp
+)
+
+add_executable(alpinocorpus-xquery
+  ${XQUERY_SOURCES}
+  ${COMMON_HEADERS}
+  ${COMMON_SOURCES}
+)
+
+target_link_libraries(alpinocorpus-xquery alpino_corpus)
+
 set(XSLT_HEADERS
   common/Stylesheet.hh
 )

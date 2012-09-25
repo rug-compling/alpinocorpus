@@ -27,6 +27,7 @@ public:
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   EntryIterator runXPath(std::string const &query) const;
+  EntryIterator runXQuery(std::string const &query) const;
   bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
 private:
@@ -81,6 +82,11 @@ std::string RecursiveCorpusReader::readEntryMarkQueries(std::string const &entry
 CorpusReader::EntryIterator RecursiveCorpusReader::runXPath(std::string const &query) const
 {
   return d_private->query(XPATH, query);
+}
+
+CorpusReader::EntryIterator RecursiveCorpusReader::runXQuery(std::string const &query) const
+{
+  return d_private->query(XQUERY, query);
 }
 
 // Implementation of the private interface
@@ -150,6 +156,12 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXPath(
     std::string const &query) const
 {
   return d_multiReader->query(CorpusReader::XPATH, query);
+}
+
+CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXQuery(
+    std::string const &query) const
+{
+  return d_multiReader->query(CorpusReader::XQUERY, query);
 }
 
 bool RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,

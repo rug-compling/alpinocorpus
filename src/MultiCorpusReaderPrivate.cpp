@@ -32,6 +32,15 @@ namespace alpinocorpus {
 
 MultiCorpusReaderPrivate::MultiCorpusReaderPrivate()
 {
+    DbXml::XmlContainerConfig config;
+    config.setReadOnly(false);
+
+    // Create an in-memory container.
+    d_container = d_mgr.createContainer("", config,
+        DbXml::XmlContainer::NodeContainer);
+
+    // Default container name.
+    d_container.addAlias("corpus"); 
 }
 
 MultiCorpusReaderPrivate::~MultiCorpusReaderPrivate()
@@ -134,7 +143,13 @@ std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
     std::string const &query) const
 {
-  return EntryIterator(new MultiIter(d_corporaMap, query));
+  return EntryIterator(new MultiIter(d_corporaMap, query, CorpusReader::XPATH));
+}
+
+CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXQuery(
+    std::string const &query) const
+{
+  return EntryIterator(new MultiIter(d_corporaMap, query, CorpusReader::XQUERY));
 }
 
 // Iteration over MultiCorpusReaders
@@ -158,7 +173,9 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
   Corpora const &corpora,
-  std::string const &query) : d_hasQuery(true), d_interrupted(false)
+  std::string const &query,
+  CorpusReader::QueryDialect dialect) :
+  d_hasQuery(true), d_query(query), d_dialect(dialect), d_interrupted(false)
 {
 #if defined(BOOST_HAS_THREADS)
     d_currentIterMutex.reset(new boost::mutex);
@@ -169,8 +186,6 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
       iter != corpora.end(); ++iter)
     d_iters.push_back(ReaderIter(iter->first, iter->second.first,
           iter->second.second));
-
-    d_query = query;
 
     // Initial number of 'iterators'.
     d_totalIters = d_iters.size();
@@ -253,7 +268,7 @@ void MultiCorpusReaderPrivate::MultiIter::openTip()
 
     try {
       if (d_hasQuery)
-        d_currentIter.reset(new EntryIterator(reader->query(CorpusReader::XPATH, d_query)));
+        d_currentIter.reset(new EntryIterator(reader->query(d_dialect, d_query)));
       else
         d_currentIter.reset(new EntryIterator(reader->entries()));
     } catch (std::runtime_error &e)

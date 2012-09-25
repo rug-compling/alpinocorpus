@@ -59,5 +59,10 @@ CorpusReader::EntryIterator MultiCorpusReader::runXPath(std::string const &query
   return d_private->query(XPATH, query);
 }
 
+CorpusReader::EntryIterator MultiCorpusReader::runXQuery(std::string const &query) const
+{
+  return d_private->query(XQUERY, query);
+}
+
 }
 
