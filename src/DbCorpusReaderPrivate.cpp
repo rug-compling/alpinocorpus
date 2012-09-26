@@ -82,7 +82,6 @@ Entry DbCorpusReaderPrivate::DbIter::next(CorpusReader const &)
     std::string value;
 
     if (v.isNode()) {
-        value = v.getNodeValue();
         try {
             db::XmlDocument doc = v.asDocument();
             name = doc.getName();
@@ -90,8 +89,9 @@ Entry DbCorpusReaderPrivate::DbIter::next(CorpusReader const &)
           // Could not use node as a document. Why is there no isDocument()
           // method?
         }
-    } else if (v.isString())
-      value = v.asString();
+    }
+
+    value = v.asString();
 
     Entry e = {name, value};
 
