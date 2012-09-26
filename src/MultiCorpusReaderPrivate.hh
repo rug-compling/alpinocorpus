@@ -91,7 +91,7 @@ protected:
   EntryIterator runXPath(std::string const &query) const;
   EntryIterator runXQuery(std::string const &query) const;
 #ifdef USE_DBXML
-  bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+  Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
 #endif
 
 private:

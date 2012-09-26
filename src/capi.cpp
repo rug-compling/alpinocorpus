@@ -87,7 +87,7 @@ void alpinocorpus_close(alpinocorpus_reader reader)
 int alpinocorpus_is_valid_query(alpinocorpus_reader reader, char const *query)
 {
   return int(reader->corpusReader->isValidQuery(
-      alpinocorpus::CorpusReader::XPATH, false, query));
+      alpinocorpus::CorpusReader::XPATH, false, query).isRight());
 }
 
 alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)

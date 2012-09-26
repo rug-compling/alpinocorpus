@@ -9,6 +9,7 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+#include <AlpinoCorpus/util/Either.hh>
 
 #include "DbCorpusReaderPrivate.hh"
 #include "util/url.hh"
@@ -143,16 +144,16 @@ std::string DbCorpusReaderPrivate::getName() const
     return container.getName();
 }
 
-bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
+Either<std::string, Empty> DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     try {
         db::XmlQueryContext ctx = mgr.createQueryContext();
         mgr.prepare(query, ctx);
     } catch (db::XmlException const &e) {
-        return false;
+        return Either<std::string, Empty>::left(e.what());
     }
     
-    return true;
+    return Either<std::string, Empty>::right(Empty());
 }
 
 

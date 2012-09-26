@@ -288,7 +288,7 @@ namespace alpinocorpus {
     }
 
     
-    bool CorpusReader::isValidQuery(QueryDialect d, bool variables, std::string const &q) const
+    Either<std::string, Empty> CorpusReader::isValidQuery(QueryDialect d, bool variables, std::string const &q) const
     {
         std::vector<std::string> queries;
         boost::split_regex(queries, q, boost::regex("\\+\\|\\+"));
@@ -296,10 +296,13 @@ namespace alpinocorpus {
 
         for (std::vector<std::string>::const_iterator iter = queries.begin();
                 iter != queries.end(); ++iter)
-            if (!validQuery(d, variables, *iter))
-                return false;
+        {
+            Either<std::string, Empty> result = validQuery(d, variables, *iter);
+            if (result.isLeft())
+                return result;
+        }
 
-        return true;
+        return Either<std::string, Empty>::right(Empty());
     }
     
     std::string CorpusReader::name() const
@@ -449,14 +452,14 @@ namespace alpinocorpus {
         return getSize();
     }
     
-    bool CorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
+    Either<std::string, Empty> CorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
     {
         if (d != XPATH)
-            return false;
+            return Either<std::string, Empty>::left("Only XPath2 queries are supported for this corpus.");
         
         // XXX - strip/trim
         if (query.empty())
-            return true;
+            return Either<std::string, Empty>::right(Empty());
 
         // Prepare context
         xmlXPathContextPtr ctx = xmlXPathNewContext(0);
@@ -470,13 +473,13 @@ namespace alpinocorpus {
         
         if (!r) {
             xmlXPathFreeContext(ctx);
-            return false;
+            return Either<std::string, Empty>::left("Invalid expression");
         }
         
         xmlXPathFreeCompExpr(r);
         xmlXPathFreeContext(ctx);
         
-        return true;
+        return Either<std::string, Empty>::right(Empty());
     }
     
     CorpusReader::EntryIterator CorpusReader::query(QueryDialect d,

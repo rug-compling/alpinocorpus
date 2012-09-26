@@ -17,6 +17,7 @@
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
+using alpinocorpus::Either;
 
 namespace tr1 = std::tr1;
 
@@ -111,11 +112,14 @@ int main(int argc, char *argv[])
     }
 
     std::string query = alpinocorpus::expandMacros(macros, opts->arguments().at(0));
-    if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
-        std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
-        return 1;
+    Either<std::string, alpinocorpus::Empty> valid =
+      reader->isValidQuery(CorpusReader::XPATH, false, query);
+    if (valid.isLeft()) {
+      std::cerr << "Invalid (or unwanted) query: " << query << std::endl << std::endl;
+      std::cerr << valid.left() << std::endl;
+      return 1;
     }
-
+    
     ValueCounts counts(countQuery(reader, query));
     printFrequencies(reader, counts, opts->option('p'));
 }

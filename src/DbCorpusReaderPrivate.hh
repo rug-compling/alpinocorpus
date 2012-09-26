@@ -55,7 +55,7 @@ public:
     {
         return const_cast<DbXml::XmlContainer &>(container).getNumDocuments();
     }
-    bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+    Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
     std::string readEntry(std::string const &) const;
     EntryIterator runXPath(std::string const &) const;
     EntryIterator runXQuery(std::string const &) const;

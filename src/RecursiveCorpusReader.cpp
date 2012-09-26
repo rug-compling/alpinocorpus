@@ -28,7 +28,7 @@ public:
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   EntryIterator runXPath(std::string const &query) const;
   EntryIterator runXQuery(std::string const &query) const;
-  bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+  Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
 private:
   bf::path d_directory;
@@ -63,7 +63,7 @@ size_t RecursiveCorpusReader::getSize() const
   return d_private->getSize();
 }
     
-bool RecursiveCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
+Either<std::string, Empty> RecursiveCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
   return d_private->isValidQuery(d, variables, query);
 }
@@ -164,11 +164,11 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXQuery(
   return d_multiReader->query(CorpusReader::XQUERY, query);
 }
 
-bool RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
+Either<std::string, Empty> RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
     std::string const &query) const
 {
     if (!d_multiReader)
-      return false;
+      return Either<std::string, Empty>::left("No reader available.");
 
     return d_multiReader->isValidQuery(d, variables, query);
 }

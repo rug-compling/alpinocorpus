@@ -22,7 +22,7 @@ class DbCorpusReader : public CorpusReader
     virtual ~DbCorpusReader();
 
   private:
-    bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+    Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
     EntryIterator getEntries() const;
     std::string getName() const;
     std::string readEntry(std::string const &) const;

@@ -17,6 +17,7 @@
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+#include <AlpinoCorpus/util/Either.hh>
 
 #include <config.hh>
 
@@ -292,16 +293,16 @@ double MultiCorpusReaderPrivate::MultiIter::progress()
 }
 
 #ifdef USE_DBXML
-bool MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
+Either<std::string, Empty> MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
     std::string const &query) const
 {
         try {
             DbXml::XmlQueryContext ctx = d_mgr.createQueryContext();
             d_mgr.prepare(query, ctx);
         } catch (DbXml::XmlException const &e) {
-            return false;
+            return Either<std::string, Empty>::left(e.what());
         }
-        return true;
+        return Either<std::string, Empty>::right(Empty());
 #endif
 }
 

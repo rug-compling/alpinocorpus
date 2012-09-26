@@ -4,6 +4,7 @@
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
+#include <AlpinoCorpus/util/Either.hh>
 
 namespace alpinocorpus {
 
@@ -30,7 +31,7 @@ private:
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   EntryIterator runXPath(std::string const &query) const;
   EntryIterator runXQuery(std::string const &query) const;
-  bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+  Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
   RecursiveCorpusReaderPrivate *d_private;
 };
