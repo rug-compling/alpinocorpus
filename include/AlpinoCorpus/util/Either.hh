@@ -3,11 +3,23 @@
 
 namespace alpinocorpus {
 
+/**
+ * Either is an option type that resembles the Either type in Haskell.
+ * It's used to indicate that computation results in two possible type:
+ * the left type or the right type (which could have the same type).
+ *
+ * Unfortunately, we do not have algebraic data types in C++, so both
+ * posibilities are encoded in the same type. The isLeft() and isRight()
+ * methods can be used to probe whether we have a left or right value.
+ *
+ * In error handling the convention is that <tt>Left L</tt> is an error,
+ * and information about the error is encoded using the type <tt>L</tt>.
+ * <tt>Right R</tt> is a succesful computation with a result of the type
+ * <tt>R</tt>.
+ */
 template <typename L, typename R>
 class Either {
 public:
-	enum Result { LEFT, RIGHT };
-
 	static Either left(L left);
 	static Either right(R right);
 
@@ -16,6 +28,8 @@ public:
 	L left();
 	R right();
 private:
+	enum Result { LEFT, RIGHT };
+
 	Either(Result result, L left, R right) :
 		d_result(result), d_left(left), d_right(right) {}
 
