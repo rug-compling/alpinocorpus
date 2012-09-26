@@ -115,7 +115,7 @@ IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
     return new QueryIter(*this);
 }
 DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
- : mgr(), container()
+ : mgr(db::DBXML_ALLOW_EXTERNAL_ACCESS), container()
 {
     try {
         db::XmlContainerConfig config;
