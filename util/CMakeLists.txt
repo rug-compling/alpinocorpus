@@ -85,6 +85,10 @@ install(TARGETS alpinocorpus-act
   RUNTIME DESTINATION bin
 )
 
+install(TARGETS alpinocorpus-xquery
+  RUNTIME DESTINATION bin
+)
+
 install(TARGETS alpinocorpus-xslt
   RUNTIME DESTINATION bin
 )
