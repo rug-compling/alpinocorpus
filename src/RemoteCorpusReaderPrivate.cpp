@@ -14,6 +14,8 @@
 
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+#include <AlpinoCorpus/util/Either.hh>
+
 #include "RemoteCorpusReaderPrivate.hh"
 #include "util/GetUrl.hh"
 #include "util/parseString.hh"
@@ -93,7 +95,7 @@ namespace alpinocorpus {
             throw std::runtime_error("RemoteCorpusReader: size is unknown");
     }
 
-    bool RemoteCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
+    Either<std::string, Empty> RemoteCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
         std::string const &query) const
     {
 #ifdef USE_DBXML
@@ -101,15 +103,18 @@ namespace alpinocorpus {
             DbXml::XmlQueryContext ctx = mgr.createQueryContext();
             mgr.prepare(query, ctx);
         } catch (DbXml::XmlException const &e) {
-            return false;
+            return Either<std::string, Empty>::left(e.what());
         }
-        return true;
+        return Either<std::string, Empty>::right(Empty());
 #else
         util::GetUrl p(d_url + "/validQuery?query=" + util::toPercentEncoding(query));
         std::string result = p.body();
         boost::to_lower(result);
         boost::trim(result);
-        return (result == "true" || result == "yes" || result == "1");
+        if (result == "true" || result == "yes" || result == "1")
+            return Either<std::string, Empty>::right(Empty());
+        else
+            return Either<std::string, Empty>::left("Query could not be validated by the server.");
 #endif
     }
 
