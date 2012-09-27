@@ -49,8 +49,7 @@ void usage(std::string const &programName)
       std::endl << std::endl <<
       "  -f filename\tRead XQuery program from file" << std::endl <<
       "  -m filename\tLoad macro file" << std::endl <<
-      "  -q query\tFilter the treebank using the given query" << std::endl <<
-      "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
+      "  -q query\tFilter the treebank using the given query" << std::endl << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -58,7 +57,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "f:m:q:r"));
+      "f:m:q:"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -88,11 +87,11 @@ int main(int argc, char *argv[])
   try {
     if (opts->arguments().size() == 1)
       reader = tr1::shared_ptr<CorpusReader>(
-        openCorpus(opts->arguments().at(0), opts->option('r')));
+        openCorpus(opts->arguments().at(0), true));
     else
       reader = tr1::shared_ptr<CorpusReader>(
         openCorpora(opts->arguments().begin(),
-          opts->arguments().end(), opts->option('r')));
+          opts->arguments().end(), true));
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;
