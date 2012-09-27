@@ -48,76 +48,6 @@ using alpinocorpus::DbCorpusWriter;
 namespace bf = boost::filesystem;
 namespace tr1 = std::tr1;
 
-void listCorpus(tr1::shared_ptr<CorpusReader> reader,
-  std::string const &query, bool bracketed = false)
-{
-  CorpusReader::EntryIterator i;
-  
-  if (query.empty())
-    i = reader->entries();
-  else
-    i = reader->query(CorpusReader::XPATH, query);
-
-  NotEqualsPrevious<std::string> pred;
-
-  tr1::unordered_set<std::string> seen;
-  while (i.hasNext())
-  {
-    Entry entry = i.next(*reader);
-    if (seen.find(entry.name) == seen.end()) {
-      std::cout << entry.name;
-
-      if (bracketed) {
-        std::cout << " ";
-
-        std::vector<LexItem> items = reader->sentence(entry.name, query);
-
-        size_t prevDepth = 0;
-        for (std::vector<LexItem>::const_iterator itemIter = items.begin();
-          itemIter != items.end(); ++itemIter)
-        {
-          size_t depth = itemIter->matches.size();
-
-          if (depth != prevDepth) {
-            if (depth == 0)
-              std::cout << "\033[0;22m";
-            else if (depth == 1)
-              std::cout << "\033[38;5;99m";
-            else if (depth == 2)
-              std::cout << "\033[38;5;111m";
-            else if (depth == 3)
-              std::cout << "\033[38;5;123m";
-            else if (depth == 4)
-              std::cout << "\033[38;5;121m";
-            else
-              std::cout << "\033[38;5;119m";
-          }
-
-          std::cout << itemIter->word;
-
-          std::vector<LexItem>::const_iterator next = itemIter + 1;
-          if (next != items.end() && next->matches.size() < depth)
-            std::cout << "\033[0;22m";
-
-          std::cout << " ";
-
-          prevDepth = depth;
-        }
-
-        std::cout << "\033[0;22m" << std::endl;
-      }
-
-      std::cout << std::endl;
-      seen.insert(entry.name);
-    }
-  }
-}
-
-void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
-{
-  std::cout << reader->read(entry);
-}
-
 void usage(std::string const &programName)
 {
     std::cerr << "Usage: " << programName << " [OPTION] treebanks" <<
@@ -126,11 +56,8 @@ void usage(std::string const &programName)
 #if defined(USE_DBXML)
       "  -d filename\tCreate a Dact dbxml archive" << std::endl <<
 #endif
-      "  -g entry\tPrint a treebank entry to stdout" << std::endl <<
-      "  -l\t\tList the entries of a treebank" << std::endl <<
       "  -m filename\tLoad macro file" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
-      "  -s\t\tInclude a bracketed sentence" << std::endl <<
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 }
 
@@ -163,7 +90,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "c:d:g:lm:q:rs"));
+      "c:d:m:q:r"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -174,23 +101,17 @@ int main(int argc, char *argv[])
     usage(opts->programName());
     return 1;
   }
-
-  size_t cmdCount = 0;
-  char const commands[] = "cdgl";
-  for (size_t i = 0; i < sizeof(commands); ++i)
-    if (opts->option(commands[i]))
-      ++cmdCount;
   
-  if (cmdCount > 1) {
+  if (opts->option('c') && opts->option('d')) {
     std::cerr << opts->programName() <<
-      ": the '-c', 'd', '-g', and '-l' options cannot be used simultaneously." <<
+      ": the '-c' and 'd' options cannot be used simultaneously." <<
       std::endl;
     return 1;
   }
   
-  if (cmdCount == 0) {
+  if (!opts->option('c') && !opts->option('d')) {
     std::cerr << opts->programName() <<
-    ": one of the '-c', 'd', -g' or '-l' option should be used." <<
+    ": one of the '-c' or 'd' options should be used." <<
     std::endl;
     return 1;
   }
@@ -276,24 +197,6 @@ int main(int argc, char *argv[])
     } catch (std::runtime_error const &e) {
         std::cerr << opts->programName() <<
         ": error creating compact corpus: " << e.what() << std::endl;
-        return 1;
-    }    
-  }
-  else if (opts->option('g')) {
-    try {
-      readEntry(reader, opts->optionValue('g'));
-    } catch (std::runtime_error const &e) {
-        std::cerr << opts->programName() <<
-        ": error reading entry: " << e.what() << std::endl;
-        return 1;
-    }    
-  }
-  else if (opts->option('l')) {
-    try {
-        listCorpus(reader, query, opts->option('s'));
-    } catch (std::runtime_error const &e) {
-        std::cerr << opts->programName() <<
-        ": error listing treebank: " << e.what() << std::endl;
         return 1;
     }    
   }

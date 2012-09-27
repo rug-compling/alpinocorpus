@@ -21,17 +21,29 @@ set(COMMON_SOURCES
   common/util.cpp
 )
 
-set(ACT_SOURCES
-  act/main.cpp
+set(CREATE_SOURCES
+  create/main.cpp
 )
 
-add_executable(alpinocorpus-act
-  ${ACT_SOURCES}
+add_executable(alpinocorpus-create
+  ${CREATE_SOURCES}
   ${COMMON_HEADERS}
   ${COMMON_SOURCES}
 )
 
-target_link_libraries(alpinocorpus-act alpino_corpus)
+target_link_libraries(alpinocorpus-create alpino_corpus)
+
+set(XPATH_SOURCES
+  xpath/main.cpp
+)
+
+add_executable(alpinocorpus-xpath
+  ${XPATH_SOURCES}
+  ${COMMON_HEADERS}
+  ${COMMON_SOURCES}
+)
+
+target_link_libraries(alpinocorpus-xpath alpino_corpus)
 
 set(XQUERY_SOURCES
   xquery/main.cpp
@@ -81,18 +93,12 @@ target_link_libraries(alpinocorpus-stats
   alpino_corpus
 )
 
-install(TARGETS alpinocorpus-act
-  RUNTIME DESTINATION bin
-)
-
-install(TARGETS alpinocorpus-xquery
-  RUNTIME DESTINATION bin
-)
-
-install(TARGETS alpinocorpus-xslt
-  RUNTIME DESTINATION bin
-)
-
-install(TARGETS alpinocorpus-stats
+install(
+  TARGETS
+    alpinocorpus-create
+    alpinocorpus-stats
+    alpinocorpus-xpath
+    alpinocorpus-xquery
+    alpinocorpus-xslt
   RUNTIME DESTINATION bin
 )

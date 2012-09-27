@@ -17,7 +17,7 @@ using alpinocorpus::MultiCorpusReader;
 CorpusReader* openCorpus(std::string const &path,
     bool recursive)
 {
-    if (recursive)
+    if (recursive && bf::is_directory(bf::path(path)))
       return CorpusReaderFactory::openRecursive(path, false);
     else
       return CorpusReaderFactory::open(path);
@@ -36,6 +36,9 @@ CorpusReader *openCorpora(
     // If we are dealing with a directory, and the path ends with a trailing
     // slash, we remove the slash.
     bf::path p = bf::path(*iter);
+
+    bool isDir = bf::is_directory(p);
+
     if (bf::is_directory(p) && iter->rfind('/') == iter->size() - 1)
       p = bf::path(iter->substr(0, iter->size() - 1));
 
@@ -45,7 +48,7 @@ CorpusReader *openCorpora(
     // Use the last path component as the corpus name.
     std::string name = p.filename().generic_string();
 
-    readers->push_back(name, *iter, recursive);
+    readers->push_back(name, *iter, recursive && isDir);
   }
 
   return readers;
