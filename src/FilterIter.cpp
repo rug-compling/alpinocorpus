@@ -15,21 +15,6 @@
 #include <xqilla/xqilla-simple.hpp>
 
 namespace {
-    struct Globals {
-        Globals();
-        virtual ~Globals();
-    };
-
-    static Globals s_globals;
-    
-    Globals::Globals() {
-        XQillaPlatformUtils::initialize();
-    }
-    
-    Globals::~Globals() {
-        XQillaPlatformUtils::terminate();
-    }
-
     static XQilla s_xqilla;
 }
 
