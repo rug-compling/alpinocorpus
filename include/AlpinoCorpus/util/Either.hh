@@ -16,6 +16,9 @@ namespace alpinocorpus {
  * and information about the error is encoded using the type <tt>L</tt>.
  * <tt>Right R</tt> is a succesful computation with a result of the type
  * <tt>R</tt>.
+ *
+ * Note: we could have used boost::variant, but I think it is kinda
+ *       heavyweight. It does more, but also has a more complex API.
  */
 template <typename L, typename R>
 class Either {
