@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(AlpinoCorpus)
 
-set (ALPINOCORPUS_VERSION "1.4.0")
+set (ALPINOCORPUS_VERSION "1.4.1")
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
@@ -50,10 +50,10 @@ option(WITH_RUBY
 option(USE_REMOTE_CORPUS "Enable remote corpus" OFF)
 
 if(USE_REMOTE_CORPUS)
-find_package(Boost 1.46.1 COMPONENTS system date_time iostreams
+find_package(Boost 1.46.1 COMPONENTS system chrono date_time iostreams
   filesystem thread regex REQUIRED)
 else()
-find_package(Boost 1.46.1 COMPONENTS system date_time filesystem
+find_package(Boost 1.46.1 COMPONENTS system chrono date_time filesystem
   thread regex REQUIRED)
 endif()
 if(Boost_FOUND)
