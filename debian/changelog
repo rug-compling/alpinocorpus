@@ -1,3 +1,9 @@
+alpino-corpus (1.4.1-1quantal1) quantal; urgency=low
+
+  * New upstream release.
+
+ -- Daniël de Kok <me@danieldk.eu>  Thu, 25 Oct 2012 10:37:49 +0200
+
 alpino-corpus (1.4.0-1quantal1) quantal; urgency=low
 
   * New upstream release.
