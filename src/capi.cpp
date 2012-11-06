@@ -14,6 +14,8 @@
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/capi.h>
 
+#include <config.hh>
+
 extern "C" {
 
 #include <libxslt/xslt.h>
@@ -67,7 +69,8 @@ alpinocorpus_reader alpinocorpus_open(char const *path)
 
 alpinocorpus_reader alpinocorpus_open_recursive(char const *path)
 {
-    alpinocorpus::CorpusReader *reader;
+#if defined(USE_DBXML)
+    alpinocorpus::CorpusReader *reader = 0;
 
     try {
         reader = alpinocorpus::CorpusReaderFactory::openRecursive(path);
@@ -76,6 +79,9 @@ alpinocorpus_reader alpinocorpus_open_recursive(char const *path)
     }
 
     return new alpinocorpus_reader_t(reader);
+#else
+    return NULL;
+#endif
 }
 
 void alpinocorpus_close(alpinocorpus_reader reader)
