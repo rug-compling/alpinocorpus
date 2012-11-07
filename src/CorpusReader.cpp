@@ -92,9 +92,13 @@ namespace {
                         } catch (std::invalid_argument &e) {
                             //qDebug() << e.what();
                         }
+
+                        xmlFree(beginStr);
                     }
 
                     alpinocorpus::LexItem item = {fromXmlStr(word), begin, std::set<size_t>() };
+
+                    xmlFree(word);
 
                     std::tr1::unordered_map<xmlNode *, std::set<size_t> >::const_iterator matchIter =
                         matchDepth.find(node);
@@ -107,6 +111,9 @@ namespace {
         }
 
         std::sort(items.begin(), items.end());
+
+        xmlXPathFreeObject(xpObj);
+        xmlXPathFreeContext(xpCtx);
 
         return items;
     }
@@ -239,8 +246,8 @@ namespace alpinocorpus {
         }
         std::string xmlData(read(entry, markers));
 
-        xmlDocPtr doc;
-        doc = xmlReadMemory(xmlData.c_str(), xmlData.size(), NULL, NULL, 0);
+        xmlDocPtr doc =
+            xmlReadMemory(xmlData.c_str(), xmlData.size(), NULL, NULL, 0);
         if (doc == NULL)
             return std::vector<LexItem>();
 
@@ -254,7 +261,6 @@ namespace alpinocorpus {
         xmlXPathContextPtr xpCtx = xmlXPathNewContext(doc);
         if (xpCtx == 0)
         {
-            //qDebug() << "Could not make XPath context.";
             xmlFreeDoc(doc);
             return std::vector<LexItem>();
         }
