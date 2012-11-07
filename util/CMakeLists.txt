@@ -1,3 +1,5 @@
+if(USE_DBXML)
+
 find_package(LibXslt REQUIRED)
 if(LIBXSLT_FOUND)
   include_directories(${LIBXSLT_INCLUDE_DIR})
@@ -102,3 +104,5 @@ install(
     alpinocorpus-xslt
   RUNTIME DESTINATION bin
 )
+
+endif(USE_DBXML)
