@@ -46,7 +46,8 @@ CorpusReader *openCorpora(
     p.replace_extension("");
 
     // Use the last path component as the corpus name.
-    std::string name = p.filename().generic_string();
+    
+    std::string name = isDir ? p.generic_string() : p.filename().generic_string();
 
     readers->push_back(name, *iter, recursive && isDir);
   }
