@@ -13,6 +13,7 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include <typeinfo>
 
@@ -50,25 +51,23 @@ namespace {
     }
 
 
-    std::vector<alpinocorpus::LexItem> collectLexicals(xmlDoc *doc,
+    std::vector<alpinocorpus::LexItem> collectLexicals(
+        std::tr1::shared_ptr<xmlDoc> doc,
         std::tr1::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth)
     {
         std::vector<alpinocorpus::LexItem> items;
 
-        xmlXPathContextPtr xpCtx = xmlXPathNewContext(doc);
+        std::tr1::shared_ptr<xmlXPathContext> xpCtx(
+            xmlXPathNewContext(doc.get()), xmlXPathFreeContext);
         if (xpCtx == 0)
         {
-            //qDebug() << "Could not make XPath context.";
             return items;
         }
 
-        xmlXPathObjectPtr xpObj = xmlXPathEvalExpression(
-            toXmlStr("//node[@word]"), xpCtx);
-        if (xpObj == 0) {
-            //qDebug() << "Could not make XPath expression to select active nodes.";
-            xmlXPathFreeContext(xpCtx);
+        std::tr1::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
+            toXmlStr("//node[@word]"), xpCtx.get()), xmlXPathFreeObject);
+        if (xpObj == 0)
             return items;
-        }
 
         xmlNodeSet *nodeSet = xpObj->nodesetval;
         if (nodeSet != 0)
@@ -80,25 +79,22 @@ namespace {
                 if (node->type == XML_ELEMENT_NODE)
                 {
                     xmlAttrPtr wordAttr = xmlHasProp(node, toXmlStr("word"));
-                    xmlChar *word = xmlNodeGetContent(wordAttr->children);
+                    std::tr1::shared_ptr<xmlChar> word(
+                        xmlNodeGetContent(wordAttr->children), xmlFree);
 
                     xmlAttrPtr beginAttr = xmlHasProp(node, toXmlStr("begin"));
                     size_t begin = 0;
                     if (beginAttr)
                     {
-                        xmlChar *beginStr = xmlNodeGetContent(beginAttr->children);
+                        std::tr1::shared_ptr<xmlChar> beginStr(
+                            xmlNodeGetContent(beginAttr->children), xmlFree);
                         try {
-                            begin = alpinocorpus::util::parseString<size_t>(fromXmlStr(beginStr));
+                            begin = alpinocorpus::util::parseString<size_t>(fromXmlStr(beginStr.get()));
                         } catch (std::invalid_argument &e) {
-                            //qDebug() << e.what();
                         }
-
-                        xmlFree(beginStr);
                     }
 
-                    alpinocorpus::LexItem item = {fromXmlStr(word), begin, std::set<size_t>() };
-
-                    xmlFree(word);
+                    alpinocorpus::LexItem item = {fromXmlStr(word.get()), begin, std::set<size_t>() };
 
                     std::tr1::unordered_map<xmlNode *, std::set<size_t> >::const_iterator matchIter =
                         matchDepth.find(node);
@@ -111,9 +107,6 @@ namespace {
         }
 
         std::sort(items.begin(), items.end());
-
-        xmlXPathFreeObject(xpObj);
-        xmlXPathFreeContext(xpCtx);
 
         return items;
     }
@@ -246,31 +239,32 @@ namespace alpinocorpus {
         }
         std::string xmlData(read(entry, markers));
 
-        xmlDocPtr doc =
-            xmlReadMemory(xmlData.c_str(), xmlData.size(), NULL, NULL, 0);
+        std::tr1::shared_ptr<xmlDoc> doc(
+            xmlReadMemory(xmlData.c_str(), xmlData.size(), NULL, NULL, 0),
+            xmlFreeDoc);
+
         if (doc == NULL)
             return std::vector<LexItem>();
 
         // We get the sentence node, we should process its children.
-        xmlNode *sentenceNode = xmlDocGetRootElement(doc);
+        xmlNode *sentenceNode = xmlDocGetRootElement(doc.get());
         if (sentenceNode == NULL) {
-            xmlFreeDoc(doc);
             return std::vector<LexItem>();
         }
 
-        xmlXPathContextPtr xpCtx = xmlXPathNewContext(doc);
+        std::tr1::shared_ptr<xmlXPathContext> xpCtx(
+            xmlXPathNewContext(doc.get()), xmlXPathFreeContext);
+
         if (xpCtx == 0)
         {
-            xmlFreeDoc(doc);
             return std::vector<LexItem>();
         }
 
-        xmlXPathObjectPtr xpObj = xmlXPathEvalExpression(
-            toXmlStr("//node[@active='1']"), xpCtx);
+        std::tr1::shared_ptr<xmlXPathObject> xpObj(
+            xmlXPathEvalExpression(toXmlStr("//node[@active='1']"), xpCtx.get()),
+            xmlXPathFreeObject);
         if (xpObj == 0) {
             //qDebug() << "Could not make XPath expression to select active nodes.";
-            xmlXPathFreeContext(xpCtx);
-            xmlFreeDoc(doc);
             return std::vector<LexItem>();
         }
 
@@ -285,10 +279,6 @@ namespace alpinocorpus {
         }
 
         std::vector<LexItem> items = collectLexicals(doc, matchDepth);
-
-        xmlXPathFreeObject(xpObj);
-        xmlXPathFreeContext(xpCtx);
-        xmlFreeDoc(doc);
 
         return items;
     }
@@ -468,23 +458,21 @@ namespace alpinocorpus {
             return Either<std::string, Empty>::right(Empty());
 
         // Prepare context
-        xmlXPathContextPtr ctx = xmlXPathNewContext(0);
+    
+        std::tr1::shared_ptr<xmlXPathContext> ctx(xmlXPathNewContext(0),
+            xmlXPathFreeContext);
         if (!variables)
             ctx->flags = XML_XPATH_NOVAR;
-        xmlSetStructuredErrorFunc(ctx, &ignoreStructuredError);
+        xmlSetStructuredErrorFunc(ctx.get(), &ignoreStructuredError);
         
         // Compile expression
-        xmlXPathCompExprPtr r = xmlXPathCtxtCompile(ctx,
-                                                    reinterpret_cast<xmlChar const *>(query.c_str()));
+        std::tr1::shared_ptr<xmlXPathCompExpr> r(
+            xmlXPathCtxtCompile(ctx.get(), reinterpret_cast<xmlChar const *>(query.c_str())),
+            xmlXPathFreeCompExpr);
         
-        if (!r) {
-            xmlXPathFreeContext(ctx);
+        if (!r)
             return Either<std::string, Empty>::left("Invalid expression");
-        }
-        
-        xmlXPathFreeCompExpr(r);
-        xmlXPathFreeContext(ctx);
-        
+                
         return Either<std::string, Empty>::right(Empty());
     }
     
