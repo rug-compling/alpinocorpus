@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/tr1/memory.hpp>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include <config.hh>
 #ifdef USE_DBXML
@@ -55,7 +55,7 @@ namespace alpinocorpus {
         virtual EntryIterator getEntries() const;
         virtual std::string getName() const;
         virtual size_t getSize() const;
-        bool validQuery(QueryDialect d, bool variables,
+        Either<std::string, Empty> validQuery(QueryDialect d, bool variables,
             std::string const &query) const;
         virtual std::string readEntry(std::string const &filename) const;
         virtual std::string readEntryMarkQueries(std::string const &entry,

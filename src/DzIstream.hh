@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include <boost/tr1/memory.hpp>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include "DzIstreamBuf.hh"
 

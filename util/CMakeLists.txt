@@ -1,3 +1,5 @@
+if(USE_DBXML)
+
 find_package(LibXslt REQUIRED)
 if(LIBXSLT_FOUND)
   include_directories(${LIBXSLT_INCLUDE_DIR})
@@ -21,17 +23,41 @@ set(COMMON_SOURCES
   common/util.cpp
 )
 
-set(ACT_SOURCES
-  act/main.cpp
+set(CREATE_SOURCES
+  create/main.cpp
 )
 
-add_executable(alpinocorpus-act
-  ${ACT_SOURCES}
+add_executable(alpinocorpus-create
+  ${CREATE_SOURCES}
   ${COMMON_HEADERS}
   ${COMMON_SOURCES}
 )
 
-target_link_libraries(alpinocorpus-act alpino_corpus)
+target_link_libraries(alpinocorpus-create alpino_corpus)
+
+set(XPATH_SOURCES
+  xpath/main.cpp
+)
+
+add_executable(alpinocorpus-xpath
+  ${XPATH_SOURCES}
+  ${COMMON_HEADERS}
+  ${COMMON_SOURCES}
+)
+
+target_link_libraries(alpinocorpus-xpath alpino_corpus)
+
+set(XQUERY_SOURCES
+  xquery/main.cpp
+)
+
+add_executable(alpinocorpus-xquery
+  ${XQUERY_SOURCES}
+  ${COMMON_HEADERS}
+  ${COMMON_SOURCES}
+)
+
+target_link_libraries(alpinocorpus-xquery alpino_corpus)
 
 set(XSLT_HEADERS
   common/Stylesheet.hh
@@ -69,14 +95,14 @@ target_link_libraries(alpinocorpus-stats
   alpino_corpus
 )
 
-install(TARGETS alpinocorpus-act
+install(
+  TARGETS
+    alpinocorpus-create
+    alpinocorpus-stats
+    alpinocorpus-xpath
+    alpinocorpus-xquery
+    alpinocorpus-xslt
   RUNTIME DESTINATION bin
 )
 
-install(TARGETS alpinocorpus-xslt
-  RUNTIME DESTINATION bin
-)
-
-install(TARGETS alpinocorpus-stats
-  RUNTIME DESTINATION bin
-)
+endif(USE_DBXML)

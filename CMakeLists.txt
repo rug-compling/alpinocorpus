@@ -137,10 +137,10 @@ set(HEADERS
   include/AlpinoCorpus/IterImpl.hh
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/LexItem.hh
-  include/AlpinoCorpus/MultiCorpusReader.hh
-  include/AlpinoCorpus/RecursiveCorpusReader.hh
   include/AlpinoCorpus/capi.h
   include/AlpinoCorpus/macros.hh
+  include/AlpinoCorpus/tr1wrap/memory.hh
+  include/AlpinoCorpus/util/Either.hh
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
   src/DzIstream.hh
@@ -149,7 +149,6 @@ set(HEADERS
   src/DzOstreamBuf.hh
   src/CompactCorpusReaderPrivate.hh
   src/FilterIter.hh
-  src/MultiCorpusReaderPrivate.hh
   src/StylesheetIter.hh
   src/XSLTransformer.hh
   src/parseMacros.hh
@@ -178,9 +177,6 @@ set(SOURCES
   src/FilterIter.cpp
   src/CompactCorpusReader.cpp
   src/CompactCorpusReaderPrivate.cpp
-  src/MultiCorpusReader.cpp
-  src/MultiCorpusReaderPrivate.cpp
-  src/RecursiveCorpusReader.cpp
   src/IterImpl.cpp
   src/StylesheetIter.cpp
   src/XSLTransformer.cpp
@@ -196,13 +192,19 @@ if(USE_DBXML)
   list(APPEND HEADERS
     include/AlpinoCorpus/DbCorpusReader.hh
     include/AlpinoCorpus/DbCorpusWriter.hh
+    include/AlpinoCorpus/MultiCorpusReader.hh
+    include/AlpinoCorpus/RecursiveCorpusReader.hh
     src/DbCorpusReaderPrivate.hh
+    src/MultiCorpusReaderPrivate.hh
   )
 
   list(APPEND SOURCES
     src/DbCorpusReader.cpp
     src/DbCorpusReaderPrivate.cpp
     src/DbCorpusWriter.cpp
+    src/MultiCorpusReader.cpp
+    src/MultiCorpusReaderPrivate.cpp
+    src/RecursiveCorpusReader.cpp
   )
 endif()
 
@@ -229,9 +231,9 @@ set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
 
 target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
+target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
+target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
 if(USE_DBXML)
-  target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
-  target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
   target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})

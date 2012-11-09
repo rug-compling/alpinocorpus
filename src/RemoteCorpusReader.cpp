@@ -73,7 +73,7 @@ namespace alpinocorpus {
         return d_private->runXQuery(query);
     }
 
-    bool RemoteCorpusReader::validQuery(QueryDialect d, bool variables,
+    Either<std::string, Empty> RemoteCorpusReader::validQuery(QueryDialect d, bool variables,
         std::string const &query) const
     {
         return d_private->isValidQuery(d, variables, query);

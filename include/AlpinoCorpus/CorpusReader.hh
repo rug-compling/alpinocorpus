@@ -6,11 +6,12 @@
 #include <queue>
 #include <string>
 
-#include <boost/tr1/memory.hpp>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/LexItem.hh>
+#include <AlpinoCorpus/util/Either.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
 namespace alpinocorpus {
@@ -79,7 +80,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     enum QueryDialect { XPATH, XQUERY };
 
     /** Is a query valid? */
-    bool isValidQuery(QueryDialect d, bool variables, std::string const &q) const;
+    Either<std::string, Empty> isValidQuery(QueryDialect d, bool variables, std::string const &q) const;
     
     /** Execute query. The end of the range is given by end(). */
     EntryIterator query(QueryDialect d, std::string const &q) const;
@@ -119,7 +120,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator runQueryWithStylesheet(QueryDialect d,
       std::string const &q, std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries) const;
-    virtual bool validQuery(QueryDialect d, bool variables, std::string const &q) const;
+    virtual Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &q) const;
 };
 
 }

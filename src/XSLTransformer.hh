@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <AlpinoCorpus/tr1wrap/memory.hh>
+
 extern "C" {
 #include <libxslt/xsltInternals.h>
 }
@@ -20,7 +22,7 @@ private:
     XSLTransformer &operator=(XSLTransformer const &other);
     void initWithStylesheet(std::string const &xslt);
 
-    xsltStylesheetPtr d_xslPtr;
+    std::tr1::shared_ptr<xsltStylesheet> d_xslPtr;
 };
 
 }

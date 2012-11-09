@@ -3,8 +3,9 @@
 #include <string>
 #include <utility>
 
+#include <AlpinoCorpus/tr1wrap/memory.hh>
+
 #include <boost/filesystem.hpp>
-#include <boost/tr1/memory.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
 #include <boost/config.hpp>
@@ -47,7 +48,7 @@ private:
   public:
     MultiIter(Corpora const &corpora);
     MultiIter(Corpora const &corpora,
-      std::string const &query);
+      std::string const &query, CorpusReader::QueryDialect dialect);
     ~MultiIter();
     IterImpl *copy() const;
     void nextIterator();
@@ -69,6 +70,7 @@ private:
     std::string d_currentName;
     bool d_hasQuery;
     std::string d_query;
+    CorpusReader::QueryDialect d_dialect;
     bool d_interrupted;
   };
 
@@ -83,9 +85,13 @@ public:
       bool recursive = false);
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
+
+protected:
+
   EntryIterator runXPath(std::string const &query) const;
+  EntryIterator runXQuery(std::string const &query) const;
 #ifdef USE_DBXML
-  bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+  Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
 #endif
 
 private:
@@ -97,6 +103,7 @@ private:
   Corpora d_corporaMap;
 #ifdef USE_DBXML
   mutable DbXml::XmlManager d_mgr;
+  DbXml::XmlContainer d_container;
 #endif
 };
 

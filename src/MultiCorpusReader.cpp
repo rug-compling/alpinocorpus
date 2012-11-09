@@ -38,7 +38,7 @@ void MultiCorpusReader::push_back(std::string const &name, std::string const &re
   d_private->push_back(name, reader, recursive);
 }
     
-bool MultiCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
+Either<std::string, Empty> MultiCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
   return d_private->isValidQuery(d, variables, query);
 }
@@ -57,6 +57,11 @@ std::string MultiCorpusReader::readEntryMarkQueries(std::string const &entry,
 CorpusReader::EntryIterator MultiCorpusReader::runXPath(std::string const &query) const
 {
   return d_private->query(XPATH, query);
+}
+
+CorpusReader::EntryIterator MultiCorpusReader::runXQuery(std::string const &query) const
+{
+  return d_private->query(XQUERY, query);
 }
 
 }

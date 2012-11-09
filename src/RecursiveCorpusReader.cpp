@@ -1,7 +1,7 @@
 #include <list>
 #include <string>
 
-#include <boost/tr1/memory.hpp>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include <boost/filesystem.hpp>
 
@@ -27,7 +27,8 @@ public:
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   EntryIterator runXPath(std::string const &query) const;
-  bool validQuery(QueryDialect d, bool variables, std::string const &query) const;
+  EntryIterator runXQuery(std::string const &query) const;
+  Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
 private:
   bf::path d_directory;
@@ -62,7 +63,7 @@ size_t RecursiveCorpusReader::getSize() const
   return d_private->getSize();
 }
     
-bool RecursiveCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
+Either<std::string, Empty> RecursiveCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
   return d_private->isValidQuery(d, variables, query);
 }
@@ -81,6 +82,11 @@ std::string RecursiveCorpusReader::readEntryMarkQueries(std::string const &entry
 CorpusReader::EntryIterator RecursiveCorpusReader::runXPath(std::string const &query) const
 {
   return d_private->query(XPATH, query);
+}
+
+CorpusReader::EntryIterator RecursiveCorpusReader::runXQuery(std::string const &query) const
+{
+  return d_private->query(XQUERY, query);
 }
 
 // Implementation of the private interface
@@ -152,11 +158,17 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXPath(
   return d_multiReader->query(CorpusReader::XPATH, query);
 }
 
-bool RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
+CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXQuery(
+    std::string const &query) const
+{
+  return d_multiReader->query(CorpusReader::XQUERY, query);
+}
+
+Either<std::string, Empty> RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
     std::string const &query) const
 {
     if (!d_multiReader)
-      return false;
+      return Either<std::string, Empty>::left("No reader available.");
 
     return d_multiReader->isValidQuery(d, variables, query);
 }

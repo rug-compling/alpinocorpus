@@ -1,7 +1,7 @@
 #include <string>
 #include <typeinfo>
 
-#include <boost/tr1/memory.hpp>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -15,21 +15,6 @@
 #include <xqilla/xqilla-simple.hpp>
 
 namespace {
-    struct Globals {
-        Globals();
-        virtual ~Globals();
-    };
-
-    static Globals s_globals;
-    
-    Globals::Globals() {
-        XQillaPlatformUtils::initialize();
-    }
-    
-    Globals::~Globals() {
-        XQillaPlatformUtils::terminate();
-    }
-
     static XQilla s_xqilla;
 }
 

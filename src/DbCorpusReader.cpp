@@ -42,7 +42,7 @@ size_t DbCorpusReader::getSize() const
     return d_private->getSize();
 }
     
-bool DbCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
+Either<std::string, Empty> DbCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     return d_private->isValidQuery(d, variables, query);
 }

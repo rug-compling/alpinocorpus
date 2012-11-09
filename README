@@ -38,6 +38,12 @@ necessary, errors are reported as exceptions. Language-specific wrappers
 can catch exceptions and translate them to the language's native error
 reporting method.
 
+Documentation
+-------------
+
+Documentation for this library can be obtained by running 'doxygen' in
+the root of the source archive.
+
 Compilation
 -----------
 

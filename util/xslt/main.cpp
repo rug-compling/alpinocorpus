@@ -2,9 +2,9 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/tr1/memory.hpp>
-#include <boost/tr1/unordered_set.hpp>
+#include <AlpinoCorpus/tr1wrap/memory.hh>
 
+#include <boost/tr1/unordered_set.hpp>
 #include <boost/scoped_ptr.hpp>
 
 extern "C" {
@@ -27,6 +27,7 @@ extern "C" {
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
+using alpinocorpus::Either;
 
 namespace tr1 = std::tr1;
 
@@ -83,8 +84,7 @@ void usage(std::string const &programName)
       std::endl << std::endl <<
       "  -g entry\tApply the stylesheet to a single entry" << std::endl <<
       "  -m filename\tLoad macro file" << std::endl <<
-      "  -q query\tFilter the treebank using the given query" << std::endl <<
-      "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
+      "  -q query\tFilter the treebank using the given query" << std::endl << std::endl;
 }
 
 int main (int argc, char *argv[])
@@ -101,7 +101,7 @@ int main (int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "g:m:q:r"));
+      "g:m:q:"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -125,11 +125,11 @@ int main (int argc, char *argv[])
   try {
     if (opts->arguments().size() == 2)
       reader = tr1::shared_ptr<CorpusReader>(
-        openCorpus(opts->arguments().at(1), opts->option('r')));
+        openCorpus(opts->arguments().at(1), true));
     else
       reader = tr1::shared_ptr<CorpusReader>(
         openCorpora(opts->arguments().begin() + 1, 
-            opts->arguments().end(), opts->option('r')));
+            opts->arguments().end(), true));
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;
@@ -150,8 +150,11 @@ int main (int argc, char *argv[])
   if (opts->option('q')) {
     query = alpinocorpus::expandMacros(macros, opts->optionValue('q'));
 
-    if (!reader->isValidQuery(CorpusReader::XPATH, false, query)) {
-      std::cerr << "Invalid (or unwanted) query: " << query << std::endl;
+    Either<std::string, alpinocorpus::Empty> valid =
+      reader->isValidQuery(CorpusReader::XPATH, false, query);
+    if (valid.isLeft()) {
+      std::cerr << "Invalid (or unwanted) query: " << query << std::endl << std::endl;
+      std::cerr << valid.left() << std::endl;
       return 1;
     }
   }

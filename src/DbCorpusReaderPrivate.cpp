@@ -9,6 +9,7 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
+#include <AlpinoCorpus/util/Either.hh>
 
 #include "DbCorpusReaderPrivate.hh"
 #include "util/url.hh"
@@ -82,11 +83,16 @@ Entry DbCorpusReaderPrivate::DbIter::next(CorpusReader const &)
     std::string value;
 
     if (v.isNode()) {
-        db::XmlDocument doc = v.asDocument();
-        value = v.getNodeValue();
-        name = doc.getName();
-    } else if (v.isString())
-      value = v.asString();
+        try {
+            db::XmlDocument doc = v.asDocument();
+            name = doc.getName();
+        } catch (db::XmlException &) {
+          // Could not use node as a document. Why is there no isDocument()
+          // method?
+        }
+    }
+
+    value = v.asString();
 
     Entry e = {name, value};
 
@@ -110,7 +116,7 @@ IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
     return new QueryIter(*this);
 }
 DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
- : mgr(), container()
+ : mgr(db::DBXML_ALLOW_EXTERNAL_ACCESS), container()
 {
     try {
         db::XmlContainerConfig config;
@@ -138,16 +144,16 @@ std::string DbCorpusReaderPrivate::getName() const
     return container.getName();
 }
 
-bool DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
+Either<std::string, Empty> DbCorpusReaderPrivate::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     try {
         db::XmlQueryContext ctx = mgr.createQueryContext();
         mgr.prepare(query, ctx);
     } catch (db::XmlException const &e) {
-        return false;
+        return Either<std::string, Empty>::left(e.what());
     }
     
-    return true;
+    return Either<std::string, Empty>::right(Empty());
 }
 
 

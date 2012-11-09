@@ -19,7 +19,12 @@ class DbCorpusWriterPrivate;
 class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
 {
   public:
-    /** Open path for writing. */
+    /**
+     * Open path for writing. If the overwrite flag is set to
+     * <tt>true</tt>, the corpus is removed before it is opened.
+     * If this flag is set to <tt>false</tt>, the corpus will not
+     * be removed, however entries that already exist are overwritten.
+     */
     DbCorpusWriter(std::string const &path, bool overwrite);
     ~DbCorpusWriter();
 

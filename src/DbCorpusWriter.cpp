@@ -74,8 +74,13 @@ namespace alpinocorpus {
                 d_container = d_mgr.createContainer(path, config,
                                                     db::XmlContainer
                                                     ::NodeContainer);
-            } else
-                d_container = d_mgr.openContainer(path, config);
+            } else {
+                if (bf::exists(path))
+                    d_container = d_mgr.openContainer(path, config);
+                else
+                    d_container = d_mgr.createContainer(path, config,
+                        db::XmlContainer::NodeContainer);
+            }
         } catch (db::XmlException const &e) {
             throw OpenError(path, e.what());
         }

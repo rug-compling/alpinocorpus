@@ -50,7 +50,11 @@ namespace alpinocorpus {
     CorpusReader *CorpusReaderFactory::openRecursive(std::string const &path,
         bool dactOnly)
     {
+#if defined(USE_DBXML)
       return new RecursiveCorpusReader(path, dactOnly);
+#else
+      throw OpenError(path);
+#endif
     }
 
     bool CorpusReaderFactory::readerAvailable(ReaderType readerType)
