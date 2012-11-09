@@ -1,3 +1,5 @@
-usr/bin/alpinocorpus-act
+usr/bin/alpinocorpus-create
 usr/bin/alpinocorpus-stats
+usr/bin/alpinocorpus-xpath
+usr/bin/alpinocorpus-xquery
 usr/bin/alpinocorpus-xslt
