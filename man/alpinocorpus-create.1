@@ -1,0 +1,50 @@
+.TH ALPINOCORPUS-CREATE 1 "Nov 19, 2012" 
+.SH NAME
+.PP
+\f[B]alpinocorpus-create\f[] -- Create Alpino treebanks
+.SH SYNOPSIS
+.PP
+\f[B]alpinocorpus-create\f[] [\f[I]options\f[]] \f[I]treebank ...\f[]
+.SH DESCRIPTION
+.PP
+The \f[B]alpinocorpus-create\f[] creates a Dact treebank or compact
+corpus based on \f[I]treebank\f[].
+If \f[I]treebank\f[] is a directory, then \f[B]alpinocorpus-create\f[]
+will create a treebank consisting of all the XML files below that
+directory.
+An XPath query can be applied to use only the entries that match that
+query.
+.PP
+The following options are available:
+.TP
+.B \f[C]-c\f[] \f[I]FILENAME\f[]
+Create a compact corpus.
+.RS
+.RE
+.TP
+.B \f[C]-d\f[] \f[I]FILENAME\f[]
+Create a Dact corpus.
+.RS
+.RE
+.TP
+.B \f[C]-m\f[] \f[I]MACROFILE\f[]
+Load macros from \f[I]MACROFILE\f[].
+.RS
+.RE
+.TP
+.B \f[C]-q\f[] \f[I]QUERY\f[]
+Only include entries that match \f[I]QUERY\f[] (XPath 2.0).
+.RS
+.RE
+.TP
+.B \f[C]-r\f[]
+If \f[I]treebank\f[] is a directory, include the contents of any Dact
+corpus below it, rather than including XML files.
+.RS
+.RE
+.SH SEE ALSO
+.PP
+alpinocorpus-stats(1), alpinocorpus-xpath(1), alpinocorpus-xquery(1),
+alpinocorpus-xslt(1)
+.SH AUTHORS
+Daniel de Kok.
