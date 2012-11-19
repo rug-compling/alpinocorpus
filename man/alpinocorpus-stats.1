@@ -1,0 +1,45 @@
+.TH ALPINOCORPUS-STATS 1 "Nov 19, 2012" 
+.SH NAME
+.PP
+\f[B]alpinocorpus-stats\f[] -- Alpino treebank node statistics
+.SH SYNOPSIS
+.PP
+\f[B]alpinocorpus-stats\f[] [\f[I]options\f[]] \f[I]query\f[]
+\f[I]treebank ...\f[]
+.SH DESCRIPTION
+.PP
+The \f[B]alpinocorpus-stats\f[] utility counts the number of occurences
+of nodes matching \f[I]query\f[] in each Dact \f[I]treebank\f[].
+If \f[I]treebank\f[] is a directory, then \f[B]alpinocorpus-stats\f[]
+will count matching nodes in all treebanks below that directory.
+The supported query format is XPath 2.0.
+.PP
+The following options are available:
+.TP
+.B \f[C]-m\f[] \f[I]MACROFILE\f[]
+Load macros from \f[I]MACROFILE\f[].
+.RS
+.RE
+.TP
+.B \f[C]-p\f[]
+Print relative frequencies.
+.RS
+.RE
+.SH EXAMPLE
+.PP
+The command:
+.IP
+.nf
+\f[C]
+alpinocorpus-stats\ \[aq]//node[\@root="loop"]/\@word/string()\[aq]\ lassy.dact
+\f[]
+.fi
+.PP
+will print the frequency of each word in the treebank that has
+\f[I]loop\f[] as its root.
+.SH SEE ALSO
+.PP
+alpinocorpus-create(1), alpinocorpus-xpath(1), alpinocorpus-xquery(1),
+alpinocorpus-xslt(1)
+.SH AUTHORS
+Daniel de Kok.

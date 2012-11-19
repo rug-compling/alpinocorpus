@@ -1,0 +1,41 @@
+.TH ALPINOCORPUS-XSLT 1 "Nov 19, 2012" 
+.SH NAME
+.PP
+\f[B]alpinocorpus-xslt\f[] -- Apply stylesheet to an Alpino treebank
+.SH SYNOPSIS
+.PP
+\f[B]alpinocorpus-xslt\f[] [\f[I]options\f[]] \f[I]stylesheet\f[]
+\f[I]treebank ...\f[]
+.SH DESCRIPTION
+.PP
+The \f[B]alpinocorpus-xslt\f[] utility applies \f[I]stylesheet\f[] to
+each Dact \f[I]treebank\f[].
+If \f[I]treebank\f[] is a directory, then \f[B]alpinocorpus-xslt\f[]
+will apply \f[I]stylesheet\f[] to each treebank below that directory.
+\f[I]stylesheet\f[] should be a XSLT stylesheet.
+.PP
+The following options are available:
+.TP
+.B \f[C]-g\f[] \f[I]ENTRY\f[]
+Apply the stylesheet to \f[I]ENTRY\f[], rather than each entry in the
+treebank.
+.RS
+.RE
+.TP
+.B \f[C]-m\f[] \f[I]MACROFILE\f[]
+Load macros from \f[I]MACROFILE\f[].
+.RS
+.RE
+.TP
+.B \f[C]-q\f[] \f[I]QUERY\f[]
+Filter the treebank using \f[I]QUERY\f[] (XPath 2.0).
+Nodes in the XML data that match \f[I]QUERY\f[] get the attribute-value
+pair \f[I]active=1\f[].
+.RS
+.RE
+.SH SEE ALSO
+.PP
+alpinocorpus-create(1), alpinocorpus-stats(1), alpinocorpus-xpath(1),
+alpinocorpus-xquery(1)
+.SH AUTHORS
+Daniel de Kok.
