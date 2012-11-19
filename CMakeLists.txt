@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.4)
 project(AlpinoCorpus)
 
 set (ALPINOCORPUS_VERSION "2.0.0")
@@ -48,6 +48,8 @@ option(WITH_RUBY
   "Compile Ruby bindings" OFF)
 
 option(USE_REMOTE_CORPUS "Enable remote corpus" OFF)
+
+include(GNUInstallDirs REQUIRED)
 
 if(USE_REMOTE_CORPUS)
 find_package(Boost 1.46.1 COMPONENTS system chrono date_time iostreams
@@ -248,16 +250,19 @@ target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
 target_link_libraries(alpino_corpus ${LIBEXSLT_LIBRARIES})
 
 install(TARGETS alpino_corpus
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(DIRECTORY include/AlpinoCorpus
-  DESTINATION include
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
 
 install(FILES ${AlpinoCorpus_BINARY_DIR}/alpinocorpus.pc
-  DESTINATION lib/pkgconfig)
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+file(GLOB MANPAGES "${AlpinoCorpus_SOURCE_DIR}/man/*.1")
+install(FILES ${MANPAGES} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 
 # Unit tests
 
