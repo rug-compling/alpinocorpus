@@ -21,9 +21,11 @@ libalpino_corpus.so
 libalpino_corpus.so.*
 resources/CMakeFiles/
 util/CMakeFiles/
-util/alpinocorpus-act
 util/alpinocorpus-config
+util/alpinocorpus-create
 util/alpinocorpus-stats
+util/alpinocorpus-xpath
+util/alpinocorpus-xquery
 util/alpinocorpus-xslt
 writer_test
 geturl_test
