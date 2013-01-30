@@ -1,7 +1,5 @@
-prefix=@CMAKE_INSTALL_PREFIX@
-
 Name: alpinocorpus
 Version: @ALPINOCORPUS_VERSION@
 Description: The alpinocorpus library provides a generic interface to XML treebanks
-Libs: -L${prefix}/lib -lalpino_corpus
-Cflags: -I${prefix}/include
+Libs: -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@ -lalpino_corpus
+Cflags: -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@
