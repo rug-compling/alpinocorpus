@@ -21,7 +21,6 @@ include(CheckFunctionExists)
 
 if(APPLE)
   set (CMAKE_OSX_ARCHITECTURES "x86_64")
-  set (CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
 endif(APPLE)
 
 list(APPEND CMAKE_MODULE_PATH "${AlpinoCorpus_SOURCE_DIR}/cmake")
