@@ -1,4 +1,4 @@
-alpino-corpus (2.0.0-2raring1) raring; urgency=low
+alpino-corpus (2.0.1-1raring1) raring; urgency=low
 
   * Build for Ubuntu 13.04 (Raring Ringtail).
   * Add manual pages.
