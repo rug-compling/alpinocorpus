@@ -12,6 +12,7 @@ Package: libalpino-corpus2.0
 Section: libs
 Suggests: libalpino-corpus-dev, alpino-corpus-util
 Architecture: any
+Pre-Depends: multiarch-support
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Library for processing XML-based treebanks
  AlpinoCorpus is a library for processing XML-based treebanks. It can read
@@ -20,6 +21,7 @@ Description: Library for processing XML-based treebanks
 Package: libalpino-corpus-dev
 Section: libdevel
 Architecture: any
+Pre-Depends: multiarch-support
 Depends: libdbxml-dev (>= 2.5.16), zlib1g-dev, libalpino-corpus2.0 (= ${binary:Version}), ${misc:Depends}
 Description: Library for processing XML-based treebanks (development headers)
  AlpinoCorpus is a library for processing XML-based treebanks. It can read

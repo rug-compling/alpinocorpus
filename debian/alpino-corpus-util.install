@@ -3,3 +3,8 @@ usr/bin/alpinocorpus-stats
 usr/bin/alpinocorpus-xpath
 usr/bin/alpinocorpus-xquery
 usr/bin/alpinocorpus-xslt
+usr/share/man/man1/alpinocorpus-create.1
+usr/share/man/man1/alpinocorpus-stats.1
+usr/share/man/man1/alpinocorpus-xpath.1
+usr/share/man/man1/alpinocorpus-xquery.1
+usr/share/man/man1/alpinocorpus-xslt.1

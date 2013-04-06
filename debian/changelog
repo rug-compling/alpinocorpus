@@ -1,3 +1,11 @@
+alpino-corpus (2.0.0-2raring1) raring; urgency=low
+
+  * Build for Ubuntu 13.04 (Raring Ringtail).
+  * Add manual pages.
+  * Fix pkg-config description.
+
+ -- Daniël de Kok <me@danieldk.eu>  Sat, 06 Apr 2013 07:37:50 -0700
+
 alpino-corpus (2.0.0-1quantal1) quantal; urgency=low
 
   * New upstream release.
