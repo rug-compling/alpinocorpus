@@ -86,8 +86,12 @@ size_t MultiCorpusReaderPrivate::getSize() const
 void MultiCorpusReaderPrivate::push_back(std::string const &name,
     std::string const &filename, bool recursive)
 {
-  d_corpora.push_back(std::make_pair(filename, recursive));
-  d_corporaMap[name] = std::make_pair(filename, recursive); // XXX - exists check?
+    bf::path corpusPath(filename);
+    if (!bf::exists(corpusPath))
+      throw OpenError(filename);
+
+    d_corpora.push_back(std::make_pair(filename, recursive));
+    d_corporaMap[name] = std::make_pair(filename, recursive); // XXX - exists check?
 }
 
 std::pair<std::string, bool> MultiCorpusReaderPrivate::corpusFromPath(
