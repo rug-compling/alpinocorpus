@@ -34,6 +34,20 @@ reporting method.
 Documentation for this library can be obtained by running 'doxygen' in
 the root of the source archive.
 
+## Downloading
+
+Pre-built binaries for Ubuntu are available from the Dact PPA:
+
+https://launchpad.net/~danieldk/+archive/dact
+
+On Mac OS X, alpinocorpus (including dependencies) can be compiled easily
+using [Homebrew](http://mxcl.github.io/homebrew/):
+
+~~~
+$ brew tap rug-compling/homebrew
+$ brew install alpinocorpus
+~~~
+
 ## Compilation
 
 Requirements
@@ -44,7 +58,7 @@ Requirements
 - libxml2
 - libxslt
 
-Execute 'cmake .', followed by 'make' in the source directory.
+Execute *cmake .*, followed by *make* in the source directory.
 
 ## Bindings
 
@@ -59,13 +73,14 @@ http://github.com/rug-compling/alpinocorpus-go
 
 ## Contributors
 
-Daniël de Kok <me@danieldk.eu>
-Jelmer van der Linde <jelmer@ikhoefgeen.nl>
-Lars Buitinck <larsmans@gmail.com>
-Peter Kleiweg <p.c.j.kleiweg@rug.nl>
+* Daniël de Kok &lt;me@danieldk.eu&gt;
+* Jelmer van der Linde &lt;jelmer@ikhoefgeen.nl&gt;
+* Lars Buitinck &lt;larsmans@gmail.com&gt;
+* Peter Kleiweg &lt;p.c.j.kleiweg@rug.nl&gt;
 
 ## License
 
+~~~
 Copyright 2010-2013 Daniël de Kok
 Copyright 2010-2012 University of Groningen
 
@@ -83,3 +98,4 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the 
 Free Software Foundation, Inc.,  51 Franklin Street, Fifth Floor,
 Boston, MA  02110-1301  USA
+~~~
