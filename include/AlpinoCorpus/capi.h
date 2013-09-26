@@ -1,6 +1,8 @@
 #ifndef ALPINOCORPUS_C_API
 #define ALPINOCORPUS_C_API
 
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
