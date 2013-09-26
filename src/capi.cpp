@@ -340,22 +340,22 @@ int alpinocorpus_writer_available(char const *writertype)
     return alpinocorpus::CorpusWriter::writerAvailable(wt) ? 1 : 0;
 }
 
-char const * alpinocorpus_write(alpinocorpus_writer writer, char const *name, char const *content)
+char const *alpinocorpus_write(alpinocorpus_writer writer, char const *name, char const *content)
 {
     try {
         writer->corpusWriter->write(name, content);
     } catch (std::exception const &e) {
-        return e.what();
+        return strdup(e.what());
     }
     return NULL;
 }
 
-char const * alpinocorpus_write_corpus(alpinocorpus_writer writer, alpinocorpus_reader reader, int failsafe)
+char const *alpinocorpus_write_corpus(alpinocorpus_writer writer, alpinocorpus_reader reader, int failsafe)
 {
     try {
         writer->corpusWriter->write(*(reader->corpusReader), failsafe ? true : false);
     } catch (std::exception const &e) {
-        return e.what();
+        return strdup(e.what());
     }
     return NULL;
 }
