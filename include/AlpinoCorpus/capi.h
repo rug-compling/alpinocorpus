@@ -185,14 +185,14 @@ int alpinocorpus_writer_available(char const *writertype);
  * on failure. If the value is not NULL, the string should be deallocated
  * using free(2).
  */
-char const *alpinocorpus_write(alpinocorpus_writer, char const *name, char const *content);
+char *alpinocorpus_write(alpinocorpus_writer, char const *name, char const *content);
 
 /*
  * Write all entries from another corpus to corpus. Returns NULL on succes,
  * error message on failure. If the value is not NULL, the string should be
  * deallocated using free(2).
  */
-char const *alpinocorpus_write_corpus(alpinocorpus_writer, alpinocorpus_reader, int failsafe);
+char *alpinocorpus_write_corpus(alpinocorpus_writer, alpinocorpus_reader, int failsafe);
 
 
 #ifdef __cplusplus

@@ -340,7 +340,7 @@ int alpinocorpus_writer_available(char const *writertype)
     return alpinocorpus::CorpusWriter::writerAvailable(wt) ? 1 : 0;
 }
 
-char const *alpinocorpus_write(alpinocorpus_writer writer, char const *name, char const *content)
+char *alpinocorpus_write(alpinocorpus_writer writer, char const *name, char const *content)
 {
     try {
         writer->corpusWriter->write(name, content);
@@ -350,7 +350,7 @@ char const *alpinocorpus_write(alpinocorpus_writer writer, char const *name, cha
     return NULL;
 }
 
-char const *alpinocorpus_write_corpus(alpinocorpus_writer writer, alpinocorpus_reader reader, int failsafe)
+char *alpinocorpus_write_corpus(alpinocorpus_writer writer, alpinocorpus_reader reader, int failsafe)
 {
     try {
         writer->corpusWriter->write(*(reader->corpusReader), failsafe ? true : false);
