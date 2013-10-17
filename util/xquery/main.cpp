@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
   }
 
   Either<std::string, alpinocorpus::Empty> valid =
-    reader->isValidQuery(CorpusReader::XPATH, false, query);
+    reader->isValidQuery(CorpusReader::XQUERY, false, query);
   if (valid.isLeft()) {
     std::cerr << "Invalid (or unwanted) query: " << query << std::endl << std::endl;
     std::cerr << valid.left() << std::endl;
