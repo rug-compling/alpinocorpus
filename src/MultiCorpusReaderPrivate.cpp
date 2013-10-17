@@ -13,6 +13,8 @@
 #include <boost/thread/mutex.hpp>
 #endif
 
+#include <AlpinoCorpus/tr1wrap/memory.hh>
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>
@@ -300,12 +302,33 @@ double MultiCorpusReaderPrivate::MultiIter::progress()
 Either<std::string, Empty> MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
     std::string const &query) const
 {
-        try {
-            DbXml::XmlQueryContext ctx = d_mgr.createQueryContext();
-            d_mgr.prepare(query, ctx);
-        } catch (DbXml::XmlException const &e) {
-            return Either<std::string, Empty>::left(e.what());
+        // Prefer to validate the query on an actual corpus.
+        if (d_corporaMap.begin() != d_corporaMap.end())
+        {
+            try {
+                std::pair<std::string, bool> p = d_corporaMap.begin()->second;
+                std::tr1::shared_ptr<CorpusReader> reader;
+                if (p.second)
+                    reader.reset(CorpusReaderFactory::openRecursive(p.first));
+                else
+                    reader.reset(CorpusReaderFactory::open(p.first));
+
+                Either<std::string, Empty> result = reader->isValidQuery(d, variables, query);
+
+                return result;
+            } catch (OpenError const &)
+            {
+            }
         }
+        else {
+            try {
+                DbXml::XmlQueryContext ctx = d_mgr.createQueryContext();
+                d_mgr.prepare(query, ctx);
+            } catch (DbXml::XmlException const &e) {
+                return Either<std::string, Empty>::left(e.what());
+            }
+        }
+
         return Either<std::string, Empty>::right(Empty());
 #endif
 }
