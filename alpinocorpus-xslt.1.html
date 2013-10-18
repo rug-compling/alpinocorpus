@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Daniel de Kok">
+  <title>ALPINOCORPUS-XSLT(1)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="manpage.css">
+</head>
+<body>
+<header>
+<h1 class="title">ALPINOCORPUS-XSLT(1)</h1>
+<h2 class="author">Daniel de Kok</h2>
+<h3 class="date">Nov 19, 2012</h3>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>alpinocorpus-xslt</strong> -- Apply stylesheet to an Alpino treebank</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<p><strong>alpinocorpus-xslt</strong> [<em>options</em>] <em>stylesheet</em> <em>treebank ...</em></p>
+<h1 id="description">DESCRIPTION</h1>
+<p>The <strong>alpinocorpus-xslt</strong> utility applies <em>stylesheet</em> to each Dact <em>treebank</em>. If <em>treebank</em> is a directory, then <strong>alpinocorpus-xslt</strong> will apply <em>stylesheet</em> to each treebank below that directory. <em>stylesheet</em> should be a XSLT stylesheet.</p>
+<p>The following options are available:</p>
+<dl>
+<dt><code>-g</code> <em>ENTRY</em></dt>
+<dd>Apply the stylesheet to <em>ENTRY</em>, rather than each entry in the treebank.
+</dd>
+<dt><code>-m</code> <em>MACROFILE</em></dt>
+<dd>Load macros from <em>MACROFILE</em>.
+</dd>
+<dt><code>-q</code> <em>QUERY</em></dt>
+<dd>Filter the treebank using <em>QUERY</em> (XPath 2.0). Nodes in the XML data that match <em>QUERY</em> get the attribute-value pair <em>active=1</em>.
+</dd>
+</dl>
+<h1 id="see-also">SEE ALSO</h1>
+<p>alpinocorpus-create(1), alpinocorpus-stats(1), alpinocorpus-xpath(1), alpinocorpus-xquery(1)</p>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Daniel de Kok">
+  <title>ALPINOCORPUS-XPATH(1)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="manpage.css">
+</head>
+<body>
+<header>
+<h1 class="title">ALPINOCORPUS-XPATH(1)</h1>
+<h2 class="author">Daniel de Kok</h2>
+<h3 class="date">Nov 19, 2012</h3>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>alpinocorpus-xpath</strong> -- Alpino treebank XPath search</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<p><strong>alpinocorpus-xpath</strong> [<em>options</em>] <em>treebank ...</em></p>
+<h1 id="description">DESCRIPTION</h1>
+<p>The <strong>alpinocorpus-xpath</strong> utility lists the entries in each Dact <em>treebank</em>. If <em>treebank</em> is a directory, then <strong>alpinocorpus-xpath</strong> will list the entries of each treebank below that directory. An XPath query can be applied to list only the entries that match that query.</p>
+<p>The following options are available:</p>
+<dl>
+<dt><code>-m</code> <em>MACROFILE</em></dt>
+<dd>Load macros from <em>MACROFILE</em>.
+</dd>
+<dt><code>-q</code> <em>QUERY</em></dt>
+<dd>Only show entries that match <em>QUERY</em> (XPath 2.0).
+</dd>
+<dt><code>-s</code></dt>
+<dd>Print the sentence of each entry, fragments that match the query are colored.
+</dd>
+</dl>
+<h1 id="see-also">SEE ALSO</h1>
+<p>alpinocorpus-create(1), alpinocorpus-stats(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)</p>
+</body>
+</html>

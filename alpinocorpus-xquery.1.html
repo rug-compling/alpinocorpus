@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Daniel de Kok">
+  <title>ALPINOCORPUS-XQUERY(1)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="manpage.css">
+</head>
+<body>
+<header>
+<h1 class="title">ALPINOCORPUS-XQUERY(1)</h1>
+<h2 class="author">Daniel de Kok</h2>
+<h3 class="date">Nov 19, 2012</h3>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>alpinocorpus-xquery</strong> -- Apply an XQuery program to an Alpino treebank</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<p><strong>alpinocorpus-xquery</strong> [<em>options</em>] <em>treebank ...</em></p>
+<h1 id="description">DESCRIPTION</h1>
+<p>The <strong>alpinocorpus-xquery</strong> utility runs an XQuery program on each <em>treebank</em>. If <em>treebank</em> is a directory, then <strong>alpinocorpus-xquery</strong> will apply the program to each treebank below that directory.</p>
+<p>Since an XQuery program normally specifies that collection that it should query, we provide the default collection name <em>collection('corpus')</em>. Note that the program is applied to each treebank.</p>
+<p>The following options are available:</p>
+<dl>
+<dt><code>-f</code> <em>XQUERY_PROGRAM</em></dt>
+<dd>Read XQuery program from the file <em>XQUERY_PROGRAM</em>.
+</dd>
+<dt><code>-m</code> <em>MACROFILE</em></dt>
+<dd>Load macros from <em>MACROFILE</em>.
+</dd>
+<dt><code>-q</code> <em>QUERY</em></dt>
+<dd>Only show entries that match <em>QUERY</em> (XPath 2.0).
+</dd>
+</dl>
+<h1 id="see-also">SEE ALSO</h1>
+<p>alpinocorpus-create(1), alpinocorpus-stats(1), alpinocorpus-xpath(1), alpinocorpus-xslt(1)</p>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Daniel de Kok">
+  <title>ALPINOCORPUS-CREATE(1)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="manpage.css">
+</head>
+<body>
+<header>
+<h1 class="title">ALPINOCORPUS-CREATE(1)</h1>
+<h2 class="author">Daniel de Kok</h2>
+<h3 class="date">Nov 19, 2012</h3>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>alpinocorpus-create</strong> -- Create Alpino treebanks</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<p><strong>alpinocorpus-create</strong> [<em>options</em>] <em>treebank ...</em></p>
+<h1 id="description">DESCRIPTION</h1>
+<p>The <strong>alpinocorpus-create</strong> creates a Dact treebank or compact corpus based on <em>treebank</em>. If <em>treebank</em> is a directory, then <strong>alpinocorpus-create</strong> will create a treebank consisting of all the XML files below that directory. An XPath query can be applied to use only the entries that match that query.</p>
+<p>The following options are available:</p>
+<dl>
+<dt><code>-c</code> <em>FILENAME</em></dt>
+<dd>Create a compact corpus.
+</dd>
+<dt><code>-d</code> <em>FILENAME</em></dt>
+<dd>Create a Dact corpus.
+</dd>
+<dt><code>-m</code> <em>MACROFILE</em></dt>
+<dd>Load macros from <em>MACROFILE</em>.
+</dd>
+<dt><code>-q</code> <em>QUERY</em></dt>
+<dd>Only include entries that match <em>QUERY</em> (XPath 2.0).
+</dd>
+<dt><code>-r</code></dt>
+<dd>If <em>treebank</em> is a directory, include the contents of any Dact corpus below it, rather than including XML files.
+</dd>
+</dl>
+<h1 id="see-also">SEE ALSO</h1>
+<p>alpinocorpus-stats(1), alpinocorpus-xpath(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)</p>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Daniel de Kok">
+  <title>ALPINOCORPUS-STATS(1)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="manpage.css">
+</head>
+<body>
+<header>
+<h1 class="title">ALPINOCORPUS-STATS(1)</h1>
+<h2 class="author">Daniel de Kok</h2>
+<h3 class="date">Nov 19, 2012</h3>
+</header>
+<h1 id="name">NAME</h1>
+<p><strong>alpinocorpus-stats</strong> -- Alpino treebank node statistics</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<p><strong>alpinocorpus-stats</strong> [<em>options</em>] <em>query</em> <em>treebank ...</em></p>
+<h1 id="description">DESCRIPTION</h1>
+<p>The <strong>alpinocorpus-stats</strong> utility counts the number of occurences of nodes matching <em>query</em> in each Dact <em>treebank</em>. If <em>treebank</em> is a directory, then <strong>alpinocorpus-stats</strong> will count matching nodes in all treebanks below that directory. The supported query format is XPath 2.0.</p>
+<p>The following options are available:</p>
+<dl>
+<dt><code>-m</code> <em>MACROFILE</em></dt>
+<dd>Load macros from <em>MACROFILE</em>.
+</dd>
+<dt><code>-p</code></dt>
+<dd>Print relative frequencies.
+</dd>
+</dl>
+<h1 id="example">EXAMPLE</h1>
+<p>The command:</p>
+<pre><code>alpinocorpus-stats &#39;//node[@root=&quot;loop&quot;]/@word/string()&#39; lassy.dact</code></pre>
+<p>will print the frequency of each word in the treebank that has <em>loop</em> as its root.</p>
+<h1 id="see-also">SEE ALSO</h1>
+<p>alpinocorpus-create(1), alpinocorpus-xpath(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)</p>
+</body>
+</html>
