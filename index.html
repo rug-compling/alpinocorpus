@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>alpinocorpus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style type="text/css">
+	      body {
+	        padding-top: 60px;
+	        padding-bottom: 40px;
+	      }
+	    </style>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.3.0/respond.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">alpinocorpus</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+          <h1>Introduction</h1>
+
+          <p>
+            alpinocorpus is a C++ library for creating, quering, and reading
+            Alpino corpora. The library also includes a plain C wrapper, which
+            is convenient for writing bindings for other languages, and a
+            handful of command-line utilities that replicate the functionality
+            of <a href="http://rug-compling.github.com/dact/">Dact</a>.
+          </p>
+
+          <h1>Installation</h1>
+
+          <h2>Mac OS X</h2>
+
+          <p>
+            alpinocorpus and its dependencies can be installed through
+            <a href="http://brew.sh/">Homebrew</a>:
+          </p>
+
+          <tt>
+            <pre>
+  brew tap rug-compling/dact
+  brew install dact</pre>
+          </tt>
+
+          <p>
+            Afterwards, you will have all of alpinocorpus available, including
+            manual pages.
+          </p>
+
+          <h2>Ubuntu</h2>
+
+          <p>
+            To install alpinocorpus on Ubuntu, use the
+            <a href="https://launchpad.net/~danieldk/+archive/dact">Dact PPA</a>:
+          </p>
+
+          <tt>
+            <pre>
+sudo add-apt-repository ppa:danieldk/dact
+sudo apt-get update
+sudo apt-get install libalpino-corpus-dev alpino-corpus-util</pre>
+          </tt>
+
+          <h2>Windows</h2>
+
+          <p>
+            Believe me, you don't want to go through this! Buy a Mac or
+            install Ubuntu in a virtual machine. We may include the
+            command-line utilities in a future release of <a
+            href="http://rug-compling.github.com/dact/">Dact</a>.
+          </p>
+
+          <h1>Manual pages</h1>
+
+          <ul>
+            <li><a href="alpinocorpus-create.1.html">alpinocorpus-create (1)</a></li>
+            <li><a href="alpinocorpus-stats.1.html">alpinocorpus-stats (1)</a></li>
+            <li><a href="alpinocorpus-xpath.1.html">alpinocorpus-xpath (1)</a></li>
+            <li><a href="alpinocorpus-xquery.1.html">alpinocorpus-xquery (1)</a></li>
+            <li><a href="alpinocorpus-xslt.1.html">alpinocorpus-xslt (1)</a></li>
+          </ul>
+        </div>
+
+        <div class="col-md-2"></div>
+
+      </div>
+    </div>
+
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+  </body>
+</html>
