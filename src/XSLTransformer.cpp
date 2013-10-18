@@ -53,13 +53,9 @@ std::string XSLTransformer::transform(std::string const &xml) const
         xmlFreeDoc);
 
     if (!res)
-    {
         throw Error("XSLTransformer::transform: Could not apply transformation!");
-    }
     else if (ctx->state != XSLT_STATE_OK)
-    {
         throw Error("XSLTransformer::transform: Transformation error, check your query!");
-    }
 
     xmlChar *bareOutput = 0;
     int outputLen = -1;
@@ -67,9 +63,7 @@ std::string XSLTransformer::transform(std::string const &xml) const
     std::tr1::shared_ptr<xmlChar> output(bareOutput, xmlFree); 
 
     if (!output)
-    {
-        throw Error("Could not apply stylesheet!");
-    }
+      return std::string();
 
     std::string result(reinterpret_cast<char const *>(output.get()));
 
