@@ -280,14 +280,13 @@ namespace alpinocorpus {
         if (d_isquery) {
             size_t i = line.find('\t');
             if (i == std::string::npos)
-                e.name = line;
+                e = Entry(line, std::string());
             else {
                 // We also have contents...
-                e.name = line.substr(0, i);
-                e.contents = unescape(line.substr(i + 1));
+                e = Entry(line.substr(0, i), unescape(line.substr(i + 1)));
             }
         } else
-              e.name = line;
+              e = Entry(line, std::string());
 
         ++d_idx;
 

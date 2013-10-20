@@ -19,7 +19,9 @@ namespace db = DbXml;
 namespace alpinocorpus {
 
 /* begin() */
-DbCorpusReaderPrivate::DbIter::DbIter(db::XmlContainer &container)
+DbCorpusReaderPrivate::DbIter::DbIter(std::string const &path,
+        db::XmlContainer &container)
+    : d_path(path)
 {
     try {
         r = container.getAllDocuments( db::DBXML_LAZY_DOCS
@@ -31,14 +33,16 @@ DbCorpusReaderPrivate::DbIter::DbIter(db::XmlContainer &container)
 }
 
 /* query */
-DbCorpusReaderPrivate::DbIter::DbIter(db::XmlResults const &r_)
- : r(r_)
+DbCorpusReaderPrivate::DbIter::DbIter(std::string const &path,
+        db::XmlResults const &r_)
+    : d_path(path), r(r_)
 {
 }
 
 /* end() */
-DbCorpusReaderPrivate::DbIter::DbIter(db::XmlManager &mgr)
- : r(mgr.createResults())   // builds empty XmlResults
+DbCorpusReaderPrivate::DbIter::DbIter(std::string const &path,
+    db::XmlManager &mgr)
+ : d_path(path), r(mgr.createResults())   // builds empty XmlResults
 {
 }
 
@@ -92,15 +96,16 @@ Entry DbCorpusReaderPrivate::DbIter::next(CorpusReader const &)
         }
     }
 
+    name = d_path + "/" + name;
+
     value = v.asString();
 
-    Entry e = {name, value};
-
-    return e;
+    return Entry(name, value);
 }
 
-DbCorpusReaderPrivate::QueryIter::QueryIter(db::XmlResults const &r, db::XmlQueryContext const &ctx)
- : DbIter(r), context(ctx)
+DbCorpusReaderPrivate::QueryIter::QueryIter(std::string const &path,
+    db::XmlResults const &r, db::XmlQueryContext const &ctx)
+ : DbIter(path, r), context(ctx)
 {
 }
 
@@ -116,7 +121,7 @@ IterImpl *DbCorpusReaderPrivate::QueryIter::copy() const
     return new QueryIter(*this);
 }
 DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
- : mgr(db::DBXML_ALLOW_EXTERNAL_ACCESS), container()
+ : d_path(path), mgr(db::DBXML_ALLOW_EXTERNAL_ACCESS), container()
 {
     try {
         db::XmlContainerConfig config;
@@ -136,7 +141,7 @@ DbCorpusReaderPrivate::~DbCorpusReaderPrivate()
 
 CorpusReader::EntryIterator DbCorpusReaderPrivate::getEntries() const
 {
-    return EntryIterator(new DbIter(container));
+    return EntryIterator(new DbIter(d_path, container));
 }
 
 std::string DbCorpusReaderPrivate::getName() const
@@ -193,7 +198,7 @@ CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &
                                      db::DBXML_LAZY_DOCS
                                    | db::DBXML_WELL_FORMED_ONLY
                                   ));
-        return EntryIterator(new QueryIter(r, ctx));
+        return EntryIterator(new QueryIter(d_path, r, ctx));
     } catch (db::XmlException const &e) {
         throw Error(e.what());
     }

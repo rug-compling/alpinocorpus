@@ -79,7 +79,7 @@ void CompactCorpusWriterPrivate::writeFailFirst(CorpusReader const &corpus)
     while(i.hasNext())
     {
         Entry e = i.next(corpus);
-        write(e.name, corpus.read(e.name));
+        write(e.shortName(), corpus.read(e.name()));
     }
 }
 
@@ -92,7 +92,7 @@ void CompactCorpusWriterPrivate::writeFailSafe(CorpusReader const &corpus)
     {
         Entry e = i.next(corpus);
         try {
-            write(e.name, corpus.read(e.name));
+            write(e.shortName(), corpus.read(e.name()));
         } catch (Error const &e) {
             err.append(e);
         }

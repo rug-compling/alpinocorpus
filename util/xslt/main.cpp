@@ -54,10 +54,10 @@ void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
     while (i.hasNext())
     {
         alpinocorpus::Entry e = i.next(*reader);
-        if (seen.find(e.name) == seen.end())
+        if (seen.find(e.name()) == seen.end())
         {
-            seen.insert(e.name);
-            std::cout << e.contents;
+            seen.insert(e.name());
+            std::cout << e.contents();
         }
     }
 }

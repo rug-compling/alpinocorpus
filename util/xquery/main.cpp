@@ -34,7 +34,7 @@ void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   while (i.hasNext())
   {
     Entry entry = i.next(*reader);
-    std::cout << entry.contents << std::endl;
+    std::cout << entry.contents() << std::endl;
   }
 }
 

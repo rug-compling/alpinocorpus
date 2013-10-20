@@ -39,17 +39,17 @@ CorpusReader *openCorpora(
 
     bool isDir = bf::is_directory(p);
 
-    if (bf::is_directory(p) && iter->rfind('/') == iter->size() - 1)
-      p = bf::path(iter->substr(0, iter->size() - 1));
+    //if (bf::is_directory(p) && iter->rfind('/') == iter->size() - 1)
+    //  p = bf::path(iter->substr(0, iter->size() - 1));
 
     // Kill the extension, if there is any.
-    p.replace_extension("");
+    //p.replace_extension("");
 
     // Use the last path component as the corpus name.
     
-    std::string name = isDir ? p.generic_string() : p.filename().generic_string();
+    //std::string name = isDir ? p.generic_string() : p.filename().generic_string();
 
-    readers->push_back(name, *iter, recursive && isDir);
+    readers->push_back(*iter, recursive && isDir);
   }
 
   return readers;

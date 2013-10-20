@@ -81,8 +81,7 @@ public:
   EntryIterator getEntries() const;
   std::string getName() const;
   size_t getSize() const;
-  void push_back(std::string const &name, std::string const &filename,
-      bool recursive = false);
+  void push_back(std::string const &filename, bool recursive = false);
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
 

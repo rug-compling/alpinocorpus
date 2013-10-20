@@ -31,7 +31,7 @@ ValueCounts countQuery(tr1::shared_ptr<CorpusReader> reader,
     ValueCounts counts;
     CorpusReader::EntryIterator iter = reader->query(CorpusReader::XPATH, query);
     while (iter.hasNext())
-      ++counts[iter.next(*reader).contents];
+      ++counts[iter.next(*reader).contents()];
 
   return counts;
 }

@@ -121,7 +121,7 @@ bool CompactCorpusReaderPrivate::IndexIter::hasNext()
 
 Entry CompactCorpusReaderPrivate::IndexIter::next(CorpusReader const &)
 {
-    Entry e = {(*d_iter)->name, ""};
+    Entry e((*d_iter)->name, "");
 
     ++d_iter;
 

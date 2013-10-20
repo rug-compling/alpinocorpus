@@ -112,13 +112,13 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
         (dactOnly || iter->path().extension() != ".index"))
       continue;
 
-    bf::path namePath = iter->path();
-    namePath.replace_extension("");
-    std::string name = namePath.string();
+    //bf::path namePath = iter->path();
+    //namePath.replace_extension("");
+    //std::string name = namePath.string();
 
-    name.erase(0, d_directory.string().size() + 1);
+    //name.erase(0, d_directory.string().size() + 1);
    
-    d_multiReader->push_back(name, iter->path().string(), false);
+    d_multiReader->push_back(iter->path().string(), false);
   }
 }
 

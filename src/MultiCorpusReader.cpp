@@ -32,10 +32,9 @@ size_t MultiCorpusReader::getSize() const
   return d_private->getSize();
 }
 
-void MultiCorpusReader::push_back(std::string const &name, std::string const &reader,
-    bool recursive)
+void MultiCorpusReader::push_back(std::string const &reader, bool recursive)
 {
-  d_private->push_back(name, reader, recursive);
+  d_private->push_back(reader, recursive);
 }
     
 Either<std::string, Empty> MultiCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const

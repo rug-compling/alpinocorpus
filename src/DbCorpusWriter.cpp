@@ -108,7 +108,7 @@ namespace alpinocorpus {
         while (i.hasNext())
         {
             Entry entry = i.next(corpus);
-            write(entry.name, corpus.read(entry.name), ctx);
+            write(entry.shortName(), corpus.read(entry.name()), ctx);
         }
     }
 
@@ -122,7 +122,7 @@ namespace alpinocorpus {
         {
             Entry entry = i.next(corpus);
             try {
-                write(entry.name, corpus.read(entry.name), ctx);
+                write(entry.shortName(), corpus.read(entry.name()), ctx);
             } catch (Error const &e) {
                 err.append(e);
             }

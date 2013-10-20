@@ -85,15 +85,22 @@ size_t MultiCorpusReaderPrivate::getSize() const
   return size;
 }
 
-void MultiCorpusReaderPrivate::push_back(std::string const &name,
-    std::string const &filename, bool recursive)
+void MultiCorpusReaderPrivate::push_back(std::string const &filename, bool recursive)
 {
     bf::path corpusPath(filename);
     if (!bf::exists(corpusPath))
-      throw OpenError(filename);
+        throw OpenError(filename);
+
+    if (bf::is_directory(corpusPath))
+    {
+        if (filename[filename.size() - 1] == '/')
+            corpusPath = bf::path(corpusPath).parent_path();
+    }
+    //else
+    //    corpusPath.replace_extension("");
 
     d_corpora.push_back(std::make_pair(filename, recursive));
-    d_corporaMap[name] = std::make_pair(filename, recursive); // XXX - exists check?
+    d_corporaMap[corpusPath.string()] = std::make_pair(filename, recursive); // XXX - exists check?
 }
 
 std::pair<std::string, bool> MultiCorpusReaderPrivate::corpusFromPath(
@@ -101,7 +108,7 @@ std::pair<std::string, bool> MultiCorpusReaderPrivate::corpusFromPath(
 {
   for (Corpora::const_iterator iter =
       d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter)
-    if (path.find(iter->first) == 0)
+    if (path.find(iter->first + '/') == 0)
       return iter->second;
   
   throw std::runtime_error(std::string("Unknown corpus: " + path));
@@ -112,7 +119,7 @@ std::string MultiCorpusReaderPrivate::entryFromPath(
 {
   for (Corpora::const_iterator iter =
       d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter)
-    if (path.find(iter->first) == 0)
+    if (path.find(iter->first + '/') == 0)
       return path.substr(iter->first.size() + 1);
 
   throw std::runtime_error(std::string("Could not find entry: " + path));
@@ -238,10 +245,10 @@ Entry MultiCorpusReaderPrivate::MultiIter::next(CorpusReader const &rdr)
     if (d_interrupted)
         throw IterationInterrupted();
 
-    Entry e = d_currentIter->next(rdr);
-    e.name = d_currentName + "/" + e.name;
+    //Entry e = d_currentIter->next(rdr);
+    //e.name = d_currentName + "/" + e.name;
 
-    return e;
+    return d_currentIter->next(rdr);
 }
 
 void MultiCorpusReaderPrivate::MultiIter::nextIterator()

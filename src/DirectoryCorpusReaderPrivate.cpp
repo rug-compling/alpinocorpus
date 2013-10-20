@@ -116,7 +116,7 @@ Entry DirectoryCorpusReaderPrivate::DirIter::next(CorpusReader const &rdr)
     // Move the iterator.
     ++iter;
 
-    Entry entry = {entryPath.string(), ""};
+    Entry entry(entryPath.string(), "");
 
     return entry;
 }

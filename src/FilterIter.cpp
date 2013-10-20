@@ -55,13 +55,13 @@ namespace alpinocorpus {
             // If we see the same filename twice sequentally, the iterator
             // is probably used in a pipeline. We do not want to parse the
             // same file twice.
-            if (e.name == d_file)
+            if (e.name() == d_file)
               continue;
 
             if (d_interrupted)
               throw IterationInterrupted();
 
-            d_file = e.name;
+            d_file = e.name();
             parseFile(d_file);
         }
 
@@ -84,7 +84,7 @@ namespace alpinocorpus {
         if (d_buffer.empty())
             throw Error("Calling next() on an iterator that is exhausted.");
 
-        Entry e = {d_file, d_buffer.empty() ? std::string() : d_buffer.front()};
+        Entry e(d_file, d_buffer.empty() ? std::string() : d_buffer.front());
 
         d_buffer.pop();
 

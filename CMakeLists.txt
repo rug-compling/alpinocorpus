@@ -170,6 +170,7 @@ set(SOURCES
   src/CorpusWriter.cpp
   src/DirectoryCorpusReader.cpp
   src/DirectoryCorpusReaderPrivate.cpp
+  src/Entry.cpp
   src/DzIstream.cpp
   src/DzIstreamBuf.cpp
   src/DzOstream.cpp

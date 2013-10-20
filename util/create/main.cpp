@@ -77,11 +77,11 @@ void writeCorpus(tr1::shared_ptr<CorpusReader> reader,
   while (i.hasNext()) {
     Entry e = i.next(*reader);
 
-    if (seen.find(e.name) == seen.end()) {
-        writer->write(e.name, reader->read(e.name));
-        seen.insert(e.name);
+    if (seen.find(e.name()) == seen.end()) {
+        writer->write(e.name(), reader->read(e.name()));
+        seen.insert(e.name());
     } else
-      std::cerr << "Duplicate entry: " << e.name << std::endl;
+      std::cerr << "Duplicate entry: " << e.shortName() << std::endl;
   }
 }
 

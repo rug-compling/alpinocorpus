@@ -47,13 +47,13 @@ void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   while (i.hasNext())
   {
     Entry entry = i.next(*reader);
-    if (seen.find(entry.name) == seen.end()) {
-      std::cout << entry.name;
+    if (seen.find(entry.name()) == seen.end()) {
+      std::cout << entry.shortName();
 
       if (bracketed) {
         std::cout << " ";
 
-        std::vector<LexItem> items = reader->sentence(entry.name, query);
+        std::vector<LexItem> items = reader->sentence(entry.name(), query);
 
         size_t prevDepth = 0;
         for (std::vector<LexItem>::const_iterator itemIter = items.begin();
@@ -91,7 +91,7 @@ void listCorpus(tr1::shared_ptr<CorpusReader> reader,
       }
 
       std::cout << std::endl;
-      seen.insert(entry.name);
+      seen.insert(entry.name());
     }
   }
 }

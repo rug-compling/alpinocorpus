@@ -17,12 +17,13 @@ class DbCorpusReaderPrivate : public CorpusReader
     DbXml::XmlManager   mutable mgr;
     DbXml::XmlContainer mutable container;
     std::string collection;
+    std::string d_path;
     
     class DbIter : public IterImpl
     {
     public:
-        DbIter(DbXml::XmlContainer &);
-        DbIter(DbXml::XmlManager &);
+        DbIter(std::string const &path, DbXml::XmlContainer &);
+        DbIter(std::string const &path, DbXml::XmlManager &);
 
         virtual IterImpl *copy() const;        
         bool equals(IterImpl const &) const;
@@ -31,14 +32,17 @@ class DbCorpusReaderPrivate : public CorpusReader
         
     protected:
         mutable DbXml::XmlResults r;
+
+        std::string const d_path;
         
-        DbIter(DbXml::XmlResults const &);
+        DbIter(std::string const &path, DbXml::XmlResults const &);
     };
     
     class QueryIter : public DbIter
     {
     public:
-        QueryIter(DbXml::XmlResults const &, DbXml::XmlQueryContext const &);
+        QueryIter(std::string const &path, DbXml::XmlResults const &,
+            DbXml::XmlQueryContext const &);
         IterImpl *copy() const;
         void interrupt();
     

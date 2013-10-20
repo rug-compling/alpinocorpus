@@ -50,9 +50,10 @@ namespace alpinocorpus {
     Entry StylesheetIter::next(CorpusReader const &rdr)
     {
         Entry e = d_iter.next(rdr);
-        e.contents = d_transformer->transform(rdr.read(e.name, d_markerQueries));
 
-        return e;
+        Entry eTrans(e.name(), d_transformer->transform(rdr.read(e.name(), d_markerQueries)));
+
+        return eTrans;
     }
 
     double StylesheetIter::progress()
