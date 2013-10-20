@@ -1,3 +1,9 @@
+alpino-corpus (2.0.2-1raring1) raring; urgency=low
+
+  * New upstream release.
+
+ -- Daniël de Kok <me@danieldk.eu>  Mon, 26 Aug 2013 01:55:03 -0700
+
 alpino-corpus (2.0.1-2raring1) raring; urgency=low
 
   * Bump Boost dependency to version 1.53.
