@@ -52,6 +52,12 @@ namespace alpinocorpus {
         {
             Entry e = d_itr.next(d_corpus);
 
+            // If we see the same filename twice sequentally, the iterator
+            // is probably used in a pipeline. We do not want to parse the
+            // same file twice.
+            if (e.name == d_file)
+              continue;
+
             if (d_interrupted)
               throw IterationInterrupted();
 
