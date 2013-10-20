@@ -9,7 +9,7 @@
 
 namespace alpinocorpus {
 
-std::string Entry::shortName()
+std::string Entry::shortName() const
 {
 
   boost::filesystem::path p(d_name);
