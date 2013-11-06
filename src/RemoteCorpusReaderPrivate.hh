@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 #include <config.hh>
 #ifdef USE_DBXML
@@ -27,7 +27,7 @@ namespace alpinocorpus {
 
         class RemoteIter : public IterImpl {
         public:
-            RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
+            RemoteIter(boost::shared_ptr<util::GetUrl> geturl,
                        size_t n,
                        bool end = false,
                        bool isQuery = false);
@@ -39,11 +39,11 @@ namespace alpinocorpus {
         private:
             void activate() const;
             static std::string unescape(std::string text);
-            std::tr1::shared_ptr<util::GetUrl> d_geturl;
+            boost::shared_ptr<util::GetUrl> d_geturl;
             mutable bool d_end;
             mutable size_t d_idx;
             bool const d_isquery;
-            std::tr1::shared_ptr<bool> d_interrupted;
+            boost::shared_ptr<bool> d_interrupted;
             mutable bool d_active;
         };
 
@@ -77,7 +77,7 @@ namespace alpinocorpus {
         bool d_validSize;
         std::vector<std::string> d_entries;
         std::vector<std::string> d_results;
-        std::tr1::shared_ptr<util::GetUrl> d_geturl;
+        boost::shared_ptr<util::GetUrl> d_geturl;
 
     };
 

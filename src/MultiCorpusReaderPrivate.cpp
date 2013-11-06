@@ -3,6 +3,7 @@
 #include <string>
 #include <utility>
 
+#include <boost/shared_ptr.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
 #include <boost/filesystem.hpp>
@@ -12,8 +13,6 @@
 #if defined(BOOST_HAS_THREADS)
 #include <boost/thread/mutex.hpp>
 #endif
-
-#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
@@ -307,7 +306,7 @@ Either<std::string, Empty> MultiCorpusReaderPrivate::validQuery(QueryDialect d, 
         {
             try {
                 std::pair<std::string, bool> p = d_corporaMap.begin()->second;
-                std::tr1::shared_ptr<CorpusReader> reader;
+                boost::shared_ptr<CorpusReader> reader;
                 if (p.second)
                     reader.reset(CorpusReaderFactory::openRecursive(p.first));
                 else

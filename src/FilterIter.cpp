@@ -1,7 +1,7 @@
 #include <string>
 #include <typeinfo>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -95,7 +95,7 @@ namespace alpinocorpus {
     {
         std::string xml(d_corpus.read(file));
 
-        std::tr1::shared_ptr<DynamicContext> ctx(d_query->createDynamicContext());
+        boost::shared_ptr<DynamicContext> ctx(d_query->createDynamicContext());
         XERCES_CPP_NAMESPACE::MemBufInputSource xmlInput(
             reinterpret_cast<XMLByte const *>(xml.c_str()),
             xml.size(), "input");

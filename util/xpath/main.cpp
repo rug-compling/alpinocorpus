@@ -2,11 +2,10 @@
 #include <stdexcept>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
-
-#include <tr1/unordered_set>
+#include <boost/tr1/unordered_set.hpp>
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -31,7 +30,7 @@ using alpinocorpus::LexItem;
 namespace bf = boost::filesystem;
 namespace tr1 = std::tr1;
 
-void listCorpus(tr1::shared_ptr<CorpusReader> reader,
+void listCorpus(boost::shared_ptr<CorpusReader> reader,
   std::string const &query, bool bracketed = false)
 {
   CorpusReader::EntryIterator i;
@@ -96,7 +95,7 @@ void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   }
 }
 
-void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
+void readEntry(boost::shared_ptr<CorpusReader> reader, std::string const &entry)
 {
   std::cout << reader->read(entry);
 }
@@ -127,13 +126,13 @@ int main(int argc, char *argv[])
     return 1;
   }
  
-  tr1::shared_ptr<CorpusReader> reader;
+  boost::shared_ptr<CorpusReader> reader;
   try {
     if (opts->arguments().size() == 1)
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpus(opts->arguments().at(0), true));
     else
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpora(opts->arguments().begin(),
           opts->arguments().end(), true));
   } catch (std::runtime_error &e) {

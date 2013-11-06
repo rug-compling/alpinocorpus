@@ -5,6 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <config.hh>
 
@@ -165,7 +166,7 @@ namespace alpinocorpus {
         if (iter != markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Multiple queries not implemented");
 
-        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(url, stylesheet));
+        boost::shared_ptr<util::GetUrl> p(new util::GetUrl(url, stylesheet));
 
         return EntryIterator(new RemoteIter(p, 0, false, true));
     }
@@ -181,7 +182,7 @@ namespace alpinocorpus {
         if (iter == markerQueries.end())
             throw Error("RemoteCorpusReaderPrivate: Missing query");
 
-        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url + "/entries" +
+        boost::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url + "/entries" +
                                                               "?markerQuery=" + util::toPercentEncoding(iter->query) +
                                                               "&markerAttr=" + util::toPercentEncoding(iter->attr) +
                                                               "&markerValue=" + util::toPercentEncoding(iter->value) +
@@ -200,7 +201,7 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator RemoteCorpusReaderPrivate::runXPath(
         std::string const &query) const
     {
-        std::tr1::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url +
+        boost::shared_ptr<util::GetUrl> p(new util::GetUrl(d_url +
             "/entries?query=" + util::toPercentEncoding(query) +
             "&contents=1"));
         return EntryIterator(new RemoteIter(p, 0, false, true));
@@ -214,13 +215,13 @@ namespace alpinocorpus {
     }
 
     // done
-    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(std::tr1::shared_ptr<util::GetUrl> geturl,
+    RemoteCorpusReaderPrivate::RemoteIter::RemoteIter(boost::shared_ptr<util::GetUrl> geturl,
                                                       size_t n,
                                                       bool end,
                                                       bool isquery)
         : d_geturl(geturl), d_idx(n), d_end(end), d_isquery(isquery), d_active(false)
     {
-        d_interrupted = std::tr1::shared_ptr<bool>(new bool(false));
+        d_interrupted = boost::shared_ptr<bool>(new bool(false));
     }
 
     // done

@@ -2,10 +2,9 @@
 #include <stdexcept>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
-
 #include <boost/tr1/unordered_set.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 extern "C" {
 #include <libxslt/xslt.h>
@@ -31,7 +30,7 @@ using alpinocorpus::Either;
 
 namespace tr1 = std::tr1;
 
-void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
+void transformCorpus(boost::shared_ptr<CorpusReader> reader,
   std::string const &query, std::string const &stylesheet)
 {
     std::list<CorpusReader::MarkerQuery> markerQueries;
@@ -62,7 +61,7 @@ void transformCorpus(tr1::shared_ptr<CorpusReader> reader,
     }
 }
 
-void transformEntry(tr1::shared_ptr<CorpusReader> reader,
+void transformEntry(boost::shared_ptr<CorpusReader> reader,
   std::string const &query,
   std::string const &stylesheet,
   std::string const &entry)
@@ -121,13 +120,13 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  tr1::shared_ptr<CorpusReader> reader;
+  boost::shared_ptr<CorpusReader> reader;
   try {
     if (opts->arguments().size() == 2)
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpus(opts->arguments().at(1), true));
     else
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpora(opts->arguments().begin() + 1, 
             opts->arguments().end(), true));
   } catch (std::runtime_error &e) {

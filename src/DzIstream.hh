@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 #include "DzIstreamBuf.hh"
 
@@ -16,7 +16,7 @@ public:
 	DzIstream(char const *filename); // Let's stick to the standards... :/
 	virtual ~DzIstream() {}
 private:
-	std::tr1::shared_ptr<DzIstreamBuf> d_streamBuf;
+	boost::shared_ptr<DzIstreamBuf> d_streamBuf;
 };
 
 }

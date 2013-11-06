@@ -4,11 +4,11 @@
 #include <stdexcept>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
 
-#include <tr1/unordered_set>
+#include <boost/tr1/unordered_set.hpp>
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -61,8 +61,8 @@ void usage(std::string const &programName)
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 }
 
-void writeCorpus(tr1::shared_ptr<CorpusReader> reader,
-  tr1::shared_ptr<CorpusWriter> writer,
+void writeCorpus(boost::shared_ptr<CorpusReader> reader,
+  boost::shared_ptr<CorpusWriter> writer,
   std::string const &query)
 {
   CorpusReader::EntryIterator i;
@@ -116,13 +116,13 @@ int main(int argc, char *argv[])
     return 1;
   }
  
-  tr1::shared_ptr<CorpusReader> reader;
+  boost::shared_ptr<CorpusReader> reader;
   try {
     if (opts->arguments().size() == 1)
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpus(opts->arguments().at(0), opts->option('r')));
     else
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpora(opts->arguments().begin(),
           opts->arguments().end(), opts->option('r')));
   } catch (std::runtime_error &e) {
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
             throw std::runtime_error("Attempting to write to the source treebank.");
   
 #if defined(USE_DBXML)
-        tr1::shared_ptr<CorpusWriter> wr(new DbCorpusWriter(treebankOut, true));
+        boost::shared_ptr<CorpusWriter> wr(new DbCorpusWriter(treebankOut, true));
         writeCorpus(reader, wr, query);
 #else
         throw std::runtime_error("AlpinoCorpus was compiled without DBXML support.");
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
           if (bf::equivalent(treebankOut, *iter))
             throw std::runtime_error("Attempting to write to the source treebank.");
   
-        tr1::shared_ptr<CorpusWriter> wr(new CompactCorpusWriter(treebankOut));
+        boost::shared_ptr<CorpusWriter> wr(new CompactCorpusWriter(treebankOut));
         writeCorpus(reader, wr, query);
 
     } catch (std::runtime_error const &e) {

@@ -140,7 +140,6 @@ set(HEADERS
   include/AlpinoCorpus/LexItem.hh
   include/AlpinoCorpus/capi.h
   include/AlpinoCorpus/macros.hh
-  include/AlpinoCorpus/tr1wrap/memory.hh
   include/AlpinoCorpus/util/Either.hh
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh

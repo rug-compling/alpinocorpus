@@ -6,7 +6,7 @@
 #include <queue>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/IterImpl.hh>
@@ -48,7 +48,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
       private:
         void copy(EntryIterator const &other);
 
-        std::tr1::shared_ptr<IterImpl> d_impl;
+        boost::shared_ptr<IterImpl> d_impl;
     };
     
     struct MarkerQuery {

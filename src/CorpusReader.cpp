@@ -52,19 +52,19 @@ namespace {
 
 
     std::vector<alpinocorpus::LexItem> collectLexicals(
-        std::tr1::shared_ptr<xmlDoc> doc,
+        boost::shared_ptr<xmlDoc> doc,
         std::tr1::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth)
     {
         std::vector<alpinocorpus::LexItem> items;
 
-        std::tr1::shared_ptr<xmlXPathContext> xpCtx(
+        boost::shared_ptr<xmlXPathContext> xpCtx(
             xmlXPathNewContext(doc.get()), xmlXPathFreeContext);
         if (xpCtx == 0)
         {
             return items;
         }
 
-        std::tr1::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
+        boost::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
             toXmlStr("//node[@word]"), xpCtx.get()), xmlXPathFreeObject);
         if (xpObj == 0)
             return items;
@@ -79,14 +79,14 @@ namespace {
                 if (node->type == XML_ELEMENT_NODE)
                 {
                     xmlAttrPtr wordAttr = xmlHasProp(node, toXmlStr("word"));
-                    std::tr1::shared_ptr<xmlChar> word(
+                    boost::shared_ptr<xmlChar> word(
                         xmlNodeGetContent(wordAttr->children), xmlFree);
 
                     xmlAttrPtr beginAttr = xmlHasProp(node, toXmlStr("begin"));
                     size_t begin = 0;
                     if (beginAttr)
                     {
-                        std::tr1::shared_ptr<xmlChar> beginStr(
+                        boost::shared_ptr<xmlChar> beginStr(
                             xmlNodeGetContent(beginAttr->children), xmlFree);
                         try {
                             begin = alpinocorpus::util::parseString<size_t>(fromXmlStr(beginStr.get()));
@@ -239,7 +239,7 @@ namespace alpinocorpus {
         }
         std::string xmlData(read(entry, markers));
 
-        std::tr1::shared_ptr<xmlDoc> doc(
+        boost::shared_ptr<xmlDoc> doc(
             xmlReadMemory(xmlData.c_str(), xmlData.size(), NULL, NULL, 0),
             xmlFreeDoc);
 
@@ -252,7 +252,7 @@ namespace alpinocorpus {
             return std::vector<LexItem>();
         }
 
-        std::tr1::shared_ptr<xmlXPathContext> xpCtx(
+        boost::shared_ptr<xmlXPathContext> xpCtx(
             xmlXPathNewContext(doc.get()), xmlXPathFreeContext);
 
         if (xpCtx == 0)
@@ -260,7 +260,7 @@ namespace alpinocorpus {
             return std::vector<LexItem>();
         }
 
-        std::tr1::shared_ptr<xmlXPathObject> xpObj(
+        boost::shared_ptr<xmlXPathObject> xpObj(
             xmlXPathEvalExpression(toXmlStr("//node[@active='1']"), xpCtx.get()),
             xmlXPathFreeObject);
         if (xpObj == 0) {
@@ -459,14 +459,14 @@ namespace alpinocorpus {
 
         // Prepare context
     
-        std::tr1::shared_ptr<xmlXPathContext> ctx(xmlXPathNewContext(0),
+        boost::shared_ptr<xmlXPathContext> ctx(xmlXPathNewContext(0),
             xmlXPathFreeContext);
         if (!variables)
             ctx->flags = XML_XPATH_NOVAR;
         xmlSetStructuredErrorFunc(ctx.get(), &ignoreStructuredError);
         
         // Compile expression
-        std::tr1::shared_ptr<xmlXPathCompExpr> r(
+        boost::shared_ptr<xmlXPathCompExpr> r(
             xmlXPathCtxtCompile(ctx.get(), reinterpret_cast<xmlChar const *>(query.c_str())),
             xmlXPathFreeCompExpr);
         
