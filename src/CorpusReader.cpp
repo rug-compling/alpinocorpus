@@ -7,13 +7,13 @@
 
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/regex.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
-#include <AlpinoCorpus/tr1wrap/memory.hh>
 
 #include <typeinfo>
 
