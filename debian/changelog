@@ -1,3 +1,9 @@
+alpino-corpus (2.0.3-1trusty1) trusty; urgency=medium
+
+  * Build for Ubuntu 14.04 (Trusty Tahr).
+
+ -- Daniël de Kok <me@danieldk.eu>  Sat, 10 May 2014 14:10:33 +0200
+
 alpino-corpus (2.0.3-1saucy1) saucy; urgency=low
 
   * New upstream release.
