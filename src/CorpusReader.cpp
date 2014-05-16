@@ -53,7 +53,8 @@ namespace {
 
     std::vector<alpinocorpus::LexItem> collectLexicals(
         boost::shared_ptr<xmlDoc> doc,
-        std::tr1::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth)
+        std::tr1::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth,
+        std::string const &attribute)
     {
         std::vector<alpinocorpus::LexItem> items;
 
@@ -78,7 +79,7 @@ namespace {
 
                 if (node->type == XML_ELEMENT_NODE)
                 {
-                    xmlAttrPtr wordAttr = xmlHasProp(node, toXmlStr("word"));
+                    xmlAttrPtr wordAttr = xmlHasProp(node, toXmlStr(attribute.c_str()));
                     boost::shared_ptr<xmlChar> word(
                         xmlNodeGetContent(wordAttr->children), xmlFree);
 
@@ -221,7 +222,7 @@ namespace alpinocorpus {
     }
 
     std::vector<LexItem> CorpusReader::getSentence(std::string const &entry,
-        std::string const &query) const
+        std::string const &query, std::string const &attribute) const
     {
         std::vector<std::string> queries;
         boost::split_regex(queries, query, boost::regex("\\+\\|\\+"));
@@ -278,7 +279,7 @@ namespace alpinocorpus {
                   markLexicals(nodeSet->nodeTab[i], &matchDepth, i);
         }
 
-        std::vector<LexItem> items = collectLexicals(doc, matchDepth);
+        std::vector<LexItem> items = collectLexicals(doc, matchDepth, attribute);
 
         return items;
     }
@@ -440,7 +441,13 @@ namespace alpinocorpus {
     std::vector<LexItem> CorpusReader::sentence(std::string const &entry,
         std::string const &query) const
     {
-        return getSentence(entry, query);
+        return getSentence(entry, query, "word");
+    }
+
+    std::vector<LexItem> CorpusReader::sentence(std::string const &entry,
+        std::string const &query, std::string const &attribute) const
+    {
+        return getSentence(entry, query, attribute);
     }
     
     size_t CorpusReader::size() const

@@ -103,6 +103,9 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     std::vector<LexItem> sentence(std::string const &entry,
       std::string const &query) const;
 
+    std::vector<LexItem> sentence(std::string const &entry,
+      std::string const &query, std::string const &attribute) const;
+
     /** The number of entries in the corpus. */
     size_t size() const;
 
@@ -110,7 +113,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator getEntries() const = 0;
     virtual std::string getName() const = 0;
     virtual std::vector<LexItem> getSentence(std::string const &entry,
-        std::string const &query) const;
+        std::string const &query, std::string const &attribute) const;
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,
