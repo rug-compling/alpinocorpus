@@ -439,12 +439,6 @@ namespace alpinocorpus {
     }
 
     std::vector<LexItem> CorpusReader::sentence(std::string const &entry,
-        std::string const &query) const
-    {
-        return getSentence(entry, query, "word");
-    }
-
-    std::vector<LexItem> CorpusReader::sentence(std::string const &entry,
         std::string const &query, std::string const &attribute) const
     {
         return getSentence(entry, query, attribute);

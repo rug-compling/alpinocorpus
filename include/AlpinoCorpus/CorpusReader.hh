@@ -101,9 +101,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
       std::list<MarkerQuery> const &queries = std::list<MarkerQuery>()) const;
 
     std::vector<LexItem> sentence(std::string const &entry,
-      std::string const &query) const;
-
-    std::vector<LexItem> sentence(std::string const &entry,
       std::string const &query, std::string const &attribute) const;
 
     /** The number of entries in the corpus. */
