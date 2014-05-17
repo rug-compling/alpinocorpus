@@ -31,7 +31,8 @@ namespace bf = boost::filesystem;
 namespace tr1 = std::tr1;
 
 void listCorpus(boost::shared_ptr<CorpusReader> reader,
-  std::string const &query, bool bracketed = false)
+  std::string const &query, bool bracketed = false,
+  std::string attribute = "word")
 {
   CorpusReader::EntryIterator i;
   
@@ -52,7 +53,8 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
       if (bracketed) {
         std::cout << " ";
 
-        std::vector<LexItem> items = reader->sentence(entry.name, query);
+        std::vector<LexItem> items = reader->sentence(entry.name, query,
+            attribute);
 
         size_t prevDepth = 0;
         for (std::vector<LexItem>::const_iterator itemIter = items.begin();
@@ -104,6 +106,7 @@ void usage(std::string const &programName)
 {
     std::cerr << "Usage: " << programName << " [OPTION] treebank(s)" <<
       std::endl << std::endl <<
+      "  -a attr\tLexical attribute to show (default: word)" << std::endl <<
       "  -m filename\tLoad macro file" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
       "  -s\t\tInclude a bracketed sentence" << std::endl << std::endl;
@@ -114,7 +117,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "m:q:s"));
+      "a:m:q:s"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -138,6 +141,11 @@ int main(int argc, char *argv[])
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;
+  }
+
+  std::string attr = "word";
+  if (opts->option('a')) {
+      attr = opts->optionValue('a');
   }
 
   alpinocorpus::Macros macros;
@@ -165,7 +173,7 @@ int main(int argc, char *argv[])
   }
   
   try {
-      listCorpus(reader, query, opts->option('s'));
+      listCorpus(reader, query, opts->option('s'), attr);
   } catch (std::runtime_error const &e) {
       std::cerr << opts->programName() <<
       ": error listing treebank: " << e.what() << std::endl;
