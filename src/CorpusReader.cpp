@@ -54,7 +54,8 @@ namespace {
     std::vector<alpinocorpus::LexItem> collectLexicals(
         boost::shared_ptr<xmlDoc> doc,
         std::tr1::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth,
-        std::string const &attribute)
+        std::string const &attribute,
+        std::string const &defaultValue)
     {
         std::vector<alpinocorpus::LexItem> items;
 
@@ -80,8 +81,11 @@ namespace {
                 if (node->type == XML_ELEMENT_NODE)
                 {
                     xmlAttrPtr wordAttr = xmlHasProp(node, toXmlStr(attribute.c_str()));
-                    boost::shared_ptr<xmlChar> word(
-                        xmlNodeGetContent(wordAttr->children), xmlFree);
+                    boost::shared_ptr<xmlChar> word;
+                    if (wordAttr == 0)
+                      word = boost::shared_ptr<xmlChar>(xmlStrdup(toXmlStr(defaultValue.c_str())), xmlFree);
+                    else
+                      word = boost::shared_ptr<xmlChar>(xmlNodeGetContent(wordAttr->children), xmlFree);
 
                     xmlAttrPtr beginAttr = xmlHasProp(node, toXmlStr("begin"));
                     size_t begin = 0;
@@ -222,7 +226,8 @@ namespace alpinocorpus {
     }
 
     std::vector<LexItem> CorpusReader::getSentence(std::string const &entry,
-        std::string const &query, std::string const &attribute) const
+        std::string const &query, std::string const &attribute,
+        std::string const &defaultValue) const
     {
         std::vector<std::string> queries;
         boost::split_regex(queries, query, boost::regex("\\+\\|\\+"));
@@ -279,7 +284,7 @@ namespace alpinocorpus {
                   markLexicals(nodeSet->nodeTab[i], &matchDepth, i);
         }
 
-        std::vector<LexItem> items = collectLexicals(doc, matchDepth, attribute);
+        std::vector<LexItem> items = collectLexicals(doc, matchDepth, attribute, defaultValue);
 
         return items;
     }
@@ -439,9 +444,10 @@ namespace alpinocorpus {
     }
 
     std::vector<LexItem> CorpusReader::sentence(std::string const &entry,
-        std::string const &query, std::string const &attribute) const
+        std::string const &query, std::string const &attribute,
+        std::string const &defaultValue) const
     {
-        return getSentence(entry, query, attribute);
+        return getSentence(entry, query, attribute, defaultValue);
     }
     
     size_t CorpusReader::size() const

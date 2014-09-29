@@ -54,7 +54,7 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
         std::cout << " ";
 
         std::vector<LexItem> items = reader->sentence(entry.name, query,
-            attribute);
+            attribute, "_missing_");
 
         size_t prevDepth = 0;
         for (std::vector<LexItem>::const_iterator itemIter = items.begin();
