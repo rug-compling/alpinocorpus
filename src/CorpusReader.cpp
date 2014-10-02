@@ -361,6 +361,8 @@ namespace alpinocorpus {
             document->createNSResolver(document->getDocumentElement()));
         resolver->addNamespaceBinding(X("fn"),
             X("http://www.w3.org/2005/xpath-functions"));
+        resolver->addNamespaceBinding(X("xs"),
+            X("http://www.w3.org/2001/XMLSchema"));
 
         for (std::list<MarkerQuery>::const_iterator iter = queries.begin();
              iter != queries.end(); ++iter)
