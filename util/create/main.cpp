@@ -182,13 +182,15 @@ int main(int argc, char *argv[])
   else if (opts->option('c')) {
     try {
         std::string treebankOut = opts->optionValue('c').c_str();
+        std::string outIndex = treebankOut + ".index";
+        std::string outDataDz = treebankOut + ".data.dz";
 
         // XXX - needs a more sophisticated check now, the output treebank
         // could also be in the search path of a recursive reader.
         for (std::vector<std::string>::const_iterator iter =
             opts->arguments().begin(); iter != opts->arguments().end();
             ++iter)
-          if (bf::equivalent(treebankOut, *iter))
+          if (bf::equivalent(outIndex, *iter) || bf::equivalent(outDataDz, *iter))
             throw std::runtime_error("Attempting to write to the source treebank.");
   
         boost::shared_ptr<CorpusWriter> wr(new CompactCorpusWriter(treebankOut));
