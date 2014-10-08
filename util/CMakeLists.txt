@@ -52,6 +52,18 @@ target_link_libraries(alpinocorpus-extract
   alpino_corpus
 )
 
+set(GET_SOURCES
+  get/main.cpp
+)
+
+add_executable(alpinocorpus-get
+  ${GET_SOURCES}
+  ${COMMON_HEADERS}
+  ${COMMON_SOURCES}
+)
+
+target_link_libraries(alpinocorpus-get alpino_corpus)
+
 add_executable(alpinocorpus-xpath
   ${XPATH_SOURCES}
   ${COMMON_HEADERS}
@@ -112,6 +124,7 @@ install(
   TARGETS
     alpinocorpus-create
     alpinocorpus-extract
+    alpinocorpus-get
     alpinocorpus-stats
     alpinocorpus-xpath
     alpinocorpus-xquery
