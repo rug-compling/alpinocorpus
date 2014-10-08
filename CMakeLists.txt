@@ -43,9 +43,6 @@ if(BOOST_ROOT)
   set(Boost_NO_SYSTEM_PATHS ON)
 endif()
 
-option(WITH_RUBY
-  "Compile Ruby bindings" OFF)
-
 option(USE_REMOTE_CORPUS "Enable remote corpus" ON)
 
 include(GNUInstallDirs REQUIRED)
@@ -279,9 +276,5 @@ add_executable(readers_available test/readers_available.cpp)
 target_link_libraries(readers_available alpino_corpus)
 
 add_subdirectory(util)
-
-if(WITH_RUBY)
-  add_subdirectory(bindings/ruby)
-endif()
 
 add_subdirectory(resources)
