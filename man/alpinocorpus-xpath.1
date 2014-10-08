@@ -1,39 +1,39 @@
-.TH ALPINOCORPUS-XPATH 1 "Nov 19, 2012" 
+.TH "ALPINOCORPUS\-XPATH" "1" "Nov 19, 2012" "" ""
 .SH NAME
 .PP
-\f[B]alpinocorpus-xpath\f[] -- Alpino treebank XPath search
+\f[B]alpinocorpus\-xpath\f[] \-\- Alpino treebank XPath search
 .SH SYNOPSIS
 .PP
-\f[B]alpinocorpus-xpath\f[] [\f[I]options\f[]] \f[I]treebank ...\f[]
+\f[B]alpinocorpus\-xpath\f[] [\f[I]options\f[]] \f[I]treebank ...\f[]
 .SH DESCRIPTION
 .PP
-The \f[B]alpinocorpus-xpath\f[] utility lists the entries in each Dact
+The \f[B]alpinocorpus\-xpath\f[] utility lists the entries in each Dact
 \f[I]treebank\f[].
-If \f[I]treebank\f[] is a directory, then \f[B]alpinocorpus-xpath\f[]
+If \f[I]treebank\f[] is a directory, then \f[B]alpinocorpus\-xpath\f[]
 will list the entries of each treebank below that directory.
 An XPath query can be applied to list only the entries that match that
 query.
 .PP
 The following options are available:
 .TP
-.B \f[C]-m\f[] \f[I]MACROFILE\f[]
+.B \f[C]\-m\f[] \f[I]MACROFILE\f[]
 Load macros from \f[I]MACROFILE\f[].
 .RS
 .RE
 .TP
-.B \f[C]-q\f[] \f[I]QUERY\f[]
+.B \f[C]\-q\f[] \f[I]QUERY\f[]
 Only show entries that match \f[I]QUERY\f[] (XPath 2.0).
 .RS
 .RE
 .TP
-.B \f[C]-s\f[]
+.B \f[C]\-s\f[]
 Print the sentence of each entry, fragments that match the query are
 colored.
 .RS
 .RE
 .SH SEE ALSO
 .PP
-alpinocorpus-create(1), alpinocorpus-stats(1), alpinocorpus-xquery(1),
-alpinocorpus-xslt(1)
+alpinocorpus\-create(1), alpinocorpus\-get(1), alpinocorpus\-stats(1),
+alpinocorpus\-xquery(1), alpinocorpus\-xslt(1)
 .SH AUTHORS
 Daniel de Kok.
