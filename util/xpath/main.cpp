@@ -31,8 +31,9 @@ namespace bf = boost::filesystem;
 namespace tr1 = std::tr1;
 
 void listCorpus(boost::shared_ptr<CorpusReader> reader,
-  std::string const &query, bool bracketed = false,
-  std::string attribute = "word")
+  std::string const &query, bool bracketed,
+  std::string const &attribute,
+  std::string const &wordAttr)
 {
   CorpusReader::EntryIterator i;
   
@@ -54,7 +55,7 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
         std::cout << " ";
 
         std::vector<LexItem> items = reader->sentence(entry.name, query,
-            attribute, "_missing_");
+            attribute, "_missing_", wordAttr);
 
         size_t prevDepth = 0;
         for (std::vector<LexItem>::const_iterator itemIter = items.begin();
@@ -143,7 +144,9 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  std::string attr = "word";
+  std::string wordAttr = reader->type() == "tueba_tree" ? "form" : "word";
+
+  std::string attr = wordAttr;
   if (opts->option('a')) {
       attr = opts->optionValue('a');
   }
@@ -173,7 +176,7 @@ int main(int argc, char *argv[])
   }
   
   try {
-      listCorpus(reader, query, opts->option('s'), attr);
+      listCorpus(reader, query, opts->option('s'), attr, wordAttr);
   } catch (std::runtime_error const &e) {
       std::cerr << opts->programName() <<
       ": error listing treebank: " << e.what() << std::endl;

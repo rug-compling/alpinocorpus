@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cstring>
 #include <list>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,7 @@
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/MemBufFormatTarget.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
+#include <xercesc/util/TransService.hpp>
 
 #include <xqilla/xqilla-dom3.hpp>
 
@@ -55,7 +57,8 @@ namespace {
         boost::shared_ptr<xmlDoc> doc,
         std::tr1::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth,
         std::string const &attribute,
-        std::string const &defaultValue)
+        std::string const &defaultValue,
+        std::string const &wordAttr)
     {
         std::vector<alpinocorpus::LexItem> items;
 
@@ -66,8 +69,14 @@ namespace {
             return items;
         }
 
+        std::ostringstream oss;
+        oss << "//node[@";
+        oss << wordAttr;
+        oss << "]";
+        std::string lexNodeQuery = oss.str();
+
         boost::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
-            toXmlStr("//node[@word]"), xpCtx.get()), xmlXPathFreeObject);
+            toXmlStr(lexNodeQuery.c_str()), xpCtx.get()), xmlXPathFreeObject);
         if (xpObj == 0)
             return items;
 
@@ -122,21 +131,21 @@ namespace {
     // a drag. Since we do not modify the tree, we can keep the counts by
     // memory adres. Ugly, but effective. Don't we love that?
     void markLexicals(xmlNode *node, std::tr1::unordered_map<xmlNode *,
-        std::set<size_t> > *matchDepth, size_t matchId)
+        std::set<size_t> > *matchDepth, size_t matchId, std::string wordAttr)
     {
         // Don't attempt to handle a node that we can't.
         if (node->type != XML_ELEMENT_NODE ||
               std::strcmp(fromXmlStr(node->name), "node") != 0)
             return;
 
-        xmlAttrPtr wordProp = xmlHasProp(node, toXmlStr("word"));
+        xmlAttrPtr wordProp = xmlHasProp(node, toXmlStr(wordAttr.c_str()));
         if (wordProp != 0)
             (*matchDepth)[node].insert(matchId);
         else // Attempt to recurse...
         {
             for (xmlNodePtr child = node->children;
                 child != NULL; child = child->next)
-              markLexicals(child, matchDepth, matchId);
+              markLexicals(child, matchDepth, matchId, wordAttr);
         }
 
     }
@@ -227,7 +236,8 @@ namespace alpinocorpus {
 
     std::vector<LexItem> CorpusReader::getSentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
-        std::string const &defaultValue) const
+        std::string const &defaultValue,
+        std::string const &wordAttr) const
     {
         std::vector<std::string> queries;
         boost::split_regex(queries, query, boost::regex("\\+\\|\\+"));
@@ -281,10 +291,10 @@ namespace alpinocorpus {
         {
             for (int i = 0; i < nodeSet->nodeNr; ++i)
               if (nodeSet->nodeTab[i]->type == XML_ELEMENT_NODE)
-                  markLexicals(nodeSet->nodeTab[i], &matchDepth, i);
+                  markLexicals(nodeSet->nodeTab[i], &matchDepth, i, wordAttr);
         }
 
-        std::vector<LexItem> items = collectLexicals(doc, matchDepth, attribute, defaultValue);
+        std::vector<LexItem> items = collectLexicals(doc, matchDepth, attribute, defaultValue, wordAttr);
 
         return items;
     }
@@ -447,9 +457,49 @@ namespace alpinocorpus {
 
     std::vector<LexItem> CorpusReader::sentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
-        std::string const &defaultValue) const
+        std::string const &defaultValue, std::string const &wordAttr) const
     {
-        return getSentence(entry, query, attribute, defaultValue);
+        return getSentence(entry, query, attribute, defaultValue, wordAttr);
+    }
+
+    std::string CorpusReader::type() const {
+      if (d_type)
+        return *d_type;
+
+      EntryIterator iter = entries();
+      if (!iter.hasNext()) {
+        return "unknown";
+      }
+
+      Entry entry = iter.next(*this);
+      std::string content = read(entry.name);
+
+      // Prepare the DOM parser.
+      xerces::DOMImplementation *xqillaImplementation =
+          xerces::DOMImplementationRegistry::getDOMImplementation(X("XPath2 3.0"));
+      AutoRelease<xerces::DOMLSParser> parser(xqillaImplementation->createLSParser(
+          xerces::DOMImplementationLS::MODE_SYNCHRONOUS, 0));
+        
+      // Parse the document.
+      xerces::MemBufInputSource xmlInput(reinterpret_cast<XMLByte const *>(content.c_str()),
+          content.size(), "input");
+
+      xerces::Wrapper4InputSource domInput(&xmlInput, false);
+
+      xerces::DOMDocument *document;
+      try {
+          document = parser->parse(&domInput);
+      } catch (xerces::DOMException const &e) {
+          throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
+      }
+
+      xercesc::TranscodeToStr transcoder(
+          document->getDocumentElement()->getTagName(), "UTF-8");
+
+      const_cast<CorpusReader *>(this)->d_type.reset(
+          new std::string(fromXmlStr(transcoder.str())));
+
+      return *d_type;
     }
     
     size_t CorpusReader::size() const

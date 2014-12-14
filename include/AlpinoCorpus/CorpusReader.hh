@@ -111,7 +111,12 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      */
     std::vector<LexItem> sentence(std::string const &entry,
       std::string const &query, std::string const &attribute,
-      std::string const &defaultValue) const;
+      std::string const &defaultValue,
+      std::string const &wordAttr) const;
+
+    /** The treebank  type. For now, this is defined to be the name of the root
+     *  element, e.g. 'alpino_ds' for Alpino treebanks. */
+    std::string type() const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -121,7 +126,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual std::string getName() const = 0;
     virtual std::vector<LexItem> getSentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
-        std::string const &defaultValue) const;
+        std::string const &defaultValue, std::string const &wordAttr) const;
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,
@@ -132,6 +137,9 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
       std::string const &q, std::string const &stylesheet,
       std::list<MarkerQuery> const &markerQueries) const;
     virtual Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &q) const;
+
+    // Initialized lazily in type();
+    boost::shared_ptr<std::string> d_type;
 };
 
 }
