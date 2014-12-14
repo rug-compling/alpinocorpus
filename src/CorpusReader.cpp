@@ -135,7 +135,8 @@ namespace {
     {
         // Don't attempt to handle a node that we can't.
         if (node->type != XML_ELEMENT_NODE ||
-              std::strcmp(fromXmlStr(node->name), "node") != 0)
+              (std::strcmp(fromXmlStr(node->name), "node") != 0 &&
+               std::strcmp(fromXmlStr(node->name), "ne") != 0))
             return;
 
         xmlAttrPtr wordProp = xmlHasProp(node, toXmlStr(wordAttr.c_str()));
@@ -277,7 +278,7 @@ namespace alpinocorpus {
         }
 
         boost::shared_ptr<xmlXPathObject> xpObj(
-            xmlXPathEvalExpression(toXmlStr("//node[@active='1']"), xpCtx.get()),
+            xmlXPathEvalExpression(toXmlStr("//ne[@active='1']|node[@active='1']"), xpCtx.get()),
             xmlXPathFreeObject);
         if (xpObj == 0) {
             //qDebug() << "Could not make XPath expression to select active nodes.";
