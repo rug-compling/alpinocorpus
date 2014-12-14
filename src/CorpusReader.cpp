@@ -278,7 +278,7 @@ namespace alpinocorpus {
         }
 
         boost::shared_ptr<xmlXPathObject> xpObj(
-            xmlXPathEvalExpression(toXmlStr("//ne[@active='1']|node[@active='1']"), xpCtx.get()),
+            xmlXPathEvalExpression(toXmlStr("//ne[@active='1']|//node[@active='1']"), xpCtx.get()),
             xmlXPathFreeObject);
         if (xpObj == 0) {
             //qDebug() << "Could not make XPath expression to select active nodes.";
