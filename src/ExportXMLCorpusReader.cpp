@@ -30,6 +30,7 @@ public:
 
 private:
     size_t addWordPositions(xmlNodePtr node, size_t n) const;
+    std::set<std::string> entrySet() const;
     virtual EntryIterator getEntries() const;
     virtual std::string getName() const;
     virtual std::string readEntry(std::string const &entry) const;
@@ -38,18 +39,19 @@ private:
     class ExportIter : public IterImpl
     {
     public:
-        ExportIter(boost::shared_ptr<xmlDoc> doc);
+        ExportIter(std::set<std::string> const &entries);
         IterImpl *copy() const;
         bool hasNext();
         Entry next(CorpusReader const &rdr);
     private:
         bool isValid();
 
-        std::set<std::string> d_entries;
+        std::set<std::string> const &d_entries;
         std::set<std::string>::const_iterator d_iter;
     };
 
     boost::shared_ptr<xmlDoc> doc;
+    std::set<std::string> d_entries;
 };
 
 namespace {
@@ -72,6 +74,42 @@ ExportXMLCorpusReader::ExportXMLCorpusReader(std::string const &filename) :
 ExportXMLCorpusReader::~ExportXMLCorpusReader()
 {
     delete d_private;
+}
+
+CorpusReader::EntryIterator ExportXMLCorpusReader::getEntries() const
+{
+  return d_private->entries();
+}
+
+std::string ExportXMLCorpusReader::getName() const
+{
+    return d_private->name();
+}
+
+std::string ExportXMLCorpusReader::readEntry(std::string const &entry) const
+{
+    return d_private->read(entry);
+}
+
+size_t ExportXMLCorpusReader::getSize() const
+{
+    return d_private->size();
+}
+
+ExportXMLCorpusReaderPrivate::ExportXMLCorpusReaderPrivate(std::string const &filename)
+{
+    doc.reset(
+        xmlReadFile(filename.c_str(), NULL, 0),
+        xmlFreeDoc);
+    
+    if (!doc)
+        throw OpenError(std::string("Could not parse ExportXML file"));
+
+    d_entries = entrySet();
+}
+
+ExportXMLCorpusReaderPrivate::~ExportXMLCorpusReaderPrivate()
+{
 }
 
 size_t ExportXMLCorpusReaderPrivate::addWordPositions(xmlNodePtr node, size_t n) const
@@ -105,43 +143,45 @@ size_t ExportXMLCorpusReaderPrivate::addWordPositions(xmlNodePtr node, size_t n)
     return n;
 }
 
-CorpusReader::EntryIterator ExportXMLCorpusReader::getEntries() const
+std::set<std::string> ExportXMLCorpusReaderPrivate::entrySet() const
 {
-  return d_private->entries();
-}
+    std::set<std::string> entries;
 
-std::string ExportXMLCorpusReader::getName() const
-{
-    return d_private->name();
-}
+    boost::shared_ptr<xmlXPathContext> xpCtx(
+        xmlXPathNewContext(doc.get()), xmlXPathFreeContext);
+    if (!xpCtx)
+      throw Error(std::string("Could not construct XPath context"));
 
-std::string ExportXMLCorpusReader::readEntry(std::string const &entry) const
-{
-    return d_private->read(entry);
-}
+    boost::shared_ptr<xmlXPathObject> xpObj(
+        xmlXPathEvalExpression(toXmlStr("//sentence"), xpCtx.get()),
+        xmlXPathFreeObject);
+    if (!xpObj)
+      throw Error(std::string("Could not evaluate sentence query"));
 
-size_t ExportXMLCorpusReader::getSize() const
-{
-    return d_private->size();
-}
+    xmlNodeSetPtr nodeSet = xpObj->nodesetval;
+    if (nodeSet == 0)
+      throw Error(std::string("Could not evaluate sentence query"));
 
-ExportXMLCorpusReaderPrivate::ExportXMLCorpusReaderPrivate(std::string const &filename)
-{
-    doc.reset(
-        xmlReadFile(filename.c_str(), NULL, 0),
-        xmlFreeDoc);
-    
-    if (!doc)
-        throw OpenError(std::string("Could not parse ExportXML file"));
-}
+    for (int i = 0; i < nodeSet->nodeNr; ++i)
+    {
+        xmlNodePtr node = nodeSet->nodeTab[i];
 
-ExportXMLCorpusReaderPrivate::~ExportXMLCorpusReaderPrivate()
-{
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            boost::shared_ptr<xmlChar> ident(
+                xmlGetProp(node, toXmlStr("id")), xmlFree);
+            if (!ident)
+                continue; // XXX: warn?
+            entries.insert(fromXmlStr(ident.get()));
+        }
+    }
+
+    return entries;
 }
 
 CorpusReader::EntryIterator ExportXMLCorpusReaderPrivate::getEntries() const
 {
-    return EntryIterator(new ExportIter(doc));
+    return EntryIterator(new ExportIter(d_entries));
 }
 
 std::string ExportXMLCorpusReaderPrivate::getName() const
@@ -208,40 +248,12 @@ std::string ExportXMLCorpusReaderPrivate::readEntry(std::string const &entry) co
 
 size_t ExportXMLCorpusReaderPrivate::getSize() const
 {
+    return d_entries.size();
 }
 
-ExportXMLCorpusReaderPrivate::ExportIter::ExportIter(boost::shared_ptr<xmlDoc> doc)
+ExportXMLCorpusReaderPrivate::ExportIter::ExportIter(std::set<std::string> const &entries)
+  : d_entries(entries), d_iter(entries.begin())
 {
-    boost::shared_ptr<xmlXPathContext> xpCtx(
-        xmlXPathNewContext(doc.get()), xmlXPathFreeContext);
-    if (!xpCtx)
-      throw Error(std::string("Could not construct XPath context"));
-
-    boost::shared_ptr<xmlXPathObject> xpObj(
-        xmlXPathEvalExpression(toXmlStr("//sentence"), xpCtx.get()),
-        xmlXPathFreeObject);
-    if (!xpObj)
-      throw Error(std::string("Could not evaluate sentence query"));
-
-    xmlNodeSetPtr nodeSet = xpObj->nodesetval;
-    if (nodeSet == 0)
-      throw Error(std::string("Could not evaluate sentence query"));
-
-    for (int i = 0; i < nodeSet->nodeNr; ++i)
-    {
-        xmlNodePtr node = nodeSet->nodeTab[i];
-
-        if (node->type == XML_ELEMENT_NODE)
-        {
-            boost::shared_ptr<xmlChar> ident(
-                xmlGetProp(node, toXmlStr("id")), xmlFree);
-            if (!ident)
-                continue; // XXX: warn?
-            d_entries.insert(fromXmlStr(ident.get()));
-        }
-    }
-
-    d_iter = d_entries.begin();
 }
 
 IterImpl *ExportXMLCorpusReaderPrivate::ExportIter::copy() const
