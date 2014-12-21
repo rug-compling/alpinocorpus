@@ -70,9 +70,8 @@ namespace {
         }
 
         std::ostringstream oss;
-        oss << "//node[@";
-        oss << wordAttr;
-        oss << "]";
+        oss << "//node[@" << wordAttr << "]|";
+        oss << "//word[@" << wordAttr << "]";
         std::string lexNodeQuery = oss.str();
 
         boost::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
@@ -136,6 +135,7 @@ namespace {
         // Don't attempt to handle a node that we can't.
         if (node->type != XML_ELEMENT_NODE ||
               (std::strcmp(fromXmlStr(node->name), "node") != 0 &&
+               std::strcmp(fromXmlStr(node->name), "word") != 0 &&
                std::strcmp(fromXmlStr(node->name), "ne") != 0))
             return;
 
@@ -278,7 +278,7 @@ namespace alpinocorpus {
         }
 
         boost::shared_ptr<xmlXPathObject> xpObj(
-            xmlXPathEvalExpression(toXmlStr("//ne[@active='1']|node[@active='1']"), xpCtx.get()),
+            xmlXPathEvalExpression(toXmlStr("//word[@active='1']|//ne[@active='1']|//node[@active='1']"), xpCtx.get()),
             xmlXPathFreeObject);
         if (xpObj == 0) {
             //qDebug() << "Could not make XPath expression to select active nodes.";
