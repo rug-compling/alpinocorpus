@@ -2,8 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include <iostream>
-
+#include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <libxml/parser.h>
@@ -30,6 +29,7 @@ public:
     ~ExportXMLCorpusReaderPrivate();
 
 private:
+    size_t addWordPositions(xmlNodePtr node, size_t n) const;
     virtual EntryIterator getEntries() const;
     virtual std::string getName() const;
     virtual std::string readEntry(std::string const &entry) const;
@@ -74,6 +74,37 @@ ExportXMLCorpusReader::~ExportXMLCorpusReader()
     delete d_private;
 }
 
+size_t ExportXMLCorpusReaderPrivate::addWordPositions(xmlNodePtr node, size_t n) const
+{
+    if (xmlStrEqual(node->name, toXmlStr("word")))
+    {
+        std::string begin = boost::lexical_cast<std::string>(n);
+        ++n;
+        std::string end = boost::lexical_cast<std::string>(n);
+        xmlSetProp(node, xmlStrdup(toXmlStr("begin")),
+            xmlStrdup(toXmlStr(begin.c_str())));
+        xmlSetProp(node, xmlStrdup(toXmlStr("end")),
+            xmlStrdup(toXmlStr(end.c_str())));
+    }
+    else
+    {
+        std::string begin = boost::lexical_cast<std::string>(n);
+        for (xmlNodePtr child = xmlFirstElementChild(node); child;
+            child = xmlNextElementSibling(child))
+        {
+            n = addWordPositions(child, n);
+        }
+        std::string end = boost::lexical_cast<std::string>(n);
+
+        xmlSetProp(node, xmlStrdup(toXmlStr("begin")),
+            xmlStrdup(toXmlStr(begin.c_str())));
+        xmlSetProp(node, xmlStrdup(toXmlStr("end")),
+            xmlStrdup(toXmlStr(end.c_str())));
+    }
+
+    return n;
+}
+
 CorpusReader::EntryIterator ExportXMLCorpusReader::getEntries() const
 {
   return d_private->entries();
@@ -83,7 +114,6 @@ std::string ExportXMLCorpusReader::getName() const
 {
     return d_private->name();
 }
-
 
 std::string ExportXMLCorpusReader::readEntry(std::string const &entry) const
 {
@@ -133,8 +163,6 @@ std::string ExportXMLCorpusReaderPrivate::readEntry(std::string const &entry) co
                 << "']";
     std::string query = queryStream.str();
 
-//std::cerr << query << std::endl;
-
     boost::shared_ptr<xmlXPathObject> xpObj(
         xmlXPathEvalExpression(toXmlStr(query.c_str()), xpCtx.get()),
         xmlXPathFreeObject);
@@ -149,8 +177,29 @@ std::string ExportXMLCorpusReaderPrivate::readEntry(std::string const &entry) co
         throw Error(std::string("Could not find entry"));
 
     xmlNodePtr node = nodeSet->nodeTab[0];
+
+    boost::shared_ptr<xmlNode> treeNode(
+        xmlNewNode(NULL, xmlStrdup(toXmlStr("tueba_tree"))), xmlFreeNode);
+    if (!treeNode)
+        throw Error(std::string("Cannot create wrapper node"));
+
+    xmlNodePtr copyNode = xmlCopyNode(node, 1);
+    if (!copyNode)
+        throw Error(std::string("Cannot copy tree recursively"));
+
+    xmlAddChild(treeNode.get(), copyNode);
+
+    copyNode->name = xmlStrdup(toXmlStr("node"));
+
+    xmlAttrPtr idAttr = xmlHasProp(copyNode, toXmlStr("id"));
+    xmlRemoveProp(idAttr);
+    xmlSetProp(treeNode.get(), xmlStrdup(toXmlStr("id")),
+        xmlStrdup(toXmlStr(entry.c_str())));
+
+    addWordPositions(copyNode, 0);
+
     boost::shared_ptr<xmlBuffer> buffer(xmlBufferCreate(), xmlBufferFree);
-    int r = xmlNodeDump(buffer.get(), doc.get(), node, 0, 1);
+    int r = xmlNodeDump(buffer.get(), doc.get(), treeNode.get(), 0, 1);
     if (r == -1)
       throw Error(std::string("Could not save XML fragment"));
 
@@ -188,7 +237,6 @@ ExportXMLCorpusReaderPrivate::ExportIter::ExportIter(boost::shared_ptr<xmlDoc> d
                 xmlGetProp(node, toXmlStr("id")), xmlFree);
             if (!ident)
                 continue; // XXX: warn?
-            std::cerr << fromXmlStr(ident.get()) << std::endl;
             d_entries.insert(fromXmlStr(ident.get()));
         }
     }
