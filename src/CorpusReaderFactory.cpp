@@ -7,6 +7,7 @@
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/DirectoryCorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/ExportXMLCorpusReader.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
 #include <config.hh>
@@ -36,6 +37,10 @@ namespace alpinocorpus {
 
         try {
             return new CompactCorpusReader(corpusPath);
+        } catch (OpenError const &) {}
+
+        try {
+            return new ExportXMLCorpusReader(corpusPath);
         } catch (OpenError const &) {}
 
 #if defined(USE_DBXML)

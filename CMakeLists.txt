@@ -132,6 +132,7 @@ set(HEADERS
   include/AlpinoCorpus/DirectoryCorpusReader.hh
   include/AlpinoCorpus/DLLDefines.hh
   include/AlpinoCorpus/Error.hh
+  include/AlpinoCorpus/ExportXMLCorpusReader.hh
   include/AlpinoCorpus/IterImpl.hh
   include/AlpinoCorpus/CompactCorpusReader.hh
   include/AlpinoCorpus/LexItem.hh
@@ -171,6 +172,7 @@ set(SOURCES
   src/DzOstream.cpp
   src/DzOstreamBuf.cpp
   src/Error.cpp
+  src/ExportXMLCorpusReader.cpp
   src/FilterIter.cpp
   src/CompactCorpusReader.cpp
   src/CompactCorpusReaderPrivate.cpp
