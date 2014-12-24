@@ -8,6 +8,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <AlpinoCorpus/CorpusInfo.hh>
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/LexItem.hh>
@@ -112,7 +113,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     std::vector<LexItem> sentence(std::string const &entry,
       std::string const &query, std::string const &attribute,
       std::string const &defaultValue,
-      std::string const &wordAttr) const;
+      CorpusInfo const &corpusInfo) const;
 
     /** The treebank  type. For now, this is defined to be the name of the root
      *  element, e.g. 'alpino_ds' for Alpino treebanks. */
@@ -126,7 +127,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual std::string getName() const = 0;
     virtual std::vector<LexItem> getSentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
-        std::string const &defaultValue, std::string const &wordAttr) const;
+        std::string const &defaultValue, CorpusInfo const &corpusInfo) const;
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,

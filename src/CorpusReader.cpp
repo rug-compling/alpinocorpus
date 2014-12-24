@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
+#include <AlpinoCorpus/CorpusInfo.hh>
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
@@ -58,7 +59,7 @@ namespace {
         std::tr1::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth,
         std::string const &attribute,
         std::string const &defaultValue,
-        std::string const &wordAttr)
+        alpinocorpus::CorpusInfo const &corpusInfo)
     {
         std::vector<alpinocorpus::LexItem> items;
 
@@ -70,8 +71,8 @@ namespace {
         }
 
         std::ostringstream oss;
-        oss << "//node[@" << wordAttr << "]|";
-        oss << "//word[@" << wordAttr << "]";
+        oss << "//" << corpusInfo.lexicalElement() <<
+          "[@" << corpusInfo.tokenAttribute() << "]";
         std::string lexNodeQuery = oss.str();
 
         boost::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
@@ -238,7 +239,7 @@ namespace alpinocorpus {
     std::vector<LexItem> CorpusReader::getSentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
         std::string const &defaultValue,
-        std::string const &wordAttr) const
+        CorpusInfo const &corpusInfo) const
     {
         std::vector<std::string> queries;
         boost::split_regex(queries, query, boost::regex("\\+\\|\\+"));
@@ -292,10 +293,12 @@ namespace alpinocorpus {
         {
             for (int i = 0; i < nodeSet->nodeNr; ++i)
               if (nodeSet->nodeTab[i]->type == XML_ELEMENT_NODE)
-                  markLexicals(nodeSet->nodeTab[i], &matchDepth, i, wordAttr);
+                  markLexicals(nodeSet->nodeTab[i], &matchDepth, i,
+                      corpusInfo.tokenAttribute());
         }
 
-        std::vector<LexItem> items = collectLexicals(doc, matchDepth, attribute, defaultValue, wordAttr);
+        std::vector<LexItem> items = collectLexicals(doc, matchDepth,
+            attribute, defaultValue, corpusInfo);
 
         return items;
     }
@@ -458,9 +461,9 @@ namespace alpinocorpus {
 
     std::vector<LexItem> CorpusReader::sentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
-        std::string const &defaultValue, std::string const &wordAttr) const
+        std::string const &defaultValue, CorpusInfo const &corpusInfo) const
     {
-        return getSentence(entry, query, attribute, defaultValue, wordAttr);
+        return getSentence(entry, query, attribute, defaultValue, corpusInfo);
     }
 
     std::string CorpusReader::type() const {
