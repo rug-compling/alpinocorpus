@@ -252,7 +252,7 @@ namespace alpinocorpus {
 
         if (!q.empty())
         {
-            MarkerQuery marker(q, "active", "1");
+            MarkerQuery marker(q, "alpinocorpusActive", "1");
             markers.push_back(marker);
         }
         std::string xmlData(read(entry, markers));
@@ -279,7 +279,8 @@ namespace alpinocorpus {
         }
 
         boost::shared_ptr<xmlXPathObject> xpObj(
-            xmlXPathEvalExpression(toXmlStr("//word[@active='1']|//ne[@active='1']|//node[@active='1']"), xpCtx.get()),
+            xmlXPathEvalExpression(toXmlStr("//*[@alpinocorpusActive='1']"),
+                xpCtx.get()),
             xmlXPathFreeObject);
         if (xpObj == 0) {
             //qDebug() << "Could not make XPath expression to select active nodes.";
