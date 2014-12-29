@@ -531,7 +531,7 @@ namespace alpinocorpus {
         
         // Compile expression
         boost::shared_ptr<xmlXPathCompExpr> r(
-            xmlXPathCtxtCompile(ctx.get(), reinterpret_cast<xmlChar const *>(query.c_str())),
+            xmlXPathCtxtCompile(ctx.get(), toXmlStr(query.c_str())),
             xmlXPathFreeCompExpr);
         
         if (!r)
