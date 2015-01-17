@@ -1,9 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
-
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -22,9 +21,7 @@ using alpinocorpus::CorpusReader;
 using alpinocorpus::Entry;
 using alpinocorpus::Either;
 
-namespace tr1 = std::tr1;
-
-void listCorpus(tr1::shared_ptr<CorpusReader> reader,
+void listCorpus(boost::shared_ptr<CorpusReader> reader,
   std::string const &query)
 {
   CorpusReader::EntryIterator i;
@@ -38,7 +35,7 @@ void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   }
 }
 
-void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
+void readEntry(boost::shared_ptr<CorpusReader> reader, std::string const &entry)
 {
   std::cout << reader->read(entry);
 }
@@ -83,13 +80,13 @@ int main(int argc, char *argv[])
     return 1;
   }   
  
-  tr1::shared_ptr<CorpusReader> reader;
+  boost::shared_ptr<CorpusReader> reader;
   try {
     if (opts->arguments().size() == 1)
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpus(opts->arguments().at(0), true));
     else
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpora(opts->arguments().begin(),
           opts->arguments().end(), true));
   } catch (std::runtime_error &e) {
@@ -121,7 +118,7 @@ int main(int argc, char *argv[])
   }
 
   Either<std::string, alpinocorpus::Empty> valid =
-    reader->isValidQuery(CorpusReader::XPATH, false, query);
+    reader->isValidQuery(CorpusReader::XQUERY, false, query);
   if (valid.isLeft()) {
     std::cerr << "Invalid (or unwanted) query: " << query << std::endl << std::endl;
     std::cerr << valid.left() << std::endl;

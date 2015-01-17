@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 template <typename T>
 class EqualsPrevious : public std::unary_function<T, bool>
@@ -23,7 +23,7 @@ public:
   }
 
   // operator() is often expected to be const.
-  mutable std::tr1::shared_ptr<T> d_previous;
+  mutable boost::shared_ptr<T> d_previous;
 };
 
 template <typename T>

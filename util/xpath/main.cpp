@@ -2,11 +2,10 @@
 #include <stdexcept>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
-
-#include <tr1/unordered_set>
+#include <boost/tr1/unordered_set.hpp>
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -31,8 +30,9 @@ using alpinocorpus::LexItem;
 namespace bf = boost::filesystem;
 namespace tr1 = std::tr1;
 
-void listCorpus(tr1::shared_ptr<CorpusReader> reader,
-  std::string const &query, bool bracketed = false)
+void listCorpus(boost::shared_ptr<CorpusReader> reader,
+  std::string const &query, bool bracketed = false,
+  std::string attribute = "word")
 {
   CorpusReader::EntryIterator i;
   
@@ -53,7 +53,8 @@ void listCorpus(tr1::shared_ptr<CorpusReader> reader,
       if (bracketed) {
         std::cout << " ";
 
-        std::vector<LexItem> items = reader->sentence(entry.name, query);
+        std::vector<LexItem> items = reader->sentence(entry.name, query,
+            attribute, "_missing_");
 
         size_t prevDepth = 0;
         for (std::vector<LexItem>::const_iterator itemIter = items.begin();
@@ -96,7 +97,7 @@ void listCorpus(tr1::shared_ptr<CorpusReader> reader,
   }
 }
 
-void readEntry(tr1::shared_ptr<CorpusReader> reader, std::string const &entry)
+void readEntry(boost::shared_ptr<CorpusReader> reader, std::string const &entry)
 {
   std::cout << reader->read(entry);
 }
@@ -105,6 +106,7 @@ void usage(std::string const &programName)
 {
     std::cerr << "Usage: " << programName << " [OPTION] treebank(s)" <<
       std::endl << std::endl <<
+      "  -a attr\tLexical attribute to show (default: word)" << std::endl <<
       "  -m filename\tLoad macro file" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
       "  -s\t\tInclude a bracketed sentence" << std::endl << std::endl;
@@ -115,7 +117,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "m:q:s"));
+      "a:m:q:s"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -127,18 +129,23 @@ int main(int argc, char *argv[])
     return 1;
   }
  
-  tr1::shared_ptr<CorpusReader> reader;
+  boost::shared_ptr<CorpusReader> reader;
   try {
     if (opts->arguments().size() == 1)
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpus(opts->arguments().at(0), true));
     else
-      reader = tr1::shared_ptr<CorpusReader>(
+      reader = boost::shared_ptr<CorpusReader>(
         openCorpora(opts->arguments().begin(),
           opts->arguments().end(), true));
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;
+  }
+
+  std::string attr = "word";
+  if (opts->option('a')) {
+      attr = opts->optionValue('a');
   }
 
   alpinocorpus::Macros macros;
@@ -166,7 +173,7 @@ int main(int argc, char *argv[])
   }
   
   try {
-      listCorpus(reader, query, opts->option('s'));
+      listCorpus(reader, query, opts->option('s'), attr);
   } catch (std::runtime_error const &e) {
       std::cerr << opts->programName() <<
       ": error listing treebank: " << e.what() << std::endl;

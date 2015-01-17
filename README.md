@@ -1,8 +1,6 @@
-libalpino_corpus
-================
+# libalpino_corpus
 
-Introduction
-------------
+## Introduction
 
 This library provides a generic interface to XML treebanks. An XML
 treebank is a directory structure with XML files representing parser
@@ -23,14 +21,7 @@ This library evolved from the libcorpus library of the Alpino parser,
 adding query-based iteration, support for Berkeley DB XML treebanks,
 and a Qt-ish API.
 
-ABI/API
--------
-
-We aim for ABI/API stability accross y versions in x.y.z. The C API
-(capi.h), Python, and Ruby bindings are not API/ABI stable yet.
-
-Design
-------
+## Design
 
 Nearly all functionality is modelled as C++ classes using RAII, meaning
 that memory is managed by virtue of construction/destruction. Where
@@ -38,14 +29,26 @@ necessary, errors are reported as exceptions. Language-specific wrappers
 can catch exceptions and translate them to the language's native error
 reporting method.
 
-Documentation
--------------
+## Documentation
 
 Documentation for this library can be obtained by running 'doxygen' in
 the root of the source archive.
 
-Compilation
------------
+## Downloading
+
+Pre-built binaries for Ubuntu are available from the Dact PPA:
+
+https://launchpad.net/~danieldk/+archive/dact
+
+On Mac OS X, alpinocorpus (including dependencies) can be compiled easily
+using [Homebrew](http://mxcl.github.io/homebrew/):
+
+~~~
+$ brew tap rug-compling/homebrew
+$ brew install alpinocorpus
+~~~
+
+## Compilation
 
 Requirements
 
@@ -55,32 +58,30 @@ Requirements
 - libxml2
 - libxslt
 
-Execute 'cmake .', followed by 'make' in the source directory.
+Execute *cmake .*, followed by *make* in the source directory.
 
-Bindings
---------
+## Bindings
 
 Bindings for Python 2 and 3 are available from:
 
-  http://github.com/rug-compling/alpinocorpus-python
+http://github.com/rug-compling/alpinocorpus-python
 
 Bindings for Go are available from:
 
-  http://github.com/rug-compling/alpinocorpus-go
+http://github.com/rug-compling/alpinocorpus-go
 
 
-Contributors
-------------
+## Contributors
 
-Daniël de Kok <me@danieldk.eu>
-Jelmer van der Linde <jelmer@ikhoefgeen.nl>
-Lars Buitinck <larsmans@gmail.com>
-Peter Kleiweg <p.c.j.kleiweg@rug.nl>
+* Daniël de Kok &lt;me@danieldk.eu&gt;
+* Jelmer van der Linde &lt;jelmer@ikhoefgeen.nl&gt;
+* Lars Buitinck &lt;larsmans@gmail.com&gt;
+* Peter Kleiweg &lt;p.c.j.kleiweg@rug.nl&gt;
 
-License
--------
+## License
 
-Copyright 2010-2012 Daniël de Kok
+~~~
+Copyright 2010-2013 Daniël de Kok
 Copyright 2010-2012 University of Groningen
 
 This library is free software; you can redistribute it and/or
@@ -97,3 +98,4 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the 
 Free Software Foundation, Inc.,  51 Franklin Street, Fifth Floor,
 Boston, MA  02110-1301  USA
+~~~

@@ -4,11 +4,9 @@
 #include <stdexcept>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
-
 #include <boost/tr1/unordered_map.hpp>
-
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/macros.hh>
@@ -23,7 +21,7 @@ namespace tr1 = std::tr1;
 
 typedef tr1::unordered_map<std::string, size_t> ValueCounts;
 
-ValueCounts countQuery(tr1::shared_ptr<CorpusReader> reader,
+ValueCounts countQuery(boost::shared_ptr<CorpusReader> reader,
     std::string const &query)
 {
     CorpusReader::EntryIterator i;
@@ -36,7 +34,7 @@ ValueCounts countQuery(tr1::shared_ptr<CorpusReader> reader,
   return counts;
 }
 
-void printFrequencies(tr1::shared_ptr<CorpusReader> reader,
+void printFrequencies(boost::shared_ptr<CorpusReader> reader,
     ValueCounts const &counts, bool relative)
 {
     if (relative)
@@ -85,13 +83,13 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    tr1::shared_ptr<CorpusReader> reader;
+    boost::shared_ptr<CorpusReader> reader;
     try {
         if (opts->arguments().size() == 1)
-          reader = tr1::shared_ptr<CorpusReader>(
+          reader = boost::shared_ptr<CorpusReader>(
             openCorpus(opts->arguments().at(0), true));
         else
-          reader = tr1::shared_ptr<CorpusReader>(
+          reader = boost::shared_ptr<CorpusReader>(
             openCorpora(opts->arguments().begin() + 1, 
                 opts->arguments().end(), true));
     } catch (std::runtime_error &e) {

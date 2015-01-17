@@ -3,6 +3,7 @@
 #include <string>
 #include <utility>
 
+#include <boost/shared_ptr.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
 #include <boost/filesystem.hpp>
@@ -86,8 +87,12 @@ size_t MultiCorpusReaderPrivate::getSize() const
 void MultiCorpusReaderPrivate::push_back(std::string const &name,
     std::string const &filename, bool recursive)
 {
-  d_corpora.push_back(std::make_pair(filename, recursive));
-  d_corporaMap[name] = std::make_pair(filename, recursive); // XXX - exists check?
+    bf::path corpusPath(filename);
+    if (!bf::exists(corpusPath))
+      throw OpenError(filename);
+
+    d_corpora.push_back(std::make_pair(filename, recursive));
+    d_corporaMap[name] = std::make_pair(filename, recursive); // XXX - exists check?
 }
 
 std::pair<std::string, bool> MultiCorpusReaderPrivate::corpusFromPath(
@@ -296,12 +301,33 @@ double MultiCorpusReaderPrivate::MultiIter::progress()
 Either<std::string, Empty> MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
     std::string const &query) const
 {
-        try {
-            DbXml::XmlQueryContext ctx = d_mgr.createQueryContext();
-            d_mgr.prepare(query, ctx);
-        } catch (DbXml::XmlException const &e) {
-            return Either<std::string, Empty>::left(e.what());
+        // Prefer to validate the query on an actual corpus.
+        if (d_corporaMap.begin() != d_corporaMap.end())
+        {
+            try {
+                std::pair<std::string, bool> p = d_corporaMap.begin()->second;
+                boost::shared_ptr<CorpusReader> reader;
+                if (p.second)
+                    reader.reset(CorpusReaderFactory::openRecursive(p.first));
+                else
+                    reader.reset(CorpusReaderFactory::open(p.first));
+
+                Either<std::string, Empty> result = reader->isValidQuery(d, variables, query);
+
+                return result;
+            } catch (OpenError const &)
+            {
+            }
         }
+        else {
+            try {
+                DbXml::XmlQueryContext ctx = d_mgr.createQueryContext();
+                d_mgr.prepare(query, ctx);
+            } catch (DbXml::XmlException const &e) {
+                return Either<std::string, Empty>::left(e.what());
+            }
+        }
+
         return Either<std::string, Empty>::right(Empty());
 #endif
 }

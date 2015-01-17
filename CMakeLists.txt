@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(AlpinoCorpus)
 
-set (ALPINOCORPUS_VERSION "2.0.3")
+set (ALPINOCORPUS_VERSION "2.2.0")
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
@@ -43,13 +43,7 @@ if(BOOST_ROOT)
   set(Boost_NO_SYSTEM_PATHS ON)
 endif()
 
-option(WITH_RUBY
-  "Compile Ruby bindings" OFF)
-
 option(USE_REMOTE_CORPUS "Enable remote corpus" OFF)
-
-include(GNUInstallDirs REQUIRED)
-
 include(GNUInstallDirs REQUIRED)
 
 if(USE_REMOTE_CORPUS)
@@ -142,7 +136,6 @@ set(HEADERS
   include/AlpinoCorpus/LexItem.hh
   include/AlpinoCorpus/capi.h
   include/AlpinoCorpus/macros.hh
-  include/AlpinoCorpus/tr1wrap/memory.hh
   include/AlpinoCorpus/util/Either.hh
   src/CompactCorpusWriterPrivate.hh
   src/DirectoryCorpusReaderPrivate.hh
@@ -230,7 +223,7 @@ add_library(alpino_corpus SHARED
 )
 
 set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
-  SOVERSION 2.0)
+  SOVERSION 2.2)
 
 target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
@@ -282,9 +275,5 @@ add_executable(readers_available test/readers_available.cpp)
 target_link_libraries(readers_available alpino_corpus)
 
 add_subdirectory(util)
-
-if(WITH_RUBY)
-  add_subdirectory(bindings/ruby)
-endif()
 
 add_subdirectory(resources)

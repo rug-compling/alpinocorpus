@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 extern "C" {
 #include <libxslt/xsltInternals.h>
@@ -22,7 +22,7 @@ private:
     XSLTransformer &operator=(XSLTransformer const &other);
     void initWithStylesheet(std::string const &xslt);
 
-    std::tr1::shared_ptr<xsltStylesheet> d_xslPtr;
+    boost::shared_ptr<xsltStylesheet> d_xslPtr;
 };
 
 }

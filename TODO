@@ -1,0 +1,4 @@
+* Since CorpusReader::Sentence now allows for extraction of any attribute,
+  the 'word' field of LexItem should be named differently.
+* Maybe generalize CorpusReader::Sentence even more: allow extraction of
+  multiple attributes?

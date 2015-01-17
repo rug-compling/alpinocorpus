@@ -1,0 +1,41 @@
+.TH "ALPINOCORPUS\-GET" "1" "Oct 8, 2014" "" ""
+.SH NAME
+.PP
+\f[B]alpinocorpus\-get\f[] \-\- Print Alpino treebank entry to stdout
+.SH SYNOPSIS
+.PP
+\f[B]alpinocorpus\-get\f[] [\f[I]options\f[]] \f[I]treebank\f[]
+\f[I]entry\f[]
+.SH DESCRIPTION
+.PP
+The \f[B]alpinocorpus\-get\f[] utility outputs a treebank entry to
+stdout.
+An XPath query can be used to mark nodes.
+.PP
+The following options are available:
+.TP
+.B \f[C]\-a\f[] \f[I]ATTRIBUTE\f[]
+Mark nodes selected with \[aq]q\[aq] with \f[I]ATTRIBUTE\f[].
+.RS
+.RE
+.TP
+.B \f[C]\-m\f[] \f[I]MACROFILE\f[]
+Load macros from \f[I]MACROFILE\f[].
+.RS
+.RE
+.TP
+.B \f[C]\-q\f[] \f[I]QUERY\f[]
+Mark nodes in the output using \f[I]QUERY\f[] (XPath 2.0).
+.RS
+.RE
+.TP
+.B \f[C]\-v\f[] \f[I]VALUE\f[]
+Mark nodes selected with \[aq]q\[aq] with \f[I]VALUE\f[].
+.RS
+.RE
+.SH SEE ALSO
+.PP
+alpinocorpus\-create(1), alpinocorpus\-stats(1),
+alpinocorpus\-xquery(1), alpinocorpus\-xslt(1)
+.SH AUTHORS
+Daniel de Kok.

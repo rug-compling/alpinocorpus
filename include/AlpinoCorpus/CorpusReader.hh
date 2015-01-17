@@ -6,7 +6,7 @@
 #include <queue>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/DLLDefines.hh>
 #include <AlpinoCorpus/IterImpl.hh>
@@ -48,7 +48,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
       private:
         void copy(EntryIterator const &other);
 
-        std::tr1::shared_ptr<IterImpl> d_impl;
+        boost::shared_ptr<IterImpl> d_impl;
     };
     
     struct MarkerQuery {
@@ -100,8 +100,18 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     std::string read(std::string const &entry,
       std::list<MarkerQuery> const &queries = std::list<MarkerQuery>()) const;
 
+    /**
+     * Retrieve a sentence. The sentence is returned as a list of lexical
+     * items, where each item contains the (query) match depth. The
+     * attribute that should be returned can also be specified (such as
+     * 'word' for words).
+     *
+     * Note: in the future we might change LexItem to contain all
+     * attribute/value pairs.
+     */
     std::vector<LexItem> sentence(std::string const &entry,
-      std::string const &query) const;
+      std::string const &query, std::string const &attribute,
+      std::string const &defaultValue) const;
 
     /** The number of entries in the corpus. */
     size_t size() const;
@@ -110,7 +120,8 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator getEntries() const = 0;
     virtual std::string getName() const = 0;
     virtual std::vector<LexItem> getSentence(std::string const &entry,
-        std::string const &query) const;
+        std::string const &query, std::string const &attribute,
+        std::string const &defaultValue) const;
     virtual size_t getSize() const = 0;
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,

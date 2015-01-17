@@ -1,7 +1,7 @@
 #include <string>
 #include <typeinfo>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -9,7 +9,9 @@
 
 #include "FilterIter.hh"
 
+#include <xercesc/dom/DOM.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
+
 #include <xqilla/functions/FunctionString.hpp>
 #include <xqilla/utils/XQillaPlatformUtils.hpp>
 #include <xqilla/xqilla-simple.hpp>
@@ -28,8 +30,19 @@ namespace alpinocorpus {
         d_itr(itr),
         d_initialState(true)
     {
+        // Create an emptry document and associate namespace resolvers with it.
+        AutoDelete<xercesc::DOMDocument> document(
+            xercesc::DOMImplementation::getImplementation()->createDocument());
+        AutoDelete<xercesc::DOMXPathNSResolver> resolver(
+            document->createNSResolver(document->getDocumentElement()));
+        resolver->addNamespaceBinding(X("fn"),
+            X("http://www.w3.org/2005/xpath-functions"));
+        resolver->addNamespaceBinding(X("xs"),
+            X("http://www.w3.org/2001/XMLSchema"));
+
         DynamicContext *ctx = s_xqilla.createContext(XQilla::XPATH2);
         ctx->setXPath1CompatibilityMode(true);
+        ctx->setNSResolver(resolver);
 
         try {
             d_query.reset(s_xqilla.parse(X(query.c_str()), ctx));
@@ -95,7 +108,7 @@ namespace alpinocorpus {
     {
         std::string xml(d_corpus.read(file));
 
-        std::tr1::shared_ptr<DynamicContext> ctx(d_query->createDynamicContext());
+        boost::shared_ptr<DynamicContext> ctx(d_query->createDynamicContext());
         XERCES_CPP_NAMESPACE::MemBufInputSource xmlInput(
             reinterpret_cast<XMLByte const *>(xml.c_str()),
             xml.size(), "input");

@@ -3,7 +3,7 @@
 #include <string>
 #include <utility>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
+#include <boost/shared_ptr.hpp>
 
 #include <boost/filesystem.hpp>
 #include <boost/tr1/unordered_map.hpp>
@@ -62,10 +62,10 @@ private:
 
     size_t d_totalIters;
     std::list<ReaderIter> d_iters;
-    std::tr1::shared_ptr<CorpusReader> d_currentReader;
-    std::tr1::shared_ptr<CorpusReader::EntryIterator> d_currentIter;
+    boost::shared_ptr<CorpusReader> d_currentReader;
+    boost::shared_ptr<CorpusReader::EntryIterator> d_currentIter;
 #if defined(BOOST_HAS_THREADS)
-    std::tr1::shared_ptr<boost::mutex> d_currentIterMutex;
+    boost::shared_ptr<boost::mutex> d_currentIterMutex;
 #endif
     std::string d_currentName;
     bool d_hasQuery;

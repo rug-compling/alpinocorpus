@@ -1,8 +1,7 @@
 #include <list>
 #include <string>
 
-#include <AlpinoCorpus/tr1wrap/memory.hh>
-
+#include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -32,7 +31,7 @@ public:
 
 private:
   bf::path d_directory;
-  std::tr1::shared_ptr<MultiCorpusReader> d_multiReader;
+  boost::shared_ptr<MultiCorpusReader> d_multiReader;
 };
 
 

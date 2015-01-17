@@ -1,16 +1,16 @@
-.TH ALPINOCORPUS-XQUERY 1 "Nov 19, 2012" 
+.TH "ALPINOCORPUS\-XQUERY" "1" "Nov 19, 2012" "" ""
 .SH NAME
 .PP
-\f[B]alpinocorpus-xquery\f[] -- Apply an XQuery program to an Alpino
+\f[B]alpinocorpus\-xquery\f[] \-\- Apply an XQuery program to an Alpino
 treebank
 .SH SYNOPSIS
 .PP
-\f[B]alpinocorpus-xquery\f[] [\f[I]options\f[]] \f[I]treebank ...\f[]
+\f[B]alpinocorpus\-xquery\f[] [\f[I]options\f[]] \f[I]treebank ...\f[]
 .SH DESCRIPTION
 .PP
-The \f[B]alpinocorpus-xquery\f[] utility runs an XQuery program on each
+The \f[B]alpinocorpus\-xquery\f[] utility runs an XQuery program on each
 \f[I]treebank\f[].
-If \f[I]treebank\f[] is a directory, then \f[B]alpinocorpus-xquery\f[]
+If \f[I]treebank\f[] is a directory, then \f[B]alpinocorpus\-xquery\f[]
 will apply the program to each treebank below that directory.
 .PP
 Since an XQuery program normally specifies that collection that it
@@ -20,23 +20,23 @@ Note that the program is applied to each treebank.
 .PP
 The following options are available:
 .TP
-.B \f[C]-f\f[] \f[I]XQUERY_PROGRAM\f[]
+.B \f[C]\-f\f[] \f[I]XQUERY_PROGRAM\f[]
 Read XQuery program from the file \f[I]XQUERY_PROGRAM\f[].
 .RS
 .RE
 .TP
-.B \f[C]-m\f[] \f[I]MACROFILE\f[]
+.B \f[C]\-m\f[] \f[I]MACROFILE\f[]
 Load macros from \f[I]MACROFILE\f[].
 .RS
 .RE
 .TP
-.B \f[C]-q\f[] \f[I]QUERY\f[]
+.B \f[C]\-q\f[] \f[I]QUERY\f[]
 Only show entries that match \f[I]QUERY\f[] (XPath 2.0).
 .RS
 .RE
 .SH SEE ALSO
 .PP
-alpinocorpus-create(1), alpinocorpus-stats(1), alpinocorpus-xpath(1),
-alpinocorpus-xslt(1)
+alpinocorpus\-create(1), alpinocorpus\-get(1), alpinocorpus\-stats(1),
+alpinocorpus\-xpath(1), alpinocorpus\-xslt(1)
 .SH AUTHORS
 Daniel de Kok.
