@@ -1,14 +1,14 @@
 Source: alpino-corpus
 Priority: extra
 Maintainer: Daniël de Kok <me@danieldk.eu>
-Build-Depends: cdbs (>= 0.4.100), debhelper (>= 9.20120115~), libboost1.54-dev (>= 1.54), libboost-chrono1.54-dev (>= 1.54), libboost-filesystem1.54-dev (>= 1.54), libboost-regex1.54-dev(>= 1.54), libboost-system1.54-dev (>= 1.54), libboost-thread1.54-dev (>= 1.54), cmake (>= 2.8.0), cdbs (>= 0.4.62), libxqilla2.2-dev, libxerces-c-dev, libdbxml-dev (>= 2.5.16), libxml2-dev (>= 2.7.8), libxslt1-dev (>= 1.1.26-7), zlib1g-dev (>= 1.2.3)
+Build-Depends: cdbs (>= 0.4.100), debhelper (>= 9.20120115~), libboost1.54-dev (>= 1.54), libboost-chrono1.54-dev (>= 1.54), libboost-date-time1.54-dev (>= 1.54), libboost-filesystem1.54-dev (>= 1.54), libboost-iostreams1.54-dev (>= 1.54), libboost-regex1.54-dev(>= 1.54), libboost-system1.54-dev (>= 1.54), libboost-thread1.54-dev (>= 1.54), cmake (>= 2.8.0), cdbs (>= 0.4.62), libxqilla2.2-dev, libxerces-c-dev, libdbxml-dev (>= 2.5.16), libxml2-dev (>= 2.7.8), libxslt1-dev (>= 1.1.26-7), zlib1g-dev (>= 1.2.3)
 Standards-Version: 3.9.5
 Section: libs
 Homepage: http://github.com/rug-compling/dact
 Vcs-Git: git://github.com/rug-compling/alpinocorpus.git
 Vcs-Browser: https://github.com/rug-compling/alpinocorpus
 
-Package: libalpino-corpus2.0
+Package: libalpino-corpus2.2
 Section: libs
 Suggests: libalpino-corpus-dev, alpino-corpus-util
 Architecture: any
@@ -22,7 +22,7 @@ Package: libalpino-corpus-dev
 Section: libdevel
 Architecture: any
 Pre-Depends: multiarch-support
-Depends: libdbxml-dev (>= 2.5.16), zlib1g-dev, libalpino-corpus2.0 (= ${binary:Version}), ${misc:Depends}
+Depends: libdbxml-dev (>= 2.5.16), zlib1g-dev, libalpino-corpus2.2 (= ${binary:Version}), ${misc:Depends}
 Description: Library for processing XML-based treebanks (development headers)
  AlpinoCorpus is a library for processing XML-based treebanks. It can read
  XML corpora in various formats and provides querying facilities.
