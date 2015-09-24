@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cstring>
 #include <list>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -10,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/tr1/unordered_map.hpp>
 
+#include <AlpinoCorpus/CorpusInfo.hh>
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
@@ -26,6 +28,7 @@
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/MemBufFormatTarget.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
+#include <xercesc/util/TransService.hpp>
 
 #include <xqilla/xqilla-dom3.hpp>
 
@@ -55,7 +58,8 @@ namespace {
         boost::shared_ptr<xmlDoc> doc,
         std::tr1::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth,
         std::string const &attribute,
-        std::string const &defaultValue)
+        std::string const &defaultValue,
+        alpinocorpus::CorpusInfo const &corpusInfo)
     {
         std::vector<alpinocorpus::LexItem> items;
 
@@ -66,8 +70,13 @@ namespace {
             return items;
         }
 
+        std::ostringstream oss;
+        oss << "//" << corpusInfo.lexicalElement() <<
+          "[@" << corpusInfo.tokenAttribute() << "]";
+        std::string lexNodeQuery = oss.str();
+
         boost::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
-            toXmlStr("//node[@word]"), xpCtx.get()), xmlXPathFreeObject);
+            toXmlStr(lexNodeQuery.c_str()), xpCtx.get()), xmlXPathFreeObject);
         if (xpObj == 0)
             return items;
 
@@ -122,21 +131,23 @@ namespace {
     // a drag. Since we do not modify the tree, we can keep the counts by
     // memory adres. Ugly, but effective. Don't we love that?
     void markLexicals(xmlNode *node, std::tr1::unordered_map<xmlNode *,
-        std::set<size_t> > *matchDepth, size_t matchId)
+        std::set<size_t> > *matchDepth, size_t matchId, std::string wordAttr)
     {
         // Don't attempt to handle a node that we can't.
         if (node->type != XML_ELEMENT_NODE ||
-              std::strcmp(fromXmlStr(node->name), "node") != 0)
+              (std::strcmp(fromXmlStr(node->name), "node") != 0 &&
+               std::strcmp(fromXmlStr(node->name), "word") != 0 &&
+               std::strcmp(fromXmlStr(node->name), "ne") != 0))
             return;
 
-        xmlAttrPtr wordProp = xmlHasProp(node, toXmlStr("word"));
+        xmlAttrPtr wordProp = xmlHasProp(node, toXmlStr(wordAttr.c_str()));
         if (wordProp != 0)
             (*matchDepth)[node].insert(matchId);
         else // Attempt to recurse...
         {
             for (xmlNodePtr child = node->children;
                 child != NULL; child = child->next)
-              markLexicals(child, matchDepth, matchId);
+              markLexicals(child, matchDepth, matchId, wordAttr);
         }
 
     }
@@ -227,7 +238,8 @@ namespace alpinocorpus {
 
     std::vector<LexItem> CorpusReader::getSentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
-        std::string const &defaultValue) const
+        std::string const &defaultValue,
+        CorpusInfo const &corpusInfo) const
     {
         std::vector<std::string> queries;
         boost::split_regex(queries, query, boost::regex("\\+\\|\\+"));
@@ -240,7 +252,7 @@ namespace alpinocorpus {
 
         if (!q.empty())
         {
-            MarkerQuery marker(q, "active", "1");
+            MarkerQuery marker(q, "alpinocorpusActive", "1");
             markers.push_back(marker);
         }
         std::string xmlData(read(entry, markers));
@@ -267,7 +279,8 @@ namespace alpinocorpus {
         }
 
         boost::shared_ptr<xmlXPathObject> xpObj(
-            xmlXPathEvalExpression(toXmlStr("//node[@active='1']"), xpCtx.get()),
+            xmlXPathEvalExpression(toXmlStr("//*[@alpinocorpusActive='1']"),
+                xpCtx.get()),
             xmlXPathFreeObject);
         if (xpObj == 0) {
             //qDebug() << "Could not make XPath expression to select active nodes.";
@@ -281,10 +294,12 @@ namespace alpinocorpus {
         {
             for (int i = 0; i < nodeSet->nodeNr; ++i)
               if (nodeSet->nodeTab[i]->type == XML_ELEMENT_NODE)
-                  markLexicals(nodeSet->nodeTab[i], &matchDepth, i);
+                  markLexicals(nodeSet->nodeTab[i], &matchDepth, i,
+                      corpusInfo.tokenAttribute());
         }
 
-        std::vector<LexItem> items = collectLexicals(doc, matchDepth, attribute, defaultValue);
+        std::vector<LexItem> items = collectLexicals(doc, matchDepth,
+            attribute, defaultValue, corpusInfo);
 
         return items;
     }
@@ -447,9 +462,49 @@ namespace alpinocorpus {
 
     std::vector<LexItem> CorpusReader::sentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
-        std::string const &defaultValue) const
+        std::string const &defaultValue, CorpusInfo const &corpusInfo) const
     {
-        return getSentence(entry, query, attribute, defaultValue);
+        return getSentence(entry, query, attribute, defaultValue, corpusInfo);
+    }
+
+    std::string CorpusReader::type() const {
+      if (d_type)
+        return *d_type;
+
+      EntryIterator iter = entries();
+      if (!iter.hasNext()) {
+        return "unknown";
+      }
+
+      Entry entry = iter.next(*this);
+      std::string content = read(entry.name);
+
+      // Prepare the DOM parser.
+      xerces::DOMImplementation *xqillaImplementation =
+          xerces::DOMImplementationRegistry::getDOMImplementation(X("XPath2 3.0"));
+      AutoRelease<xerces::DOMLSParser> parser(xqillaImplementation->createLSParser(
+          xerces::DOMImplementationLS::MODE_SYNCHRONOUS, 0));
+        
+      // Parse the document.
+      xerces::MemBufInputSource xmlInput(reinterpret_cast<XMLByte const *>(content.c_str()),
+          content.size(), "input");
+
+      xerces::Wrapper4InputSource domInput(&xmlInput, false);
+
+      xerces::DOMDocument *document;
+      try {
+          document = parser->parse(&domInput);
+      } catch (xerces::DOMException const &e) {
+          throw Error(std::string("Could not parse XML data: ") + UTF8(e.getMessage()));
+      }
+
+      xercesc::TranscodeToStr transcoder(
+          document->getDocumentElement()->getTagName(), "UTF-8");
+
+      const_cast<CorpusReader *>(this)->d_type.reset(
+          new std::string(fromXmlStr(transcoder.str())));
+
+      return *d_type;
     }
     
     size_t CorpusReader::size() const
@@ -476,7 +531,7 @@ namespace alpinocorpus {
         
         // Compile expression
         boost::shared_ptr<xmlXPathCompExpr> r(
-            xmlXPathCtxtCompile(ctx.get(), reinterpret_cast<xmlChar const *>(query.c_str())),
+            xmlXPathCtxtCompile(ctx.get(), toXmlStr(query.c_str())),
             xmlXPathFreeCompExpr);
         
         if (!r)

@@ -125,6 +125,7 @@ configure_file (
 
 set(HEADERS
   include/AlpinoCorpus/CompactCorpusWriter.hh
+  include/AlpinoCorpus/CorpusInfo.hh
   include/AlpinoCorpus/CorpusReader.hh
   include/AlpinoCorpus/CorpusReaderFactory.hh
   include/AlpinoCorpus/CorpusWriter.hh
@@ -160,6 +161,7 @@ set(HEADERS
 set(SOURCES
   src/CompactCorpusWriter.cpp
   src/CompactCorpusWriterPrivate.cpp
+  src/CorpusInfo.cpp
   src/CorpusReader.cpp
   src/CorpusReaderFactory.cpp
   src/CorpusWriter.cpp
