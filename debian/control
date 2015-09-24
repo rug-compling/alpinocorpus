@@ -8,7 +8,7 @@ Homepage: http://github.com/rug-compling/dact
 Vcs-Git: git://github.com/rug-compling/alpinocorpus.git
 Vcs-Browser: https://github.com/rug-compling/alpinocorpus
 
-Package: libalpino-corpus2.2
+Package: libalpino-corpus2.4
 Section: libs
 Suggests: libalpino-corpus-dev, alpino-corpus-util
 Architecture: any
