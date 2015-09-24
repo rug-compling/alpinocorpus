@@ -1,3 +1,9 @@
+alpino-corpus (2.4.0-1trusty1) trusty; urgency=medium
+
+  * New upstream release.
+
+ -- Daniel de Kok <me@danieldk.eu>  Thu, 24 Sep 2015 12:30:02 +0200
+
 alpino-corpus (2.2.0-1trusty1) trusty; urgency=medium
 
   * New upstream release.
