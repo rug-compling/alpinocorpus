@@ -1,3 +1,9 @@
+alpino-corpus (2.4.0-1trusty4) trusty; urgency=medium
+
+  * Fix included libraries and directories.
+
+ -- Daniël de Kok <me@danieldk.eu>  Thu, 24 Sep 2015 16:21:46 +0200
+
 alpino-corpus (2.4.0-1trusty1) trusty; urgency=medium
 
   * New upstream release.
