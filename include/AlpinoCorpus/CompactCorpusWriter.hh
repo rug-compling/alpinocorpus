@@ -16,11 +16,10 @@ public:
     CompactCorpusWriter(std::string const &basename);
     virtual ~CompactCorpusWriter();
 
-protected:
-    void writeEntry(std::string const &name, std::string const &content);
-    void writeEntry(CorpusReader const &corpus, bool failsafe = false);
-
 private:
+    virtual void writeEntry(std::string const &name, std::string const &content);
+    virtual void writeEntry(CorpusReader const &corpus, bool failsafe = false);
+
     CompactCorpusWriterPrivate *d_private;
 };
 
