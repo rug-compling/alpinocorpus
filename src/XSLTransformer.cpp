@@ -30,7 +30,18 @@ void XSLTransformer::initWithStylesheet(std::string const &xsl)
 {
     xmlDocPtr xslDoc = xmlReadMemory(xsl.c_str(), xsl.size(), 0, 0,
         XSLT_PARSE_OPTIONS);
+
+    if (xslDoc == 0)
+    {
+      throw Error("XSLTransformer::initWithStylesheet: Could not read stylesheet as XML data");
+    }
+
     d_xslPtr.reset(xsltParseStylesheetDoc(xslDoc), xsltFreeStylesheet);
+
+    if (!d_xslPtr)
+    {
+      throw Error("XSLTransformer::initWithStylesheet: Could not read stylesheet as XML data");
+    }
 }
 
 std::string XSLTransformer::transform(std::string const &xml) const
