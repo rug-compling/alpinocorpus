@@ -22,6 +22,7 @@ namespace alpinocorpus {
     public:
         /** Open path for writing. */
         DbCorpusWriterPrivate(std::string const &path, bool overwrite);
+        ~DbCorpusWriterPrivate();
         DbXml::XmlUpdateContext &mkUpdateContext(DbXml::XmlUpdateContext &);
         void write(std::string const &, std::string const &, DbXml::XmlUpdateContext &);
         void writeFailFirst(CorpusReader const &, DbXml::XmlUpdateContext &);
@@ -84,6 +85,14 @@ namespace alpinocorpus {
         } catch (db::XmlException const &e) {
             throw OpenError(path, e.what());
         }
+    }
+
+    DbCorpusWriterPrivate::~DbCorpusWriterPrivate()
+    {
+      // Should not been necessary. But in some rare cases, the database
+      // was not correctly written. Maybe a reference counting bug in
+      // DB XML?
+      d_container.sync();
     }
 
     db::XmlUpdateContext &DbCorpusWriterPrivate::mkUpdateContext(
