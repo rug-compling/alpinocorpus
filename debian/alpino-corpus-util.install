@@ -1,4 +1,5 @@
 usr/bin/alpinocorpus-create
+usr/bin/alpinocorpus-extract
 usr/bin/alpinocorpus-stats
 usr/bin/alpinocorpus-xpath
 usr/bin/alpinocorpus-xquery

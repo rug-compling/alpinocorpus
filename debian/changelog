@@ -1,3 +1,10 @@
+alpino-corpus (2.4.1-1xenial1) xenial; urgency=medium
+
+  * Update to alpinocorpus 2.4.1.
+  * Update package for Ubuntu Xenial Xerus.
+
+ -- Daniël de Kok <me@danieldk.eu>  Sun, 19 Jun 2016 19:18:35 +0200
+
 alpino-corpus (2.4.0-1trusty4) trusty; urgency=medium
 
   * Fix included libraries and directories.
