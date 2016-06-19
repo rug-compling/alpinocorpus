@@ -26,13 +26,13 @@ class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
      * be removed, however entries that already exist are overwritten.
      */
     DbCorpusWriter(std::string const &path, bool overwrite);
-    ~DbCorpusWriter();
+    virtual ~DbCorpusWriter();
 
   private:
     /**
      * Will write name as a portable (Unix, UTF-8) pathname.
      */
-    void writeEntry(std::string const &name, std::string const &content);
+    virtual void writeEntry(std::string const &name, std::string const &content);
     
     /**
      * Write the contents of an entire CorpusReader.
@@ -42,7 +42,7 @@ class ALPINO_CORPUS_EXPORT DbCorpusWriter : public CorpusWriter
      *
      * @bug Weakly exception-safe: does not clean up in fail-first mode.
      */
-    void writeEntry(CorpusReader const &corpus, bool failsafe = false);
+    virtual void writeEntry(CorpusReader const &corpus, bool failsafe = false);
 
     DbCorpusWriterPrivate *d_private;
 };
