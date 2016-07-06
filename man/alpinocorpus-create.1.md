@@ -36,5 +36,5 @@ The following options are available:
 SEE ALSO
 ========
 
-alpinocorpus-get(1), alpinocorpus-stats(1), alpinocorpus-xpath(1),
+alpinocorpus-create(1), alpinocorpus-extract(1), alpinocorpus-stats(1),
 alpinocorpus-xquery(1), alpinocorpus-xslt(1)
