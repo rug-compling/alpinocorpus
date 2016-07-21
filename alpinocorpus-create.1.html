@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <meta name="author" content="Daniel de Kok">
   <title>ALPINOCORPUS-CREATE(1)</title>
   <style type="text/css">code{white-space: pre;}</style>
-  <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
   <link rel="stylesheet" href="manpage.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
 <header>
@@ -26,22 +27,18 @@
 <p>The following options are available:</p>
 <dl>
 <dt><code>-c</code> <em>FILENAME</em></dt>
-<dd>Create a compact corpus.
+<dd>Create a compact corpus. <code>-d</code> <em>FILENAME</em>
 </dd>
-<dt><code>-d</code> <em>FILENAME</em></dt>
-<dd>Create a Dact corpus.
+<dd>Create a Dact corpus. <code>-m</code> <em>MACROFILE</em>
 </dd>
-<dt><code>-m</code> <em>MACROFILE</em></dt>
-<dd>Load macros from <em>MACROFILE</em>.
+<dd>Load macros from <em>MACROFILE</em>. <code>-q</code> <em>QUERY</em>
 </dd>
-<dt><code>-q</code> <em>QUERY</em></dt>
-<dd>Only include entries that match <em>QUERY</em> (XPath 2.0).
+<dd>Only include entries that match <em>QUERY</em> (XPath 2.0). <code>-r</code>
 </dd>
-<dt><code>-r</code></dt>
 <dd>If <em>treebank</em> is a directory, include the contents of any Dact corpus below it, rather than including XML files.
 </dd>
 </dl>
 <h1 id="see-also">SEE ALSO</h1>
-<p>alpinocorpus-stats(1), alpinocorpus-xpath(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)</p>
+<p>alpinocorpus-create(1), alpinocorpus-extract(1), alpinocorpus-stats(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)</p>
 </body>
 </html>

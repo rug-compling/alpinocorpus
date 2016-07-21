@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <meta name="author" content="Daniel de Kok">
   <title>ALPINOCORPUS-STATS(1)</title>
   <style type="text/css">code{white-space: pre;}</style>
-  <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
   <link rel="stylesheet" href="manpage.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
 <header>
@@ -26,9 +27,8 @@
 <p>The following options are available:</p>
 <dl>
 <dt><code>-m</code> <em>MACROFILE</em></dt>
-<dd>Load macros from <em>MACROFILE</em>.
+<dd>Load macros from <em>MACROFILE</em>. <code>-p</code>
 </dd>
-<dt><code>-p</code></dt>
 <dd>Print relative frequencies.
 </dd>
 </dl>
@@ -37,6 +37,6 @@
 <pre><code>alpinocorpus-stats &#39;//node[@root=&quot;loop&quot;]/@word/string()&#39; lassy.dact</code></pre>
 <p>will print the frequency of each word in the treebank that has <em>loop</em> as its root.</p>
 <h1 id="see-also">SEE ALSO</h1>
-<p>alpinocorpus-create(1), alpinocorpus-xpath(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)</p>
+<p>alpinocorpus-create(1), alpinocorpus-extract(1), alpinocorpus-stats(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)</p>
 </body>
 </html>
