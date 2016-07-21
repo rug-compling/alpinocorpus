@@ -22,14 +22,23 @@ An XPath query can be applied to use only the entries that match that query.
 The following options are available:
 
 `-c` *FILENAME*
+
 :    Create a compact corpus.
+
 `-d` *FILENAME*
+
 :    Create a Dact corpus.
+
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-q` *QUERY*
+
 :    Only include entries that match *QUERY* (XPath 2.0).
+
 `-r`
+
 :    If *treebank* is a directory, include the contents of any Dact corpus
      below it, rather than including XML files.
 

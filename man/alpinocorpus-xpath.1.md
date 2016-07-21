@@ -22,10 +22,15 @@ be applied to list only the entries that match that query.
 The following options are available:
 
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-q` *QUERY*
+
 :    Only show entries that match *QUERY* (XPath 2.0).
+
 `-s`
+
 :    Print the sentence of each entry, fragments that match the query are
      colored.
 

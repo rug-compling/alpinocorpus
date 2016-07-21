@@ -22,8 +22,11 @@ directory. The supported query format is XPath 2.0.
 The following options are available:
 
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-p`
+
 :    Print relative frequencies.
 
 EXAMPLE

@@ -25,10 +25,15 @@ that the program is applied to each treebank.
 The following options are available:
 
 `-f` *XQUERY_PROGRAM*
+
 :    Read XQuery program from the file *XQUERY_PROGRAM*.
+
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-q` *QUERY*
+
 :    Only show entries that match *QUERY* (XPath 2.0).
 
 SEE ALSO

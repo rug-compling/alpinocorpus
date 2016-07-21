@@ -20,12 +20,19 @@ XPath query can be used to mark nodes.
 The following options are available:
 
 `-a` *ATTRIBUTE*
+
 :    Mark nodes selected with 'q' with *ATTRIBUTE*.
+
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-q` *QUERY*
+
 :    Mark nodes in the output using *QUERY* (XPath 2.0).
+
 `-v` *VALUE*
+
 :    Mark nodes selected with 'q' with *VALUE*.
 
 SEE ALSO

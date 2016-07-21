@@ -22,10 +22,15 @@ should be a XSLT stylesheet.
 The following options are available:
 
 `-g` *ENTRY*
+
 :    Apply the stylesheet to *ENTRY*, rather than each entry in the treebank.
+
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-q` *QUERY*
+
 :    Filter the treebank using *QUERY* (XPath 2.0). Nodes in the XML data
      that match *QUERY* get the attribute-value pair *active=1*.
 
