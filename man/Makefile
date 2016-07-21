@@ -6,7 +6,8 @@ web: alpinocorpus-create.1.html \
 	alpinocorpus-stats.1.html \
 	alpinocorpus-xpath.1.html \
 	alpinocorpus-xquery.1.html \
-	alpinocorpus-xslt.1 alpinocorpus-get.1.html \
+	alpinocorpus-xslt.1.html \
+	alpinocorpus-get.1.html \
 	alpinocorpus-extract.1.html
 
 %.1: %.1.md
