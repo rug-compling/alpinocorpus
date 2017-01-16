@@ -43,7 +43,7 @@ if(BOOST_ROOT)
   set(Boost_NO_SYSTEM_PATHS ON)
 endif()
 
-option(USE_REMOTE_CORPUS "Enable remote corpus" ON)
+option(USE_REMOTE_CORPUS "Enable remote corpus" OFF)
 
 include(GNUInstallDirs REQUIRED)
 
