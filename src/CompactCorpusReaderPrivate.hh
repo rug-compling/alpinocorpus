@@ -63,7 +63,7 @@ public:
     CompactCorpusReaderPrivate(std::string const &dataFilename, std::string const &indexFilename);
     virtual ~CompactCorpusReaderPrivate() {}
 
-    virtual EntryIterator getEntries() const;
+    virtual EntryIterator getEntries(SortOrder sortOrder) const;
     virtual std::string getName() const;
     virtual std::string readEntry(std::string const &filename) const;
     virtual size_t getSize() const;

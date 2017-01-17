@@ -17,7 +17,7 @@ public:
   void push_back(std::string const &name, std::string const &filename,
       bool recursive);
 private:
-  EntryIterator getEntries() const;
+  EntryIterator getEntries(SortOrder sortOrder) const;
   std::string getName() const;
   size_t getSize() const;
   std::string readEntry(std::string const &) const;

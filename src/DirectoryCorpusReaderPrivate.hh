@@ -19,21 +19,6 @@ class DirectoryCorpusReaderPrivate : public CorpusReader
 {
     typedef std::vector<std::string> StrVector;
 
-    class DirIter : public IterImpl
-    {
-        boost::filesystem::recursive_directory_iterator iter;
-        boost::filesystem::path d_directory;
-
-      public:
-        DirIter(boost::filesystem::path const &path,
-            boost::filesystem::recursive_directory_iterator i);
-        IterImpl *copy() const;
-        bool hasNext();
-        Entry next(CorpusReader const &rdr);
-      private:
-        bool isValid();
-    };
-
 public:
     /**
      * Open directory dir for reading.
@@ -41,7 +26,7 @@ public:
     DirectoryCorpusReaderPrivate(std::string const &directory);
     virtual ~DirectoryCorpusReaderPrivate();
 
-    virtual EntryIterator getEntries() const;
+    virtual EntryIterator getEntries(SortOrder sortOrder) const;
     virtual std::string getName() const;
     virtual std::string readEntry(std::string const &entry) const;
     virtual size_t getSize() const;

@@ -20,7 +20,7 @@ public:
       bool dactOnly);
   virtual ~RecursiveCorpusReaderPrivate();
 
-  EntryIterator getEntries() const;
+  EntryIterator getEntries(SortOrder sortOrder) const;
   std::string getName() const;
   size_t getSize() const;
   std::string readEntry(std::string const &) const;
@@ -47,9 +47,9 @@ RecursiveCorpusReader::~RecursiveCorpusReader()
   delete d_private;
 }
 
-CorpusReader::EntryIterator RecursiveCorpusReader::getEntries() const
+CorpusReader::EntryIterator RecursiveCorpusReader::getEntries(SortOrder sortOrder) const
 {
-  return d_private->getEntries();
+  return d_private->getEntries(sortOrder);
 }
 
 std::string RecursiveCorpusReader::getName() const
@@ -125,9 +125,9 @@ RecursiveCorpusReaderPrivate::~RecursiveCorpusReaderPrivate()
 {
 }
 
-CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getEntries() const
+CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::getEntries(SortOrder sortOrder) const
 {
-  return d_multiReader->entries();
+  return d_multiReader->entries(sortOrder);
 }
 
 std::string RecursiveCorpusReaderPrivate::getName() const

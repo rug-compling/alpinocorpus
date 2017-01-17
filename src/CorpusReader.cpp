@@ -188,16 +188,17 @@ namespace alpinocorpus {
     }
     
     
-    CorpusReader::EntryIterator CorpusReader::entries() const
+    CorpusReader::EntryIterator CorpusReader::entries(SortOrder sortOrder) const
     {
-        return getEntries();
+        return getEntries(sortOrder);
     }
 
     CorpusReader::EntryIterator CorpusReader::entriesWithStylesheet(
         std::string const &stylesheet,
-        std::list<MarkerQuery> const &markerQueries) const
+        std::list<MarkerQuery> const &markerQueries,
+        SortOrder sortOrder) const
     {
-        return EntryIterator(new StylesheetIter(getEntries(),
+        return EntryIterator(new StylesheetIter(getEntries(sortOrder),
             stylesheet, markerQueries));
     }
 
@@ -541,7 +542,7 @@ namespace alpinocorpus {
     }
     
     CorpusReader::EntryIterator CorpusReader::query(QueryDialect d,
-        std::string const &q) const
+        std::string const &q, SortOrder sortOrder) const
     {
         if (d == XPATH)
         {
@@ -549,7 +550,7 @@ namespace alpinocorpus {
             boost::split_regex(queries, q, boost::regex("\\+\\|\\+"));
             assert(queries.size() > 0);
 
-            EntryIterator qIter = runXPath(queries[0]);
+            EntryIterator qIter = runXPath(queries[0], sortOrder);
             for (std::vector<std::string>::const_iterator iter = queries.begin() + 1;
                     iter != queries.end(); ++iter)
                 qIter = EntryIterator(new FilterIter(*this, qIter, *iter));
@@ -557,7 +558,7 @@ namespace alpinocorpus {
             return qIter;
         }
         else if (d == XQUERY)
-           return runXQuery(q);
+           return runXQuery(q, sortOrder);
         else
             throw NotImplemented("unknown query language");
     }
@@ -583,13 +584,15 @@ namespace alpinocorpus {
             markerQueries));
     }
 
-    CorpusReader::EntryIterator CorpusReader::runXPath(std::string const &query) const
+    CorpusReader::EntryIterator CorpusReader::runXPath(std::string const &query,
+        SortOrder sortOrder) const
     {        
         //throw NotImplemented(typeid(*this).name(), "XQuery functionality");
-        return EntryIterator(new FilterIter(*this, getEntries(), query));
+        return EntryIterator(new FilterIter(*this, getEntries(sortOrder), query));
     }
 
-    CorpusReader::EntryIterator CorpusReader::runXQuery(std::string const &) const
+    CorpusReader::EntryIterator CorpusReader::runXQuery(std::string const &,
+        SortOrder sortOrder) const
     {
         throw NotImplemented(typeid(*this).name(), "XQuery functionality");
     }
