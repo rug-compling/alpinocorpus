@@ -33,6 +33,10 @@ The following options are available:
 
 :    Load macros from *MACROFILE*.
 
+`-n`
+
+:    Sort entries numerically, if supported by the underlying reader.
+
 `-q` *QUERY*
 
 :    Only include entries that match *QUERY* (XPath 2.0).
