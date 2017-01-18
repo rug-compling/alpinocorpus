@@ -68,7 +68,7 @@ void CompactCorpusReaderPrivate::construct(std::string const &canonical,
     d_name = canonical;
 }
 
-CorpusReader::EntryIterator CompactCorpusReaderPrivate::getEntries() const
+CorpusReader::EntryIterator CompactCorpusReaderPrivate::getEntries(SortOrder sortOrder) const
 {
     ItemVector::const_iterator begin(d_indices.begin());
     return EntryIterator(new IndexIter(begin, d_indices.end()));

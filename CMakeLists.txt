@@ -150,6 +150,7 @@ set(HEADERS
   src/StylesheetIter.hh
   src/XSLTransformer.hh
   src/parseMacros.hh
+  src/util/InfInt.h
   src/util/NameCompare.hh
   src/util/base64.hh
   src/util/bufutil.hh

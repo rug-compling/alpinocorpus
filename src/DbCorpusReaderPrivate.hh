@@ -49,7 +49,7 @@ class DbCorpusReaderPrivate : public CorpusReader
 public:
     DbCorpusReaderPrivate(std::string const &);
     virtual ~DbCorpusReaderPrivate();
-    EntryIterator getEntries() const;
+    EntryIterator getEntries(SortOrder sortOrder) const;
     std::string getName() const;
     size_t getSize() const
     {

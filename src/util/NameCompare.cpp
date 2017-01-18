@@ -5,6 +5,7 @@
 
 #include <boost/filesystem.hpp>
 
+#include "InfInt.h"
 #include "NameCompare.hh"
 #include "parseString.hh"
 
@@ -57,8 +58,8 @@ namespace alpinocorpus {
                 // Both digits? Sort on digits!
             if (std::isdigit(i1[i][0]) && std::isdigit(i2[i][0]))
             {
-                long long int d1 = util::parseString<long long int>(i1[i]);
-                long long int d2 = util::parseString<long long int>(i2[i]);
+                InfInt d1 = util::parseString<InfInt>(i1[i]);
+                InfInt d2 = util::parseString<InfInt>(i2[i]);
 
                 if (d1 != d2)
                     return d1 < d2;

@@ -78,7 +78,7 @@ public:
   MultiCorpusReaderPrivate();
   virtual ~MultiCorpusReaderPrivate();
 
-  EntryIterator getEntries() const;
+  EntryIterator getEntries(SortOrder sortOrder) const;
   std::string getName() const;
   size_t getSize() const;
   void push_back(std::string const &name, std::string const &filename,

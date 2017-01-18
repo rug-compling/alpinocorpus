@@ -17,9 +17,9 @@ DirectoryCorpusReader::~DirectoryCorpusReader()
     delete d_private;
 }
 
-CorpusReader::EntryIterator DirectoryCorpusReader::getEntries() const
+CorpusReader::EntryIterator DirectoryCorpusReader::getEntries(SortOrder sortOrder) const
 {
-    return d_private->getEntries();
+    return d_private->getEntries(sortOrder);
 }
 
 std::string DirectoryCorpusReader::getName() const

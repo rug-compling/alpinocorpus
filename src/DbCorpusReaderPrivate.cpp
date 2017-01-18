@@ -134,7 +134,7 @@ DbCorpusReaderPrivate::~DbCorpusReaderPrivate()
 {
 }
 
-CorpusReader::EntryIterator DbCorpusReaderPrivate::getEntries() const
+CorpusReader::EntryIterator DbCorpusReaderPrivate::getEntries(SortOrder sortOrder) const
 {
     return EntryIterator(new DbIter(container));
 }
