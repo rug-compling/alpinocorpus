@@ -6,6 +6,8 @@
 #include <string>
 #include <typeinfo>
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/assert.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/Error.hh>
@@ -13,6 +15,7 @@
 #include <AlpinoCorpus/IterImpl.hh>
 
 #include "DirectoryCorpusReaderPrivate.hh"
+#include "util/NameCompare.hh"
 #include "util/textfile.hh"
 
 namespace bf = boost::filesystem;
@@ -87,9 +90,8 @@ namespace {
 
     class SortedDirIter : public alpinocorpus::IterImpl
     {
-        std::vector<bf::path> d_entries;
-        std::vector<bf::path>::const_iterator d_iter;
-        boost::filesystem::path d_directory;
+        std::vector<std::string> d_entries;
+        std::vector<std::string>::const_iterator d_iter;
 
       public:
         SortedDirIter(boost::filesystem::path const &path,
@@ -104,11 +106,21 @@ namespace {
     };
 
     SortedDirIter::SortedDirIter(
-        bf::path const &path, bf::recursive_directory_iterator i) :
-        d_directory(path)
+        bf::path const &path, bf::recursive_directory_iterator i)
     {
-        std::copy(i, bf::recursive_directory_iterator(),
-            std::back_inserter(d_entries));
+        for (; i != bf::recursive_directory_iterator(); i++)
+        {
+            std::string entryPathStr = i->path().string();
+            entryPathStr.erase(0, path.string().size());
+
+            if (entryPathStr[0] == '/')
+                entryPathStr.erase(0, 1);
+
+            d_entries.push_back(entryPathStr);
+        }
+
+        std::sort(d_entries.begin(), d_entries.end(),
+            alpinocorpus::NameCompare());
 
         d_iter = d_entries.begin();
     }
@@ -120,7 +132,6 @@ namespace {
     {
       SortedDirIter *dirIter = new SortedDirIter;
       dirIter->d_entries = d_entries;
-      dirIter->d_directory = d_directory;
       dirIter->d_iter = dirIter->d_entries.begin() +
           std::distance(d_entries.begin(), d_iter);
 
@@ -133,7 +144,7 @@ namespace {
         if (d_iter == d_entries.end())
             return true;
 
-        return d_iter->extension() == ".xml";
+        return boost::algorithm::ends_with(*d_iter, ".xml");
     }
 
     bool SortedDirIter::hasNext()
@@ -149,15 +160,8 @@ namespace {
     alpinocorpus::Entry SortedDirIter::next(alpinocorpus::CorpusReader const &rdr)
     {
         // We assume the iterator is valid, since hasNext() should be called
-        // before next().
 
-        std::string entryPathStr = d_iter->string();
-        entryPathStr.erase(0, d_directory.string().size());
-
-        if (entryPathStr[0] == '/')
-            entryPathStr.erase(0, 1);
-
-        bf::path entryPath(entryPathStr);
+        bf::path entryPath(*d_iter);
 
         // Move the iterator.
         ++d_iter;
@@ -190,8 +194,16 @@ DirectoryCorpusReaderPrivate::~DirectoryCorpusReaderPrivate()
 
 CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEntries(SortOrder sortOrder) const
 {
-    return EntryIterator(new DirIter(d_directory,
-        bf::recursive_directory_iterator(d_directory, bf::symlink_option::recurse)));
+    switch (sortOrder) {
+        case NaturalOrder:
+            return EntryIterator(new DirIter(d_directory,
+                bf::recursive_directory_iterator(d_directory, bf::symlink_option::recurse)));
+        case NumericOrder:
+            return EntryIterator(new SortedDirIter(d_directory,
+                bf::recursive_directory_iterator(d_directory, bf::symlink_option::recurse)));
+        default:
+            BOOST_ASSERT_MSG(false, "Unexpected sort order.");
+    }
 }
 
 std::string DirectoryCorpusReaderPrivate::getName() const
