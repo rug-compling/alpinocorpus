@@ -48,7 +48,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
   public:
     /** Forward iterator over entry names */
     class ALPINO_CORPUS_EXPORT EntryIterator
-    : public std::iterator<std::input_iterator_tag, std::string, ptrdiff_t, std::string *, std::string>
     {
       public:
         EntryIterator();
