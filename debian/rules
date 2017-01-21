@@ -13,7 +13,7 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/cmake.mk
 
 common-install-arch::
-	for file in libalpino-corpus2.4.install libalpino-corpus-dev.install ; \
+	for file in libalpino-corpus2.6.install libalpino-corpus-dev.install ; \
 	do \
 		sed -e"s,\$${DEB_HOST_MULTIARCH},${DEB_HOST_MULTIARCH},g" \
 			debian/$${file}.in > debian/$$file; \
