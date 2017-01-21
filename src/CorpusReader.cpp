@@ -566,22 +566,25 @@ namespace alpinocorpus {
     CorpusReader::EntryIterator CorpusReader::queryWithStylesheet(
         QueryDialect d, std::string const &query,
       std::string const &stylesheet,
-      std::list<MarkerQuery> const &markerQueries) const
+      std::list<MarkerQuery> const &markerQueries,
+      SortOrder sortOrder) const
     {
-      return runQueryWithStylesheet(d, query, stylesheet, markerQueries);
+      return runQueryWithStylesheet(d, query, stylesheet, markerQueries,
+          sortOrder);
     }
 
     CorpusReader::EntryIterator CorpusReader::runQueryWithStylesheet(
         QueryDialect d, std::string const &q,
       std::string const &stylesheet,
-      std::list<MarkerQuery> const &markerQueries) const
+      std::list<MarkerQuery> const &markerQueries,
+      SortOrder sortOrder) const
     {
         if (d == XQUERY)
             throw NotImplemented(typeid(*this).name(),
                 "XQuery functionality");
         
-        return EntryIterator(new StylesheetIter(query(XPATH, q), stylesheet,
-            markerQueries));
+        return EntryIterator(new StylesheetIter(query(XPATH, q, sortOrder),
+              stylesheet, markerQueries));
     }
 
     CorpusReader::EntryIterator CorpusReader::runXPath(std::string const &query,

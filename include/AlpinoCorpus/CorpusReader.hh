@@ -112,8 +112,9 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      * end of the range is given by end().
      */ 
     EntryIterator queryWithStylesheet(QueryDialect d, std::string const &q,
-      std::string const &stylesheet,
-      std::list<MarkerQuery> const &markerQueries) const;
+        std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries,
+        SortOrder sortOrder = NaturalOrder) const;
     
     /**
      * Return content of a single treebank entry. Mark elements if a marker
@@ -157,7 +158,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator runXQuery(std::string const &, SortOrder sortOrder) const;
     virtual EntryIterator runQueryWithStylesheet(QueryDialect d,
       std::string const &q, std::string const &stylesheet,
-      std::list<MarkerQuery> const &markerQueries) const;
+      std::list<MarkerQuery> const &markerQueries, SortOrder sortOrder) const;
     virtual Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &q) const;
 
     // Initialized lazily in type();
