@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(AlpinoCorpus)
 
-set (ALPINOCORPUS_VERSION "2.0.0")
+set (ALPINOCORPUS_VERSION "2.6.0")
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
