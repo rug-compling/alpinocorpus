@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <string>
 
-
 #include <boost/tr1/unordered_set.hpp>
 
 #include <boost/scoped_ptr.hpp>
@@ -40,6 +39,9 @@ using alpinocorpus::CompactCorpusWriter;
 using alpinocorpus::Either;
 using alpinocorpus::Entry;
 using alpinocorpus::LexItem;
+using alpinocorpus::NaturalOrder;
+using alpinocorpus::NumericalOrder;
+using alpinocorpus::SortOrder;
 
 #if defined(USE_DBXML)
 using alpinocorpus::DbCorpusWriter;
@@ -57,19 +59,21 @@ void usage(std::string const &programName)
       "  -d filename\tCreate a Dact dbxml archive" << std::endl <<
 #endif
       "  -m filename\tLoad macro file" << std::endl <<
+      "  -n\t\tUse numerical sorting (when available)" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
       "  -r\t\tProcess a directory of corpora recursively" << std::endl << std::endl;
 }
 
 void writeCorpus(boost::shared_ptr<CorpusReader> reader,
   boost::shared_ptr<CorpusWriter> writer,
-  std::string const &query)
+  std::string const &query,
+  SortOrder sortOrder)
 {
   CorpusReader::EntryIterator i;
   if (query.empty())
-    i = reader->entries();
+    i = reader->entries(sortOrder);
   else
-    i = reader->query(CorpusReader::XPATH, query);
+    i = reader->query(CorpusReader::XPATH, query, sortOrder);
   
   // We need to be *really* sure when writing a corpus that an entry was not written
   // before. So, we'll use a set, rather than a basic filter.
@@ -90,7 +94,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "c:d:m:q:r"));
+      "c:d:m:nq:r"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -114,6 +118,11 @@ int main(int argc, char *argv[])
     ": one of the '-c' or 'd' options should be used." <<
     std::endl;
     return 1;
+  }
+
+  SortOrder sortOrder = NaturalOrder;
+  if (opts->option('n')) {
+      sortOrder = NumericalOrder;
   }
  
   boost::shared_ptr<CorpusReader> reader;
@@ -168,7 +177,7 @@ int main(int argc, char *argv[])
   
 #if defined(USE_DBXML)
         boost::shared_ptr<CorpusWriter> wr(new DbCorpusWriter(treebankOut, true));
-        writeCorpus(reader, wr, query);
+        writeCorpus(reader, wr, query, sortOrder);
 #else
         throw std::runtime_error("AlpinoCorpus was compiled without DBXML support.");
 #endif // defined(USE_DBXML)
@@ -194,7 +203,7 @@ int main(int argc, char *argv[])
             throw std::runtime_error("Attempting to write to the source treebank.");
   
         boost::shared_ptr<CorpusWriter> wr(new CompactCorpusWriter(treebankOut));
-        writeCorpus(reader, wr, query);
+        writeCorpus(reader, wr, query, sortOrder);
 
     } catch (std::runtime_error const &e) {
         std::cerr << opts->programName() <<

@@ -18,6 +18,26 @@
 namespace alpinocorpus {
 
 /**
+ * The sort order for iterators.
+ *
+ * Note that this is currently just a hint to the iterator implementation.
+ * Most iterators currently only support the order that is natural to the
+ * underlying corpus.
+ */
+enum SortOrder {
+    /**
+     * Sort using the natural order, typically the sequence in which the
+     * entries are stored in a treebank.
+     */
+    NaturalOrder,
+
+    /**
+     * Sort using numeric order.
+     */
+    NumericalOrder
+};
+
+/**
  * Abstract base class for corpus readers.
  *
  * A corpus is conceptually a mapping of names to XML documents.
@@ -28,7 +48,6 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
   public:
     /** Forward iterator over entry names */
     class ALPINO_CORPUS_EXPORT EntryIterator
-    : public std::iterator<std::input_iterator_tag, std::string, ptrdiff_t, std::string *, std::string>
     {
       public:
         EntryIterator();
@@ -69,14 +88,15 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     std::string name() const;
 
     /** Iterator over entry names. */
-    EntryIterator entries() const;
+    EntryIterator entries(SortOrder order = NaturalOrder) const;
 
     /**
      * Iterator over entry names, contents are transformed with
      * the given stylesheet.
      */
     EntryIterator entriesWithStylesheet(std::string const &stylesheet,
-      std::list<MarkerQuery> const &markerQueries = std::list<MarkerQuery>()) const;
+      std::list<MarkerQuery> const &markerQueries = std::list<MarkerQuery>(),
+      SortOrder sortOrder = NaturalOrder) const;
 
     enum QueryDialect { XPATH, XQUERY };
 
@@ -84,15 +104,17 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     Either<std::string, Empty> isValidQuery(QueryDialect d, bool variables, std::string const &q) const;
     
     /** Execute query. The end of the range is given by end(). */
-    EntryIterator query(QueryDialect d, std::string const &q) const;
+    EntryIterator query(QueryDialect d, std::string const &q,
+        SortOrder sortOrder = NaturalOrder) const;
 
     /**
      * Execute a query, applying the given stylesheet to each entry. The
      * end of the range is given by end().
      */ 
     EntryIterator queryWithStylesheet(QueryDialect d, std::string const &q,
-      std::string const &stylesheet,
-      std::list<MarkerQuery> const &markerQueries) const;
+        std::string const &stylesheet,
+        std::list<MarkerQuery> const &markerQueries,
+        SortOrder sortOrder = NaturalOrder) const;
     
     /**
      * Return content of a single treebank entry. Mark elements if a marker
@@ -123,7 +145,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     size_t size() const;
 
   private:
-    virtual EntryIterator getEntries() const = 0;
+    virtual EntryIterator getEntries(SortOrder sortOrder) const = 0;
     virtual std::string getName() const = 0;
     virtual std::vector<LexItem> getSentence(std::string const &entry,
         std::string const &query, std::string const &attribute,
@@ -132,11 +154,11 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual std::string readEntry(std::string const &entry) const = 0;
     virtual std::string readEntryMarkQueries(std::string const &entry,
         std::list<MarkerQuery> const &queries) const;
-    virtual EntryIterator runXPath(std::string const &) const;
-    virtual EntryIterator runXQuery(std::string const &) const;
+    virtual EntryIterator runXPath(std::string const &, SortOrder sortOrder) const;
+    virtual EntryIterator runXQuery(std::string const &, SortOrder sortOrder) const;
     virtual EntryIterator runQueryWithStylesheet(QueryDialect d,
       std::string const &q, std::string const &stylesheet,
-      std::list<MarkerQuery> const &markerQueries) const;
+      std::list<MarkerQuery> const &markerQueries, SortOrder sortOrder) const;
     virtual Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &q) const;
 
     // Initialized lazily in type();

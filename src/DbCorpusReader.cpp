@@ -27,9 +27,9 @@ DbCorpusReader::~DbCorpusReader()
     delete d_private;
 }
     
-CorpusReader::EntryIterator DbCorpusReader::getEntries() const
+CorpusReader::EntryIterator DbCorpusReader::getEntries(SortOrder sortOrder) const
 {
-    return d_private->getEntries();
+    return d_private->getEntries(sortOrder);
 }
 
 std::string DbCorpusReader::getName() const

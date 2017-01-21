@@ -18,6 +18,11 @@ typedef struct {
   char const *value;
 } marker_query_t;
 
+typedef enum {
+  natural_order,
+  numerical_order
+} sort_order_t;
+
 /**
  * Initialize the library. If you don't use the library anymore, call
  * alpinocorpus_cleanup().
@@ -60,7 +65,8 @@ int alpinocorpus_is_valid_query(alpinocorpus_reader corpus, char const *query);
  * alpinocorpus_iter_destroy to free up resources associated with the
  * iterator.
  */
-alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus);
+alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus,
+    sort_order_t sort_order);
 
 
 /**
@@ -70,7 +76,7 @@ alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus);
  */
 alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
     char const *query, char const *stylesheet, marker_query_t *queries,
-    size_t n_queries);
+    size_t n_queries, sort_order_t sort_order);
 
 /**
  * Get an iterator over the entries in a corpus, where the contents
@@ -82,7 +88,8 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_marker_iter(alpinocorpus_reader 
 							    char const *stylesheet,
 							    char const *markerQuery,
 							    char const *markerAttr,
-							    char const *markerValue);
+							    char const *markerValue,
+                  sort_order_t sort_order);
 
 /**
  * Get the contents of an entry. The content string is deallocated when
@@ -106,7 +113,8 @@ char const * alpinocorpus_entry_name(alpinocorpus_entry entry);
  * alpinocorpus_iter_destroy to free up resources associated with the
  * iterator.
  */
-alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query);
+alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader,
+    char const *query, sort_order_t sort_order);
 
 /**
  * Destroy an iterator.

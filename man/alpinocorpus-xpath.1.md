@@ -22,15 +22,20 @@ be applied to list only the entries that match that query.
 The following options are available:
 
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-q` *QUERY*
+
 :    Only show entries that match *QUERY* (XPath 2.0).
+
 `-s`
+
 :    Print the sentence of each entry, fragments that match the query are
      colored.
 
 SEE ALSO
 ========
 
-alpinocorpus-create(1), alpinocorpus-get(1), alpinocorpus-stats(1),
-alpinocorpus-xquery(1), alpinocorpus-xslt(1)
+alpinocorpus-create(1), alpinocorpus-extract(1), alpinocorpus-get(1),
+alpinocorpus-stats(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)

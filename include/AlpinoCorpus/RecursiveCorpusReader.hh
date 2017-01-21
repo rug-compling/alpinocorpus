@@ -24,7 +24,7 @@ public:
   RecursiveCorpusReader(std::string const &directory, bool dactOnly = true);
   virtual ~RecursiveCorpusReader();
 private:
-  EntryIterator getEntries() const;
+  EntryIterator getEntries(SortOrder sortOrder) const;
   std::string getName() const;
   size_t getSize() const;
   std::string readEntry(std::string const &) const;

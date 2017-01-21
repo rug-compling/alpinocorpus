@@ -54,7 +54,7 @@ Requirements
 
 - A C++ compiler.
 - Boost 1.47.0.
-- Berkeley DB XML 2.5.16 or later.
+- Berkeley DB XML 2.5.16 (later versions are not supported, see #131).
 - libxml2
 - libxslt
 

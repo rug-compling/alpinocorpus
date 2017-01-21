@@ -25,14 +25,19 @@ that the program is applied to each treebank.
 The following options are available:
 
 `-f` *XQUERY_PROGRAM*
+
 :    Read XQuery program from the file *XQUERY_PROGRAM*.
+
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-q` *QUERY*
+
 :    Only show entries that match *QUERY* (XPath 2.0).
 
 SEE ALSO
 ========
 
-alpinocorpus-create(1), alpinocorpus-get(1), alpinocorpus-stats(1),
-alpinocorpus-xpath(1), alpinocorpus-xslt(1)
+alpinocorpus-create(1), alpinocorpus-get(1), alpinocorpus-extract(1),
+alpinocorpus-stats(1), alpinocorpus-xpath(1), alpinocorpus-xslt(1)

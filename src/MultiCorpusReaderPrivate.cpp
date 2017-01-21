@@ -49,7 +49,7 @@ MultiCorpusReaderPrivate::~MultiCorpusReaderPrivate()
 {
 }
 
-CorpusReader::EntryIterator MultiCorpusReaderPrivate::getEntries() const
+CorpusReader::EntryIterator MultiCorpusReaderPrivate::getEntries(SortOrder sortOrder) const
 {
   return EntryIterator(new MultiIter(d_corporaMap));
 }

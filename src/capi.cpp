@@ -9,12 +9,25 @@
 #include <list>
 #include <string>
 
+#include <boost/assert.hpp>
+
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/capi.h>
 
 #include <config.hh>
+
+alpinocorpus::SortOrder to_sort_order(sort_order_t sort_order) {
+    switch (sort_order) {
+        case natural_order:
+            return alpinocorpus::NaturalOrder;
+        case numerical_order:
+            return alpinocorpus::NumericalOrder;
+        default:
+            BOOST_ASSERT_MSG(false, "Unknown sort order");
+    }
+}
 
 extern "C" {
 
@@ -96,9 +109,11 @@ int alpinocorpus_is_valid_query(alpinocorpus_reader reader, char const *query)
       alpinocorpus::CorpusReader::XPATH, false, query).isRight());
 }
 
-alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus)
+alpinocorpus_iter alpinocorpus_entry_iter(alpinocorpus_reader corpus,
+    sort_order_t sort_order)
 {
-    alpinocorpus_iter i = new alpinocorpus_iter_t(corpus->corpusReader->entries());
+    alpinocorpus_iter i = new alpinocorpus_iter_t(
+        corpus->corpusReader->entries(to_sort_order(sort_order)));
 
     return i;
 }
@@ -122,7 +137,7 @@ char const * alpinocorpus_entry_name(alpinocorpus_entry entry)
 
 alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
     char const *query, char const *stylesheet, marker_query_t *queries,
-    size_t n_queries)
+    size_t n_queries, sort_order_t sort_order)
 {
     std::list<alpinocorpus::CorpusReader::MarkerQuery> markerQueries;
 
@@ -140,7 +155,7 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
     try {
         iter = corpus->corpusReader->queryWithStylesheet(
             alpinocorpus::CorpusReader::XPATH, query, stylesheet,
-            markerQueries);
+            markerQueries, to_sort_order(sort_order));
     } catch (std::exception const &) {
         return NULL;
     }
@@ -153,21 +168,25 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_marker_iter(alpinocorpus_reader 
 							    char const *stylesheet,
 							    char const *markerQuery,
 							    char const *markerAttr,
-							    char const *markerValue)
+							    char const *markerValue,
+                  sort_order_t sort_order)
 {
     marker_query_t m [1];
     m[0].query = markerQuery;
     m[0].attr = markerAttr;
     m[0].value = markerValue;
-    return alpinocorpus_query_stylesheet_iter(corpus, query, stylesheet, m, 1);
+    return alpinocorpus_query_stylesheet_iter(corpus, query, stylesheet, m, 1,
+        sort_order);
 }
 
-alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader, char const *query)
+alpinocorpus_iter alpinocorpus_query_iter(alpinocorpus_reader reader,
+    char const *query, sort_order_t sort_order)
 {
     alpinocorpus::CorpusReader::EntryIterator iter;
 
     try {
-        iter = reader->corpusReader->query(alpinocorpus::CorpusReader::XPATH, query);
+        iter = reader->corpusReader->query(alpinocorpus::CorpusReader::XPATH,
+            query, to_sort_order(sort_order));
     } catch (std::exception const &) {
         return NULL;
     }

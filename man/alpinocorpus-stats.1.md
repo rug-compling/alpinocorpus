@@ -22,8 +22,11 @@ directory. The supported query format is XPath 2.0.
 The following options are available:
 
 `-m` *MACROFILE*
+
 :    Load macros from *MACROFILE*.
+
 `-p`
+
 :    Print relative frequencies.
 
 EXAMPLE
@@ -39,5 +42,5 @@ its root.
 SEE ALSO
 ========
 
-alpinocorpus-create(1), alpinocorpus-get(1), alpinocorpus-xpath(1),
-alpinocorpus-xquery(1), alpinocorpus-xslt(1)
+alpinocorpus-create(1), alpinocorpus-extract(1), alpinocorpus-get(1),
+alpinocorpus-xpath(1), alpinocorpus-xquery(1), alpinocorpus-xslt(1)
