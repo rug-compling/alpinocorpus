@@ -15,21 +15,10 @@
     #include <AlpinoCorpus/DbCorpusReader.hh>
 #endif
 
-#if defined(USE_REMOTE_CORPUS)
-  #include <AlpinoCorpus/RemoteCorpusReader.hh>
-#endif
-
 namespace alpinocorpus {
 
     CorpusReader *CorpusReaderFactory::open(std::string const &corpusPath)
     {
-
-#if defined(USE_REMOTE_CORPUS)
-        try {
-            return new RemoteCorpusReader(corpusPath);
-        } catch (OpenError const &) {}
-#endif
-
         try {
             return new DirectoryCorpusReader(corpusPath);
         } catch (OpenError const &) {}
@@ -83,9 +72,6 @@ namespace alpinocorpus {
 
         readers.push_back(ReaderInfo(COMPACT_CORPUS_READER,
             "Compact corpus reader", std::list<std::string>(1, "data.dz")));
-
-        readers.push_back(ReaderInfo(REMOTE_CORPUS_READER,
-            "Remote corpus reader", std::list<std::string>(1, "http://")));
 
         return readers;
     }

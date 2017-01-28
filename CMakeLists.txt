@@ -43,17 +43,11 @@ if(BOOST_ROOT)
   set(Boost_NO_SYSTEM_PATHS ON)
 endif()
 
-option(USE_REMOTE_CORPUS "Enable remote corpus" OFF)
-
 include(GNUInstallDirs REQUIRED)
 
-if(USE_REMOTE_CORPUS)
-find_package(Boost 1.46.1 COMPONENTS system chrono date_time iostreams
-  filesystem thread regex REQUIRED)
-else()
 find_package(Boost 1.46.1 COMPONENTS system chrono date_time filesystem
   thread regex REQUIRED)
-endif()
+
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
@@ -91,15 +85,6 @@ endif()
 find_package(LibXml2 REQUIRED)
 if(LIBXML2_FOUND)
   include_directories(${LIBXML2_INCLUDE_DIR})
-endif()
-
-if(USE_REMOTE_CORPUS)
-  find_package(OpenSSL)
-  if (OPENSSL_FOUND)
-    set(ALPINOCORPUS_WITH_SSL ON)
-    option(ALPINOCORPUS_WITH_SSL_STRICT
- 	"With SSL, enable domain verification" OFF)
-  endif()
 endif()
 
 find_package(LibXslt REQUIRED)
@@ -208,19 +193,6 @@ if(USE_DBXML)
   )
 endif()
 
-if(USE_REMOTE_CORPUS)
-  list(APPEND HEADERS
-    include/AlpinoCorpus/RemoteCorpusReader.hh
-    src/RemoteCorpusReaderPrivate.hh
-    src/util/GetUrl.hh
-  )
-  list(APPEND SOURCES
-    src/RemoteCorpusReader.cpp
-    src/RemoteCorpusReaderPrivate.cpp
-    src/util/GetUrl.cpp
-  )
-endif()
-
 add_library(alpino_corpus SHARED
 	${SOURCES}
 	${HEADERS}
@@ -237,12 +209,6 @@ if(USE_DBXML)
   target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
 endif(USE_DBXML)
 target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
-
-if(USE_REMOTE_CORPUS)
-  if(ALPINOCORPUS_WITH_SSL)
-    target_link_libraries(alpino_corpus ${OPENSSL_LIBRARIES})
-  endif(ALPINOCORPUS_WITH_SSL)
-endif()
 
 target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
 target_link_libraries(alpino_corpus ${LIBEXSLT_LIBRARIES})
@@ -268,11 +234,6 @@ if(USE_DBXML)
   add_executable(writer_test test/writer.cpp)
   target_link_libraries(writer_test alpino_corpus)
   #add_test(writer writer_test)
-endif()
-
-if(USE_REMOTE_CORPUS)
-  add_executable(geturl_test test/geturl.cpp)
-  target_link_libraries(geturl_test alpino_corpus)
 endif()
 
 add_executable(readers_available test/readers_available.cpp)
