@@ -17,10 +17,16 @@ CorpusInfo const TUEBA_DZ_CORPUS_INFO(
     "word",
     "form");
 
+CorpusInfo const CONLLX_CORPUS_INFO(
+    boost::assign::list_of("word"),
+    "word",
+    "form");
+
 std::map<std::string, CorpusInfo> const PREDEFINED_CORPORA =
     boost::assign::map_list_of
       ("alpino_ds", ALPINO_CORPUS_INFO)
-      ("tueba_tree", TUEBA_DZ_CORPUS_INFO);
+      ("tueba_tree", TUEBA_DZ_CORPUS_INFO)
+      ("conllx_ds", CONLLX_CORPUS_INFO);
 
 CorpusInfo const FALLBACK_CORPUS_INFO = ALPINO_CORPUS_INFO;
 
