@@ -4,7 +4,6 @@
 #include <utility>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/tr1/unordered_map.hpp>
 
 #include <boost/filesystem.hpp>
 

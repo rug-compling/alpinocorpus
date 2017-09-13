@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/tr1/unordered_set.hpp>
+#include <boost/unordered_set.hpp>
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
@@ -31,7 +31,6 @@ using alpinocorpus::Entry;
 using alpinocorpus::LexItem;
 
 namespace bf = boost::filesystem;
-namespace tr1 = std::tr1;
 
 void listCorpus(boost::shared_ptr<CorpusReader> reader,
   std::string const &query, bool bracketed,
@@ -47,7 +46,7 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
 
   NotEqualsPrevious<std::string> pred;
 
-  tr1::unordered_set<std::string> seen;
+  boost::unordered_set<std::string> seen;
   while (i.hasNext())
   {
     Entry entry = i.next(*reader);

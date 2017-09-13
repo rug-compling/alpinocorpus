@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/tr1/unordered_set.hpp>
+#include <boost/unordered_set.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -28,8 +28,6 @@ extern "C" {
 using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;
 
-namespace tr1 = std::tr1;
-
 void transformCorpus(boost::shared_ptr<CorpusReader> reader,
   std::string const &query, std::string const &stylesheet)
 {
@@ -48,7 +46,7 @@ void transformCorpus(boost::shared_ptr<CorpusReader> reader,
     else
         i = reader->entriesWithStylesheet(stylesheet);
 
-    tr1::unordered_set<std::string> seen;
+    boost::unordered_set<std::string> seen;
 
     while (i.hasNext())
     {

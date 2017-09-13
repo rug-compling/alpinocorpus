@@ -6,7 +6,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include <boost/filesystem.hpp>
-#include <boost/tr1/unordered_map.hpp>
 
 #include <boost/config.hpp>
 

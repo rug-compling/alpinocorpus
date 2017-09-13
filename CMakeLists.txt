@@ -45,7 +45,7 @@ endif()
 
 include(GNUInstallDirs REQUIRED)
 
-find_package(Boost 1.46.1 COMPONENTS system chrono date_time filesystem
+find_package(Boost 1.50 COMPONENTS system chrono date_time filesystem
   thread regex REQUIRED)
 
 if(Boost_FOUND)

@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/tr1/unordered_set.hpp>
+#include <boost/unordered_set.hpp>
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
@@ -48,7 +48,6 @@ using alpinocorpus::DbCorpusWriter;
 #endif
 
 namespace bf = boost::filesystem;
-namespace tr1 = std::tr1;
 
 void usage(std::string const &programName)
 {
@@ -77,7 +76,7 @@ void writeCorpus(boost::shared_ptr<CorpusReader> reader,
   
   // We need to be *really* sure when writing a corpus that an entry was not written
   // before. So, we'll use a set, rather than a basic filter.
-  tr1::unordered_set<std::string> seen;
+  boost::unordered_set<std::string> seen;
   while (i.hasNext()) {
     Entry e = i.next(*reader);
 

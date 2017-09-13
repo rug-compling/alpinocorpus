@@ -7,7 +7,7 @@
 #include <string>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/tr1/unordered_map.hpp>
+#include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -21,9 +21,8 @@
 using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;
 
-namespace tr1 = std::tr1;
 
-typedef tr1::unordered_map<std::string, size_t> ValueCounts;
+typedef boost::unordered_map<std::string, size_t> ValueCounts;
 
 
 void usage(std::string const &programName) {

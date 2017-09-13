@@ -6,7 +6,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <boost/tr1/unordered_map.hpp>
+#include <boost/unordered_map.hpp>
 
 #include <boost/config.hpp>
 
@@ -36,7 +36,7 @@ namespace alpinocorpus
 class CompactCorpusReaderPrivate : public CorpusReader
 {
     typedef boost::shared_ptr<IndexItem> IndexItemPtr;
-    typedef std::tr1::unordered_map<std::string, IndexItemPtr> IndexMap;
+    typedef boost::unordered_map<std::string, IndexItemPtr> IndexMap;
     typedef boost::shared_ptr<DzIstream> DzIstreamPtr;
     typedef std::vector<IndexItemPtr> ItemVector;
 
