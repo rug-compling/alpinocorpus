@@ -17,35 +17,35 @@ class DbCorpusReaderPrivate : public CorpusReader
     DbXml::XmlManager   mutable mgr;
     DbXml::XmlContainer mutable container;
     std::string collection;
-    
+
     class DbIter : public IterImpl
     {
     public:
         DbIter(DbXml::XmlContainer &);
         DbIter(DbXml::XmlManager &);
 
-        virtual IterImpl *copy() const;        
+        virtual IterImpl *copy() const;
         bool equals(IterImpl const &) const;
         bool hasNext();
         Entry next(CorpusReader const &);
-        
+
     protected:
         mutable DbXml::XmlResults r;
-        
+
         DbIter(DbXml::XmlResults const &);
     };
-    
+
     class QueryIter : public DbIter
     {
     public:
         QueryIter(DbXml::XmlResults const &, DbXml::XmlQueryContext const &);
         IterImpl *copy() const;
         void interrupt();
-    
+
     protected:
         DbXml::XmlQueryContext context;
     };
-    
+
 public:
     DbCorpusReaderPrivate(std::string const &);
     virtual ~DbCorpusReaderPrivate();
@@ -57,13 +57,12 @@ public:
     }
     Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
     std::string readEntry(std::string const &) const;
-    EntryIterator runXPath(std::string const &) const;
-    EntryIterator runXQuery(std::string const &) const;
-    
+    EntryIterator runXPath(std::string const &, SortOrder) const;
+    EntryIterator runXQuery(std::string const &, SortOrder) const;
+
 private:
     void setNameAndCollection(std::string const &);
-    
+
 };
 
 }
-

@@ -37,7 +37,7 @@ void MultiCorpusReader::push_back(std::string const &name, std::string const &re
 {
   d_private->push_back(name, reader, recursive);
 }
-    
+
 Either<std::string, Empty> MultiCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
   return d_private->isValidQuery(d, variables, query);
@@ -47,22 +47,21 @@ std::string MultiCorpusReader::readEntry(std::string const &entry) const
 {
   return d_private->readEntry(entry);
 }
-    
-std::string MultiCorpusReader::readEntryMarkQueries(std::string const &entry, 
+
+std::string MultiCorpusReader::readEntryMarkQueries(std::string const &entry,
     std::list<MarkerQuery> const &queries) const
 {
   return d_private->readEntryMarkQueries(entry, queries);
 }
 
-CorpusReader::EntryIterator MultiCorpusReader::runXPath(std::string const &query) const
+CorpusReader::EntryIterator MultiCorpusReader::runXPath(std::string const &query, SortOrder sortOrder) const
 {
-  return d_private->query(XPATH, query);
+  return d_private->query(XPATH, query, sortOrder);
 }
 
-CorpusReader::EntryIterator MultiCorpusReader::runXQuery(std::string const &query) const
+CorpusReader::EntryIterator MultiCorpusReader::runXQuery(std::string const &query, SortOrder sortOrder) const
 {
-  return d_private->query(XQUERY, query);
+  return d_private->query(XQUERY, query, sortOrder);
 }
 
 }
-

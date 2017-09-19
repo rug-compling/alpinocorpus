@@ -41,7 +41,7 @@ MultiCorpusReaderPrivate::MultiCorpusReaderPrivate()
         DbXml::XmlContainer::NodeContainer);
 
     // Default container name.
-    d_container.addAlias("corpus"); 
+    d_container.addAlias("corpus");
 }
 
 MultiCorpusReaderPrivate::~MultiCorpusReaderPrivate()
@@ -50,7 +50,7 @@ MultiCorpusReaderPrivate::~MultiCorpusReaderPrivate()
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::getEntries(SortOrder sortOrder) const
 {
-  return EntryIterator(new MultiIter(d_corporaMap));
+  return EntryIterator(new MultiIter(d_corporaMap, sortOrder));
 }
 
 std::string MultiCorpusReaderPrivate::getName() const
@@ -101,7 +101,7 @@ std::pair<std::string, bool> MultiCorpusReaderPrivate::corpusFromPath(
       d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter)
     if (path.find(iter->first) == 0)
       return iter->second;
-  
+
   throw std::runtime_error(std::string("Unknown corpus: " + path));
 }
 
@@ -146,21 +146,21 @@ std::string MultiCorpusReaderPrivate::readEntryMarkQueries(
 }
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXPath(
-    std::string const &query) const
+  std::string const &query, SortOrder sortOrder) const
 {
-  return EntryIterator(new MultiIter(d_corporaMap, query, CorpusReader::XPATH));
+  return EntryIterator(new MultiIter(d_corporaMap, query, CorpusReader::XPATH, sortOrder));
 }
 
 CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXQuery(
-    std::string const &query) const
+  std::string const &query, SortOrder sortOrder) const
 {
-  return EntryIterator(new MultiIter(d_corporaMap, query, CorpusReader::XQUERY));
+  return EntryIterator(new MultiIter(d_corporaMap, query, CorpusReader::XQUERY, sortOrder));
 }
 
 // Iteration over MultiCorpusReaders
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
-  Corpora const &corpora) : d_hasQuery(false), d_interrupted(false)
+  Corpora const &corpora, SortOrder sortOrder) : d_sortOrder(sortOrder), d_hasQuery(false), d_interrupted(false)
 {
 #if defined(BOOST_HAS_THREADS)
     d_currentIterMutex.reset(new boost::mutex);
@@ -179,8 +179,9 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
   Corpora const &corpora,
   std::string const &query,
-  CorpusReader::QueryDialect dialect) :
-  d_hasQuery(true), d_query(query), d_dialect(dialect), d_interrupted(false)
+  CorpusReader::QueryDialect dialect,
+  SortOrder sortOrder) :
+  d_sortOrder(sortOrder), d_hasQuery(true), d_query(query), d_dialect(dialect), d_interrupted(false)
 {
 #if defined(BOOST_HAS_THREADS)
     d_currentIterMutex.reset(new boost::mutex);
@@ -273,9 +274,9 @@ void MultiCorpusReaderPrivate::MultiIter::openTip()
 
     try {
       if (d_hasQuery)
-        d_currentIter.reset(new EntryIterator(reader->query(d_dialect, d_query)));
+        d_currentIter.reset(new EntryIterator(reader->query(d_dialect, d_query, d_sortOrder)));
       else
-        d_currentIter.reset(new EntryIterator(reader->entries()));
+        d_currentIter.reset(new EntryIterator(reader->entries(d_sortOrder)));
     } catch (std::runtime_error &e)
     {
       delete reader;

@@ -9,7 +9,7 @@
 namespace alpinocorpus {
 
 class DbCorpusReaderPrivate;
-    
+
 /**
  * Corpus reader for Berkeley DB XML-based corpora.
  *
@@ -26,10 +26,10 @@ class DbCorpusReader : public CorpusReader
     EntryIterator getEntries(SortOrder sortOrder) const;
     std::string getName() const;
     std::string readEntry(std::string const &) const;
-    EntryIterator runXPath(std::string const &) const;
-    EntryIterator runXQuery(std::string const &) const;
+    EntryIterator runXPath(std::string const &, SortOrder sortOrder) const;
+    EntryIterator runXQuery(std::string const &, SortOrder sortOrder) const;
     size_t getSize() const;
-    
+
     DbCorpusReaderPrivate *d_private;
 };
 

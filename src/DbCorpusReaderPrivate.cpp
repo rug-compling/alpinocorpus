@@ -78,7 +78,7 @@ Entry DbCorpusReaderPrivate::DbIter::next(CorpusReader const &)
         else
           throw Error(e.what());
     }
-   
+
     std::string name;
     std::string value;
 
@@ -123,7 +123,7 @@ DbCorpusReaderPrivate::DbCorpusReaderPrivate(std::string const &path)
         config.setReadOnly(true);
         container = mgr.openContainer(path, config);
         // Nasty: using a hard-coded alias to work use in the xpath queries.
-        container.addAlias("corpus"); 
+        container.addAlias("corpus");
         setNameAndCollection(path);
     } catch (db::XmlException const &e) {
         throw OpenError(path, e.what());
@@ -152,7 +152,7 @@ Either<std::string, Empty> DbCorpusReaderPrivate::validQuery(QueryDialect d, boo
     } catch (db::XmlException const &e) {
         return Either<std::string, Empty>::left(e.what());
     }
-    
+
     return Either<std::string, Empty>::right(Empty());
 }
 
@@ -174,12 +174,12 @@ std::string DbCorpusReaderPrivate::readEntry(std::string const &filename) const
     }
 }
 
-CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(std::string const &query) const
+CorpusReader::EntryIterator DbCorpusReaderPrivate::runXPath(std::string const &query, SortOrder sortOrder) const
 {
-    return runXQuery(std::string("collection('corpus')" + query));
+    return runXQuery(std::string("collection('corpus')" + query), sortOrder);
 }
 
-CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &query)
+CorpusReader::EntryIterator DbCorpusReaderPrivate::runXQuery(std::string const &query, SortOrder)
     const
 {
     // XXX use DBXML_DOCUMENT_PROJECTION and return to whole-doc containers?

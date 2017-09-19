@@ -45,9 +45,11 @@ private:
   class MultiIter : public IterImpl
   {
   public:
-    MultiIter(Corpora const &corpora);
+    MultiIter(Corpora const &corpora, SortOrder sortOrder);
     MultiIter(Corpora const &corpora,
-      std::string const &query, CorpusReader::QueryDialect dialect);
+	      std::string const &query,
+	      CorpusReader::QueryDialect dialect,
+	      SortOrder sortOrder);
     ~MultiIter();
     IterImpl *copy() const;
     void nextIterator();
@@ -59,6 +61,7 @@ private:
   private:
     void openTip();
 
+    SortOrder d_sortOrder;
     size_t d_totalIters;
     std::list<ReaderIter> d_iters;
     boost::shared_ptr<CorpusReader> d_currentReader;
@@ -87,8 +90,8 @@ public:
 
 protected:
 
-  EntryIterator runXPath(std::string const &query) const;
-  EntryIterator runXQuery(std::string const &query) const;
+  EntryIterator runXPath(std::string const &query, SortOrder sortOrder) const;
+  EntryIterator runXQuery(std::string const &query, SortOrder sortOrder) const;
 #ifdef USE_DBXML
   Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
 #endif

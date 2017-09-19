@@ -16,7 +16,7 @@
 #include "DbCorpusReaderPrivate.hh"
 
 namespace alpinocorpus {
-    
+
 DbCorpusReader::DbCorpusReader(std::string const &name) :
     d_private(new DbCorpusReaderPrivate(name))
 {
@@ -26,7 +26,7 @@ DbCorpusReader::~DbCorpusReader()
 {
     delete d_private;
 }
-    
+
 CorpusReader::EntryIterator DbCorpusReader::getEntries(SortOrder sortOrder) const
 {
     return d_private->getEntries(sortOrder);
@@ -41,7 +41,7 @@ size_t DbCorpusReader::getSize() const
 {
     return d_private->getSize();
 }
-    
+
 Either<std::string, Empty> DbCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
     return d_private->isValidQuery(d, variables, query);
@@ -53,14 +53,14 @@ std::string DbCorpusReader::readEntry(std::string const &entry) const
     return d_private->readEntry(entry);
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runXPath(std::string const &query) const
+CorpusReader::EntryIterator DbCorpusReader::runXPath(std::string const &query, SortOrder sortOrder) const
 {
-    return d_private->runXPath(query);
+    return d_private->runXPath(query, sortOrder);
 }
 
-CorpusReader::EntryIterator DbCorpusReader::runXQuery(std::string const &query) const
+CorpusReader::EntryIterator DbCorpusReader::runXQuery(std::string const &query, SortOrder sortOrder) const
 {
-    return d_private->runXQuery(query);
+    return d_private->runXQuery(query, sortOrder);
 }
 
 }   // namespace alpinocorpus

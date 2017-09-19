@@ -26,7 +26,7 @@ public:
   std::string readEntry(std::string const &) const;
   std::string readEntryMarkQueries(std::string const &entry, std::list<MarkerQuery> const &queries) const;
   EntryIterator runXPath(std::string const &query) const;
-  EntryIterator runXQuery(std::string const &query) const;
+  EntryIterator runXQuery(std::string const &, SortOrder sortOrder) const;
   Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
 private:
@@ -61,7 +61,7 @@ size_t RecursiveCorpusReader::getSize() const
 {
   return d_private->getSize();
 }
-    
+
 Either<std::string, Empty> RecursiveCorpusReader::validQuery(QueryDialect d, bool variables, std::string const &query) const
 {
   return d_private->isValidQuery(d, variables, query);
@@ -71,8 +71,8 @@ std::string RecursiveCorpusReader::readEntry(std::string const &entry) const
 {
   return d_private->readEntry(entry);
 }
-    
-std::string RecursiveCorpusReader::readEntryMarkQueries(std::string const &entry, 
+
+std::string RecursiveCorpusReader::readEntryMarkQueries(std::string const &entry,
     std::list<MarkerQuery> const &queries) const
 {
   return d_private->readEntryMarkQueries(entry, queries);
@@ -83,9 +83,9 @@ CorpusReader::EntryIterator RecursiveCorpusReader::runXPath(std::string const &q
   return d_private->query(XPATH, query);
 }
 
-CorpusReader::EntryIterator RecursiveCorpusReader::runXQuery(std::string const &query) const
+CorpusReader::EntryIterator RecursiveCorpusReader::runXQuery(std::string const &query, SortOrder sortOrder) const
 {
-  return d_private->query(XQUERY, query);
+  return d_private->query(XQUERY, query, sortOrder);
 }
 
 // Implementation of the private interface
@@ -98,7 +98,7 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
     d_directory = bf::path(directory).parent_path();
   else
     d_directory = bf::path(directory);
-  
+
   if (!bf::exists(d_directory) ||
     !bf::is_directory(d_directory))
     throw OpenError(directory, "non-existent or not a directory");
@@ -116,7 +116,7 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
     std::string name = namePath.string();
 
     name.erase(0, d_directory.string().size() + 1);
-   
+
     d_multiReader->push_back(name, iter->path().string(), false);
   }
 }
@@ -158,9 +158,9 @@ CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXPath(
 }
 
 CorpusReader::EntryIterator RecursiveCorpusReaderPrivate::runXQuery(
-    std::string const &query) const
+    std::string const &query, SortOrder sortOrder) const
 {
-  return d_multiReader->query(CorpusReader::XQUERY, query);
+  return d_multiReader->query(CorpusReader::XQUERY, query, sortOrder);
 }
 
 Either<std::string, Empty> RecursiveCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
@@ -174,4 +174,3 @@ Either<std::string, Empty> RecursiveCorpusReaderPrivate::validQuery(QueryDialect
 
 
 }
-
