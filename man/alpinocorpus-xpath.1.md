@@ -21,6 +21,10 @@ be applied to list only the entries that match that query.
 
 The following options are available:
 
+`-c`
+
+:    Print colored bracketing (when `-s` is used).
+
 `-m` *MACROFILE*
 
 :    Load macros from *MACROFILE*.

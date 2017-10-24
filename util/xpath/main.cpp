@@ -33,7 +33,9 @@ using alpinocorpus::LexItem;
 namespace bf = boost::filesystem;
 
 void listCorpus(boost::shared_ptr<CorpusReader> reader,
-  std::string const &query, bool bracketed,
+  std::string const &query,
+  bool bracketed,
+  bool colorBrackets,
   std::string const &attribute,
   CorpusInfo const &corpusInfo)
 {
@@ -66,32 +68,55 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
           size_t depth = itemIter->matches.size();
 
           if (depth != prevDepth) {
-            if (depth == 0)
-              std::cout << "\033[0;22m";
-            else if (depth == 1)
-              std::cout << "\033[38;5;99m";
-            else if (depth == 2)
-              std::cout << "\033[38;5;111m";
-            else if (depth == 3)
-              std::cout << "\033[38;5;123m";
-            else if (depth == 4)
-              std::cout << "\033[38;5;121m";
-            else
-              std::cout << "\033[38;5;119m";
+            if (colorBrackets) {
+              if (depth == 0)
+                std::cout << "\033[0;22m";
+              else if (depth == 1)
+                std::cout << "\033[38;5;99m";
+              else if (depth == 2)
+                std::cout << "\033[38;5;111m";
+              else if (depth == 3)
+                std::cout << "\033[38;5;123m";
+              else if (depth == 4)
+                std::cout << "\033[38;5;121m";
+              else
+                std::cout << "\033[38;5;119m";
+            } else {
+              if (depth > prevDepth) {
+                for (size_t i = prevDepth; i < depth; ++i)
+                  std::cout << "[ ";
+              }
+            }
           }
 
           std::cout << itemIter->word;
 
           std::vector<LexItem>::const_iterator next = itemIter + 1;
-          if (next != items.end() && next->matches.size() < depth)
-            std::cout << "\033[0;22m";
+          if (next != items.end() && next->matches.size() < depth) {
+            if (colorBrackets) {
+              std::cout << "\033[0;22m";
+            } else {
+              for (size_t i = next->matches.size(); i < depth; ++i)
+                std::cout << " ]";
+            }
+          }
 
           std::cout << " ";
 
           prevDepth = depth;
         }
 
-        std::cout << "\033[0;22m" << std::endl;
+        if (colorBrackets) {
+          std::cout << "\033[0;22m" << std::endl;
+        } else {
+          for (size_t i = prevDepth; i > 0; --i) {
+            if (i == prevDepth) {
+              std::cout << "]";
+            } else {
+              std::cout << " ]";
+            }
+          }
+        }
       }
 
       std::cout << std::endl;
@@ -110,6 +135,7 @@ void usage(std::string const &programName)
     std::cerr << "Usage: " << programName << " [OPTION] treebank(s)" <<
       std::endl << std::endl <<
       "  -a attr\tLexical attribute to show (default: word)" << std::endl <<
+      "  -c\t\tUse colored bracketing" << std::endl <<
       "  -m filename\tLoad macro file" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
       "  -s\t\tInclude a bracketed sentence" << std::endl << std::endl;
@@ -120,7 +146,7 @@ int main(int argc, char *argv[])
   boost::scoped_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
-      "a:m:q:s"));
+      "a:cm:q:s"));
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return 1;
@@ -178,7 +204,7 @@ int main(int argc, char *argv[])
   }
   
   try {
-      listCorpus(reader, query, opts->option('s'), attr, corpusInfo);
+      listCorpus(reader, query, opts->option('s'), opts->option('c'), attr, corpusInfo);
   } catch (std::runtime_error const &e) {
       std::cerr << opts->programName() <<
       ": error listing treebank: " << e.what() << std::endl;
