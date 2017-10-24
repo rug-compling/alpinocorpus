@@ -160,13 +160,9 @@ int main(int argc, char *argv[])
  
   boost::shared_ptr<CorpusReader> reader;
   try {
-    if (opts->arguments().size() == 1)
-      reader = boost::shared_ptr<CorpusReader>(
-        openCorpus(opts->arguments().at(0), true));
-    else
-      reader = boost::shared_ptr<CorpusReader>(
-        openCorpora(opts->arguments().begin(),
-          opts->arguments().end(), true));
+    reader = boost::shared_ptr<CorpusReader>(
+      openCorpora(opts->arguments().begin(),
+        opts->arguments().end(), true));
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;
