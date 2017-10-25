@@ -37,7 +37,7 @@ namespace bf = boost::filesystem;
 template<typename T>
 std::set<T> unique_to_first(std::set<T> const &a, std::set<T> const &b)
 {
-  std::set<size_t> result;
+  std::set<T> result;
   std::set_difference(a.begin(), a.end(), b.begin(), b.end(),
       std::inserter(result, result.begin()));
   return result;
