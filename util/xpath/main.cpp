@@ -1,5 +1,7 @@
+#include <algorithm>
 #include <iostream>
 #include <map>
+#include <set>
 #include <stdexcept>
 #include <string>
 
@@ -32,6 +34,15 @@ using alpinocorpus::LexItem;
 
 namespace bf = boost::filesystem;
 
+template<typename T>
+std::set<T> unique_to_first(std::set<T> const &a, std::set<T> const &b)
+{
+  std::set<size_t> result;
+  std::set_difference(a.begin(), a.end(), b.begin(), b.end(),
+      std::inserter(result, result.begin()));
+  return result;
+}
+
 void listCorpus(boost::shared_ptr<CorpusReader> reader,
   std::string const &query,
   bool bracketed,
@@ -61,14 +72,20 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
         std::vector<LexItem> items = reader->sentence(entry.name, query,
             attribute, "_missing_", corpusInfo);
 
-        size_t prevDepth = 0;
+        std::set<size_t> prevMatches = std::set<size_t>();
         for (std::vector<LexItem>::const_iterator itemIter = items.begin();
           itemIter != items.end(); ++itemIter)
         {
           size_t depth = itemIter->matches.size();
 
-          if (depth != prevDepth) {
-            if (colorBrackets) {
+          // Find the set of matches starting before the current word.
+          std::set<size_t> startAtCurrent = unique_to_first(itemIter->matches,
+              prevMatches);
+
+          if (colorBrackets) {
+            if (startAtCurrent.size() != 0) {
+              size_t depth = itemIter->matches.size();
+
               if (depth == 0)
                 std::cout << "\033[0;22m";
               else if (depth == 1)
@@ -81,41 +98,40 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
                 std::cout << "\033[38;5;121m";
               else
                 std::cout << "\033[38;5;119m";
-            } else {
-              if (depth > prevDepth) {
-                for (size_t i = prevDepth; i < depth; ++i)
-                  std::cout << "[ ";
-              }
+            }
+          } else {
+            for (std::set<size_t>::const_iterator iter = startAtCurrent.begin();
+                iter != startAtCurrent.end(); ++iter) {
+                std::cout << "[ ";
             }
           }
 
           std::cout << itemIter->word;
 
+          // Find the set of matches ending after the current word.
           std::vector<LexItem>::const_iterator next = itemIter + 1;
-          if (next != items.end() && next->matches.size() < depth) {
-            if (colorBrackets) {
+          std::set<size_t> endAtCurrent = itemIter->matches;
+          if (next != items.end()) {
+            endAtCurrent = unique_to_first(itemIter->matches, next->matches);
+          }
+
+          if (colorBrackets) {
+            if (next != items.end() && endAtCurrent.size() != 0) {
               std::cout << "\033[0;22m";
-            } else {
-              for (size_t i = next->matches.size(); i < depth; ++i)
-                std::cout << " ]";
-            }
+            } 
+          } else {
+            for (std::set<size_t>::const_iterator iter = endAtCurrent.begin();
+                iter != endAtCurrent.end(); ++iter)
+              std::cout << " ]";
           }
 
           std::cout << " ";
 
-          prevDepth = depth;
+          prevMatches = itemIter->matches;
         }
 
         if (colorBrackets) {
           std::cout << "\033[0;22m" << std::endl;
-        } else {
-          for (size_t i = prevDepth; i > 0; --i) {
-            if (i == prevDepth) {
-              std::cout << "]";
-            } else {
-              std::cout << " ]";
-            }
-          }
         }
       }
 
