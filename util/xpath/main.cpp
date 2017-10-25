@@ -104,7 +104,7 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
           } else {
             for (std::set<size_t>::const_iterator iter = startAtCurrent.begin();
                 iter != startAtCurrent.end(); ++iter) {
-                std::cout << "[ ";
+              std::cout << *iter << ":[ ";
             }
           }
 
