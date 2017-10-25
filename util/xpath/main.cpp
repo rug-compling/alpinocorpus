@@ -43,6 +43,21 @@ std::set<T> unique_to_first(std::set<T> const &a, std::set<T> const &b)
   return result;
 }
 
+void output_depth_color(size_t depth) {
+  if (depth == 0)
+    std::cout << "\033[0;22m";
+  else if (depth == 1)
+    std::cout << "\033[38;5;99m";
+  else if (depth == 2)
+    std::cout << "\033[38;5;111m";
+  else if (depth == 3)
+    std::cout << "\033[38;5;123m";
+  else if (depth == 4)
+    std::cout << "\033[38;5;121m";
+  else
+    std::cout << "\033[38;5;119m";
+}
+
 void listCorpus(boost::shared_ptr<CorpusReader> reader,
   std::string const &query,
   bool bracketed,
@@ -84,20 +99,7 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
 
           if (colorBrackets) {
             if (startAtCurrent.size() != 0) {
-              size_t depth = itemIter->matches.size();
-
-              if (depth == 0)
-                std::cout << "\033[0;22m";
-              else if (depth == 1)
-                std::cout << "\033[38;5;99m";
-              else if (depth == 2)
-                std::cout << "\033[38;5;111m";
-              else if (depth == 3)
-                std::cout << "\033[38;5;123m";
-              else if (depth == 4)
-                std::cout << "\033[38;5;121m";
-              else
-                std::cout << "\033[38;5;119m";
+              output_depth_color(itemIter->matches.size());
             }
           } else {
             for (std::set<size_t>::const_iterator iter = startAtCurrent.begin();
@@ -128,10 +130,6 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
           std::cout << " ";
 
           prevMatches = itemIter->matches;
-        }
-
-        if (colorBrackets) {
-          std::cout << "\033[0;22m" << std::endl;
         }
       }
 
