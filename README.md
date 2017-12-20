@@ -54,7 +54,7 @@ Requirements
 
 - A C++ compiler.
 - Boost 1.47.0.
-- Berkeley DB XML 2.5.16 (later versions are not supported, see #131).
+- Berkeley DB XML 6.1.4 (with a small patch to correct a query processing bug, see #131).
 - libxml2
 - libxslt
 
@@ -81,7 +81,7 @@ http://github.com/rug-compling/alpinocorpus-go
 ## License
 
 ~~~
-Copyright 2010-2013 Daniël de Kok
+Copyright 2010-2017 Daniël de Kok
 Copyright 2010-2012 University of Groningen
 
 This library is free software; you can redistribute it and/or
