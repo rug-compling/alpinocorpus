@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(AlpinoCorpus)
 
-set (ALPINOCORPUS_VERSION "2.6.0")
+set (ALPINOCORPUS_VERSION "2.8.0")
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
@@ -199,7 +199,7 @@ add_library(alpino_corpus SHARED
 )
 
 set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
-  SOVERSION 2.0)
+  SOVERSION 2.8)
 
 target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
 target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
