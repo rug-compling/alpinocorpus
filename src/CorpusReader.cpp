@@ -8,7 +8,7 @@
 
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/regex.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/unordered_map.hpp>
 
 #include <AlpinoCorpus/CorpusInfo.hh>
@@ -55,7 +55,7 @@ namespace {
 
 
     std::vector<alpinocorpus::LexItem> collectLexicals(
-        boost::shared_ptr<xmlDoc> doc,
+        std::shared_ptr<xmlDoc> doc,
         boost::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth,
         std::string const &attribute,
         std::string const &defaultValue,
@@ -63,7 +63,7 @@ namespace {
     {
         std::vector<alpinocorpus::LexItem> items;
 
-        boost::shared_ptr<xmlXPathContext> xpCtx(
+        std::shared_ptr<xmlXPathContext> xpCtx(
             xmlXPathNewContext(doc.get()), xmlXPathFreeContext);
         if (xpCtx == 0)
         {
@@ -75,7 +75,7 @@ namespace {
           "[@" << corpusInfo.tokenAttribute() << "]";
         std::string lexNodeQuery = oss.str();
 
-        boost::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
+        std::shared_ptr<xmlXPathObject> xpObj(xmlXPathEvalExpression(
             toXmlStr(lexNodeQuery.c_str()), xpCtx.get()), xmlXPathFreeObject);
         if (xpObj == 0)
             return items;
@@ -90,17 +90,17 @@ namespace {
                 if (node->type == XML_ELEMENT_NODE)
                 {
                     xmlAttrPtr wordAttr = xmlHasProp(node, toXmlStr(attribute.c_str()));
-                    boost::shared_ptr<xmlChar> word;
+                    std::shared_ptr<xmlChar> word;
                     if (wordAttr == 0)
-                      word = boost::shared_ptr<xmlChar>(xmlStrdup(toXmlStr(defaultValue.c_str())), xmlFree);
+                      word = std::shared_ptr<xmlChar>(xmlStrdup(toXmlStr(defaultValue.c_str())), xmlFree);
                     else
-                      word = boost::shared_ptr<xmlChar>(xmlNodeGetContent(wordAttr->children), xmlFree);
+                      word = std::shared_ptr<xmlChar>(xmlNodeGetContent(wordAttr->children), xmlFree);
 
                     xmlAttrPtr beginAttr = xmlHasProp(node, toXmlStr("begin"));
                     size_t begin = 0;
                     if (beginAttr)
                     {
-                        boost::shared_ptr<xmlChar> beginStr(
+                        std::shared_ptr<xmlChar> beginStr(
                             xmlNodeGetContent(beginAttr->children), xmlFree);
                         try {
                             begin = alpinocorpus::util::parseString<size_t>(fromXmlStr(beginStr.get()));
@@ -258,7 +258,7 @@ namespace alpinocorpus {
         }
         std::string xmlData(read(entry, markers));
 
-        boost::shared_ptr<xmlDoc> doc(
+        std::shared_ptr<xmlDoc> doc(
             xmlReadMemory(xmlData.c_str(), xmlData.size(), NULL, NULL, 0),
             xmlFreeDoc);
 
@@ -271,7 +271,7 @@ namespace alpinocorpus {
             return std::vector<LexItem>();
         }
 
-        boost::shared_ptr<xmlXPathContext> xpCtx(
+        std::shared_ptr<xmlXPathContext> xpCtx(
             xmlXPathNewContext(doc.get()), xmlXPathFreeContext);
 
         if (xpCtx == 0)
@@ -279,7 +279,7 @@ namespace alpinocorpus {
             return std::vector<LexItem>();
         }
 
-        boost::shared_ptr<xmlXPathObject> xpObj(
+        std::shared_ptr<xmlXPathObject> xpObj(
             xmlXPathEvalExpression(toXmlStr("//*[@alpinocorpusActive='1']"),
                 xpCtx.get()),
             xmlXPathFreeObject);
@@ -524,14 +524,14 @@ namespace alpinocorpus {
 
         // Prepare context
     
-        boost::shared_ptr<xmlXPathContext> ctx(xmlXPathNewContext(0),
+        std::shared_ptr<xmlXPathContext> ctx(xmlXPathNewContext(0),
             xmlXPathFreeContext);
         if (!variables)
             ctx->flags = XML_XPATH_NOVAR;
         xmlSetStructuredErrorFunc(ctx.get(), &ignoreStructuredError);
         
         // Compile expression
-        boost::shared_ptr<xmlXPathCompExpr> r(
+        std::shared_ptr<xmlXPathCompExpr> r(
             xmlXPathCtxtCompile(ctx.get(), toXmlStr(query.c_str())),
             xmlXPathFreeCompExpr);
         

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <boost/unordered_map.hpp>
 
@@ -35,9 +35,9 @@ namespace alpinocorpus
 
 class CompactCorpusReaderPrivate : public CorpusReader
 {
-    typedef boost::shared_ptr<IndexItem> IndexItemPtr;
+    typedef std::shared_ptr<IndexItem> IndexItemPtr;
     typedef boost::unordered_map<std::string, IndexItemPtr> IndexMap;
-    typedef boost::shared_ptr<DzIstream> DzIstreamPtr;
+    typedef std::shared_ptr<DzIstream> DzIstreamPtr;
     typedef std::vector<IndexItemPtr> ItemVector;
 
     class IndexIter : public IterImpl

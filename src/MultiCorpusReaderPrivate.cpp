@@ -3,7 +3,7 @@
 #include <string>
 #include <utility>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <boost/filesystem.hpp>
 
@@ -306,7 +306,7 @@ Either<std::string, Empty> MultiCorpusReaderPrivate::validQuery(QueryDialect d, 
         {
             try {
                 std::pair<std::string, bool> p = d_corporaMap.begin()->second;
-                boost::shared_ptr<CorpusReader> reader;
+                std::shared_ptr<CorpusReader> reader;
                 if (p.second)
                     reader.reset(CorpusReaderFactory::openRecursive(p.first));
                 else

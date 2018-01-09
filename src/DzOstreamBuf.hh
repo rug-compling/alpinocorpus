@@ -2,11 +2,10 @@
 #define DZ_OSTREAMBUF_HH
 
 #include <cstdio>
+#include <memory>
 #include <streambuf>
 #include <string>
 #include <vector>
-
-#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <zlib.h>
 

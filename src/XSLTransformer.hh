@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 extern "C" {
 #include <libxslt/xsltInternals.h>
@@ -22,7 +22,7 @@ private:
     XSLTransformer &operator=(XSLTransformer const &other);
     void initWithStylesheet(std::string const &xslt);
 
-    boost::shared_ptr<xsltStylesheet> d_xslPtr;
+    std::shared_ptr<xsltStylesheet> d_xslPtr;
 };
 
 }

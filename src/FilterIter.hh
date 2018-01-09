@@ -4,7 +4,7 @@
 #include <queue>
 #include <string>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -33,7 +33,7 @@ namespace alpinocorpus {
         CorpusReader const &d_corpus;
         CorpusReader::EntryIterator d_itr;
         std::string d_file;
-        boost::shared_ptr<XQQuery> d_query;
+        std::shared_ptr<XQQuery> d_query;
         std::queue<std::string> d_buffer;
         mutable bool d_initialState;
         bool d_interrupted;
