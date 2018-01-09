@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <boost/config.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #if defined(BOOST_HAS_THREADS)
 #include <boost/thread/mutex.hpp>
@@ -16,7 +16,7 @@
 namespace alpinocorpus
 {
 
-typedef boost::shared_ptr<std::ostream> ostreamPtr;
+typedef std::shared_ptr<std::ostream> ostreamPtr;
 
 class CompactCorpusWriterPrivate : public CorpusWriter
 {

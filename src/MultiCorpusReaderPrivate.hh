@@ -3,7 +3,7 @@
 #include <string>
 #include <utility>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <boost/filesystem.hpp>
 
@@ -64,10 +64,10 @@ private:
     SortOrder d_sortOrder;
     size_t d_totalIters;
     std::list<ReaderIter> d_iters;
-    boost::shared_ptr<CorpusReader> d_currentReader;
-    boost::shared_ptr<CorpusReader::EntryIterator> d_currentIter;
+    std::shared_ptr<CorpusReader> d_currentReader;
+    std::shared_ptr<CorpusReader::EntryIterator> d_currentIter;
 #if defined(BOOST_HAS_THREADS)
-    boost::shared_ptr<boost::mutex> d_currentIterMutex;
+    std::shared_ptr<boost::mutex> d_currentIterMutex;
 #endif
     std::string d_currentName;
     bool d_hasQuery;

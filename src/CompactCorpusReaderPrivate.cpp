@@ -7,7 +7,7 @@
 
 #include <boost/config.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #if defined(BOOST_HAS_THREADS)
 #include <boost/thread/mutex.hpp>
