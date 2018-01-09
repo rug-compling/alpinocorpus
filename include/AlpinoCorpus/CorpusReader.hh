@@ -3,10 +3,9 @@
 
 #include <cstddef>
 #include <list>
+#include <memory>
 #include <queue>
 #include <string>
-
-#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusInfo.hh>
 #include <AlpinoCorpus/DLLDefines.hh>
@@ -68,7 +67,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
       private:
         void copy(EntryIterator const &other);
 
-        boost::shared_ptr<IterImpl> d_impl;
+        std::shared_ptr<IterImpl> d_impl;
     };
     
     struct MarkerQuery {
@@ -162,7 +161,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &q) const;
 
     // Initialized lazily in type();
-    boost::shared_ptr<std::string> d_type;
+    std::shared_ptr<std::string> d_type;
 };
 
 }

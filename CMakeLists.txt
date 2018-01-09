@@ -1,7 +1,9 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 3.1)
 project(AlpinoCorpus)
 
 set (ALPINOCORPUS_VERSION "2.8.0")
+
+set (CMAKE_CXX_STANDARD 11)
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
@@ -44,6 +46,8 @@ if(BOOST_ROOT)
 endif()
 
 include(GNUInstallDirs REQUIRED)
+
+set(Boost_USE_STATIC_LIBS ON)
 
 find_package(Boost 1.50 COMPONENTS system chrono date_time filesystem
   thread regex REQUIRED)
