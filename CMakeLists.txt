@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(AlpinoCorpus)
 
-set (ALPINOCORPUS_VERSION "2.8.0")
+set (ALPINOCORPUS_VERSION "2.8.1")
 
 set (CMAKE_CXX_STANDARD 11)
 
