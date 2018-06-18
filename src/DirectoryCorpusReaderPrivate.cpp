@@ -202,7 +202,7 @@ CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEntries(SortOrder s
             return EntryIterator(new SortedDirIter(d_directory,
                 bf::recursive_directory_iterator(d_directory, bf::symlink_option::recurse)));
         default:
-            BOOST_ASSERT_MSG(false, "Unexpected sort order.");
+            throw NotImplemented("Unexpected sort order.");
     }
 }
 
