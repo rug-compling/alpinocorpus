@@ -47,8 +47,6 @@ endif()
 
 include(GNUInstallDirs REQUIRED)
 
-set(Boost_USE_STATIC_LIBS ON)
-
 find_package(Boost 1.50 COMPONENTS system chrono date_time filesystem
   thread regex REQUIRED)
 
