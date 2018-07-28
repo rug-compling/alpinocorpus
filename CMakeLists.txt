@@ -32,12 +32,6 @@ include_directories(
   ${AlpinoCorpus_BINARY_DIR}/include
 )
 
-if (APPLE OR WIN32)
-  set(Boost_USE_STATIC_LIBS ON)
-else(APPLE OR WIN32)
-  set(Boost_USE_STATIC_LIBS OFF)
-endif(APPLE OR WIN32)
-
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
