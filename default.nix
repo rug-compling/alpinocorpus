@@ -5,6 +5,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     cmake
+    pkgconfig
   ];
 
   buildInputs = [
@@ -12,7 +13,6 @@ stdenv.mkDerivation rec {
     dbxml
     libxml2
     libxslt
-    pkgconfig
     xercesc
     xqilla
     zlib
