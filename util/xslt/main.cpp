@@ -163,5 +163,6 @@ int main (int argc, char *argv[])
       transformCorpus(reader, query, stylesheet);
   } catch (std::runtime_error &e) {
     std::cerr << "Error while transforming corpus: " << e.what() << std::endl;
+    return 1;
   }
 }
