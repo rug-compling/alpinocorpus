@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import argparse
+import sys
 
 from lxml import etree
 
@@ -44,7 +45,11 @@ def createGraph(tokens, n, explode_features):
     tokenElem.set('begin', str(i + 1))
     tokenElem.set('end', str(i + 2))
     headToken = int(token[6])
-    tokenElements[headToken].append(tokenElements[i + 1])
+    try:
+      tokenElements[headToken].append(tokenElements[i + 1])
+    except ValueError:
+        sys.stderr.write("s%d contains a cycle?\n" % n)
+        return
 
   wrap = etree.Element("conllx_ds")
   wrap.append(root)
