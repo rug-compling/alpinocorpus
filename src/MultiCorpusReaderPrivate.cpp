@@ -97,10 +97,24 @@ void MultiCorpusReaderPrivate::push_back(std::string const &name,
 std::pair<std::string, bool> MultiCorpusReaderPrivate::corpusFromPath(
     std::string const &path) const
 {
+  bool found = false;
+  std::string match;
+  std::pair<std::string, bool> corpus;
+
   for (Corpora::const_iterator iter =
-      d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter)
-    if (path.find(iter->first) == 0)
-      return iter->second;
+      d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter) {
+    if (path.find(iter->first) == 0) {
+      found = true;
+      if (iter->first.size() > match.size()) {
+        match = iter->first;
+	corpus = iter->second;
+      }
+    }
+  }
+
+  if (found) {
+    return corpus;
+  }
 
   throw std::runtime_error(std::string("Unknown corpus: " + path));
 }
@@ -108,10 +122,23 @@ std::pair<std::string, bool> MultiCorpusReaderPrivate::corpusFromPath(
 std::string MultiCorpusReaderPrivate::entryFromPath(
     std::string const &path) const
 {
+  bool found = false;
+  std::string match;
+
+  // Find corpus with longest shared name prefix.
   for (Corpora::const_iterator iter =
-      d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter)
-    if (path.find(iter->first) == 0)
-      return path.substr(iter->first.size() + 1);
+      d_corporaMap.begin(); iter != d_corporaMap.end(); ++iter) {
+    if (path.find(iter->first) == 0) {
+      found = true;
+      if (iter->first.size() > match.size()) {
+        match = iter->first;
+      }
+    }
+  }
+
+  if (found) {
+    return path.substr(match.size() + 1);
+  }
 
   throw std::runtime_error(std::string("Could not find entry: " + path));
 }
