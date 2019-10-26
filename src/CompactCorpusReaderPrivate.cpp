@@ -145,14 +145,14 @@ void CompactCorpusReaderPrivate::open(std::string const &dataPath,
         std::istringstream iss(line);
         
         std::string name;
-        iss >> name;
+        std::getline(iss, name, '\t');
         
         std::string offset64;
-        iss >> offset64;
+        std::getline(iss, offset64, '\t');
         size_t offset = util::b64_decode<size_t>(offset64);
         
         std::string size64;
-        iss >> size64;
+        std::getline(iss, size64);
         size_t size = util::b64_decode<size_t>(size64);
         
         IndexItemPtr item(new IndexItem(name, offset, size));
