@@ -3,13 +3,13 @@
 #include <iomanip>
 #include <iostream>
 #include <list>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/macros.hh>
@@ -44,10 +44,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    boost::shared_ptr<CorpusReader> reader;
+    std::shared_ptr<CorpusReader> reader;
     try {
-        reader = boost::shared_ptr<CorpusReader>(
-                openCorpus(opts->arguments().at(0), true));
+        reader = openCorpus(opts->arguments().at(0), true);
     } catch (std::runtime_error &e) {
         std::cerr << "Could not open corpus: " << e.what() << std::endl;
         return 1;

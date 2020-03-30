@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -8,7 +9,6 @@
 #include <boost/unordered_set.hpp>
 
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusInfo.hh>
@@ -58,7 +58,7 @@ void output_depth_color(size_t depth) {
     std::cout << "\033[38;5;119m";
 }
 
-void listCorpus(boost::shared_ptr<CorpusReader> reader,
+void listCorpus(std::shared_ptr<CorpusReader> reader,
   std::string const &query,
   bool bracketed,
   bool colorBrackets,
@@ -172,11 +172,10 @@ int main(int argc, char *argv[])
     return 1;
   }
  
-  boost::shared_ptr<CorpusReader> reader;
+  std::shared_ptr<CorpusReader> reader;
   try {
-    reader = boost::shared_ptr<CorpusReader>(
-      openCorpora(opts->arguments().begin(),
-        opts->arguments().end(), true));
+    reader = openCorpora(opts->arguments().begin(),
+        opts->arguments().end(), true);
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;

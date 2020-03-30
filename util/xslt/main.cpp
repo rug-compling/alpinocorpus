@@ -1,10 +1,10 @@
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
 #include <boost/unordered_set.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 extern "C" {
 #include <libxslt/xslt.h>
@@ -28,7 +28,7 @@ extern "C" {
 using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;
 
-void transformCorpus(boost::shared_ptr<CorpusReader> reader,
+void transformCorpus(std::shared_ptr<CorpusReader> reader,
   std::string const &query, std::string const &stylesheet)
 {
     std::list<CorpusReader::MarkerQuery> markerQueries;
@@ -59,7 +59,7 @@ void transformCorpus(boost::shared_ptr<CorpusReader> reader,
     }
 }
 
-void transformEntry(boost::shared_ptr<CorpusReader> reader,
+void transformEntry(std::shared_ptr<CorpusReader> reader,
   std::string const &query,
   std::string const &stylesheet,
   std::string const &entry)
@@ -118,15 +118,14 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  boost::shared_ptr<CorpusReader> reader;
+  std::shared_ptr<CorpusReader> reader;
   try {
     if (opts->arguments().size() == 2)
-      reader = boost::shared_ptr<CorpusReader>(
+      reader = std::shared_ptr<CorpusReader>(
         openCorpus(opts->arguments().at(1), true));
     else
-      reader = boost::shared_ptr<CorpusReader>(
-        openCorpora(opts->arguments().begin() + 1, 
-            opts->arguments().end(), true));
+      reader = openCorpora(opts->arguments().begin() + 1, 
+            opts->arguments().end(), true);
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;

@@ -1,12 +1,12 @@
 #include <exception>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
 #include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/macros.hh>
@@ -20,7 +20,7 @@ using alpinocorpus::Either;
 
 typedef boost::unordered_map<std::string, size_t> ValueCounts;
 
-ValueCounts countQuery(boost::shared_ptr<CorpusReader> reader,
+ValueCounts countQuery(std::shared_ptr<CorpusReader> reader,
     std::string const &query)
 {
     CorpusReader::EntryIterator i;
@@ -33,7 +33,7 @@ ValueCounts countQuery(boost::shared_ptr<CorpusReader> reader,
   return counts;
 }
 
-void printFrequencies(boost::shared_ptr<CorpusReader> reader,
+void printFrequencies(std::shared_ptr<CorpusReader> reader,
     ValueCounts const &counts, bool relative)
 {
     if (relative)
@@ -82,15 +82,14 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    boost::shared_ptr<CorpusReader> reader;
+    std::shared_ptr<CorpusReader> reader;
     try {
         if (opts->arguments().size() == 1)
-          reader = boost::shared_ptr<CorpusReader>(
+          reader = std::shared_ptr<CorpusReader>(
             openCorpus(opts->arguments().at(0), true));
         else
-          reader = boost::shared_ptr<CorpusReader>(
-            openCorpora(opts->arguments().begin() + 1, 
-                opts->arguments().end(), true));
+          reader = openCorpora(opts->arguments().begin() + 1, 
+                opts->arguments().end(), true);
     } catch (std::runtime_error &e) {
         std::cerr << "Could not open corpus: " << e.what() << std::endl;
         return 1;
