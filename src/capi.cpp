@@ -1,15 +1,10 @@
-// #define CAPI_DEBUG
-
-#ifdef CAPI_DEBUG
-#include <iostream>
-#endif
+#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <iostream>
 #include <list>
 #include <string>
-
-#include <boost/assert.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
@@ -25,7 +20,8 @@ alpinocorpus::SortOrder to_sort_order(sort_order_t sort_order) {
         case numerical_order:
             return alpinocorpus::NumericalOrder;
         default:
-            BOOST_ASSERT_MSG(false, "Unknown sort order");
+	  std::cerr << "Unknown sort order" << std::endl;
+	  exit(0);
     }
 }
 
