@@ -1,3 +1,4 @@
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -14,21 +15,21 @@ using alpinocorpus::CorpusReader;
 using alpinocorpus::CorpusReaderFactory;
 using alpinocorpus::MultiCorpusReader;
 
-CorpusReader* openCorpus(std::string const &path,
+std::shared_ptr<CorpusReader> openCorpus(std::string const &path,
     bool recursive)
 {
     if (recursive && bf::is_directory(bf::path(path)))
-      return CorpusReaderFactory::openRecursive(path, false);
+      return std::shared_ptr<CorpusReader>(CorpusReaderFactory::openRecursive(path, false));
     else
-      return CorpusReaderFactory::open(path);
+      return std::shared_ptr<CorpusReader>(CorpusReaderFactory::open(path));
 }
 
-CorpusReader *openCorpora(
+std::shared_ptr<CorpusReader> openCorpora(
     std::vector<std::string>::const_iterator const &pathBegin,    
     std::vector<std::string>::const_iterator const &pathEnd,
     bool recursive)
 {
-  MultiCorpusReader *readers = new MultiCorpusReader;
+  auto readers = std::make_shared<MultiCorpusReader>();
 
   for (std::vector<std::string>::const_iterator iter = pathBegin;
       iter != pathEnd; ++iter)
@@ -39,7 +40,7 @@ CorpusReader *openCorpora(
 
     bool isDir = bf::is_directory(p);
 
-    if (bf::is_directory(p) && iter->rfind('/') == iter->size() - 1)
+    if (isDir && iter->rfind('/') == iter->size() - 1)
       p = bf::path(iter->substr(0, iter->size() - 1));
 
     // Kill the extension, if there is any.

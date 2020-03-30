@@ -1,8 +1,8 @@
 #include <iostream>
+#include <memory>
 #include <string>
 
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -21,7 +21,7 @@ using alpinocorpus::CorpusReader;
 using alpinocorpus::Entry;
 using alpinocorpus::Either;
 
-void listCorpus(boost::shared_ptr<CorpusReader> reader,
+void listCorpus(std::shared_ptr<CorpusReader> reader,
   std::string const &query)
 {
   CorpusReader::EntryIterator i;
@@ -35,7 +35,7 @@ void listCorpus(boost::shared_ptr<CorpusReader> reader,
   }
 }
 
-void readEntry(boost::shared_ptr<CorpusReader> reader, std::string const &entry)
+void readEntry(std::shared_ptr<CorpusReader> reader, std::string const &entry)
 {
   std::cout << reader->read(entry);
 }
@@ -80,15 +80,14 @@ int main(int argc, char *argv[])
     return 1;
   }   
  
-  boost::shared_ptr<CorpusReader> reader;
+  std::shared_ptr<CorpusReader> reader;
   try {
     if (opts->arguments().size() == 1)
-      reader = boost::shared_ptr<CorpusReader>(
+      reader = std::shared_ptr<CorpusReader>(
         openCorpus(opts->arguments().at(0), true));
     else
-      reader = boost::shared_ptr<CorpusReader>(
-        openCorpora(opts->arguments().begin(),
-          opts->arguments().end(), true));
+      reader = openCorpora(opts->arguments().begin(),
+          opts->arguments().end(), true);
   } catch (std::runtime_error &e) {
     std::cerr << "Could not open corpus: " << e.what() << std::endl;
     return 1;
