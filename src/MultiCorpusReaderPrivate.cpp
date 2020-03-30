@@ -187,7 +187,8 @@ CorpusReader::EntryIterator MultiCorpusReaderPrivate::runXQuery(
 // Iteration over MultiCorpusReaders
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
-  Corpora const &corpora, SortOrder sortOrder) : d_sortOrder(sortOrder), d_hasQuery(false), d_interrupted(false)
+  Corpora const &corpora, SortOrder sortOrder) : d_sortOrder(sortOrder), d_hasQuery(false),
+						 d_dialect(CorpusReader::XPATH), d_interrupted(false)
 {
 #if defined(BOOST_HAS_THREADS)
     d_currentIterMutex.reset(new boost::mutex);
