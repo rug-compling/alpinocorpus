@@ -4,8 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-
-#include <boost/unordered_set.hpp>
+#include <unordered_set>
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/filesystem.hpp>
@@ -76,7 +75,7 @@ void writeCorpus(std::shared_ptr<CorpusReader> reader,
   
   // We need to be *really* sure when writing a corpus that an entry was not written
   // before. So, we'll use a set, rather than a basic filter.
-  boost::unordered_set<std::string> seen;
+  std::unordered_set<std::string> seen;
   while (i.hasNext()) {
     Entry e = i.next(*reader);
 

@@ -2,8 +2,8 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <unordered_set>
 
-#include <boost/unordered_set.hpp>
 #include <boost/scoped_ptr.hpp>
 
 extern "C" {
@@ -46,7 +46,7 @@ void transformCorpus(std::shared_ptr<CorpusReader> reader,
     else
         i = reader->entriesWithStylesheet(stylesheet);
 
-    boost::unordered_set<std::string> seen;
+    std::unordered_set<std::string> seen;
 
     while (i.hasNext())
     {

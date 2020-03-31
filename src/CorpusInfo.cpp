@@ -1,32 +1,30 @@
 #include <map>
 #include <string>
 
-#include <boost/assign/list_of.hpp>
-
 #include <AlpinoCorpus/CorpusInfo.hh>
 
 namespace alpinocorpus {
 
 CorpusInfo const ALPINO_CORPUS_INFO(
-    boost::assign::list_of("node"),
+    {"node"},
     "node",
     "word");
 
 CorpusInfo const TUEBA_DZ_CORPUS_INFO(
-    boost::assign::list_of("node")("ne")("word"),
+    {"node", "ne", "word"},
     "word",
     "form");
 
 CorpusInfo const CONLLX_CORPUS_INFO(
-    boost::assign::list_of("word"),
+    {"word"},
     "word",
     "form");
 
-std::map<std::string, CorpusInfo> const PREDEFINED_CORPORA =
-    boost::assign::map_list_of
-      ("alpino_ds", ALPINO_CORPUS_INFO)
-      ("tueba_tree", TUEBA_DZ_CORPUS_INFO)
-      ("conllx_ds", CONLLX_CORPUS_INFO);
+std::map<std::string, CorpusInfo> const PREDEFINED_CORPORA = {
+    {"alpino_ds", ALPINO_CORPUS_INFO},
+    {"tueba_tree", TUEBA_DZ_CORPUS_INFO},
+    {"conllx_ds", CONLLX_CORPUS_INFO}
+};
 
 CorpusInfo const FALLBACK_CORPUS_INFO = ALPINO_CORPUS_INFO;
 
