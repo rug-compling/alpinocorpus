@@ -2,15 +2,12 @@
 #define ALPINO_COMPACT_CORPUSREADER_PRIVATE_HH
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include <boost/config.hpp>
-
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread/mutex.hpp>
-#endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -77,9 +74,7 @@ private:
 	IndexMap d_namedIndices;
     std::string d_name;
 
-#if defined(BOOST_HAS_THREADS)
-    mutable boost::mutex d_readMutex;
-#endif
+    mutable std::mutex d_readMutex;
 };
 
 }
