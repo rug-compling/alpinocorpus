@@ -4,8 +4,8 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 
-#include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -18,7 +18,7 @@ using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;
 
 
-typedef boost::unordered_map<std::string, size_t> ValueCounts;
+typedef std::unordered_map<std::string, size_t> ValueCounts;
 
 ValueCounts countQuery(std::shared_ptr<CorpusReader> reader,
     std::string const &query)
@@ -39,19 +39,16 @@ void printFrequencies(std::shared_ptr<CorpusReader> reader,
     if (relative)
     {
         size_t count = 0;
-        for (ValueCounts::const_iterator iter = counts.begin();
-            iter != counts.end(); ++iter)
+        for (auto iter = counts.begin(); iter != counts.end(); ++iter)
             count += iter->second;
 
-        for (ValueCounts::const_iterator iter = counts.begin();
-            iter != counts.end(); ++iter)
+        for (auto iter = counts.begin(); iter != counts.end(); ++iter)
             std::cout << iter->first << " " <<
         (static_cast<double>(iter->second) / count) << std::endl;
 
     }
     else
-        for (ValueCounts::const_iterator iter = counts.begin();
-            iter != counts.end(); ++iter)
+        for (auto iter = counts.begin(); iter != counts.end(); ++iter)
             std::cout << iter->first << " " << iter->second << std::endl;
 }
 

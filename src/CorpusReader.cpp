@@ -2,14 +2,14 @@
 #include <cassert>
 #include <cstring>
 #include <list>
+#include <memory>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/regex.hpp>
-#include <memory>
-#include <boost/unordered_map.hpp>
 
 #include <AlpinoCorpus/CorpusInfo.hh>
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -56,7 +56,7 @@ namespace {
 
     std::vector<alpinocorpus::LexItem> collectLexicals(
         std::shared_ptr<xmlDoc> doc,
-        boost::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth,
+        std::unordered_map<xmlNode *, std::set<size_t> > const &matchDepth,
         std::string const &attribute,
         std::string const &defaultValue,
         alpinocorpus::CorpusInfo const &corpusInfo)
@@ -110,8 +110,7 @@ namespace {
 
                     alpinocorpus::LexItem item = {fromXmlStr(word.get()), begin, std::set<size_t>() };
 
-                    boost::unordered_map<xmlNode *, std::set<size_t> >::const_iterator matchIter =
-                        matchDepth.find(node);
+                    auto matchIter = matchDepth.find(node);
                     if (matchIter != matchDepth.end())
                         item.matches = matchIter->second;
 
@@ -130,7 +129,7 @@ namespace {
     // counts in the lexical nodes. But frankly, manipulating the DOM tree is
     // a drag. Since we do not modify the tree, we can keep the counts by
     // memory adres. Ugly, but effective. Don't we love that?
-    void markLexicals(xmlNode *node, boost::unordered_map<xmlNode *,
+    void markLexicals(xmlNode *node, std::unordered_map<xmlNode *,
         std::set<size_t> > *matchDepth, size_t matchId, std::string wordAttr)
     {
         // Don't attempt to handle a node that we can't.
@@ -290,7 +289,7 @@ namespace alpinocorpus {
 
         // Do we have matches?
         xmlNodeSet *nodeSet = xpObj->nodesetval;
-        boost::unordered_map<xmlNode *, std::set<size_t> > matchDepth;
+        std::unordered_map<xmlNode *, std::set<size_t> > matchDepth;
         if (nodeSet != 0)
         {
             for (int i = 0; i < nodeSet->nodeNr; ++i)

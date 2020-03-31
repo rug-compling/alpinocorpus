@@ -1,12 +1,10 @@
 #ifndef ALPINO_COMPACT_CORPUSREADER_PRIVATE_HH
 #define ALPINO_COMPACT_CORPUSREADER_PRIVATE_HH
 
-#include <string>
-#include <vector>
-
 #include <memory>
-
-#include <boost/unordered_map.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <boost/config.hpp>
 
@@ -36,7 +34,7 @@ namespace alpinocorpus
 class CompactCorpusReaderPrivate : public CorpusReader
 {
     typedef std::shared_ptr<IndexItem> IndexItemPtr;
-    typedef boost::unordered_map<std::string, IndexItemPtr> IndexMap;
+    typedef std::unordered_map<std::string, IndexItemPtr> IndexMap;
     typedef std::shared_ptr<DzIstream> DzIstreamPtr;
     typedef std::vector<IndexItemPtr> ItemVector;
 

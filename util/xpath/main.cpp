@@ -5,8 +5,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
-
-#include <boost/unordered_set.hpp>
+#include <unordered_set>
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/filesystem.hpp>
@@ -74,7 +73,7 @@ void listCorpus(std::shared_ptr<CorpusReader> reader,
 
   NotEqualsPrevious<std::string> pred;
 
-  boost::unordered_set<std::string> seen;
+  std::unordered_set<std::string> seen;
   while (i.hasNext())
   {
     Entry entry = i.next(*reader);

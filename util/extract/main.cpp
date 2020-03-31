@@ -8,7 +8,6 @@
 #include <string>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -20,9 +19,6 @@
 
 using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;
-
-
-typedef boost::unordered_map<std::string, size_t> ValueCounts;
 
 
 void usage(std::string const &programName) {
