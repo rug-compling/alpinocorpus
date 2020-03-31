@@ -1,4 +1,6 @@
+#include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
@@ -9,9 +11,6 @@
 
 #include <zlib.h>
 
-#include <boost/cstdint.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/filesystem.hpp>
 
 #include "DzOstreamBuf.hh"
@@ -20,8 +19,6 @@
 
 
 namespace bf = boost::filesystem;
-namespace pt = boost::posix_time;
-namespace bg = boost::gregorian;
 
 namespace {
 
@@ -197,15 +194,16 @@ void DzOstreamBuf::writeHeader()
 {
 	std::vector<unsigned char> header(GZ_HEADER_SIZE);
 
-	// Get the current time. gzip only allows for 32-bit timestamps.
-  pt::ptime epoch(bg::date(1970, 1, 1));
-  pt::time_duration diff = pt::second_clock::universal_time() - epoch;
+  // Get the current time. gzip only allows for 32-bit timestamps.
+  //
+  // system_clock is not guaranteed to use UNIX epoch until C++20.
+  // But we only support UNIX systems anyway.
+  const auto clock = std::chrono::system_clock::now();
+  auto secsSinceEpoch = std::chrono::duration_cast<std::chrono::seconds>(
+    clock.time_since_epoch()).count();
  
-  long secsSinceEpoch;
-  if (diff.total_seconds() > std::numeric_limits<boost::int32_t>::max())
+  if (secsSinceEpoch > std::numeric_limits<boost::int32_t>::max())
       secsSinceEpoch = 0;
-  else
-      secsSinceEpoch = diff.total_seconds();
 
 	header[GZ_HEADER_ID1] = gzipId1;
 	header[GZ_HEADER_ID2] = gzipId2;
