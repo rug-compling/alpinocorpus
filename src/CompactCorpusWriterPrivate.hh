@@ -5,10 +5,7 @@
 
 #include <boost/config.hpp>
 #include <memory>
-
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread/mutex.hpp>
-#endif
+#include <mutex>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
@@ -46,9 +43,7 @@ private:
 	ostreamPtr d_indexStream;
 	size_t d_offset;
 
-#if defined(BOOST_HAS_THREADS)
-    mutable boost::mutex d_writeMutex;
-#endif
+    mutable std::mutex d_writeMutex;
 };
 
 inline CompactCorpusWriterPrivate::CompactCorpusWriterPrivate(CompactCorpusWriterPrivate const &other)

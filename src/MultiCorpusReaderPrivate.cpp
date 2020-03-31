@@ -1,17 +1,13 @@
 #include <list>
+#include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
-#include <memory>
-
 #include <boost/filesystem.hpp>
 
 #include <boost/config.hpp>
-
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread/mutex.hpp>
-#endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
@@ -190,9 +186,7 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
   Corpora const &corpora, SortOrder sortOrder) : d_sortOrder(sortOrder), d_hasQuery(false),
 						 d_dialect(CorpusReader::XPATH), d_interrupted(false)
 {
-#if defined(BOOST_HAS_THREADS)
-    d_currentIterMutex.reset(new boost::mutex);
-#endif
+  d_currentIterMutex.reset(new std::mutex);
 
   for (Corpora::const_iterator
       iter = corpora.begin();
@@ -211,9 +205,7 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
   SortOrder sortOrder) :
   d_sortOrder(sortOrder), d_hasQuery(true), d_query(query), d_dialect(dialect), d_interrupted(false)
 {
-#if defined(BOOST_HAS_THREADS)
-    d_currentIterMutex.reset(new boost::mutex);
-#endif
+  d_currentIterMutex.reset(new std::mutex);
 
   for (Corpora::const_iterator
       iter = corpora.begin();
@@ -253,9 +245,7 @@ void MultiCorpusReaderPrivate::MultiIter::interrupt()
 
   // d_currentIter could be resetted in the iteration thread after the
   // null-pointer check.
-#if defined(BOOST_HAS_THREADS)
-  boost::mutex::scoped_lock lock(*d_currentIterMutex);
-#endif
+  std::lock_guard<std::mutex> lock(*d_currentIterMutex);
   if (d_currentIter)
     d_currentIter->interrupt();
 }
@@ -276,9 +266,7 @@ void MultiCorpusReaderPrivate::MultiIter::nextIterator()
   while (d_iters.size() != 0 && !d_interrupted &&
     (!d_currentIter || !d_currentIter->hasNext()))
   {
-#if defined(BOOST_HAS_THREADS)
-    boost::mutex::scoped_lock lock(*d_currentIterMutex);
-#endif
+    std::lock_guard<std::mutex> lock(*d_currentIterMutex);
     d_currentIter.reset();
     d_currentReader.reset();
     openTip();

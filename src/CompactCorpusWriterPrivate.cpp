@@ -1,11 +1,8 @@
 #include <fstream>
+#include <mutex>
 #include <string>
 
 #include <boost/config.hpp>
-
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread/mutex.hpp>
-#endif
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -43,9 +40,7 @@ void CompactCorpusWriterPrivate::copy(CompactCorpusWriterPrivate const &other)
 
 void CompactCorpusWriterPrivate::writeEntry(std::string const &name, std::string const &data)
 {
-#if defined(BOOST_HAS_THREADS)
-    boost::mutex::scoped_lock lock(d_writeMutex);
-#endif
+  std::lock_guard<std::mutex> lock(d_writeMutex);
 
 	*d_dataStream << data;
 	*d_indexStream << name << "\t" << util::b64_encode(d_offset) << "\t" <<
@@ -55,9 +50,7 @@ void CompactCorpusWriterPrivate::writeEntry(std::string const &name, std::string
 
 void CompactCorpusWriterPrivate::writeEntry(std::string const &name, char const *buf, size_t len)
 {
-#if defined(BOOST_HAS_THREADS)
-    boost::mutex::scoped_lock lock(d_writeMutex);
-#endif
+  std::lock_guard<std::mutex> lock(d_writeMutex);
 
 	d_dataStream->write(buf, len);
 	*d_indexStream << name << "\t" << util::b64_encode(d_offset) << "\t" <<

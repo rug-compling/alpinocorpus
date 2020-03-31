@@ -1,4 +1,6 @@
 #include <fstream>
+#include <memory>
+#include <mutex>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -7,11 +9,6 @@
 
 #include <boost/config.hpp>
 #include <boost/filesystem.hpp>
-#include <memory>
-
-#if defined(BOOST_HAS_THREADS)
-#include <boost/thread/mutex.hpp>
-#endif
 
 #include <AlpinoCorpus/Error.hh>
 
@@ -166,9 +163,7 @@ std::string CompactCorpusReaderPrivate::readEntry(std::string const &filename) c
     if (iter == d_namedIndices.end())
         throw Error("CompactCorpusReaderPrivate::read: requesting unknown data!");
 
-#if defined(BOOST_HAS_THREADS)
-    boost::mutex::scoped_lock lock(d_readMutex);
-#endif
+    std::lock_guard<std::mutex> lock(d_readMutex);
     
     std::vector<unsigned char> data(iter->second->size);
     d_dataStream->seekg(iter->second->offset, std::ios::beg);
