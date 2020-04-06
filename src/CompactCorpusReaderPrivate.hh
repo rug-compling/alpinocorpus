@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <boost/config.hpp>
-
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>

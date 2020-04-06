@@ -2,8 +2,6 @@
 #define ALPINO_COMPACT_CORPUSWRITER_PRIVATE_HH
 
 #include <iostream>
-
-#include <boost/config.hpp>
 #include <memory>
 #include <mutex>
 
