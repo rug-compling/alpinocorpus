@@ -3,13 +3,11 @@
 #include <cstring>
 #include <list>
 #include <memory>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include <boost/algorithm/string/regex.hpp>
-#include <boost/regex.hpp>
 
 #include <AlpinoCorpus/CorpusInfo.hh>
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -35,6 +33,7 @@
 #include "FilterIter.hh"
 #include "StylesheetIter.hh"
 #include "util/parseString.hh"
+#include "util/split.hh"
 
 namespace xerces = XERCES_CPP_NAMESPACE;
 
@@ -241,8 +240,7 @@ namespace alpinocorpus {
         std::string const &defaultValue,
         CorpusInfo const &corpusInfo) const
     {
-        std::vector<std::string> queries;
-        boost::split_regex(queries, query, boost::regex("\\+\\|\\+"));
+        auto queries = split_string(query, std::regex("\\+\\|\\+"));
         assert(queries.size() > 0);
 
         // Discard pre-filters
@@ -307,8 +305,7 @@ namespace alpinocorpus {
     
     Either<std::string, Empty> CorpusReader::isValidQuery(QueryDialect d, bool variables, std::string const &q) const
     {
-        std::vector<std::string> queries;
-        boost::split_regex(queries, q, boost::regex("\\+\\|\\+"));
+        auto queries = split_string(q, std::regex("\\+\\|\\+"));
         assert(queries.size() > 0);
 
         for (std::vector<std::string>::const_iterator iter = queries.begin();
@@ -338,8 +335,7 @@ namespace alpinocorpus {
         for (std::list<MarkerQuery>::iterator iter = effectiveQueries.begin();
             iter != effectiveQueries.end(); ++iter)
         {
-            std::vector<std::string> queries;
-            boost::split_regex(queries, iter->query, boost::regex("\\+\\|\\+"));
+            auto queries = split_string(iter->query, std::regex("\\+\\|\\+"));
             assert(queries.size() > 0);
             iter->query = queries.back();
         }
@@ -545,8 +541,7 @@ namespace alpinocorpus {
     {
         if (d == XPATH)
         {
-            std::vector<std::string> queries;
-            boost::split_regex(queries, q, boost::regex("\\+\\|\\+"));
+            auto queries = split_string(q, std::regex("\\+\\|\\+"));
             assert(queries.size() > 0);
 
             EntryIterator qIter = runXPath(queries[0], sortOrder);

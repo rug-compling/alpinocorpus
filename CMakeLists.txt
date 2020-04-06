@@ -41,7 +41,7 @@ endif()
 
 include(GNUInstallDirs REQUIRED)
 
-find_package(Boost 1.50 COMPONENTS system filesystem regex REQUIRED)
+find_package(Boost 1.50 COMPONENTS system filesystem REQUIRED)
 
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -135,6 +135,7 @@ set(HEADERS
   src/util/base64.hh
   src/util/bufutil.hh
   src/util/parseString.hh
+  src/util/split.hh
   src/util/textfile.hh
   src/util/url.hh
 )
@@ -163,6 +164,7 @@ set(SOURCES
   src/macros.cpp
   src/parseMacros.cpp
   src/util/NameCompare.cpp
+  src/util/split.cpp
   src/util/textfile.cpp
   src/util/url.cpp
 )
