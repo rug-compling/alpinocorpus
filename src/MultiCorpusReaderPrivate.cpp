@@ -7,8 +7,6 @@
 
 #include <boost/filesystem.hpp>
 
-#include <boost/config.hpp>
-
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>

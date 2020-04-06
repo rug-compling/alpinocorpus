@@ -2,8 +2,6 @@
 #include <mutex>
 #include <string>
 
-#include <boost/config.hpp>
-
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>

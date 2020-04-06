@@ -7,7 +7,6 @@
 #include <typeinfo>
 #include <vector>
 
-#include <boost/config.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/Error.hh>

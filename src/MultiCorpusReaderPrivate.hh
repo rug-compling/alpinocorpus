@@ -5,7 +5,6 @@
 #include <string>
 #include <utility>
 
-#include <boost/config.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
@@ -61,9 +60,7 @@ private:
     std::list<ReaderIter> d_iters;
     std::shared_ptr<CorpusReader> d_currentReader;
     std::shared_ptr<CorpusReader::EntryIterator> d_currentIter;
-#if defined(BOOST_HAS_THREADS)
     std::shared_ptr<std::mutex> d_currentIterMutex;
-#endif
     std::string d_currentName;
     bool d_hasQuery;
     std::string d_query;
