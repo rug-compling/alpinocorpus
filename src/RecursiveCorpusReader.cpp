@@ -1,15 +1,14 @@
+#include <filesystem>
 #include <list>
-#include <string>
-
 #include <memory>
-#include <boost/filesystem.hpp>
+#include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 #include <AlpinoCorpus/RecursiveCorpusReader.hh>
 
-namespace bf = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace alpinocorpus {
 
@@ -30,7 +29,7 @@ public:
   Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
 
 private:
-  bf::path d_directory;
+  fs::path d_directory;
   std::shared_ptr<MultiCorpusReader> d_multiReader;
 };
 
@@ -95,23 +94,24 @@ RecursiveCorpusReaderPrivate::RecursiveCorpusReaderPrivate(std::string const &di
   d_multiReader(new MultiCorpusReader)
 {
   if (directory[directory.size() - 1] == '/')
-    d_directory = bf::path(directory).parent_path();
+    d_directory = fs::path(directory).parent_path();
   else
-    d_directory = bf::path(directory);
+    d_directory = fs::path(directory);
 
-  if (!bf::exists(d_directory) ||
-    !bf::is_directory(d_directory))
+  if (!fs::exists(d_directory) ||
+    !fs::is_directory(d_directory))
     throw OpenError(directory, "non-existent or not a directory");
 
-  for (bf::recursive_directory_iterator iter(d_directory, bf::symlink_option::recurse);
-       iter != bf::recursive_directory_iterator();
+  for (fs::recursive_directory_iterator iter(d_directory,
+       fs::directory_options::follow_directory_symlink);
+       iter != fs::recursive_directory_iterator();
        ++iter)
   {
     if (iter->path().extension() != ".dact" &&
         (dactOnly || iter->path().extension() != ".index"))
       continue;
 
-    bf::path namePath = iter->path();
+    fs::path namePath = iter->path();
     namePath.replace_extension("");
     std::string name = namePath.string();
 

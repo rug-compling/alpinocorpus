@@ -5,7 +5,7 @@ enable_testing()
 
 set (ALPINOCORPUS_VERSION "2.6.0")
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 17)
 
 if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Release)
@@ -41,7 +41,7 @@ endif()
 
 include(GNUInstallDirs REQUIRED)
 
-find_package(Boost 1.50 COMPONENTS system filesystem REQUIRED)
+find_package(Boost 1.50 COMPONENTS system REQUIRED)
 
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})

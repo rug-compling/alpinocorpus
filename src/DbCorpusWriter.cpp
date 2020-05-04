@@ -1,10 +1,9 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
 #include <sstream>
 #include <string>
-
-#include <boost/filesystem.hpp>
 
 #include <dbxml/DbXml.hpp>
 
@@ -13,7 +12,7 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/util/NonCopyable.hh>
 
-namespace bf = boost::filesystem;
+namespace fs = std::filesystem;
 namespace db = DbXml;
 
 namespace alpinocorpus {
@@ -76,7 +75,7 @@ namespace alpinocorpus {
                                                     db::XmlContainer
                                                     ::NodeContainer);
             } else {
-                if (bf::exists(path))
+                if (fs::exists(path))
                     d_container = d_mgr.openContainer(path, config);
                 else
                     d_container = d_mgr.createContainer(path, config,
@@ -149,7 +148,7 @@ namespace alpinocorpus {
                                db::XmlUpdateContext &ctx)
     {
         try {
-            std::string canonical(bf::path(name).generic_string());
+            std::string canonical(fs::path(name).generic_string());
             d_container.putDocument(canonical, content, ctx,
                                   db::DBXML_WELL_FORMED_ONLY);
         } catch (db::XmlException const &e) {

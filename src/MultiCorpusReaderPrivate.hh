@@ -1,11 +1,10 @@
+#include <filesystem>
 #include <list>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <utility>
-
-#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -92,7 +91,7 @@ private:
   std::pair<std::string, bool> corpusFromPath(std::string const &path) const;
   std::string entryFromPath(std::string const &path) const;
 
-  boost::filesystem::path d_directory;
+  std::filesystem::path d_directory;
   std::list<std::pair<std::string, bool> > d_corpora;
   Corpora d_corporaMap;
 #ifdef USE_DBXML
