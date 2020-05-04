@@ -4,8 +4,6 @@
 #include <functional>
 #include <memory>
 
-#include <boost/shared_ptr.hpp>
-
 template <typename T>
 class EqualsPrevious : public std::unary_function<T, bool>
 {

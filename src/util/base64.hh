@@ -10,8 +10,6 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/static_assert.hpp>
-
 namespace {
   std::string b64_chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -45,7 +43,7 @@ namespace util {
 template <typename T>
 std::string b64_encode(T val)
 {
-  BOOST_STATIC_ASSERT(std::numeric_limits<T>::is_integer);
+  static_assert(std::numeric_limits<T>::is_integer);
 
   // Find number of 6-bit chunks
   size_t chunks = 1;
@@ -69,7 +67,7 @@ std::string b64_encode(T val)
 template <typename T>
 T b64_decode(std::string const &val)
 {
-  BOOST_STATIC_ASSERT(std::numeric_limits<T>::is_integer);
+  static_assert(std::numeric_limits<T>::is_integer);
 
   T result = 0;
   size_t offset = 0;
