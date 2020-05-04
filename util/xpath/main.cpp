@@ -7,7 +7,6 @@
 #include <string>
 #include <unordered_set>
 
-#include <boost/scoped_ptr.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusInfo.hh>
@@ -138,11 +137,6 @@ void listCorpus(std::shared_ptr<CorpusReader> reader,
   }
 }
 
-void readEntry(boost::shared_ptr<CorpusReader> reader, std::string const &entry)
-{
-  std::cout << reader->read(entry);
-}
-
 void usage(std::string const &programName)
 {
     std::cerr << "Usage: " << programName << " [OPTION] treebank(s)" <<
@@ -156,7 +150,7 @@ void usage(std::string const &programName)
 
 int main(int argc, char *argv[])
 {
-  boost::scoped_ptr<ProgramOptions> opts;
+  std::unique_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
       "a:cm:q:s"));

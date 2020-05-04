@@ -4,8 +4,6 @@
 #include <string>
 #include <unordered_set>
 
-#include <boost/scoped_ptr.hpp>
-
 extern "C" {
 #include <libxslt/xslt.h>
 #include <libxml/parser.h>
@@ -20,7 +18,6 @@ extern "C" {
 
 #include "../src/util/textfile.hh" // XXX - hmpf
 
-#include <EqualsPrevious.hh>
 #include <ProgramOptions.hh>
 #include <Stylesheet.hh>
 #include <util.hh>
@@ -95,7 +92,7 @@ int main (int argc, char *argv[])
     // XPath
     xmlXPathInit();
 
-  boost::scoped_ptr<ProgramOptions> opts;
+  std::unique_ptr<ProgramOptions> opts;
   try {
     opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
       "g:m:q:"));

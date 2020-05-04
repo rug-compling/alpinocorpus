@@ -8,7 +8,6 @@
 #include <string>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/macros.hh>
@@ -26,7 +25,7 @@ void usage(std::string const &programName) {
 }
 
 int main(int argc, char *argv[]) {
-    boost::scoped_ptr<ProgramOptions> opts;
+    std::unique_ptr<ProgramOptions> opts;
     try {
         opts.reset(new ProgramOptions(argc, const_cast<char const **>(argv),
                 "q"));
