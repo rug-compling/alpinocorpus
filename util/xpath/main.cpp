@@ -7,8 +7,6 @@
 #include <string>
 #include <unordered_set>
 
-#include <boost/filesystem.hpp>
-
 #include <AlpinoCorpus/CorpusInfo.hh>
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -29,8 +27,6 @@ using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;
 using alpinocorpus::Entry;
 using alpinocorpus::LexItem;
-
-namespace bf = boost::filesystem;
 
 template<typename T>
 std::set<T> unique_to_first(std::set<T> const &a, std::set<T> const &b)

@@ -12,7 +12,6 @@
 
 #include <ProgramOptions.hh>
 #include <util.hh>
-#include <boost/filesystem/operations.hpp>
 
 using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;

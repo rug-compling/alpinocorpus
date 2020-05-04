@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -6,8 +7,6 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
-
-#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/Error.hh>
 
@@ -20,7 +19,7 @@ namespace {
     char const * const INDEX_EXT = ".index";
 }
 
-namespace bf = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace alpinocorpus {
 
@@ -51,12 +50,12 @@ void CompactCorpusReaderPrivate::construct(std::string const &canonical,
     std::string const &indexPath)
 {
     // XXX race condition up ahead
-    bf::path dataP(dataPath);
-    if (!bf::is_regular_file(dataP))
+    fs::path dataP(dataPath);
+    if (!fs::is_regular_file(dataP))
         throw OpenError(dataPath, "not a regular file");
 
-    bf::path indexP(indexPath);
-    if (!bf::is_regular_file(indexP))
+    fs::path indexP(indexPath);
+    if (!fs::is_regular_file(indexP))
         throw OpenError(indexPath, "not a regular file");
 
     open(dataPath, indexPath);

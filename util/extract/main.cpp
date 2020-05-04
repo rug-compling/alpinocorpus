@@ -1,4 +1,5 @@
 #include <exception>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -7,14 +8,11 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/filesystem/path.hpp>
-
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/macros.hh>
 
 #include <ProgramOptions.hh>
 #include <util.hh>
-#include <boost/filesystem/operations.hpp>
 
 using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;
@@ -47,17 +45,17 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    boost::filesystem::path targetPath = opts->arguments().at(1);
+    std::filesystem::path targetPath = opts->arguments().at(1);
 
     CorpusReader::EntryIterator iter = reader->entries();
     while (iter.hasNext()) {
         alpinocorpus::Entry entry = iter.next(*reader);
 
-        boost::filesystem::path entryPath(entry.name);
-        boost::filesystem::path filePath = targetPath / entryPath;
+        std::filesystem::path entryPath(entry.name);
+        std::filesystem::path filePath = targetPath / entryPath;
 
-        if (!boost::filesystem::exists(filePath.parent_path())) {
-            boost::filesystem::create_directories(filePath.parent_path());
+        if (!std::filesystem::exists(filePath.parent_path())) {
+            std::filesystem::create_directories(filePath.parent_path());
         }
 
         std::string content = reader->read(entry.name,

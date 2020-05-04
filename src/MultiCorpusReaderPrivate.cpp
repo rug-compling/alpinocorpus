@@ -1,11 +1,10 @@
+#include <filesystem>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <string>
 #include <utility>
-
-#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
@@ -21,7 +20,7 @@
 
 #include "MultiCorpusReaderPrivate.hh"
 
-namespace bf = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace alpinocorpus {
 
@@ -80,8 +79,8 @@ size_t MultiCorpusReaderPrivate::getSize() const
 void MultiCorpusReaderPrivate::push_back(std::string const &name,
     std::string const &filename, bool recursive)
 {
-    bf::path corpusPath(filename);
-    if (!bf::exists(corpusPath))
+    fs::path corpusPath(filename);
+    if (!fs::exists(corpusPath))
       throw OpenError(filename);
 
     d_corpora.push_back(std::make_pair(filename, recursive));

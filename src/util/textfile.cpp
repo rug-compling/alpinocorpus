@@ -1,10 +1,9 @@
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <stdexcept>
 #include <string>
-
-#include <boost/filesystem.hpp>
 
 #include "textfile.hh"
 
@@ -12,9 +11,9 @@ namespace alpinocorpus { namespace util {
 
 std::string readFile(std::string const &filename)
 {
-    boost::filesystem::path p(filename);
+    std::filesystem::path p(filename);
     
-    if (!boost::filesystem::is_regular_file(p))
+    if (!std::filesystem::is_regular_file(p))
         throw std::runtime_error(std::string("readFile: '")
                                 + filename
                                 + "' is not a regular file");
