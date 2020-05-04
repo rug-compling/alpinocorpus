@@ -2,6 +2,7 @@
 #define ALPINOCORPUS_EQUALSPREVIOUS_HH
 
 #include <functional>
+#include <memory>
 
 #include <boost/shared_ptr.hpp>
 
@@ -23,7 +24,7 @@ public:
   }
 
   // operator() is often expected to be const.
-  mutable boost::shared_ptr<T> d_previous;
+  mutable std::unique_ptr<T> d_previous;
 };
 
 template <typename T>
