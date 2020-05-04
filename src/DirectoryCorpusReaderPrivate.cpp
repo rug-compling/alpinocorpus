@@ -7,7 +7,6 @@
 #include <typeinfo>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/assert.hpp>
 #include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/Error.hh>
