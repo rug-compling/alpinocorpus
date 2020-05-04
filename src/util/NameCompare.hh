@@ -1,9 +1,8 @@
 #ifndef ALPINOCORPUS_NAME_COMPARE
 #define ALPINOCORPUS_NAME_COMPARE
 
+#include <filesystem>
 #include <string>
-
-#include <boost/filesystem.hpp>
 
 namespace alpinocorpus
 {
@@ -15,8 +14,8 @@ struct NameCompare
 
 struct PathCompare
 {
-    bool operator()(boost::filesystem::path const &p1,
-        boost::filesystem::path const &p2) const;
+    bool operator()(std::filesystem::path const &p1,
+        std::filesystem::path const &p2) const;
 private:
     NameCompare d_nameCompare;
 };

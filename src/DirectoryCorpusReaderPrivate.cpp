@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <limits>
@@ -8,7 +9,6 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/assert.hpp>
-#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -18,17 +18,17 @@
 #include "util/NameCompare.hh"
 #include "util/textfile.hh"
 
-namespace bf = boost::filesystem;
+namespace fs = std::filesystem;
 
 namespace {
     class DirIter : public alpinocorpus::IterImpl
     {
-        boost::filesystem::recursive_directory_iterator iter;
-        boost::filesystem::path d_directory;
+        fs::recursive_directory_iterator iter;
+        fs::path d_directory;
 
       public:
-        DirIter(boost::filesystem::path const &path,
-            boost::filesystem::recursive_directory_iterator i);
+        DirIter(fs::path const &path,
+            fs::recursive_directory_iterator i);
         alpinocorpus::IterImpl *copy() const;
         bool hasNext();
         alpinocorpus::Entry next(alpinocorpus::CorpusReader const &rdr);
@@ -37,7 +37,7 @@ namespace {
     };
 
     DirIter::DirIter(
-        bf::path const &path, bf::recursive_directory_iterator i) :
+        fs::path const &path, fs::recursive_directory_iterator i) :
         d_directory(path), iter(i)
     {
     }
@@ -51,7 +51,7 @@ namespace {
     bool DirIter::isValid()
     {
         // End is a correct iterator state.
-        if (iter == bf::recursive_directory_iterator())
+        if (iter == fs::recursive_directory_iterator())
             return true;
 
         return iter->path().extension() == ".xml";
@@ -64,7 +64,7 @@ namespace {
           ++iter;
         }
 
-        return iter != bf::recursive_directory_iterator();
+        return iter != fs::recursive_directory_iterator();
     }
 
     alpinocorpus::Entry DirIter::next(alpinocorpus::CorpusReader const &rdr)
@@ -78,7 +78,7 @@ namespace {
         if (entryPathStr[0] == '/')
             entryPathStr.erase(0, 1);
 
-        bf::path entryPath(entryPathStr);
+        fs::path entryPath(entryPathStr);
 
         // Move the iterator.
         ++iter;
@@ -94,8 +94,8 @@ namespace {
         std::vector<std::string>::const_iterator d_iter;
 
       public:
-        SortedDirIter(boost::filesystem::path const &path,
-            boost::filesystem::recursive_directory_iterator i);
+        SortedDirIter(fs::path const &path,
+            fs::recursive_directory_iterator i);
         alpinocorpus::IterImpl *copy() const;
         bool hasNext();
         alpinocorpus::Entry next(alpinocorpus::CorpusReader const &rdr);
@@ -106,9 +106,9 @@ namespace {
     };
 
     SortedDirIter::SortedDirIter(
-        bf::path const &path, bf::recursive_directory_iterator i)
+        fs::path const &path, fs::recursive_directory_iterator i)
     {
-        for (; i != bf::recursive_directory_iterator(); i++)
+        for (; i != fs::recursive_directory_iterator(); i++)
         {
             std::string entryPathStr = i->path().string();
             entryPathStr.erase(0, path.string().size());
@@ -161,7 +161,7 @@ namespace {
     {
         // We assume the iterator is valid, since hasNext() should be called
 
-        bf::path entryPath(*d_iter);
+        fs::path entryPath(*d_iter);
 
         // Move the iterator.
         ++d_iter;
@@ -180,12 +180,12 @@ DirectoryCorpusReaderPrivate::DirectoryCorpusReaderPrivate(
     d_nEntries(std::numeric_limits<size_t>::max())
 {
     if (directory[directory.size() - 1] == '/')
-        d_directory = bf::path(directory).parent_path();
+        d_directory = fs::path(directory).parent_path();
     else
-        d_directory = bf::path(directory);
+        d_directory = fs::path(directory);
     
-    if (!bf::exists(d_directory) ||
-        !bf::is_directory(d_directory))
+    if (!fs::exists(d_directory) ||
+        !fs::is_directory(d_directory))
         throw OpenError(directory, "non-existent or not a directory");
 }
 
@@ -197,10 +197,12 @@ CorpusReader::EntryIterator DirectoryCorpusReaderPrivate::getEntries(SortOrder s
     switch (sortOrder) {
         case NaturalOrder:
             return EntryIterator(new DirIter(d_directory,
-                bf::recursive_directory_iterator(d_directory, bf::symlink_option::recurse)));
+                fs::recursive_directory_iterator(d_directory,
+		  fs::directory_options::follow_directory_symlink)));
         case NumericalOrder:
             return EntryIterator(new SortedDirIter(d_directory,
-                bf::recursive_directory_iterator(d_directory, bf::symlink_option::recurse)));
+                fs::recursive_directory_iterator(d_directory,
+		  fs::directory_options::follow_directory_symlink)));
         default:
             throw NotImplemented("Unexpected sort order.");
     }
@@ -232,12 +234,12 @@ size_t DirectoryCorpusReaderPrivate::getSize() const
 
 std::string DirectoryCorpusReaderPrivate::readEntry(std::string const &entry) const
 {
-    bf::path p(d_directory);
+    fs::path p(d_directory);
     p /= entry;
     return util::readFile(p.string());
 }
 
-bf::path DirectoryCorpusReaderPrivate::cachePath() const
+fs::path DirectoryCorpusReaderPrivate::cachePath() const
 {
     return d_directory.parent_path() / d_directory.filename().replace_extension(".dir_index");
 }

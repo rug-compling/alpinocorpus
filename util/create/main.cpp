@@ -1,12 +1,11 @@
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
-
-#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
@@ -44,7 +43,7 @@ using alpinocorpus::SortOrder;
 using alpinocorpus::DbCorpusWriter;
 #endif
 
-namespace bf = boost::filesystem;
+namespace fs = std::filesystem;
 
 void usage(std::string const &programName)
 {
@@ -167,7 +166,7 @@ int main(int argc, char *argv[])
         for (std::vector<std::string>::const_iterator iter =
             opts->arguments().begin(); iter != opts->arguments().end();
             ++iter)
-          if (bf::equivalent(treebankOut, *iter))
+          if (fs::equivalent(treebankOut, *iter))
             throw std::runtime_error("Attempting to write to the source treebank.");
   
 #if defined(USE_DBXML)
@@ -194,7 +193,7 @@ int main(int argc, char *argv[])
         for (std::vector<std::string>::const_iterator iter =
             opts->arguments().begin(); iter != opts->arguments().end();
             ++iter)
-          if (bf::equivalent(outIndex, *iter) || bf::equivalent(outDataDz, *iter))
+          if (fs::equivalent(outIndex, *iter) || fs::equivalent(outDataDz, *iter))
             throw std::runtime_error("Attempting to write to the source treebank.");
   
         std::shared_ptr<CorpusWriter> wr(new CompactCorpusWriter(treebankOut));

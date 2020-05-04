@@ -1,10 +1,9 @@
 #ifndef ALPINO_DIRECTORYCORPUSREADER_PRIVATE_HH
 #define ALPINO_DIRECTORYCORPUSREADER_PRIVATE_HH
 
+#include <filesystem>
 #include <string>
 #include <vector>
-
-#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
@@ -32,9 +31,9 @@ public:
     virtual size_t getSize() const;
 
 private:
-    boost::filesystem::path cachePath() const;
+    std::filesystem::path cachePath() const;
 
-    boost::filesystem::path d_directory;
+    std::filesystem::path d_directory;
     mutable size_t d_nEntries;
     bool d_entriesRead;
 };

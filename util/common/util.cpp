@@ -1,15 +1,15 @@
+#include <filesystem>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
-#include <boost/filesystem.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 
-namespace bf = boost::filesystem;
+namespace fs = std::filesystem;
 
 using alpinocorpus::CorpusReader;
 using alpinocorpus::CorpusReaderFactory;
@@ -18,7 +18,7 @@ using alpinocorpus::MultiCorpusReader;
 std::shared_ptr<CorpusReader> openCorpus(std::string const &path,
     bool recursive)
 {
-    if (recursive && bf::is_directory(bf::path(path)))
+    if (recursive && fs::is_directory(fs::path(path)))
       return std::shared_ptr<CorpusReader>(CorpusReaderFactory::openRecursive(path, false));
     else
       return std::shared_ptr<CorpusReader>(CorpusReaderFactory::open(path));
@@ -36,12 +36,12 @@ std::shared_ptr<CorpusReader> openCorpora(
   {
     // If we are dealing with a directory, and the path ends with a trailing
     // slash, we remove the slash.
-    bf::path p = bf::path(*iter);
+    fs::path p = fs::path(*iter);
 
-    bool isDir = bf::is_directory(p);
+    bool isDir = fs::is_directory(p);
 
     if (isDir && iter->rfind('/') == iter->size() - 1)
-      p = bf::path(iter->substr(0, iter->size() - 1));
+      p = fs::path(iter->substr(0, iter->size() - 1));
 
     // Kill the extension, if there is any.
     p.replace_extension("");

@@ -1,9 +1,8 @@
 #include <cctype>
+#include <filesystem>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <boost/filesystem.hpp>
 
 #include "InfInt.h"
 #include "NameCompare.hh"
@@ -76,8 +75,8 @@ namespace alpinocorpus {
         return false;
     }
 
-    bool PathCompare::operator()(boost::filesystem::path const &p1,
-        boost::filesystem::path const &p2) const
+    bool PathCompare::operator()(std::filesystem::path const &p1,
+        std::filesystem::path const &p2) const
     {
         return d_nameCompare(p1.string(), p2.string());
     }
