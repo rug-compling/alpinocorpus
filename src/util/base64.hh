@@ -43,7 +43,8 @@ namespace util {
 template <typename T>
 std::string b64_encode(T val)
 {
-  static_assert(std::numeric_limits<T>::is_integer);
+  static_assert(std::numeric_limits<T>::is_integer,
+    "b64_encode can only encode integral types");
 
   // Find number of 6-bit chunks
   size_t chunks = 1;
@@ -67,7 +68,8 @@ std::string b64_encode(T val)
 template <typename T>
 T b64_decode(std::string const &val)
 {
-  static_assert(std::numeric_limits<T>::is_integer);
+  static_assert(std::numeric_limits<T>::is_integer,
+    "b64_decode can only decode integral types");
 
   T result = 0;
   size_t offset = 0;
