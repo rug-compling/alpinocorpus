@@ -15,8 +15,8 @@ alpinocorpus.pc
 cmake_install.cmake
 include/config.hh
 install_manifest.txt
-libalpino_corpus.so
-libalpino_corpus.so.*
+libalpinocorpus.so
+libalpinocorpus.so.*
 resources/CMakeFiles/
 util/CMakeFiles/
 util/alpinocorpus-config

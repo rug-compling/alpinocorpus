@@ -3,6 +3,7 @@ project(AlpinoCorpus)
 
 enable_testing()
 
+set(ALPINOCORPUS_LIB alpinocorpus)
 set (ALPINOCORPUS_VERSION "2.6.0")
 
 set (CMAKE_CXX_STANDARD 11)
@@ -189,27 +190,27 @@ if(USE_DBXML)
   )
 endif()
 
-add_library(alpino_corpus SHARED
+add_library(${ALPINOCORPUS_LIB} SHARED
 	${SOURCES}
 	${HEADERS}
 )
 
-set_target_properties(alpino_corpus PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
+set_target_properties(${ALPINOCORPUS_LIB} PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
   SOVERSION 2.0)
 
-target_link_libraries(alpino_corpus ${Boost_LIBRARIES})
-target_link_libraries(alpino_corpus ${ZLIB_LIBRARIES})
-target_link_libraries(alpino_corpus ${XERCESC_LIBRARY})
-target_link_libraries(alpino_corpus ${XQILLA_LIBRARY})
+target_link_libraries(${ALPINOCORPUS_LIB} ${Boost_LIBRARIES})
+target_link_libraries(${ALPINOCORPUS_LIB} ${ZLIB_LIBRARIES})
+target_link_libraries(${ALPINOCORPUS_LIB} ${XERCESC_LIBRARY})
+target_link_libraries(${ALPINOCORPUS_LIB} ${XQILLA_LIBRARY})
 if(USE_DBXML)
-  target_link_libraries(alpino_corpus ${DBXML_LIBRARY})
+  target_link_libraries(${ALPINOCORPUS_LIB} ${DBXML_LIBRARY})
 endif(USE_DBXML)
-target_link_libraries(alpino_corpus ${LIBXML2_LIBRARIES})
+target_link_libraries(${ALPINOCORPUS_LIB} ${LIBXML2_LIBRARIES})
 
-target_link_libraries(alpino_corpus ${LIBXSLT_LIBRARIES})
-target_link_libraries(alpino_corpus ${LIBEXSLT_LIBRARIES})
+target_link_libraries(${ALPINOCORPUS_LIB} ${LIBXSLT_LIBRARIES})
+target_link_libraries(${ALPINOCORPUS_LIB} ${LIBEXSLT_LIBRARIES})
 
-install(TARGETS alpino_corpus
+install(TARGETS ${ALPINOCORPUS_LIB}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
@@ -228,12 +229,12 @@ install(FILES ${MANPAGES} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 
 if(USE_DBXML)
   add_executable(writer_test test/writer.cpp)
-  target_link_libraries(writer_test alpino_corpus)
+  target_link_libraries(writer_test ${ALPINOCORPUS_LIB})
   #add_test(writer writer_test)
 endif()
 
 add_executable(readers_available test/readers_available.cpp)
-target_link_libraries(readers_available alpino_corpus)
+target_link_libraries(readers_available ${ALPINOCORPUS_LIB})
 
 add_subdirectory(util)
 

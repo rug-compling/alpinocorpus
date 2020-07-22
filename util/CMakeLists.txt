@@ -33,7 +33,7 @@ add_executable(alpinocorpus-create
   ${COMMON_SOURCES}
 )
 
-target_link_libraries(alpinocorpus-create alpino_corpus)
+target_link_libraries(alpinocorpus-create ${ALPINOCORPUS_LIB})
 
 set(XPATH_SOURCES
   xpath/main.cpp
@@ -49,7 +49,7 @@ add_executable(alpinocorpus-extract
 )
 
 target_link_libraries(alpinocorpus-extract
-  alpino_corpus
+  ${ALPINOCORPUS_LIB}
 )
 
 set(GET_SOURCES
@@ -62,7 +62,7 @@ add_executable(alpinocorpus-get
   ${COMMON_SOURCES}
 )
 
-target_link_libraries(alpinocorpus-get alpino_corpus)
+target_link_libraries(alpinocorpus-get ${ALPINOCORPUS_LIB})
 
 add_executable(alpinocorpus-xpath
   ${XPATH_SOURCES}
@@ -70,7 +70,7 @@ add_executable(alpinocorpus-xpath
   ${COMMON_SOURCES}
 )
 
-target_link_libraries(alpinocorpus-xpath alpino_corpus)
+target_link_libraries(alpinocorpus-xpath ${ALPINOCORPUS_LIB})
 
 set(XQUERY_SOURCES
   xquery/main.cpp
@@ -82,7 +82,7 @@ add_executable(alpinocorpus-xquery
   ${COMMON_SOURCES}
 )
 
-target_link_libraries(alpinocorpus-xquery alpino_corpus)
+target_link_libraries(alpinocorpus-xquery ${ALPINOCORPUS_LIB})
 
 set(XSLT_HEADERS
   common/Stylesheet.hh
@@ -101,7 +101,7 @@ add_executable(alpinocorpus-xslt
 )
 
 target_link_libraries(alpinocorpus-xslt
-  alpino_corpus
+  ${ALPINOCORPUS_LIB}
   ${LIBXSLT_LIBRARIES}
   ${LIBEXSLT_LIBRARIES}
 )
@@ -117,7 +117,7 @@ add_executable(alpinocorpus-stats
 )
 
 target_link_libraries(alpinocorpus-stats
-  alpino_corpus
+  ${ALPINOCORPUS_LIB}
 )
 
 install(
