@@ -4,7 +4,10 @@ project(AlpinoCorpus)
 enable_testing()
 
 set(ALPINOCORPUS_LIB alpinocorpus)
-set (ALPINOCORPUS_VERSION "2.6.0")
+set(ALPINOCORPUS_MAJOR_VERSION 3)
+set(ALPINOCORPUS_MINOR_VERSION 0)
+set(ALPINOCORPUS_PATCH_VERSION 0)
+set(ALPINOCORPUS_VERSION "${ALPINOCORPUS_MAJOR_VERSION}.${ALPINOCORPUS_MINOR_VERSION}.${ALPINOCORPUS_PATCH_VERSION}")
 
 set (CMAKE_CXX_STANDARD 11)
 
@@ -93,10 +96,14 @@ if(LIBEXSLT_FOUND)
   include_directories(${LIBEXSLT_INCLUDE_DIR})
 endif()
 
-
 configure_file (
   "${AlpinoCorpus_SOURCE_DIR}/include/config.hh.in"
   "${AlpinoCorpus_BINARY_DIR}/include/config.hh"
+)
+
+configure_file (
+  "${AlpinoCorpus_SOURCE_DIR}/include/AlpinoCorpus/version.hh.in"
+  "${AlpinoCorpus_BINARY_DIR}/include/AlpinoCorpus/version.hh"
 )
 
 configure_file (
@@ -196,7 +203,7 @@ add_library(${ALPINOCORPUS_LIB} SHARED
 )
 
 set_target_properties(${ALPINOCORPUS_LIB} PROPERTIES VERSION ${ALPINOCORPUS_VERSION}
-  SOVERSION 2.0)
+  SOVERSION ${ALPINOCORPUS_MAJOR_VERSION})
 
 target_link_libraries(${ALPINOCORPUS_LIB} ${Boost_LIBRARIES})
 target_link_libraries(${ALPINOCORPUS_LIB} ${ZLIB_LIBRARIES})
@@ -218,6 +225,9 @@ install(TARGETS ${ALPINOCORPUS_LIB}
 install(DIRECTORY include/AlpinoCorpus
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   FILES_MATCHING REGEX "^[^.].*\\.(hh|h)$")
+
+install(FILES ${AlpinoCorpus_BINARY_DIR}/include/AlpinoCorpus/version.hh
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/AlpinoCorpus)
 
 install(FILES ${AlpinoCorpus_BINARY_DIR}/alpinocorpus.pc
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
