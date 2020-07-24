@@ -10,8 +10,9 @@ stdenv.mkDerivation {
   src = nix-gitignore.gitignoreSource [ ".git/" ] ./.;
 
   nativeBuildInputs = [
-    cmake
-    pkgconfig
+    meson
+    ninja
+    pkg-config
   ];
 
   buildInputs = [
@@ -24,15 +25,14 @@ stdenv.mkDerivation {
     zlib
   ] ++ lib.optional stdenv.isDarwin libiconv;
 
-  doInstallCheck = true;
+  doCheck = true;
 
-  # Tests currently only work after installation, since the library
-  # paths are not set up correctly.
-  installCheckPhase = ''
-    make test
-  '';
+  # Meson is no longer able to pick up Boost automatically.
+  # https://github.com/NixOS/nixpkgs/issues/86131
+  BOOST_INCLUDEDIR = "${stdenv.lib.getDev boost}/include";
+  BOOST_LIBRARYDIR = "${stdenv.lib.getLib boost}/lib";
 
-   meta = with stdenv.lib; {
+  meta = with stdenv.lib; {
     description = "Library for Alpino treebanks";
     homepage = "https://github.com/rug-compling/alpinocorpus";
     license = licenses.lgpl21;

@@ -6,18 +6,13 @@
 #include <utility>
 
 #include <boost/filesystem.hpp>
+#include <dbxml/DbXml.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 
 #include "util/NameCompare.hh"
-
-#include <config.hh>
-
-#ifdef USE_DBXML
-#include <dbxml/DbXml.hpp>
-#endif
 
 namespace alpinocorpus {
 
@@ -84,9 +79,7 @@ protected:
 
   EntryIterator runXPath(std::string const &query, SortOrder sortOrder) const;
   EntryIterator runXQuery(std::string const &query, SortOrder sortOrder) const;
-#ifdef USE_DBXML
   Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &query) const;
-#endif
 
 private:
   std::pair<std::string, bool> corpusFromPath(std::string const &path) const;
@@ -95,10 +88,8 @@ private:
   boost::filesystem::path d_directory;
   std::list<std::pair<std::string, bool> > d_corpora;
   Corpora d_corporaMap;
-#ifdef USE_DBXML
   mutable DbXml::XmlManager d_mgr;
   DbXml::XmlContainer d_container;
-#endif
 };
 
 }

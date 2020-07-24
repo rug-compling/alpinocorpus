@@ -5,7 +5,6 @@
 #include <AlpinoCorpus/CorpusWriter.hh>
 #include <AlpinoCorpus/DbCorpusWriter.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <config.hh>
 
 namespace alpinocorpus {
     CorpusWriter *CorpusWriter::open(std::string const &filename,
@@ -13,11 +12,7 @@ namespace alpinocorpus {
     {
       switch (writerType) {
         case DBXML_CORPUS_WRITER:
-#ifdef USE_DBXML
           return new DbCorpusWriter(filename, overwrite);
-#else
-          throw Error("AlpinoCorpus library without DBXML support");
-#endif
           break;
         case COMPACT_CORPUS_WRITER:
           return new CompactCorpusWriter(filename);
@@ -29,10 +24,6 @@ namespace alpinocorpus {
 
     bool CorpusWriter::writerAvailable(WriterType writerType)
     {
-#ifndef USE_DBXML
-      if (writerType == DBXML_CORPUS_WRITER)
-        return false;
-#endif
       return true;
     }
 

@@ -15,7 +15,6 @@
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 #include <AlpinoCorpus/util/Either.hh>
-#include <config.hh>
 
 #include <AlpinoCorpus/LexItem.hh>
 #include <AlpinoCorpus/macros.hh>

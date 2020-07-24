@@ -1,0 +1,45 @@
+alpinocorpus_sources = [
+  'capi.cpp',
+  'CompactCorpusReader.cpp',
+  'CompactCorpusReaderPrivate.cpp',
+  'CompactCorpusWriter.cpp',
+  'CompactCorpusWriterPrivate.cpp',
+  'CorpusInfo.cpp',
+  'CorpusReader.cpp',
+  'CorpusReaderFactory.cpp',
+  'CorpusWriter.cpp',
+  'DbCorpusReader.cpp',
+  'DbCorpusReaderPrivate.cpp',
+  'DbCorpusWriter.cpp',
+  'DirectoryCorpusReader.cpp',
+  'DirectoryCorpusReaderPrivate.cpp',
+  'DzIstreamBuf.cpp',
+  'DzIstream.cpp',
+  'DzOstreamBuf.cpp',
+  'DzOstream.cpp',
+  'Error.cpp',
+  'FilterIter.cpp',
+  'IterImpl.cpp',
+  'macros.cpp',
+  'MultiCorpusReader.cpp',
+  'MultiCorpusReaderPrivate.cpp',
+  'parseMacros.cpp',
+  'RecursiveCorpusReader.cpp',
+  'StylesheetIter.cpp',
+  'util/NameCompare.cpp',
+  'util/split.cpp',
+  'util/textfile.cpp',
+  'util/url.cpp',
+  'XSLTransformer.cpp'
+]
+
+alpinocorpus = shared_library('alpinocorpus',
+  alpinocorpus_sources,
+  include_directories: inc,
+  dependencies: [boost_dep, dbxml_dep, libxml_dep, libexslt_dep, libxslt_dep, xercesc_dep, xqilla_dep, zlib_dep],
+  install: true,
+  version: meson.project_version())
+
+pkg = import('pkgconfig')
+pkg.generate(alpinocorpus,
+  description: 'Library for reading, writing, and querying Alpino treebanks')

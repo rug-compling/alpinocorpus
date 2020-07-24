@@ -1,0 +1,7 @@
+install_man('alpinocorpus-create.1')
+install_man('alpinocorpus-extract.1')
+install_man('alpinocorpus-get.1')
+install_man('alpinocorpus-stats.1')
+install_man('alpinocorpus-xpath.1')
+install_man('alpinocorpus-xquery.1')
+install_man('alpinocorpus-xslt.1')
