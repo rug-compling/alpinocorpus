@@ -1,7 +1,0 @@
-include(CTest)
-
-file(COPY test_corpora DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-add_executable(compact_handle_filename_with_spaces compact_handle_filename_with_spaces.cpp)
-target_link_libraries(compact_handle_filename_with_spaces alpino_corpus)
-add_test(compact_handle_filename_with_spaces compact_handle_filename_with_spaces)

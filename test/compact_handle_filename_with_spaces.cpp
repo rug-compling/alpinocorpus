@@ -4,7 +4,7 @@
 
 namespace ac = alpinocorpus;
 
-static std::string const corpus_path = "test_corpora/filename_with_spaces.index";
+static std::string const corpus_path = "test/test_corpora/filename_with_spaces.index";
 
 int main(int argc, char *argv[])
 {

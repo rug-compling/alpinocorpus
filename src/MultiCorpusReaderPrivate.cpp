@@ -6,18 +6,13 @@
 #include <utility>
 
 #include <boost/filesystem.hpp>
+#include <dbxml/DbXml.hpp>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/IterImpl.hh>
 #include <AlpinoCorpus/util/Either.hh>
-
-#include <config.hh>
-
-#ifdef USE_DBXML
-#include <dbxml/DbXml.hpp>
-#endif
 
 #include "MultiCorpusReaderPrivate.hh"
 
@@ -311,7 +306,6 @@ double MultiCorpusReaderPrivate::MultiIter::progress()
           static_cast<double>(d_totalIters) * 100.0;
 }
 
-#ifdef USE_DBXML
 Either<std::string, Empty> MultiCorpusReaderPrivate::validQuery(QueryDialect d, bool variables,
     std::string const &query) const
 {
@@ -343,7 +337,6 @@ Either<std::string, Empty> MultiCorpusReaderPrivate::validQuery(QueryDialect d, 
         }
 
         return Either<std::string, Empty>::right(Empty());
-#endif
 }
 
 }

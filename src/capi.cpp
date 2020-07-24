@@ -11,8 +11,6 @@
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/capi.h>
 
-#include <config.hh>
-
 alpinocorpus::SortOrder to_sort_order(sort_order_t sort_order) {
     switch (sort_order) {
         case natural_order:
@@ -78,7 +76,6 @@ alpinocorpus_reader alpinocorpus_open(char const *path)
 
 alpinocorpus_reader alpinocorpus_open_recursive(char const *path)
 {
-#if defined(USE_DBXML)
     alpinocorpus::CorpusReader *reader = 0;
 
     try {
@@ -88,9 +85,6 @@ alpinocorpus_reader alpinocorpus_open_recursive(char const *path)
     }
 
     return new alpinocorpus_reader_t(reader);
-#else
-    return NULL;
-#endif
 }
 
 void alpinocorpus_close(alpinocorpus_reader reader)

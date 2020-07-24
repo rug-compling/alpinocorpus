@@ -10,15 +10,11 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
+#include <AlpinoCorpus/DbCorpusWriter.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
 #include <AlpinoCorpus/util/Either.hh>
-#include <config.hh>
-
-#if defined(USE_DBXML)
-  #include <AlpinoCorpus/DbCorpusWriter.hh>
-#endif
 
 #include <AlpinoCorpus/CompactCorpusWriter.hh>
 #include <AlpinoCorpus/LexItem.hh>
@@ -33,16 +29,13 @@
 using alpinocorpus::CorpusReader;
 using alpinocorpus::CorpusWriter;
 using alpinocorpus::CompactCorpusWriter;
+using alpinocorpus::DbCorpusWriter;
 using alpinocorpus::Either;
 using alpinocorpus::Entry;
 using alpinocorpus::LexItem;
 using alpinocorpus::NaturalOrder;
 using alpinocorpus::NumericalOrder;
 using alpinocorpus::SortOrder;
-
-#if defined(USE_DBXML)
-using alpinocorpus::DbCorpusWriter;
-#endif
 
 namespace bf = boost::filesystem;
 
@@ -51,9 +44,7 @@ void usage(std::string const &programName)
     std::cerr << "Usage: " << programName << " [OPTION] treebanks" <<
       std::endl << std::endl <<
       "  -c filename\tCreate a compact corpus archive" << std::endl <<
-#if defined(USE_DBXML)
       "  -d filename\tCreate a Dact dbxml archive" << std::endl <<
-#endif
       "  -m filename\tLoad macro file" << std::endl <<
       "  -n\t\tUse numerical sorting (when available)" << std::endl <<
       "  -q query\tFilter the treebank using the given query" << std::endl <<
@@ -170,13 +161,8 @@ int main(int argc, char *argv[])
           if (bf::equivalent(treebankOut, *iter))
             throw std::runtime_error("Attempting to write to the source treebank.");
   
-#if defined(USE_DBXML)
         std::shared_ptr<CorpusWriter> wr(new DbCorpusWriter(treebankOut, true));
         writeCorpus(reader, wr, query, sortOrder);
-#else
-        throw std::runtime_error("AlpinoCorpus was compiled without DBXML support.");
-#endif // defined(USE_DBXML)
-
     } catch (std::runtime_error const &e) {
         std::cerr << opts->programName() <<
         ": error creating Dact treebank: " << e.what() << std::endl;

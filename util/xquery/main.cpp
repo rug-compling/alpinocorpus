@@ -6,7 +6,6 @@
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/MultiCorpusReader.hh>
-#include <config.hh>
 
 #include <AlpinoCorpus/macros.hh>
 
