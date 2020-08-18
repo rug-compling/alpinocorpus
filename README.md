@@ -53,12 +53,21 @@ $ brew install alpinocorpus
 Requirements
 
 - A C++ compiler.
+- Meson
 - Boost 1.47.0.
 - Berkeley DB XML 6.1.4 (with a small patch to correct a query processing bug, see #131).
 - libxml2
 - libxslt
 
-Execute *cmake .*, followed by *make* in the source directory.
+Compilation steps:
+
+```bash
+$ meson builddir
+$ cd builddir
+$ meson compile
+# If you want to install the library:
+$ meson install
+```
 
 ## Bindings
 
