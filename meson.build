@@ -11,7 +11,12 @@ libexslt_dep = dependency('libexslt')
 libxml_dep = dependency('libxml-2.0')
 libxslt_dep = dependency('libxslt')
 dbxml_dep = cpp.find_library('dbxml', has_headers: 'dbxml/DbXml.hpp')
-xercesc_dep = dependency('xerces-c')
+
+xercesc_dep = dependency('xerces-c', required: false)
+if not xercesc_dep.found()
+  xercesc_dep = cpp.find_library('xerces-c', has_headers: 'xercesc/dom/DOM.hpp')
+endif
+
 xqilla_dep = cpp.find_library('xqilla',
   has_headers: 'xqilla/xqilla-simple.hpp')
 zlib_dep = dependency('zlib')
