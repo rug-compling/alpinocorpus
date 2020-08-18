@@ -5,13 +5,16 @@ util_common_sources = [
   'common/util.cpp'
 ]
 
+rpath = join_paths(get_option ('prefix'), get_option ('libdir'))
+
 executable('alpinocorpus-create',
   'create/main.cpp',
   util_common_sources,
   include_directories: [inc, util_inc],
   link_with: alpinocorpus,
   dependencies: boost_dep,
-  install: true)
+  install: true,
+  install_rpath: rpath)
 
 executable('alpinocorpus-extract',
   'extract/main.cpp',
@@ -19,7 +22,8 @@ executable('alpinocorpus-extract',
   include_directories: [inc, util_inc],
   link_with: alpinocorpus,
   dependencies: boost_dep,
-  install: true)
+  install: true,
+  install_rpath: rpath)
 
 executable('alpinocorpus-get',
   'get/main.cpp',
@@ -27,7 +31,8 @@ executable('alpinocorpus-get',
   include_directories: [inc, util_inc],
   link_with: alpinocorpus,
   dependencies: boost_dep,
-  install: true)
+  install: true,
+  install_rpath: rpath)
 
 executable('alpinocorpus-stats',
   'stats/main.cpp',
@@ -35,7 +40,8 @@ executable('alpinocorpus-stats',
   include_directories: [inc, util_inc],
   link_with: alpinocorpus,
   dependencies: boost_dep,
-  install: true)
+  install: true,
+  install_rpath: rpath)
 
 executable('alpinocorpus-xpath',
   'xpath/main.cpp',
@@ -43,7 +49,8 @@ executable('alpinocorpus-xpath',
   include_directories: [inc, util_inc],
   link_with: alpinocorpus,
   dependencies: boost_dep,
-  install: true)
+  install: true,
+  install_rpath: rpath)
 
 executable('alpinocorpus-xquery',
   'xquery/main.cpp',
@@ -51,7 +58,8 @@ executable('alpinocorpus-xquery',
   include_directories: [inc, util_inc],
   link_with: alpinocorpus,
   dependencies: boost_dep,
-  install: true)
+  install: true,
+  install_rpath: rpath)
 
 executable('alpinocorpus-xslt',
   'common/Stylesheet.cpp',
@@ -60,4 +68,5 @@ executable('alpinocorpus-xslt',
   include_directories: [inc, util_inc],
   link_with: alpinocorpus,
   dependencies: [boost_dep, libexslt_dep, libxml_dep],
-  install: true)
+  install: true,
+  install_rpath: rpath)
