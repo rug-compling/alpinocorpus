@@ -38,6 +38,7 @@ alpinocorpus = shared_library('alpinocorpus',
   include_directories: inc,
   dependencies: [boost_dep, dbxml_dep, libxml_dep, libexslt_dep, libxslt_dep, xercesc_dep, xqilla_dep, zlib_dep],
   install: true,
+  install_rpath: dbxml_rpath,
   version: meson.project_version())
 
 pkg = import('pkgconfig')
