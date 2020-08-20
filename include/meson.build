@@ -15,6 +15,7 @@ configure_file(
 )
 
 install_headers(
+  'AlpinoCorpus/capi.h',
   'AlpinoCorpus/CompactCorpusReader.hh',
   'AlpinoCorpus/CompactCorpusWriter.hh',
   'AlpinoCorpus/CorpusInfo.hh',
