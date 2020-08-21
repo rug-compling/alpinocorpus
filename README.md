@@ -48,7 +48,7 @@ $ brew tap rug-compling/homebrew
 $ brew install alpinocorpus
 ~~~
 
-## Compilation
+## Building
 
 Requirements
 
@@ -59,15 +59,55 @@ Requirements
 - libxml2
 - libxslt
 
-Compilation steps:
+### Build against system packages
+
+If Berkeley DB XML is installed as a system package, alpinocorpus can
+be built as follows:
 
 ```bash
 $ meson builddir
-$ cd builddir
-$ meson compile
+$ ninja -C builddir
 # If you want to install the library:
-$ meson install
+$ ninja -C builddir install
 ```
+
+### Build against DB XML bundle
+
+If Berkeley DB XML, XQilla, Xerces-C, and Berkeley DB are installed as
+a bundle using the upstream Berkeley DB XML distribution, there are
+two options for building alpinocorpus.
+
+Assuming that the DB XML bundle is installed in `/opt/dbxml`, the
+first option is to alpinocorpus as follows:
+
+```bash
+$ meson builddir -D dbxml_bundle=/opt/dbxml
+$ ninja -C builddir
+# If you want to install the library:
+$ ninja -C builddir install
+```
+
+This embeds the DB, Xerces-C, XQilla, and DB XML library paths in the
+alpinocorpus library. This will allow you to use the library and
+utilities without further ado.
+
+The second option is to instead define some variables before building
+to point Meson to the headers and libraries:
+
+```bash
+$ export LD_LIBRARY_PATH=/opt/dbxml/lib
+$ export LIBRARY_PATH=/opt/dbxml/lib
+$ export CPATH=/opt/dbxml/include
+$ meson builddir
+$ ninja -C builddir
+# If you want to install the library:
+$ ninja -C builddir install
+```
+
+This does not embed the DB XML library paths into the alpinocorpus
+shared library. Consequently, `LD_LIBRARY_PATH` should always be set
+when using alpinocorpus (`LIBRARY_PATH` and `CPATH` only have to be
+set at build time).
 
 ## Bindings
 
