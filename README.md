@@ -34,19 +34,37 @@ reporting method.
 Documentation for this library can be obtained by running 'doxygen' in
 the root of the source archive.
 
-## Downloading
+## Installing the utilities with Nix
 
-Pre-built binaries for Ubuntu are available from the Dact PPA:
+The alpinocorpus command-line tools can be easily installed with
+Nix. On systems without Nix, follow the build instructions below.
 
-https://launchpad.net/~danieldk/+archive/dact
+### Nix with flake support
 
-On Mac OS X, alpinocorpus (including dependencies) can be compiled easily
-using [Homebrew](http://mxcl.github.io/homebrew/):
+On recent versions of Nix that support flakes, you can spawn a
+shell with the alpinocorpus utilities:
 
-~~~
-$ brew tap rug-compling/homebrew
-$ brew install alpinocorpus
-~~~
+```shell
+$ nix shell github:rug-compling/alpinocorpus
+```
+
+If you want the utitlities to be permanently available, you can
+install them in your profile:
+
+```shell
+$ nix profile install github:rug-compling/alpinocorpus
+```
+
+### Nix without flake support
+
+On Nix versions that do not support flakes, you can use the following
+command to install alpinocorpus into your profile:
+
+```shell
+nix-env \
+  -f https://github.com/rug-compling/alpinocorpus/archive/master.tar.gz \
+  -i
+```
 
 ## Building
 
