@@ -7,7 +7,7 @@
   };
 
   outputs = { self, nixpkgs, utils }:
-  utils.lib.eachSystem  [ "x86_64-linux" ] (system: {
+  utils.lib.eachSystem  [ "aarch64-linux" "x86_64-linux" ] (system: {
     defaultPackage = self.packages.${system}.alpinocorpus;
 
     packages.alpinocorpus = with nixpkgs.legacyPackages.${system}; stdenv.mkDerivation {
