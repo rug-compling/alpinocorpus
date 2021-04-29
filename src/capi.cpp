@@ -4,12 +4,14 @@
 #include <exception>
 #include <iostream>
 #include <list>
+#include <memory>
 #include <string>
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/CorpusWriter.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/capi.h>
+#include <AlpinoCorpus/XSLTransformer.hh>
 
 alpinocorpus::SortOrder to_sort_order(sort_order_t sort_order) {
     switch (sort_order) {
@@ -141,10 +143,12 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
         markerQueries.push_back(query);
     }
 
+    auto transformer = std::make_shared<alpinocorpus::XSLTransformer>(stylesheet);
+
     alpinocorpus::CorpusReader::EntryIterator iter;
     try {
         iter = corpus->corpusReader->queryWithStylesheet(
-            alpinocorpus::CorpusReader::XPATH, query, stylesheet,
+            alpinocorpus::CorpusReader::XPATH, query, transformer,
             markerQueries, to_sort_order(sort_order));
     } catch (std::exception const &) {
         return NULL;

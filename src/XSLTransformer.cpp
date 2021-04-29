@@ -11,9 +11,8 @@ extern "C" {
 #include <libxslt/xsltutils.h>
 }
 
-#include "AlpinoCorpus/Error.hh"
-
-#include "XSLTransformer.hh"
+#include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/XSLTransformer.hh>
 
 namespace alpinocorpus {
 
