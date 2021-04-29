@@ -14,12 +14,12 @@ extern "C" {
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
+#include <AlpinoCorpus/XSLTransformer.hh>
 #include <AlpinoCorpus/macros.hh>
 
 #include "../src/util/textfile.hh" // XXX - hmpf
 
 #include <ProgramOptions.hh>
-#include <Stylesheet.hh>
 #include <util.hh>
 
 using alpinocorpus::CorpusReader;
@@ -36,12 +36,14 @@ void transformCorpus(std::shared_ptr<CorpusReader> reader,
     }
 
     CorpusReader::EntryIterator i;
-    
+
+    auto parsedStylesheet = std::make_shared<alpinocorpus::XSLTransformer>(stylesheet);
+
     if (!query.empty())
         i = reader->queryWithStylesheet(CorpusReader::XPATH, query,
-            stylesheet, markerQueries);
+            parsedStylesheet, markerQueries);
     else
-        i = reader->entriesWithStylesheet(stylesheet);
+        i = reader->entriesWithStylesheet(parsedStylesheet);
 
     std::unordered_set<std::string> seen;
 
@@ -61,7 +63,7 @@ void transformEntry(std::shared_ptr<CorpusReader> reader,
   std::string const &stylesheet,
   std::string const &entry)
 {
-  Stylesheet compiledStylesheet(stylesheet);
+  alpinocorpus::XSLTransformer parsedStylesheet(stylesheet);
 
   std::list<CorpusReader::MarkerQuery> markerQueries;
   if (!query.empty()) {
@@ -69,7 +71,7 @@ void transformEntry(std::shared_ptr<CorpusReader> reader,
     CorpusReader::MarkerQuery activeMarker(query, "active", "1");
     markerQueries.push_back(activeMarker);
   }
-  std::cout << compiledStylesheet.transform(reader->read(entry, markerQueries));
+  std::cout << parsedStylesheet.transform(reader->read(entry, markerQueries));
 }
 
 void usage(std::string const &programName)
