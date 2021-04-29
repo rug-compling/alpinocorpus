@@ -14,14 +14,28 @@ namespace alpinocorpus {
 class Stylesheet
 {
 public:
-    Stylesheet(std::string const &xslt);
-    ~Stylesheet();
+    Stylesheet(Stylesheet const &other) = delete;
+    Stylesheet &operator=(Stylesheet const &other) = delete;
+    virtual ~Stylesheet();
+
+    Stylesheet(std::shared_ptr<xsltStylesheet> xslPtr) : d_xslPtr(xslPtr) {}
+
+    /**
+     * Read a stylesheet from an in-memory buffer.
+     * @param data Buffer
+     * @return Stylesheet
+     */
+    static Stylesheet *readData(std::string const &data);
+
+    /**
+     * Read a stylesheet from a file.
+     * @param filename Name of the file containing the stylesheet
+     * @return Stylesheet
+     */
+    static Stylesheet *readFile(std::string const &filename);
+
     std::string transform(std::string const &xml) const;
 private:
-    Stylesheet(Stylesheet const &other);
-    Stylesheet &operator=(Stylesheet const &other);
-    void initWithStylesheet(std::string const &xslt);
-
     std::shared_ptr<xsltStylesheet> d_xslPtr;
 };
 

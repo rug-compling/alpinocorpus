@@ -26,7 +26,7 @@ using alpinocorpus::CorpusReader;
 using alpinocorpus::Either;
 
 void transformCorpus(std::shared_ptr<CorpusReader> reader,
-  std::string const &query, std::string const &stylesheet)
+  std::string const &query, std::string const &stylesheetFilename)
 {
     std::list<CorpusReader::MarkerQuery> markerQueries;
     if (!query.empty()) {
@@ -37,7 +37,7 @@ void transformCorpus(std::shared_ptr<CorpusReader> reader,
 
     CorpusReader::EntryIterator i;
 
-    auto parsedStylesheet = std::make_shared<alpinocorpus::Stylesheet>(stylesheet);
+    std::shared_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readFile(stylesheetFilename));
 
     if (!query.empty())
         i = reader->queryWithStylesheet(CorpusReader::XPATH, query,
@@ -60,10 +60,10 @@ void transformCorpus(std::shared_ptr<CorpusReader> reader,
 
 void transformEntry(std::shared_ptr<CorpusReader> reader,
   std::string const &query,
-  std::string const &stylesheet,
+  std::string const &stylesheetFilename,
   std::string const &entry)
 {
-  alpinocorpus::Stylesheet parsedStylesheet(stylesheet);
+  std::shared_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readFile(stylesheetFilename));
 
   std::list<CorpusReader::MarkerQuery> markerQueries;
   if (!query.empty()) {
@@ -71,7 +71,7 @@ void transformEntry(std::shared_ptr<CorpusReader> reader,
     CorpusReader::MarkerQuery activeMarker(query, "active", "1");
     markerQueries.push_back(activeMarker);
   }
-  std::cout << parsedStylesheet.transform(reader->read(entry, markerQueries));
+  std::cout << parsedStylesheet->transform(reader->read(entry, markerQueries));
 }
 
 void usage(std::string const &programName)
@@ -109,13 +109,7 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  std::string stylesheet;
-  try {
-    stylesheet = alpinocorpus::util::readFile(opts->arguments().at(0));
-  } catch (std::runtime_error &e) {
-    std::cerr << "Could not read stylesheet: " << e.what() << std::endl;
-    return 1;
-  }
+  std::string stylesheetFilename = opts->arguments().at(0);
 
   std::shared_ptr<CorpusReader> reader;
   try {
@@ -156,9 +150,9 @@ int main (int argc, char *argv[])
 
   try {
     if (opts->option('g'))
-      transformEntry(reader, query, stylesheet, opts->optionValue('g'));
+      transformEntry(reader, query, stylesheetFilename, opts->optionValue('g'));
     else
-      transformCorpus(reader, query, stylesheet);
+      transformCorpus(reader, query, stylesheetFilename);
   } catch (std::runtime_error &e) {
     std::cerr << "Error while transforming corpus: " << e.what() << std::endl;
     return 1;
