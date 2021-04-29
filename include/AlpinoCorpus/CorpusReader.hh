@@ -16,7 +16,7 @@
 
 namespace alpinocorpus {
 
-class XSLTransformer;
+class Stylesheet;
 
 /**
  * The sort order for iterators.
@@ -95,7 +95,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      * Iterator over entry names, contents are transformed with
      * the given stylesheet.
      */
-    EntryIterator entriesWithStylesheet(std::shared_ptr<XSLTransformer> const stylesheet,
+    EntryIterator entriesWithStylesheet(std::shared_ptr<Stylesheet> const stylesheet,
       std::list<MarkerQuery> const &markerQueries = std::list<MarkerQuery>(),
       SortOrder sortOrder = NaturalOrder) const;
 
@@ -113,7 +113,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
      * end of the range is given by end().
      */ 
     EntryIterator queryWithStylesheet(QueryDialect d, std::string const &q,
-        std::shared_ptr<XSLTransformer> const stylesheet,
+        std::shared_ptr<Stylesheet> const stylesheet,
         std::list<MarkerQuery> const &markerQueries,
         SortOrder sortOrder = NaturalOrder) const;
     
@@ -158,7 +158,7 @@ class ALPINO_CORPUS_EXPORT CorpusReader : private util::NonCopyable
     virtual EntryIterator runXPath(std::string const &, SortOrder sortOrder) const;
     virtual EntryIterator runXQuery(std::string const &, SortOrder sortOrder) const;
     virtual EntryIterator runQueryWithStylesheet(QueryDialect d,
-      std::string const &q, std::shared_ptr<XSLTransformer> const stylesheet,
+      std::string const &q, std::shared_ptr<Stylesheet> const stylesheet,
       std::list<MarkerQuery> const &markerQueries, SortOrder sortOrder) const;
     virtual Either<std::string, Empty> validQuery(QueryDialect d, bool variables, std::string const &q) const;
 

@@ -4,7 +4,7 @@
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/IterImpl.hh>
-#include <AlpinoCorpus/XSLTransformer.hh>
+#include <AlpinoCorpus/Stylesheet.hh>
 
 #include "StylesheetIter.hh"
 

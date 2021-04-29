@@ -30,7 +30,7 @@ alpinocorpus_sources = [
   'util/split.cpp',
   'util/textfile.cpp',
   'util/url.cpp',
-  'XSLTransformer.cpp'
+  'Stylesheet.cpp'
 ]
 
 alpinocorpus = shared_library('alpinocorpus',
