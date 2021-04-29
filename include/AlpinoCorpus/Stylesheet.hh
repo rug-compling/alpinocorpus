@@ -11,15 +11,15 @@ extern "C" {
 
 namespace alpinocorpus {
 
-class XSLTransformer
+class Stylesheet
 {
 public:
-    XSLTransformer(std::string const &xslt);
-    ~XSLTransformer();
+    Stylesheet(std::string const &xslt);
+    ~Stylesheet();
     std::string transform(std::string const &xml) const;
 private:
-    XSLTransformer(XSLTransformer const &other);
-    XSLTransformer &operator=(XSLTransformer const &other);
+    Stylesheet(Stylesheet const &other);
+    Stylesheet &operator=(Stylesheet const &other);
     void initWithStylesheet(std::string const &xslt);
 
     std::shared_ptr<xsltStylesheet> d_xslPtr;

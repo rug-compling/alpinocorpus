@@ -11,7 +11,7 @@
 #include <AlpinoCorpus/CorpusWriter.hh>
 #include <AlpinoCorpus/CorpusReaderFactory.hh>
 #include <AlpinoCorpus/capi.h>
-#include <AlpinoCorpus/XSLTransformer.hh>
+#include <AlpinoCorpus/Stylesheet.hh>
 
 alpinocorpus::SortOrder to_sort_order(sort_order_t sort_order) {
     switch (sort_order) {
@@ -143,7 +143,7 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
         markerQueries.push_back(query);
     }
 
-    auto transformer = std::make_shared<alpinocorpus::XSLTransformer>(stylesheet);
+    auto transformer = std::make_shared<alpinocorpus::Stylesheet>(stylesheet);
 
     alpinocorpus::CorpusReader::EntryIterator iter;
     try {

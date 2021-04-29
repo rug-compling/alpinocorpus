@@ -14,7 +14,7 @@ extern "C" {
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>
 #include <AlpinoCorpus/Error.hh>
-#include <AlpinoCorpus/XSLTransformer.hh>
+#include <AlpinoCorpus/Stylesheet.hh>
 #include <AlpinoCorpus/macros.hh>
 
 #include "../src/util/textfile.hh" // XXX - hmpf
@@ -37,7 +37,7 @@ void transformCorpus(std::shared_ptr<CorpusReader> reader,
 
     CorpusReader::EntryIterator i;
 
-    auto parsedStylesheet = std::make_shared<alpinocorpus::XSLTransformer>(stylesheet);
+    auto parsedStylesheet = std::make_shared<alpinocorpus::Stylesheet>(stylesheet);
 
     if (!query.empty())
         i = reader->queryWithStylesheet(CorpusReader::XPATH, query,
@@ -63,7 +63,7 @@ void transformEntry(std::shared_ptr<CorpusReader> reader,
   std::string const &stylesheet,
   std::string const &entry)
 {
-  alpinocorpus::XSLTransformer parsedStylesheet(stylesheet);
+  alpinocorpus::Stylesheet parsedStylesheet(stylesheet);
 
   std::list<CorpusReader::MarkerQuery> markerQueries;
   if (!query.empty()) {

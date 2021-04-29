@@ -12,38 +12,38 @@ extern "C" {
 }
 
 #include <AlpinoCorpus/Error.hh>
-#include <AlpinoCorpus/XSLTransformer.hh>
+#include <AlpinoCorpus/Stylesheet.hh>
 
 namespace alpinocorpus {
 
-XSLTransformer::XSLTransformer(std::string const &xsl)
+Stylesheet::Stylesheet(std::string const &xsl)
 {
     initWithStylesheet(xsl);
 }
 
-XSLTransformer::~XSLTransformer()
+Stylesheet::~Stylesheet()
 {
 }
 
-void XSLTransformer::initWithStylesheet(std::string const &xsl)
+void Stylesheet::initWithStylesheet(std::string const &xsl)
 {
     xmlDocPtr xslDoc = xmlReadMemory(xsl.c_str(), xsl.size(), 0, 0,
         XSLT_PARSE_OPTIONS);
 
     if (xslDoc == 0)
     {
-      throw Error("XSLTransformer::initWithStylesheet: Could not read stylesheet as XML data");
+      throw Error("Stylesheet::initWithStylesheet: Could not read stylesheet as XML data");
     }
 
     d_xslPtr.reset(xsltParseStylesheetDoc(xslDoc), xsltFreeStylesheet);
 
     if (!d_xslPtr)
     {
-      throw Error("XSLTransformer::initWithStylesheet: Could not read stylesheet as XML data");
+      throw Error("Stylesheet::initWithStylesheet: Could not read stylesheet as XML data");
     }
 }
 
-std::string XSLTransformer::transform(std::string const &xml) const
+std::string Stylesheet::transform(std::string const &xml) const
 {
     // Read XML data intro an xmlDoc.
     std::shared_ptr<xmlDoc> doc(
@@ -51,7 +51,7 @@ std::string XSLTransformer::transform(std::string const &xml) const
         xmlFreeDoc);
 
     if (!doc)
-        throw Error("XSLTransformer::transform: Could not open XML data");
+        throw Error("Stylesheet::transform: Could not open XML data");
 
     std::shared_ptr<xsltTransformContext> ctx(
         xsltNewTransformContext(d_xslPtr.get(), doc.get()),
@@ -64,9 +64,9 @@ std::string XSLTransformer::transform(std::string const &xml) const
         xmlFreeDoc);
 
     if (!res)
-        throw Error("XSLTransformer::transform: Could not apply transformation!");
+        throw Error("Stylesheet::transform: Could not apply transformation!");
     else if (ctx->state != XSLT_STATE_OK)
-        throw Error("XSLTransformer::transform: Transformation error, check your query!");
+        throw Error("Stylesheet::transform: Transformation error, check your query!");
 
     xmlChar *bareOutput = 0;
     int outputLen = -1;

@@ -62,7 +62,6 @@ executable('alpinocorpus-xquery',
   install_rpath: rpath)
 
 executable('alpinocorpus-xslt',
-  'common/Stylesheet.cpp',
   'xslt/main.cpp',
   util_common_sources,
   include_directories: [inc, util_inc],
