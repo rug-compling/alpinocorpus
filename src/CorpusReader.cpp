@@ -193,7 +193,7 @@ namespace alpinocorpus {
     }
 
     CorpusReader::EntryIterator CorpusReader::entriesWithStylesheet(
-        std::shared_ptr<Stylesheet> const stylesheet,
+        Stylesheet const &stylesheet,
         std::list<MarkerQuery> const &markerQueries,
         SortOrder sortOrder) const
     {
@@ -560,7 +560,7 @@ namespace alpinocorpus {
 
     CorpusReader::EntryIterator CorpusReader::queryWithStylesheet(
         QueryDialect d, std::string const &query,
-      std::shared_ptr<Stylesheet> const stylesheet,
+      Stylesheet const &stylesheet,
       std::list<MarkerQuery> const &markerQueries,
       SortOrder sortOrder) const
     {
@@ -570,7 +570,7 @@ namespace alpinocorpus {
 
     CorpusReader::EntryIterator CorpusReader::runQueryWithStylesheet(
         QueryDialect d, std::string const &q,
-      std::shared_ptr<Stylesheet> const stylesheet,
+      Stylesheet const &stylesheet,
       std::list<MarkerQuery> const &markerQueries,
       SortOrder sortOrder) const
     {

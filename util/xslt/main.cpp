@@ -37,13 +37,13 @@ void transformCorpus(std::shared_ptr<CorpusReader> reader,
 
     CorpusReader::EntryIterator i;
 
-    std::shared_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readFile(stylesheetFilename));
+    std::unique_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readFile(stylesheetFilename));
 
     if (!query.empty())
         i = reader->queryWithStylesheet(CorpusReader::XPATH, query,
-            parsedStylesheet, markerQueries);
+            *parsedStylesheet, markerQueries);
     else
-        i = reader->entriesWithStylesheet(parsedStylesheet);
+        i = reader->entriesWithStylesheet(*parsedStylesheet);
 
     std::unordered_set<std::string> seen;
 
@@ -63,7 +63,7 @@ void transformEntry(std::shared_ptr<CorpusReader> reader,
   std::string const &stylesheetFilename,
   std::string const &entry)
 {
-  std::shared_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readFile(stylesheetFilename));
+  std::unique_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readFile(stylesheetFilename));
 
   std::list<CorpusReader::MarkerQuery> markerQueries;
   if (!query.empty()) {
