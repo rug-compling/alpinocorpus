@@ -88,8 +88,6 @@ void listCorpus(std::shared_ptr<CorpusReader> reader,
         for (std::vector<LexItem>::const_iterator itemIter = items.begin();
           itemIter != items.end(); ++itemIter)
         {
-          size_t depth = itemIter->matches.size();
-
           // Find the set of matches starting before the current word.
           std::set<size_t> startAtCurrent = unique_to_first(itemIter->matches,
               prevMatches);

@@ -35,7 +35,6 @@ namespace alpinocorpus {
         std::string d_file;
         std::shared_ptr<XQQuery> d_query;
         std::queue<std::string> d_buffer;
-        mutable bool d_initialState;
         bool d_interrupted;
     };
 }

@@ -62,9 +62,9 @@ namespace alpinocorpus {
          */
          static std::list<ReaderInfo> readersAvailable();
     private:
-        CorpusReaderFactory();
-        CorpusReaderFactory(CorpusReaderFactory const &);
-        CorpusReaderFactory &operator=(CorpusReaderFactory const &);
+        CorpusReaderFactory() = delete;
+        CorpusReaderFactory(CorpusReaderFactory const &) = delete;
+        CorpusReaderFactory &operator=(CorpusReaderFactory const &) = delete;
     };
 
 }
