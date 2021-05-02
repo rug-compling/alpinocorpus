@@ -133,13 +133,13 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
     std::list<alpinocorpus::CorpusReader::MarkerQuery> markerQueries;
 
     for (size_t i = 0; i < n_queries; ++i) {
-        alpinocorpus::CorpusReader::MarkerQuery query(
+        alpinocorpus::CorpusReader::MarkerQuery markerQuery(
           queries[i].query,
           queries[i].attr,
           queries[i].value
         );
 
-        markerQueries.push_back(query);
+        markerQueries.push_back(markerQuery);
     }
 
     std::unique_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readData(stylesheet));
@@ -320,7 +320,7 @@ alpinocorpus_writer alpinocorpus_writer_open(char const *path, int overwrite, ch
     }
 
     try {
-        writer = alpinocorpus::CorpusWriter::open(path, overwrite ? true : false,  wt);
+        writer = alpinocorpus::CorpusWriter::open(path, overwrite != 0, wt);
     } catch (std::exception const &e) {
 #ifdef CAPI_DEBUG
         std::cerr << e.what() << std::endl;
@@ -365,7 +365,7 @@ char *alpinocorpus_write(alpinocorpus_writer writer, char const *name, char cons
 char *alpinocorpus_write_corpus(alpinocorpus_writer writer, alpinocorpus_reader reader, int failsafe)
 {
     try {
-        writer->corpusWriter->write(*(reader->corpusReader), failsafe ? true : false);
+        writer->corpusWriter->write(*(reader->corpusReader), failsafe != 0);
     } catch (std::exception const &e) {
         return strdup(e.what());
     }

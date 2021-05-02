@@ -33,4 +33,4 @@ private:
 
 }
 
-#endif  // ALPINO_COMPACT_CORPUSWRITER_HH
+#endif  // ALPINO_COMPACT_CORPUSREADER_HH

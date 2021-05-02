@@ -37,4 +37,4 @@ public:
   EqualsPrevious<T> d_equalsPrevious;
 };
 
-#endif // ALPINOCORPUS_EQUALSPREVIOUS
+#endif // ALPINOCORPUS_EQUALSPREVIOUS_HH

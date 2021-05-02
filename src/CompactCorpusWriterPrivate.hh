@@ -59,4 +59,4 @@ inline CompactCorpusWriterPrivate &CompactCorpusWriterPrivate::operator=(Compact
 
 }
 
-#endif  // ALPINO_INDEXED_CORPUSWRITER_PRIVATE_HH
+#endif  // ALPINO_COMPACT_CORPUSWRITER_PRIVATE_HH

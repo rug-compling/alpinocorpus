@@ -28,8 +28,7 @@ namespace alpinocorpus {
     :
         d_corpus(corpus),
         d_itr(itr),
-        d_initialState(true),
-	d_interrupted(false)
+  	    d_interrupted(false)
     {
         // Create an emptry document and associate namespace resolvers with it.
         AutoDelete<xercesc::DOMDocument> document(

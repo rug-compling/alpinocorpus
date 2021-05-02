@@ -100,7 +100,7 @@ namespace {
         alpinocorpus::Entry next(alpinocorpus::CorpusReader const &rdr);
       private:
         SortedDirIter();
-        SortedDirIter &operator=(SortedDirIter &other);
+        SortedDirIter &operator=(SortedDirIter &other) = delete;
         bool isValid();
     };
 

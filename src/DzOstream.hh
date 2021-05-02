@@ -20,4 +20,4 @@ private:
 
 }
 
-#endif // DZ_ISTREAM_HH
+#endif // DZ_OSTREAM_HH

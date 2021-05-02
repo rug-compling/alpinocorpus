@@ -13,10 +13,8 @@ namespace alpinocorpus {
       switch (writerType) {
         case DBXML_CORPUS_WRITER:
           return new DbCorpusWriter(filename, overwrite);
-          break;
         case COMPACT_CORPUS_WRITER:
           return new CompactCorpusWriter(filename);
-          break;
         default:
           throw Error("Trying to write to a corpus of an unknown type type");
       }

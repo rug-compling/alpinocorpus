@@ -31,8 +31,7 @@ ValueCounts countQuery(std::shared_ptr<CorpusReader> reader,
   return counts;
 }
 
-void printFrequencies(std::shared_ptr<CorpusReader> reader,
-    ValueCounts const &counts, bool relative)
+void printFrequencies(ValueCounts const &counts, bool relative)
 {
     if (relative)
     {
@@ -111,5 +110,5 @@ int main(int argc, char *argv[])
     }
     
     ValueCounts counts(countQuery(reader, query));
-    printFrequencies(reader, counts, opts->option('p'));
+    printFrequencies(counts, opts->option('p'));
 }

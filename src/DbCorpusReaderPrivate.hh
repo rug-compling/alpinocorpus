@@ -25,7 +25,6 @@ class DbCorpusReaderPrivate : public CorpusReader
         DbIter(DbXml::XmlManager &);
 
         virtual IterImpl *copy() const;
-        bool equals(IterImpl const &) const;
         bool hasNext();
         Entry next(CorpusReader const &);
 
