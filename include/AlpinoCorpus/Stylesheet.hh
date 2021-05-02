@@ -14,8 +14,6 @@ namespace alpinocorpus {
 class Stylesheet
 {
 public:
-    Stylesheet(Stylesheet const &other) = delete;
-    Stylesheet &operator=(Stylesheet const &other) = delete;
     virtual ~Stylesheet();
 
     Stylesheet(std::shared_ptr<xsltStylesheet> xslPtr) : d_xslPtr(xslPtr) {}

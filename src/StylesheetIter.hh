@@ -15,7 +15,7 @@ namespace alpinocorpus {
     class StylesheetIter : public IterImpl {
     public:
         StylesheetIter(CorpusReader::EntryIterator iter,
-                       std::shared_ptr<Stylesheet> const stylesheet,
+                       Stylesheet const &stylesheet,
                        std::list<CorpusReader::MarkerQuery> const &markerQueries) :
                 d_iter(iter),
                 d_markerQueries(markerQueries),
@@ -43,7 +43,7 @@ namespace alpinocorpus {
 
         CorpusReader::EntryIterator d_iter;
         std::list<CorpusReader::MarkerQuery> d_markerQueries;
-        std::shared_ptr<Stylesheet> const d_stylesheet;
+        Stylesheet const d_stylesheet;
     };
 }
 

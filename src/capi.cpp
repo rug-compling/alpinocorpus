@@ -142,12 +142,12 @@ alpinocorpus_iter alpinocorpus_query_stylesheet_iter(alpinocorpus_reader corpus,
         markerQueries.push_back(query);
     }
 
-    std::shared_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readData(stylesheet));
+    std::unique_ptr<alpinocorpus::Stylesheet> parsedStylesheet(alpinocorpus::Stylesheet::readData(stylesheet));
 
     alpinocorpus::CorpusReader::EntryIterator iter;
     try {
         iter = corpus->corpusReader->queryWithStylesheet(
-            alpinocorpus::CorpusReader::XPATH, query, parsedStylesheet,
+            alpinocorpus::CorpusReader::XPATH, query, *parsedStylesheet,
             markerQueries, to_sort_order(sort_order));
     } catch (std::exception const &) {
         return NULL;
