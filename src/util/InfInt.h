@@ -49,7 +49,7 @@
 #define PROFINY_SCOPE
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 #define LONG_LONG_MIN LLONG_MIN
 #define LONG_LONG_MAX LLONG_MAX
 #define ULONG_LONG_MIN ULLONG_MIN
