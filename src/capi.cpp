@@ -24,12 +24,12 @@ alpinocorpus::SortOrder to_sort_order(sort_order_t sort_order) {
     }
 }
 
-extern "C" {
-
 #include <libxslt/xslt.h>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libexslt/exslt.h>
+
+extern "C" {
 
 void alpinocorpus_initialize()
 {
