@@ -4,12 +4,10 @@
 #include <string>
 #include <unordered_set>
 
-extern "C" {
 #include <libxslt/xslt.h>
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libexslt/exslt.h>
-}
 
 #include <AlpinoCorpus/CorpusReader.hh>
 #include <AlpinoCorpus/Entry.hh>

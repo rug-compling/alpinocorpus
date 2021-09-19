@@ -5,9 +5,7 @@
 
 #include <memory>
 
-extern "C" {
 #include <libxslt/xsltInternals.h>
-}
 
 namespace alpinocorpus {
 

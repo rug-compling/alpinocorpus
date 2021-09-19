@@ -2,14 +2,12 @@
 
 #include <memory>
 
-extern "C" {
 #include <libxml/globals.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxslt/xslt.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
-}
 
 #include <AlpinoCorpus/Error.hh>
 #include <AlpinoCorpus/Stylesheet.hh>
