@@ -22,8 +22,8 @@ namespace bf = boost::filesystem;
 namespace {
     class DirIter : public alpinocorpus::IterImpl
     {
-        boost::filesystem::recursive_directory_iterator iter;
         boost::filesystem::path d_directory;
+        boost::filesystem::recursive_directory_iterator iter;
 
       public:
         DirIter(boost::filesystem::path const &path,

@@ -187,8 +187,8 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
     d_iters.push_back(ReaderIter(iter->first, iter->second.first,
           iter->second.second));
 
-    // Initial number of 'iterators'.
-    d_totalIters = d_iters.size();
+  // Initial number of 'iterators'.
+  d_totalIters = d_iters.size();
 }
 
 MultiCorpusReaderPrivate::MultiIter::MultiIter(
@@ -206,8 +206,8 @@ MultiCorpusReaderPrivate::MultiIter::MultiIter(
     d_iters.push_back(ReaderIter(iter->first, iter->second.first,
           iter->second.second));
 
-    // Initial number of 'iterators'.
-    d_totalIters = d_iters.size();
+  // Initial number of 'iterators'.
+  d_totalIters = d_iters.size();
 }
 
 MultiCorpusReaderPrivate::MultiIter::~MultiIter() {}
